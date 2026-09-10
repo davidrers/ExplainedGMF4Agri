@@ -1,0 +1,39 @@
+# Data (root-anchored, so src/gfm4agri/data/ is unaffected)
+/data/*
+!/data/README.md
+
+# Results, except the proposal-phase EDA which is kept as a record
+/results/*
+!/results/eda/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Large / binary artefacts
+*.npz
+*.tif
+*.tiff
+*.zip
+*.pth
+*.ckpt
+*.safetensors
+
+# Credentials
+.env
+*.json.key
+service_account*.json
+
+# OS / Office
+Thumbs.db
+desktop.ini
+~$*
+.DS_Store
