@@ -37,3 +37,18 @@ Thumbs.db
 desktop.ini
 ~$*
 .DS_Store
+
+# Claude Code / AI tooling (CLAUDE.md itself is kept, it documents the project)
+.claude/
+.claude.json
+.claude.json.backup
+**/.claude/settings.local.json
+.anthropic/
+.mcp.json
+.aider*
+.cursor/
+.windsurf/
+.github/copilot-instructions.md
+
+# Experiments scratch space (runs, checkpoints, logs, ad-hoc outputs)
+/experiments/
