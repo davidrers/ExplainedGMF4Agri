@@ -38,8 +38,10 @@ desktop.ini
 ~$*
 .DS_Store
 
-# Claude Code / AI tooling (CLAUDE.md itself is kept, it documents the project)
-.claude/
+# Claude Code / AI tooling (CLAUDE.md itself is kept, it documents the project).
+# .claude/settings.json IS tracked: it holds the shared, project-level tool
+# permissions and should travel with the repository. Only the per-machine
+# override file stays local.
 .claude.json
 .claude.json.backup
 **/.claude/settings.local.json

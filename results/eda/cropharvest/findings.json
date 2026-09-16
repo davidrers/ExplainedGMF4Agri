@@ -1,0 +1,2654 @@
+{
+  "_basis": "all counts are from the full labels.geojson unless stated otherwise",
+  "zenodo_record": 10251170,
+  "zenodo_doi": "10.5281/zenodo.10251170",
+  "licence": "CC-BY-SA-4.0",
+  "n_labels_total": 113893,
+  "crs": "EPSG:4326",
+  "columns": [
+    "harvest_date",
+    "planting_date",
+    "label",
+    "classification_label",
+    "index",
+    "is_crop",
+    "lat",
+    "lon",
+    "dataset",
+    "collection_date",
+    "export_end_date",
+    "externally_contributed_dataset",
+    "is_test",
+    "gtype",
+    "is_polygon",
+    "area_ha",
+    "country",
+    "iso_a3",
+    "subregion",
+    "region",
+    "has_array",
+    "array_path",
+    "pixel_offset_m",
+    "offset_ok",
+    "array_usable",
+    "fao_group_raw",
+    "crop",
+    "is_crop_type",
+    "fao_group",
+    "agg_group",
+    "window_end",
+    "window_start",
+    "window_end_year",
+    "dominant_year",
+    "alphaearth_ok",
+    "tessera_ok"
+  ],
+  "n_with_array": 87464,
+  "n_offset_ok": 83402,
+  "n_array_usable": 83402,
+  "n_lost_to_offset": 4062,
+  "offset_scan": {
+    "generated_at": "2026-09-11T09:30:03Z",
+    "arrays_scanned": 87464,
+    "tolerance_m": 14.14,
+    "n_ok": 83402,
+    "n_bad": 4062,
+    "pct_bad": 4.64,
+    "n_over_1km": 2910,
+    "pct_over_1km": 3.33,
+    "median_m": 3.72,
+    "p95_m": 6.59,
+    "p99_m": 18412.29,
+    "max_km": 1456.8,
+    "per_dataset": [
+      {
+        "dataset": "uganda",
+        "n": 225,
+        "n_bad": 225,
+        "median_m": 82399.28,
+        "max_km": 266.51,
+        "pct_bad": 100.0
+      },
+      {
+        "dataset": "tanzania",
+        "n": 379,
+        "n_bad": 379,
+        "median_m": 129289.06,
+        "max_km": 290.24,
+        "pct_bad": 100.0
+      },
+      {
+        "dataset": "jecam",
+        "n": 12856,
+        "n_bad": 3458,
+        "median_m": 4.56,
+        "max_km": 1456.75,
+        "pct_bad": 26.9
+      },
+      {
+        "dataset": "central-asia",
+        "n": 4894,
+        "n_bad": 0,
+        "median_m": 3.53,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "china-crop",
+        "n": 4397,
+        "n_bad": 0,
+        "median_m": 3.38,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "ethiopia",
+        "n": 830,
+        "n_bad": 0,
+        "median_m": 3.98,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "croplands",
+        "n": 4519,
+        "n_bad": 0,
+        "median_m": 3.83,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "geowiki-landcover-2017",
+        "n": 24761,
+        "n_bad": 0,
+        "median_m": 3.6,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "germany",
+        "n": 2550,
+        "n_bad": 0,
+        "median_m": 3.1,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "canada",
+        "n": 7160,
+        "n_bad": 0,
+        "median_m": 3.33,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "brazil-non-crop",
+        "n": 36,
+        "n_bad": 0,
+        "median_m": 4.08,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "kenya",
+        "n": 319,
+        "n_bad": 0,
+        "median_m": 4.12,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "ile-de-france",
+        "n": 6184,
+        "n_bad": 0,
+        "median_m": 3.23,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "kenya-non-crop",
+        "n": 2686,
+        "n_bad": 0,
+        "median_m": 3.97,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "lem-brazil",
+        "n": 860,
+        "n_bad": 0,
+        "median_m": 3.92,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "mali-non-crop",
+        "n": 142,
+        "n_bad": 0,
+        "median_m": 3.8,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "martinique-france",
+        "n": 2129,
+        "n_bad": 0,
+        "median_m": 3.88,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "mali",
+        "n": 148,
+        "n_bad": 0,
+        "median_m": 3.76,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "mali-helmets-labelling-crops",
+        "n": 1506,
+        "n_bad": 0,
+        "median_m": 3.91,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "rwanda-ceo",
+        "n": 3591,
+        "n_bad": 0,
+        "median_m": 4.21,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "reunion-france",
+        "n": 2238,
+        "n_bad": 0,
+        "median_m": 3.83,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "tanzania-ceo",
+        "n": 2209,
+        "n_bad": 0,
+        "median_m": 3.99,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "sudan",
+        "n": 418,
+        "n_bad": 0,
+        "median_m": 3.74,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "tanzania-rice-ecaas",
+        "n": 800,
+        "n_bad": 0,
+        "median_m": 3.96,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "togo",
+        "n": 1272,
+        "n_bad": 0,
+        "median_m": 3.96,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "togo-eval",
+        "n": 306,
+        "n_bad": 0,
+        "median_m": 3.97,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      },
+      {
+        "dataset": "zimbabwe",
+        "n": 49,
+        "n_bad": 0,
+        "median_m": 3.97,
+        "max_km": 0.01,
+        "pct_bad": 0.0
+      }
+    ],
+    "fully_affected_datasets": [
+      "tanzania",
+      "uganda"
+    ]
+  },
+  "n_without_array": 26429,
+  "n_is_test": 6049,
+  "is_crop_counts": {
+    "1": 80895,
+    "0": 32998
+  },
+  "excluded_label_counts": {
+    "non_crop_fao_group": 5902,
+    "french_autre_catchall": 1671,
+    "curated_non_crop_type_list": 6979
+  },
+  "labels_per_region": {
+    "Sub-Saharan Africa": 35942,
+    "South America": 20887,
+    "Europe": 14375,
+    "North America": 13593,
+    "East & Southeast Asia": 12835,
+    "Central Asia": 6501,
+    "Central America & Caribbean": 3517,
+    "South Asia": 2708,
+    "MENA": 2365,
+    "Oceania": 1169,
+    "Other": 1
+  },
+  "labels_per_country_top20": {
+    "Brazil": 18742,
+    "Canada": 9884,
+    "People's Republic of China": 9575,
+    "France": 6518,
+    "Madagascar": 5373,
+    "Uzbekistan": 5314,
+    "United States of America": 3683,
+    "Tanzania": 3446,
+    "Burkina Faso": 3184,
+    "Kenya": 2945,
+    "Reunion (FR)": 2776,
+    "Senegal": 2769,
+    "Germany": 2767,
+    "Russia": 2635,
+    "Martinique (FR)": 2421,
+    "Mali": 2088,
+    "Democratic Republic of the Congo": 1993,
+    "India": 1681,
+    "South Africa": 1464,
+    "Togo": 1431
+  },
+  "n_countries": 182,
+  "source_datasets": [
+    {
+      "dataset": "geowiki-landcover-2017",
+      "n": 35866,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 24761,
+      "pct_croptype": 0.0,
+      "pct_array": 69.0
+    },
+    {
+      "dataset": "croplands",
+      "n": 14976,
+      "polygons": 0,
+      "with_croptype": 577,
+      "with_array": 4519,
+      "pct_croptype": 3.9,
+      "pct_array": 30.2
+    },
+    {
+      "dataset": "jecam",
+      "n": 13083,
+      "polygons": 13083,
+      "with_croptype": 10909,
+      "with_array": 12856,
+      "pct_croptype": 83.4,
+      "pct_array": 98.3
+    },
+    {
+      "dataset": "canada",
+      "n": 9088,
+      "polygons": 0,
+      "with_croptype": 6976,
+      "with_array": 7160,
+      "pct_croptype": 76.8,
+      "pct_array": 78.8
+    },
+    {
+      "dataset": "ile-de-france",
+      "n": 6184,
+      "polygons": 6184,
+      "with_croptype": 4492,
+      "with_array": 6184,
+      "pct_croptype": 72.6,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "china-crop",
+      "n": 5624,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 4397,
+      "pct_croptype": 0.0,
+      "pct_array": 78.2
+    },
+    {
+      "dataset": "central-asia",
+      "n": 5302,
+      "polygons": 5302,
+      "with_croptype": 5074,
+      "with_array": 4894,
+      "pct_croptype": 95.7,
+      "pct_array": 92.3
+    },
+    {
+      "dataset": "rwanda-ceo",
+      "n": 3600,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 3591,
+      "pct_croptype": 0.0,
+      "pct_array": 99.8
+    },
+    {
+      "dataset": "reunion-france",
+      "n": 2776,
+      "polygons": 2776,
+      "with_croptype": 1445,
+      "with_array": 2238,
+      "pct_croptype": 52.1,
+      "pct_array": 80.6
+    },
+    {
+      "dataset": "kenya-non-crop",
+      "n": 2704,
+      "polygons": 506,
+      "with_croptype": 0,
+      "with_array": 2686,
+      "pct_croptype": 0.0,
+      "pct_array": 99.3
+    },
+    {
+      "dataset": "germany",
+      "n": 2550,
+      "polygons": 2550,
+      "with_croptype": 1045,
+      "with_array": 2550,
+      "pct_croptype": 41.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "martinique-france",
+      "n": 2421,
+      "polygons": 2421,
+      "with_croptype": 1295,
+      "with_array": 2129,
+      "pct_croptype": 53.5,
+      "pct_array": 87.9
+    },
+    {
+      "dataset": "tanzania-ceo",
+      "n": 2400,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 2209,
+      "pct_croptype": 0.0,
+      "pct_array": 92.0
+    },
+    {
+      "dataset": "mali-helmets-labelling-crops",
+      "n": 1506,
+      "polygons": 0,
+      "with_croptype": 1506,
+      "with_array": 1506,
+      "pct_croptype": 100.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "togo",
+      "n": 1276,
+      "polygons": 1276,
+      "with_croptype": 0,
+      "with_array": 1272,
+      "pct_croptype": 0.0,
+      "pct_array": 99.7
+    },
+    {
+      "dataset": "lem-brazil",
+      "n": 860,
+      "polygons": 860,
+      "with_croptype": 112,
+      "with_array": 860,
+      "pct_croptype": 13.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "ethiopia",
+      "n": 830,
+      "polygons": 474,
+      "with_croptype": 0,
+      "with_array": 830,
+      "pct_croptype": 0.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "tanzania-rice-ecaas",
+      "n": 800,
+      "polygons": 0,
+      "with_croptype": 800,
+      "with_array": 800,
+      "pct_croptype": 100.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "sudan",
+      "n": 422,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 418,
+      "pct_croptype": 0.0,
+      "pct_array": 99.1
+    },
+    {
+      "dataset": "tanzania",
+      "n": 392,
+      "polygons": 392,
+      "with_croptype": 392,
+      "with_array": 379,
+      "pct_croptype": 100.0,
+      "pct_array": 96.7
+    },
+    {
+      "dataset": "kenya",
+      "n": 319,
+      "polygons": 319,
+      "with_croptype": 296,
+      "with_array": 319,
+      "pct_croptype": 92.8,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "togo-eval",
+      "n": 306,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 306,
+      "pct_croptype": 0.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "uganda",
+      "n": 233,
+      "polygons": 233,
+      "with_croptype": 233,
+      "with_array": 225,
+      "pct_croptype": 100.0,
+      "pct_array": 96.6
+    },
+    {
+      "dataset": "mali",
+      "n": 148,
+      "polygons": 148,
+      "with_croptype": 148,
+      "with_array": 148,
+      "pct_croptype": 100.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "mali-non-crop",
+      "n": 142,
+      "polygons": 142,
+      "with_croptype": 0,
+      "with_array": 142,
+      "pct_croptype": 0.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "zimbabwe",
+      "n": 49,
+      "polygons": 0,
+      "with_croptype": 49,
+      "with_array": 49,
+      "pct_croptype": 100.0,
+      "pct_array": 100.0
+    },
+    {
+      "dataset": "brazil-non-crop",
+      "n": 36,
+      "polygons": 0,
+      "with_croptype": 0,
+      "with_array": 36,
+      "pct_croptype": 0.0,
+      "pct_array": 100.0
+    }
+  ],
+  "n_source_datasets": 27,
+  "binary_only_datasets": [
+    "geowiki-landcover-2017",
+    "china-crop",
+    "rwanda-ceo",
+    "kenya-non-crop",
+    "tanzania-ceo",
+    "togo",
+    "ethiopia",
+    "sudan",
+    "togo-eval",
+    "mali-non-crop",
+    "brazil-non-crop"
+  ],
+  "n_labels_binary_only": 53206,
+  "n_points": 77226,
+  "n_polygons": 36666,
+  "n_missing_geom": 1,
+  "polygon_share_pct": 32.2,
+  "polygons_with_array": 35169,
+  "polygons_with_croptype": 25441,
+  "polygons_with_array_and_croptype": 24363,
+  "polygons_usable": 20471,
+  "polygons_lost_to_offset": 3892,
+  "polygon_datasets": {
+    "jecam": 13083,
+    "ile-de-france": 6184,
+    "central-asia": 5302,
+    "reunion-france": 2776,
+    "germany": 2550,
+    "martinique-france": 2421,
+    "togo": 1276,
+    "lem-brazil": 860,
+    "kenya-non-crop": 506,
+    "ethiopia": 474,
+    "tanzania": 392,
+    "kenya": 319,
+    "uganda": 233,
+    "mali": 148,
+    "mali-non-crop": 142
+  },
+  "polygons_per_region": {
+    "Sub-Saharan Africa": 18025,
+    "Europe": 8734,
+    "Central Asia": 5302,
+    "Central America & Caribbean": 2421,
+    "South America": 2139,
+    "MENA": 45
+  },
+  "polygons_per_country_top15": {
+    "France": 6184,
+    "Uzbekistan": 5207,
+    "Madagascar": 5144,
+    "Burkina Faso": 3010,
+    "Reunion (FR)": 2776,
+    "Senegal": 2651,
+    "Germany": 2550,
+    "Martinique (FR)": 2421,
+    "Brazil": 2139,
+    "Togo": 1102,
+    "South Africa": 1019,
+    "Kenya": 811,
+    "Ethiopia": 429,
+    "Tanzania": 385,
+    "Mali": 290
+  },
+  "polygon_area_ha": {
+    "count": 36666.0,
+    "mean": 6.0788,
+    "std": 30.7177,
+    "min": 0.0,
+    "1%": 0.0142,
+    "5%": 0.0342,
+    "25%": 0.1706,
+    "50%": 0.7207,
+    "75%": 4.4646,
+    "95%": 21.2795,
+    "99%": 83.5929,
+    "max": 2622.2814
+  },
+  "polygon_area_by_dataset": [
+    {
+      "dataset": "central-asia",
+      "count": 5302,
+      "median": 6.407,
+      "mean": 7.688,
+      "max": 48.451
+    },
+    {
+      "dataset": "ethiopia",
+      "count": 474,
+      "median": 2.507,
+      "mean": 6.367,
+      "max": 71.802
+    },
+    {
+      "dataset": "germany",
+      "count": 2550,
+      "median": 3.599,
+      "mean": 11.038,
+      "max": 187.881
+    },
+    {
+      "dataset": "ile-de-france",
+      "count": 6184,
+      "median": 1.898,
+      "mean": 4.053,
+      "max": 50.371
+    },
+    {
+      "dataset": "jecam",
+      "count": 13083,
+      "median": 0.242,
+      "mean": 2.598,
+      "max": 121.668
+    },
+    {
+      "dataset": "kenya",
+      "count": 319,
+      "median": 0.133,
+      "mean": 0.194,
+      "max": 2.018
+    },
+    {
+      "dataset": "kenya-non-crop",
+      "count": 506,
+      "median": 0.055,
+      "mean": 1.777,
+      "max": 81.899
+    },
+    {
+      "dataset": "lem-brazil",
+      "count": 860,
+      "median": 54.02,
+      "mean": 96.446,
+      "max": 2622.281
+    },
+    {
+      "dataset": "mali",
+      "count": 148,
+      "median": 0.524,
+      "mean": 0.589,
+      "max": 3.243
+    },
+    {
+      "dataset": "mali-non-crop",
+      "count": 142,
+      "median": 0.045,
+      "mean": 0.083,
+      "max": 0.767
+    },
+    {
+      "dataset": "martinique-france",
+      "count": 2421,
+      "median": 0.579,
+      "mean": 1.464,
+      "max": 161.736
+    },
+    {
+      "dataset": "reunion-france",
+      "count": 2776,
+      "median": 0.377,
+      "mean": 1.187,
+      "max": 116.109
+    },
+    {
+      "dataset": "tanzania",
+      "count": 392,
+      "median": 0.227,
+      "mean": 0.729,
+      "max": 11.844
+    },
+    {
+      "dataset": "togo",
+      "count": 1276,
+      "median": 0.126,
+      "mean": 0.562,
+      "max": 43.749
+    },
+    {
+      "dataset": "uganda",
+      "count": 233,
+      "median": 0.163,
+      "mean": 0.248,
+      "max": 1.51
+    }
+  ],
+  "polygons_below_0p1ha": 6094,
+  "polygons_below_1_s2_pixel": 220,
+  "polygons_below_10_s2_pixels": 6094,
+  "polygon_median_area_ha": 0.721,
+  "polygons_smallholder_under_2ha_pct": 64.5,
+  "n_with_croptype": 35349,
+  "n_distinct_crops": 272,
+  "n_raw_labels": 391,
+  "n_binary_only_labels": 78544,
+  "crop_inventory_top30": [
+    {
+      "crop": "cotton",
+      "n": 3871,
+      "n_datasets": 5,
+      "n_countries": 7,
+      "n_regions": 4,
+      "n_polygons": 3860,
+      "share_pct": 10.95
+    },
+    {
+      "crop": "maize",
+      "n": 3788,
+      "n_datasets": 13,
+      "n_countries": 19,
+      "n_regions": 7,
+      "n_polygons": 2984,
+      "share_pct": 10.72
+    },
+    {
+      "crop": "rice",
+      "n": 2917,
+      "n_datasets": 6,
+      "n_countries": 11,
+      "n_regions": 5,
+      "n_polygons": 1432,
+      "share_pct": 8.25
+    },
+    {
+      "crop": "wheat",
+      "n": 2248,
+      "n_datasets": 4,
+      "n_countries": 6,
+      "n_regions": 4,
+      "n_polygons": 1860,
+      "share_pct": 6.36
+    },
+    {
+      "crop": "millet",
+      "n": 1295,
+      "n_datasets": 7,
+      "n_countries": 8,
+      "n_regions": 5,
+      "n_polygons": 922,
+      "share_pct": 3.66
+    },
+    {
+      "crop": "sorghum",
+      "n": 960,
+      "n_datasets": 7,
+      "n_countries": 8,
+      "n_regions": 4,
+      "n_polygons": 698,
+      "share_pct": 2.72
+    },
+    {
+      "crop": "groundnut",
+      "n": 956,
+      "n_datasets": 2,
+      "n_countries": 5,
+      "n_regions": 1,
+      "n_polygons": 956,
+      "share_pct": 2.7
+    },
+    {
+      "crop": "soybean",
+      "n": 937,
+      "n_datasets": 5,
+      "n_countries": 8,
+      "n_regions": 5,
+      "n_polygons": 837,
+      "share_pct": 2.65
+    },
+    {
+      "crop": "sugarcane",
+      "n": 842,
+      "n_datasets": 5,
+      "n_countries": 5,
+      "n_regions": 4,
+      "n_polygons": 785,
+      "share_pct": 2.38
+    },
+    {
+      "crop": "banana",
+      "n": 803,
+      "n_datasets": 4,
+      "n_countries": 4,
+      "n_regions": 3,
+      "n_polygons": 803,
+      "share_pct": 2.27
+    },
+    {
+      "crop": "potato",
+      "n": 780,
+      "n_datasets": 5,
+      "n_countries": 8,
+      "n_regions": 6,
+      "n_polygons": 677,
+      "share_pct": 2.21
+    },
+    {
+      "crop": "carrot",
+      "n": 584,
+      "n_datasets": 2,
+      "n_countries": 2,
+      "n_regions": 2,
+      "n_polygons": 484,
+      "share_pct": 1.65
+    },
+    {
+      "crop": "eggplant",
+      "n": 554,
+      "n_datasets": 2,
+      "n_countries": 2,
+      "n_regions": 2,
+      "n_polygons": 542,
+      "share_pct": 1.57
+    },
+    {
+      "crop": "bean",
+      "n": 519,
+      "n_datasets": 4,
+      "n_countries": 6,
+      "n_regions": 3,
+      "n_polygons": 419,
+      "share_pct": 1.47
+    },
+    {
+      "crop": "barley",
+      "n": 490,
+      "n_datasets": 4,
+      "n_countries": 4,
+      "n_regions": 4,
+      "n_polygons": 148,
+      "share_pct": 1.39
+    },
+    {
+      "crop": "rye",
+      "n": 379,
+      "n_datasets": 2,
+      "n_countries": 2,
+      "n_regions": 2,
+      "n_polygons": 279,
+      "share_pct": 1.07
+    },
+    {
+      "crop": "citrus",
+      "n": 307,
+      "n_datasets": 3,
+      "n_countries": 3,
+      "n_regions": 3,
+      "n_polygons": 307,
+      "share_pct": 0.87
+    },
+    {
+      "crop": "cassava",
+      "n": 281,
+      "n_datasets": 3,
+      "n_countries": 6,
+      "n_regions": 3,
+      "n_polygons": 242,
+      "share_pct": 0.79
+    },
+    {
+      "crop": "cowpea",
+      "n": 281,
+      "n_datasets": 1,
+      "n_countries": 3,
+      "n_regions": 1,
+      "n_polygons": 281,
+      "share_pct": 0.79
+    },
+    {
+      "crop": "sunflower",
+      "n": 254,
+      "n_datasets": 4,
+      "n_countries": 5,
+      "n_regions": 5,
+      "n_polygons": 151,
+      "share_pct": 0.72
+    },
+    {
+      "crop": "oats",
+      "n": 245,
+      "n_datasets": 3,
+      "n_countries": 4,
+      "n_regions": 2,
+      "n_polygons": 145,
+      "share_pct": 0.69
+    },
+    {
+      "crop": "strawberry",
+      "n": 234,
+      "n_datasets": 3,
+      "n_countries": 3,
+      "n_regions": 3,
+      "n_polygons": 134,
+      "share_pct": 0.66
+    },
+    {
+      "crop": "cabbage",
+      "n": 222,
+      "n_datasets": 3,
+      "n_countries": 4,
+      "n_regions": 2,
+      "n_polygons": 147,
+      "share_pct": 0.63
+    },
+    {
+      "crop": "sugarbeet",
+      "n": 201,
+      "n_datasets": 3,
+      "n_countries": 3,
+      "n_regions": 3,
+      "n_polygons": 101,
+      "share_pct": 0.57
+    },
+    {
+      "crop": "buckwheat",
+      "n": 200,
+      "n_datasets": 2,
+      "n_countries": 2,
+      "n_regions": 2,
+      "n_polygons": 100,
+      "share_pct": 0.57
+    },
+    {
+      "crop": "alfalfa",
+      "n": 189,
+      "n_datasets": 3,
+      "n_countries": 4,
+      "n_regions": 2,
+      "n_polygons": 88,
+      "share_pct": 0.53
+    },
+    {
+      "crop": "pea",
+      "n": 183,
+      "n_datasets": 3,
+      "n_countries": 4,
+      "n_regions": 2,
+      "n_polygons": 183,
+      "share_pct": 0.52
+    },
+    {
+      "crop": "pineapple",
+      "n": 178,
+      "n_datasets": 3,
+      "n_countries": 3,
+      "n_regions": 2,
+      "n_polygons": 178,
+      "share_pct": 0.5
+    },
+    {
+      "crop": "tomato",
+      "n": 158,
+      "n_datasets": 3,
+      "n_countries": 4,
+      "n_regions": 2,
+      "n_polygons": 58,
+      "share_pct": 0.45
+    },
+    {
+      "crop": "melon",
+      "n": 158,
+      "n_datasets": 4,
+      "n_countries": 4,
+      "n_regions": 4,
+      "n_polygons": 58,
+      "share_pct": 0.45
+    }
+  ],
+  "crop_by_country_top12": {
+    "Canada": {
+      "cotton": 0,
+      "maize": 196,
+      "rice": 0,
+      "wheat": 300,
+      "millet": 15,
+      "sorghum": 49,
+      "groundnut": 0,
+      "soybean": 95,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 100,
+      "carrot": 100,
+      "eggplant": 12,
+      "bean": 100,
+      "barley": 300,
+      "rye": 100,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 100
+    },
+    "Uzbekistan": {
+      "cotton": 3235,
+      "maize": 62,
+      "rice": 39,
+      "wheat": 1538,
+      "millet": 0,
+      "sorghum": 0,
+      "groundnut": 0,
+      "soybean": 0,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 0,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 0
+    },
+    "France": {
+      "cotton": 0,
+      "maize": 200,
+      "rice": 0,
+      "wheat": 0,
+      "millet": 8,
+      "sorghum": 100,
+      "groundnut": 0,
+      "soybean": 100,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 200,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 100
+    },
+    "Madagascar": {
+      "cotton": 0,
+      "maize": 800,
+      "rice": 1316,
+      "wheat": 0,
+      "millet": 0,
+      "sorghum": 0,
+      "groundnut": 43,
+      "soybean": 226,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 370,
+      "carrot": 484,
+      "eggplant": 0,
+      "bean": 78,
+      "barley": 11,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 162,
+      "cowpea": 1,
+      "sunflower": 0
+    },
+    "Burkina Faso": {
+      "cotton": 562,
+      "maize": 784,
+      "rice": 49,
+      "wheat": 0,
+      "millet": 75,
+      "sorghum": 252,
+      "groundnut": 272,
+      "soybean": 411,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 0,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 236,
+      "sunflower": 0
+    },
+    "Senegal": {
+      "cotton": 13,
+      "maize": 74,
+      "rice": 14,
+      "wheat": 0,
+      "millet": 764,
+      "sorghum": 173,
+      "groundnut": 591,
+      "soybean": 0,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 3,
+      "carrot": 0,
+      "eggplant": 542,
+      "bean": 10,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 21,
+      "cowpea": 44,
+      "sunflower": 0
+    },
+    "Mali": {
+      "cotton": 3,
+      "maize": 563,
+      "rice": 413,
+      "wheat": 0,
+      "millet": 411,
+      "sorghum": 257,
+      "groundnut": 0,
+      "soybean": 0,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 0,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 0
+    },
+    "Reunion (FR)": {
+      "cotton": 0,
+      "maize": 50,
+      "rice": 0,
+      "wheat": 0,
+      "millet": 0,
+      "sorghum": 0,
+      "groundnut": 0,
+      "soybean": 0,
+      "sugarcane": 219,
+      "banana": 300,
+      "potato": 101,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 100,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 0
+    },
+    "Martinique (FR)": {
+      "cotton": 0,
+      "maize": 0,
+      "rice": 0,
+      "wheat": 0,
+      "millet": 0,
+      "sorghum": 0,
+      "groundnut": 0,
+      "soybean": 1,
+      "sugarcane": 232,
+      "banana": 487,
+      "potato": 0,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 100,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 0
+    },
+    "Tanzania": {
+      "cotton": 0,
+      "maize": 1,
+      "rice": 799,
+      "wheat": 0,
+      "millet": 0,
+      "sorghum": 0,
+      "groundnut": 0,
+      "soybean": 0,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 0,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 286,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 51
+    },
+    "Germany": {
+      "cotton": 0,
+      "maize": 254,
+      "rice": 0,
+      "wheat": 307,
+      "millet": 0,
+      "sorghum": 0,
+      "groundnut": 0,
+      "soybean": 0,
+      "sugarcane": 0,
+      "banana": 0,
+      "potato": 0,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 0,
+      "barley": 137,
+      "rye": 279,
+      "citrus": 0,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 0
+    },
+    "Brazil": {
+      "cotton": 8,
+      "maize": 133,
+      "rice": 0,
+      "wheat": 0,
+      "millet": 4,
+      "sorghum": 2,
+      "groundnut": 0,
+      "soybean": 97,
+      "sugarcane": 331,
+      "banana": 15,
+      "potato": 3,
+      "carrot": 0,
+      "eggplant": 0,
+      "bean": 36,
+      "barley": 0,
+      "rye": 0,
+      "citrus": 107,
+      "cassava": 0,
+      "cowpea": 0,
+      "sunflower": 0
+    }
+  },
+  "croptype_labels_per_country_top20": {
+    "Canada": 6960,
+    "Uzbekistan": 4980,
+    "France": 4492,
+    "Madagascar": 4350,
+    "Burkina Faso": 2819,
+    "Senegal": 2504,
+    "Mali": 1654,
+    "Reunion (FR)": 1445,
+    "Martinique (FR)": 1295,
+    "Tanzania": 1185,
+    "Germany": 1045,
+    "Brazil": 887,
+    "South Africa": 461,
+    "Thailand": 369,
+    "Kenya": 304,
+    "Uganda": 232,
+    "Tunisia": 141,
+    "Tajikistan": 93,
+    "Zimbabwe": 49,
+    "India": 34
+  },
+  "croptype_labels_per_region": {
+    "Sub-Saharan Africa": 15003,
+    "North America": 6979,
+    "Europe": 5537,
+    "Central Asia": 5074,
+    "Central America & Caribbean": 1295,
+    "South America": 887,
+    "East & Southeast Asia": 399,
+    "MENA": 141,
+    "South Asia": 34
+  },
+  "n_with_fao_group": 46288,
+  "fao_group_counts": {
+    "cereals": 14087,
+    "other": 9139,
+    "non_crop": 5902,
+    "fruits_nuts": 4807,
+    "vegetables_melons": 4284,
+    "oilseeds": 3021,
+    "leguminous": 1951,
+    "root_tuber": 1213,
+    "beverage_spice": 1028,
+    "sugar": 856
+  },
+  "fao_group_by_region": {
+    "Central America & Caribbean": {
+      "beverage_spice": 130,
+      "cereals": 0,
+      "fruits_nuts": 915,
+      "leguminous": 0,
+      "non_crop": 657,
+      "oilseeds": 2,
+      "other": 63,
+      "root_tuber": 0,
+      "sugar": 238,
+      "vegetables_melons": 416
+    },
+    "Central Asia": {
+      "beverage_spice": 0,
+      "cereals": 1657,
+      "fruits_nuts": 280,
+      "leguminous": 88,
+      "non_crop": 0,
+      "oilseeds": 0,
+      "other": 3277,
+      "root_tuber": 0,
+      "sugar": 0,
+      "vegetables_melons": 0
+    },
+    "East & Southeast Asia": {
+      "beverage_spice": 0,
+      "cereals": 291,
+      "fruits_nuts": 0,
+      "leguminous": 0,
+      "non_crop": 0,
+      "oilseeds": 11,
+      "other": 0,
+      "root_tuber": 40,
+      "sugar": 57,
+      "vegetables_melons": 0
+    },
+    "Europe": {
+      "beverage_spice": 518,
+      "cereals": 2570,
+      "fruits_nuts": 276,
+      "leguminous": 618,
+      "non_crop": 1741,
+      "oilseeds": 667,
+      "other": 1420,
+      "root_tuber": 244,
+      "sugar": 0,
+      "vegetables_melons": 680
+    },
+    "MENA": {
+      "beverage_spice": 0,
+      "cereals": 130,
+      "fruits_nuts": 0,
+      "leguminous": 8,
+      "non_crop": 0,
+      "oilseeds": 2,
+      "other": 0,
+      "root_tuber": 1,
+      "sugar": 0,
+      "vegetables_melons": 0
+    },
+    "North America": {
+      "beverage_spice": 0,
+      "cereals": 1600,
+      "fruits_nuts": 1473,
+      "leguminous": 355,
+      "non_crop": 1312,
+      "oilseeds": 450,
+      "other": 2376,
+      "root_tuber": 0,
+      "sugar": 0,
+      "vegetables_melons": 1525
+    },
+    "South America": {
+      "beverage_spice": 48,
+      "cereals": 177,
+      "fruits_nuts": 201,
+      "leguminous": 36,
+      "non_crop": 722,
+      "oilseeds": 97,
+      "other": 524,
+      "root_tuber": 3,
+      "sugar": 331,
+      "vegetables_melons": 0
+    },
+    "South Asia": {
+      "beverage_spice": 0,
+      "cereals": 22,
+      "fruits_nuts": 0,
+      "leguminous": 0,
+      "non_crop": 0,
+      "oilseeds": 3,
+      "other": 8,
+      "root_tuber": 1,
+      "sugar": 0,
+      "vegetables_melons": 0
+    },
+    "Sub-Saharan Africa": {
+      "beverage_spice": 332,
+      "cereals": 7640,
+      "fruits_nuts": 1662,
+      "leguminous": 846,
+      "non_crop": 1470,
+      "oilseeds": 1789,
+      "other": 1471,
+      "root_tuber": 924,
+      "sugar": 230,
+      "vegetables_melons": 1663
+    }
+  },
+  "fao_group_defects": [
+    {
+      "crop": "pine",
+      "assigned_group": "fruits_nuts",
+      "n": 358,
+      "problem": "not a crop (forestry)"
+    },
+    {
+      "crop": "eucalyptus",
+      "assigned_group": "other",
+      "n": 355,
+      "problem": "not a crop (forestry)"
+    },
+    {
+      "crop": "sugarbeet",
+      "assigned_group": "vegetables_melons",
+      "n": 100,
+      "problem": "inconsistent with sugarcane -> sugar"
+    },
+    {
+      "crop": "potato",
+      "assigned_group": "vegetables_melons",
+      "n": 100,
+      "problem": "inconsistent with potato -> root_tuber"
+    },
+    {
+      "crop": "cotton",
+      "assigned_group": "other",
+      "n": 3871,
+      "problem": "fibre crop absent from ICC11 core, silently pooled into 'other'"
+    }
+  ],
+  "n_labels_in_flagged_fao_assignments": 4784,
+  "export_end_month_day": {
+    "02-01": 113893
+  },
+  "window_end_year_counts": {
+    "2016": 498,
+    "2017": 55127,
+    "2018": 12945,
+    "2019": 14271,
+    "2020": 20225,
+    "2021": 6264,
+    "2022": 4563
+  },
+  "dominant_year_counts": {
+    "2015": 498,
+    "2016": 55127,
+    "2017": 12945,
+    "2018": 14271,
+    "2019": 20225,
+    "2020": 6264,
+    "2021": 4563
+  },
+  "collection_year_counts": {
+    "2016": 39196,
+    "2017": 11026,
+    "2018": 9558,
+    "2019": 17738,
+    "2020": 7527,
+    "2021": 23830,
+    "2022": 5018
+  },
+  "window_span": [
+    "2015-02-06",
+    "2022-02-01"
+  ],
+  "n_alphaearth_ok": 58268,
+  "n_alphaearth_out_of_range": 55625,
+  "alphaearth_out_of_range_years": {
+    "2015": 498,
+    "2016": 55127
+  },
+  "n_tessera_ok": 17856,
+  "n_tessera_out_of_coverage": 96037,
+  "polygon_croptype_n": 20471,
+  "polygon_croptype_alphaearth_ok": 18044,
+  "polygon_croptype_tessera_ok": 5537,
+  "polygon_croptype_dominant_years": {
+    "2016": 2427,
+    "2017": 2797,
+    "2018": 5790,
+    "2019": 9225,
+    "2020": 225,
+    "2021": 7
+  },
+  "class_survival": [
+    {
+      "subset": "all geometries",
+      "threshold": 20,
+      "n_region_class_pairs": 186,
+      "n_distinct_crops": 144,
+      "n_regions_with_2plus": 8,
+      "n_regions_with_4plus": 6,
+      "n_labels": 27635
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 50,
+      "n_region_class_pairs": 130,
+      "n_distinct_crops": 100,
+      "n_regions_with_2plus": 6,
+      "n_regions_with_4plus": 5,
+      "n_labels": 25784
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 100,
+      "n_region_class_pairs": 84,
+      "n_distinct_crops": 67,
+      "n_regions_with_2plus": 6,
+      "n_regions_with_4plus": 3,
+      "n_labels": 22300
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 150,
+      "n_region_class_pairs": 24,
+      "n_distinct_crops": 15,
+      "n_regions_with_2plus": 5,
+      "n_regions_with_4plus": 2,
+      "n_labels": 16035
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 200,
+      "n_region_class_pairs": 23,
+      "n_distinct_crops": 15,
+      "n_regions_with_2plus": 5,
+      "n_regions_with_4plus": 2,
+      "n_labels": 15865
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 300,
+      "n_region_class_pairs": 15,
+      "n_distinct_crops": 12,
+      "n_regions_with_2plus": 3,
+      "n_regions_with_4plus": 1,
+      "n_labels": 14123
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 500,
+      "n_region_class_pairs": 5,
+      "n_distinct_crops": 5,
+      "n_regions_with_2plus": 2,
+      "n_regions_with_4plus": 0,
+      "n_labels": 10089
+    },
+    {
+      "subset": "all geometries",
+      "threshold": 1000,
+      "n_region_class_pairs": 4,
+      "n_distinct_crops": 4,
+      "n_regions_with_2plus": 2,
+      "n_regions_with_4plus": 0,
+      "n_labels": 9425
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 20,
+      "n_region_class_pairs": 121,
+      "n_distinct_crops": 100,
+      "n_regions_with_2plus": 5,
+      "n_regions_with_4plus": 5,
+      "n_labels": 19699
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 50,
+      "n_region_class_pairs": 77,
+      "n_distinct_crops": 62,
+      "n_regions_with_2plus": 5,
+      "n_regions_with_4plus": 4,
+      "n_labels": 18284
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 100,
+      "n_region_class_pairs": 54,
+      "n_distinct_crops": 44,
+      "n_regions_with_2plus": 5,
+      "n_regions_with_4plus": 2,
+      "n_labels": 16623
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 150,
+      "n_region_class_pairs": 21,
+      "n_distinct_crops": 14,
+      "n_regions_with_2plus": 4,
+      "n_regions_with_4plus": 2,
+      "n_labels": 13059
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 200,
+      "n_region_class_pairs": 20,
+      "n_distinct_crops": 14,
+      "n_regions_with_2plus": 4,
+      "n_regions_with_4plus": 2,
+      "n_labels": 12889
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 300,
+      "n_region_class_pairs": 14,
+      "n_distinct_crops": 11,
+      "n_regions_with_2plus": 3,
+      "n_regions_with_4plus": 1,
+      "n_labels": 11534
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 500,
+      "n_region_class_pairs": 4,
+      "n_distinct_crops": 4,
+      "n_regions_with_2plus": 2,
+      "n_regions_with_4plus": 0,
+      "n_labels": 7649
+    },
+    {
+      "subset": "polygons only",
+      "threshold": 1000,
+      "n_region_class_pairs": 4,
+      "n_distinct_crops": 4,
+      "n_regions_with_2plus": 2,
+      "n_regions_with_4plus": 0,
+      "n_labels": 7649
+    }
+  ],
+  "region_crop_matrix": {
+    "banana": {
+      "Sub-Saharan Africa": 205,
+      "Central Asia": 0,
+      "Europe": 0,
+      "North America": 0,
+      "Central America & Caribbean": 471,
+      "South America": 15,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "barley": {
+      "Sub-Saharan Africa": 11,
+      "Central Asia": 0,
+      "Europe": 137,
+      "North America": 227,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 0,
+      "MENA": 42,
+      "South Asia": 0
+    },
+    "carrot": {
+      "Sub-Saharan Africa": 484,
+      "Central Asia": 0,
+      "Europe": 0,
+      "North America": 69,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "cassava": {
+      "Sub-Saharan Africa": 221,
+      "Central Asia": 0,
+      "Europe": 0,
+      "North America": 0,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 10,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "cotton": {
+      "Sub-Saharan Africa": 310,
+      "Central Asia": 3067,
+      "Europe": 0,
+      "North America": 0,
+      "Central America & Caribbean": 0,
+      "South America": 8,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 8
+    },
+    "groundnut": {
+      "Sub-Saharan Africa": 393,
+      "Central Asia": 0,
+      "Europe": 0,
+      "North America": 0,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "maize": {
+      "Sub-Saharan Africa": 2329,
+      "Central Asia": 44,
+      "Europe": 454,
+      "North America": 201,
+      "Central America & Caribbean": 0,
+      "South America": 133,
+      "East & Southeast Asia": 1,
+      "MENA": 0,
+      "South Asia": 5
+    },
+    "millet": {
+      "Sub-Saharan Africa": 664,
+      "Central Asia": 0,
+      "Europe": 8,
+      "North America": 0,
+      "Central America & Caribbean": 0,
+      "South America": 4,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 2
+    },
+    "potato": {
+      "Sub-Saharan Africa": 470,
+      "Central Asia": 0,
+      "Europe": 200,
+      "North America": 100,
+      "Central America & Caribbean": 0,
+      "South America": 3,
+      "East & Southeast Asia": 0,
+      "MENA": 1,
+      "South Asia": 0
+    },
+    "rice": {
+      "Sub-Saharan Africa": 2541,
+      "Central Asia": 38,
+      "Europe": 0,
+      "North America": 1,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 99,
+      "MENA": 0,
+      "South Asia": 9
+    },
+    "rye": {
+      "Sub-Saharan Africa": 0,
+      "Central Asia": 0,
+      "Europe": 279,
+      "North America": 79,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "sorghum": {
+      "Sub-Saharan Africa": 454,
+      "Central Asia": 0,
+      "Europe": 100,
+      "North America": 0,
+      "Central America & Caribbean": 0,
+      "South America": 2,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "soybean": {
+      "Sub-Saharan Africa": 360,
+      "Central Asia": 0,
+      "Europe": 100,
+      "North America": 100,
+      "Central America & Caribbean": 0,
+      "South America": 97,
+      "East & Southeast Asia": 0,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "sugarcane": {
+      "Sub-Saharan Africa": 170,
+      "Central Asia": 0,
+      "Europe": 0,
+      "North America": 0,
+      "Central America & Caribbean": 209,
+      "South America": 331,
+      "East & Southeast Asia": 25,
+      "MENA": 0,
+      "South Asia": 0
+    },
+    "wheat": {
+      "Sub-Saharan Africa": 0,
+      "Central Asia": 1488,
+      "Europe": 307,
+      "North America": 200,
+      "Central America & Caribbean": 0,
+      "South America": 0,
+      "East & Southeast Asia": 0,
+      "MENA": 88,
+      "South Asia": 0
+    }
+  },
+  "crops_meeting_floor_per_region": {
+    "Sub-Saharan Africa": [
+      "banana",
+      "carrot",
+      "cassava",
+      "cotton",
+      "groundnut",
+      "maize",
+      "millet",
+      "potato",
+      "rice",
+      "sorghum",
+      "soybean",
+      "sugarcane"
+    ],
+    "Central Asia": [
+      "cotton",
+      "wheat"
+    ],
+    "Europe": [
+      "maize",
+      "potato",
+      "rye",
+      "wheat"
+    ],
+    "North America": [
+      "barley",
+      "maize",
+      "wheat"
+    ],
+    "Central America & Caribbean": [
+      "banana",
+      "sugarcane"
+    ],
+    "South America": [
+      "sugarcane"
+    ],
+    "East & Southeast Asia": [],
+    "MENA": [],
+    "South Asia": []
+  },
+  "crop_n_regions_meeting_floor": {
+    "maize": 3,
+    "wheat": 3,
+    "sugarcane": 3,
+    "cotton": 2,
+    "potato": 2,
+    "banana": 2,
+    "carrot": 1,
+    "groundnut": 1,
+    "cassava": 1,
+    "barley": 1,
+    "millet": 1,
+    "rye": 1,
+    "rice": 1,
+    "soybean": 1,
+    "sorghum": 1
+  },
+  "cross_region_shared_crops": [
+    "banana",
+    "cotton",
+    "maize",
+    "potato",
+    "sugarcane",
+    "wheat"
+  ],
+  "class_floor": 150,
+  "agg_group_matrix": {
+    "beverage_spice": {
+      "Central America & Caribbean": 51,
+      "Central Asia": 0,
+      "East & Southeast Asia": 0,
+      "Europe": 0,
+      "MENA": 0,
+      "North America": 100,
+      "South America": 48,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 90
+    },
+    "cereals": {
+      "Central America & Caribbean": 0,
+      "Central Asia": 1570,
+      "East & Southeast Asia": 100,
+      "Europe": 1571,
+      "MENA": 130,
+      "North America": 831,
+      "South America": 139,
+      "South Asia": 16,
+      "Sub-Saharan Africa": 5999
+    },
+    "fibre": {
+      "Central America & Caribbean": 0,
+      "Central Asia": 3067,
+      "East & Southeast Asia": 0,
+      "Europe": 0,
+      "MENA": 0,
+      "North America": 0,
+      "South America": 8,
+      "South Asia": 8,
+      "Sub-Saharan Africa": 310
+    },
+    "fodder": {
+      "Central America & Caribbean": 0,
+      "Central Asia": 38,
+      "East & Southeast Asia": 0,
+      "Europe": 0,
+      "MENA": 0,
+      "North America": 101,
+      "South America": 0,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 0
+    },
+    "legumes": {
+      "Central America & Caribbean": 0,
+      "Central Asia": 0,
+      "East & Southeast Asia": 0,
+      "Europe": 200,
+      "MENA": 0,
+      "North America": 100,
+      "South America": 36,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 271
+    },
+    "oilseeds": {
+      "Central America & Caribbean": 0,
+      "Central Asia": 0,
+      "East & Southeast Asia": 0,
+      "Europe": 200,
+      "MENA": 2,
+      "North America": 198,
+      "South America": 97,
+      "South Asia": 1,
+      "Sub-Saharan Africa": 785
+    },
+    "perennial_fruit": {
+      "Central America & Caribbean": 622,
+      "Central Asia": 0,
+      "East & Southeast Asia": 0,
+      "Europe": 72,
+      "MENA": 0,
+      "North America": 67,
+      "South America": 122,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 621
+    },
+    "roots_tubers": {
+      "Central America & Caribbean": 0,
+      "Central Asia": 0,
+      "East & Southeast Asia": 10,
+      "Europe": 200,
+      "MENA": 1,
+      "North America": 100,
+      "South America": 3,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 856
+    },
+    "sugar": {
+      "Central America & Caribbean": 209,
+      "Central Asia": 0,
+      "East & Southeast Asia": 25,
+      "Europe": 100,
+      "MENA": 0,
+      "North America": 100,
+      "South America": 331,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 171
+    },
+    "vegetables": {
+      "Central America & Caribbean": 4,
+      "Central Asia": 0,
+      "East & Southeast Asia": 0,
+      "Europe": 3,
+      "MENA": 0,
+      "North America": 572,
+      "South America": 0,
+      "South Asia": 0,
+      "Sub-Saharan Africa": 679
+    }
+  },
+  "agg_groups_meeting_floor_per_region": {
+    "Central America & Caribbean": [
+      "perennial_fruit",
+      "sugar"
+    ],
+    "Central Asia": [
+      "cereals",
+      "fibre"
+    ],
+    "East & Southeast Asia": [],
+    "Europe": [
+      "cereals",
+      "legumes",
+      "oilseeds",
+      "roots_tubers"
+    ],
+    "MENA": [],
+    "North America": [
+      "cereals",
+      "oilseeds",
+      "vegetables"
+    ],
+    "South America": [
+      "sugar"
+    ],
+    "South Asia": [],
+    "Sub-Saharan Africa": [
+      "cereals",
+      "fibre",
+      "legumes",
+      "oilseeds",
+      "perennial_fruit",
+      "roots_tubers",
+      "sugar",
+      "vegetables"
+    ]
+  },
+  "cross_region_shared_agg_groups": [
+    "cereals",
+    "fibre",
+    "legumes",
+    "oilseeds",
+    "perennial_fruit",
+    "roots_tubers",
+    "sugar",
+    "vegetables"
+  ],
+  "agg_group_n_regions": {
+    "cereals": 4,
+    "oilseeds": 3,
+    "sugar": 3,
+    "fibre": 2,
+    "legumes": 2,
+    "perennial_fruit": 2,
+    "roots_tubers": 2,
+    "vegetables": 2
+  },
+  "region_pair_intersections": [
+    {
+      "region_a": "Sub-Saharan Africa",
+      "region_b": "Europe",
+      "n_shared": 2,
+      "shared": [
+        "maize",
+        "potato"
+      ],
+      "n_labels_a": 2799,
+      "n_labels_b": 654
+    },
+    {
+      "region_a": "Sub-Saharan Africa",
+      "region_b": "Central America & Caribbean",
+      "n_shared": 2,
+      "shared": [
+        "banana",
+        "sugarcane"
+      ],
+      "n_labels_a": 375,
+      "n_labels_b": 680
+    },
+    {
+      "region_a": "Europe",
+      "region_b": "North America",
+      "n_shared": 2,
+      "shared": [
+        "maize",
+        "wheat"
+      ],
+      "n_labels_a": 761,
+      "n_labels_b": 401
+    },
+    {
+      "region_a": "Sub-Saharan Africa",
+      "region_b": "Central Asia",
+      "n_shared": 1,
+      "shared": [
+        "cotton"
+      ],
+      "n_labels_a": 310,
+      "n_labels_b": 3067
+    },
+    {
+      "region_a": "Sub-Saharan Africa",
+      "region_b": "North America",
+      "n_shared": 1,
+      "shared": [
+        "maize"
+      ],
+      "n_labels_a": 2329,
+      "n_labels_b": 201
+    },
+    {
+      "region_a": "Sub-Saharan Africa",
+      "region_b": "South America",
+      "n_shared": 1,
+      "shared": [
+        "sugarcane"
+      ],
+      "n_labels_a": 170,
+      "n_labels_b": 331
+    },
+    {
+      "region_a": "Central Asia",
+      "region_b": "Europe",
+      "n_shared": 1,
+      "shared": [
+        "wheat"
+      ],
+      "n_labels_a": 1488,
+      "n_labels_b": 307
+    },
+    {
+      "region_a": "Central Asia",
+      "region_b": "North America",
+      "n_shared": 1,
+      "shared": [
+        "wheat"
+      ],
+      "n_labels_a": 1488,
+      "n_labels_b": 200
+    },
+    {
+      "region_a": "Central America & Caribbean",
+      "region_b": "South America",
+      "n_shared": 1,
+      "shared": [
+        "sugarcane"
+      ],
+      "n_labels_a": 209,
+      "n_labels_b": 331
+    },
+    {
+      "region_a": "Central Asia",
+      "region_b": "Central America & Caribbean",
+      "n_shared": 0,
+      "shared": [],
+      "n_labels_a": 0,
+      "n_labels_b": 0
+    },
+    {
+      "region_a": "Central Asia",
+      "region_b": "South America",
+      "n_shared": 0,
+      "shared": [],
+      "n_labels_a": 0,
+      "n_labels_b": 0
+    },
+    {
+      "region_a": "Europe",
+      "region_b": "Central America & Caribbean",
+      "n_shared": 0,
+      "shared": [],
+      "n_labels_a": 0,
+      "n_labels_b": 0
+    },
+    {
+      "region_a": "Europe",
+      "region_b": "South America",
+      "n_shared": 0,
+      "shared": [],
+      "n_labels_a": 0,
+      "n_labels_b": 0
+    },
+    {
+      "region_a": "North America",
+      "region_b": "Central America & Caribbean",
+      "n_shared": 0,
+      "shared": [],
+      "n_labels_a": 0,
+      "n_labels_b": 0
+    },
+    {
+      "region_a": "North America",
+      "region_b": "South America",
+      "n_shared": 0,
+      "shared": [],
+      "n_labels_a": 0,
+      "n_labels_b": 0
+    }
+  ],
+  "n_admissible_transfer_pairs": 3,
+  "best_transfer_pair": {
+    "region_a": "Sub-Saharan Africa",
+    "region_b": "Europe",
+    "n_shared": 2,
+    "shared": [
+      "maize",
+      "potato"
+    ],
+    "n_labels_a": 2799,
+    "n_labels_b": 654
+  },
+  "n_labels_without_coordinates": 1,
+  "n_exact_coordinate_duplicates": 5102,
+  "near_duplicates": {
+    "10": {
+      "n_pairs": 9884,
+      "n_cross_dataset_pairs": 22,
+      "n_labels_involved": 10447,
+      "pct_labels_involved": 9.17
+    },
+    "100": {
+      "n_pairs": 40373,
+      "n_cross_dataset_pairs": 136,
+      "n_labels_involved": 24801,
+      "pct_labels_involved": 21.78
+    },
+    "1000": {
+      "n_pairs": 570547,
+      "n_cross_dataset_pairs": 2625,
+      "n_labels_involved": 61254,
+      "pct_labels_involved": 53.78
+    }
+  },
+  "shared_s2_bands": [
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "B6",
+    "B7",
+    "B8",
+    "B8A",
+    "B9",
+    "B11",
+    "B12"
+  ],
+  "n_shared_s2_bands": 11,
+  "eurocropsml_only_bands": [
+    "B01",
+    "B10"
+  ],
+  "cropharvest_only_channels": [
+    "VV",
+    "VH",
+    "temperature_2m",
+    "total_precipitation",
+    "elevation",
+    "slope",
+    "NDVI"
+  ],
+  "array_sample_n": 11570,
+  "array_sample_unreadable": 0,
+  "array_shape": [
+    12,
+    18
+  ],
+  "array_bands": [
+    "VV",
+    "VH",
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "B6",
+    "B7",
+    "B8",
+    "B8A",
+    "B9",
+    "B11",
+    "B12",
+    "temperature_2m",
+    "total_precipitation",
+    "elevation",
+    "slope",
+    "NDVI"
+  ],
+  "arrays_total_on_disk": 87464,
+  "array_nan_count": 0,
+  "array_constant_band_mean": 1.997,
+  "ndvi_peak_step_by_region": {
+    "Central America & Caribbean": 7.0,
+    "Central Asia": 4.0,
+    "East & Southeast Asia": 6.0,
+    "Europe": 4.0,
+    "MENA": 3.0,
+    "North America": 5.0,
+    "Oceania": 6.0,
+    "South America": 3.0,
+    "South Asia": 7.0,
+    "Sub-Saharan Africa": 5.0
+  },
+  "pixel_offset_m": {
+    "median": 3.61,
+    "p95": 6.26,
+    "p99": 19458.12,
+    "max": 1451417.8
+  },
+  "pixel_offset_over_20m": 481,
+  "pixel_offset_over_20m_pct": 4.16,
+  "pixel_offset_over_1km": 368,
+  "pixel_offset_over_1km_pct": 3.18,
+  "pixel_offset_over_20m_by_dataset": [
+    {
+      "dataset": "uganda",
+      "size": 6,
+      "sum": 6,
+      "pct": 100.0
+    },
+    {
+      "dataset": "tanzania",
+      "size": 92,
+      "sum": 92,
+      "pct": 100.0
+    },
+    {
+      "dataset": "jecam",
+      "size": 2263,
+      "sum": 383,
+      "pct": 16.9
+    },
+    {
+      "dataset": "central-asia",
+      "size": 717,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "china-crop",
+      "size": 125,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "ethiopia",
+      "size": 17,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "croplands",
+      "size": 503,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "geowiki-landcover-2017",
+      "size": 1756,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "germany",
+      "size": 362,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "canada",
+      "size": 1609,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "brazil-non-crop",
+      "size": 2,
+      "sum": 0,
+      "pct": 0.0
+    },
+    {
+      "dataset": "kenya",
+      "size": 26,
+      "sum": 0,
+      "pct": 0.0
+    }
+  ],
+  "example_ts_crops": [
+    "maize",
+    "rice",
+    "wheat"
+  ],
+  "phenology_summary": {
+    "Sub-Saharan Africa": {
+      "beverage_spice": {
+        "n": 90,
+        "peak_step": 1,
+        "peak_ndvi": 0.617,
+        "amplitude": 0.204
+      },
+      "cereals": {
+        "n": 229,
+        "peak_step": 7,
+        "peak_ndvi": 0.355,
+        "amplitude": 0.056
+      },
+      "fibre": {
+        "n": 95,
+        "peak_step": 7,
+        "peak_ndvi": 0.431,
+        "amplitude": 0.19
+      },
+      "legumes": {
+        "n": 206,
+        "peak_step": 11,
+        "peak_ndvi": 0.325,
+        "amplitude": 0.09
+      },
+      "oilseeds": {
+        "n": 214,
+        "peak_step": 7,
+        "peak_ndvi": 0.371,
+        "amplitude": 0.114
+      },
+      "perennial_fruit": {
+        "n": 107,
+        "peak_step": 1,
+        "peak_ndvi": 0.529,
+        "amplitude": 0.115
+      },
+      "roots_tubers": {
+        "n": 222,
+        "peak_step": 1,
+        "peak_ndvi": 0.497,
+        "amplitude": 0.161
+      },
+      "sugar": {
+        "n": 171,
+        "peak_step": 1,
+        "peak_ndvi": 0.593,
+        "amplitude": 0.166
+      },
+      "vegetables": {
+        "n": 187,
+        "peak_step": 11,
+        "peak_ndvi": 0.385,
+        "amplitude": 0.109
+      }
+    },
+    "North America": {
+      "cereals": {
+        "n": 173,
+        "peak_step": 5,
+        "peak_ndvi": 0.515,
+        "amplitude": 0.435
+      },
+      "fodder": {
+        "n": 19,
+        "peak_step": 8,
+        "peak_ndvi": 0.571,
+        "amplitude": 0.483
+      },
+      "legumes": {
+        "n": 74,
+        "peak_step": 5,
+        "peak_ndvi": 0.622,
+        "amplitude": 0.55
+      },
+      "oilseeds": {
+        "n": 132,
+        "peak_step": 5,
+        "peak_ndvi": 0.57,
+        "amplitude": 0.506
+      },
+      "roots_tubers": {
+        "n": 16,
+        "peak_step": 5,
+        "peak_ndvi": 0.573,
+        "amplitude": 0.482
+      },
+      "sugar": {
+        "n": 20,
+        "peak_step": 6,
+        "peak_ndvi": 0.603,
+        "amplitude": 0.535
+      },
+      "vegetables": {
+        "n": 108,
+        "peak_step": 5,
+        "peak_ndvi": 0.481,
+        "amplitude": 0.377
+      }
+    },
+    "South America": {
+      "beverage_spice": {
+        "n": 48,
+        "peak_step": 11,
+        "peak_ndvi": 0.495,
+        "amplitude": 0.098
+      },
+      "cereals": {
+        "n": 139,
+        "peak_step": 11,
+        "peak_ndvi": 0.637,
+        "amplitude": 0.327
+      },
+      "legumes": {
+        "n": 36,
+        "peak_step": 11,
+        "peak_ndvi": 0.642,
+        "amplitude": 0.307
+      },
+      "oilseeds": {
+        "n": 97,
+        "peak_step": 11,
+        "peak_ndvi": 0.662,
+        "amplitude": 0.353
+      },
+      "perennial_fruit": {
+        "n": 122,
+        "peak_step": 11,
+        "peak_ndvi": 0.568,
+        "amplitude": 0.139
+      },
+      "sugar": {
+        "n": 230,
+        "peak_step": 1,
+        "peak_ndvi": 0.523,
+        "amplitude": 0.179
+      }
+    },
+    "Europe": {
+      "cereals": {
+        "n": 136,
+        "peak_step": 3,
+        "peak_ndvi": 0.463,
+        "amplitude": 0.216
+      },
+      "legumes": {
+        "n": 79,
+        "peak_step": 4,
+        "peak_ndvi": 0.584,
+        "amplitude": 0.419
+      },
+      "oilseeds": {
+        "n": 68,
+        "peak_step": 5,
+        "peak_ndvi": 0.545,
+        "amplitude": 0.419
+      },
+      "perennial_fruit": {
+        "n": 59,
+        "peak_step": 4,
+        "peak_ndvi": 0.473,
+        "amplitude": 0.298
+      },
+      "roots_tubers": {
+        "n": 190,
+        "peak_step": 4,
+        "peak_ndvi": 0.601,
+        "amplitude": 0.458
+      },
+      "sugar": {
+        "n": 55,
+        "peak_step": 4,
+        "peak_ndvi": 0.596,
+        "amplitude": 0.473
+      }
+    }
+  },
+  "ndvi_amp_by_region": {
+    "Central America & Caribbean": 0.303,
+    "Central Asia": 0.445,
+    "East & Southeast Asia": 0.474,
+    "Europe": 0.489,
+    "MENA": 0.328,
+    "North America": 0.572,
+    "Oceania": 0.461,
+    "South America": 0.375,
+    "South Asia": 0.397,
+    "Sub-Saharan Africa": 0.279
+  },
+  "t2m_amp_by_region": {
+    "Central America & Caribbean": 2.5,
+    "Central Asia": 28.46,
+    "East & Southeast Asia": 22.02,
+    "Europe": 15.86,
+    "MENA": 19.67,
+    "North America": 27.2,
+    "Oceania": 13.65,
+    "South America": 7.94,
+    "South Asia": 14.63,
+    "Sub-Saharan Africa": 6.35
+  },
+  "scheme_regions": {
+    "Central America & Caribbean": "small_multiclass_croptype",
+    "Central Asia": "small_multiclass_croptype",
+    "East & Southeast Asia": "binary_cropland",
+    "Europe": "small_multiclass_croptype",
+    "MENA": "binary_cropland",
+    "North America": "small_multiclass_croptype",
+    "Oceania": "binary_cropland",
+    "South America": "binary_cropland",
+    "South Asia": "binary_cropland",
+    "Sub-Saharan Africa": "multiclass_croptype"
+  },
+  "scheme_multiclass_regions": [
+    "Sub-Saharan Africa"
+  ]
+}

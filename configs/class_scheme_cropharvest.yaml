@@ -1,0 +1,398 @@
+_meta:
+  generated_by: results/eda/cropharvest/_run_analysis.py
+  generated_at: '2026-09-11T09:31:09Z'
+  dataset: CropHarvest
+  zenodo_record: 10251170
+  zenodo_doi: 10.5281/zenodo.10251170
+  labels_md5: 54a5070f103bc3e635afba27c139ac8d
+  seed: 42
+  min_labels_per_class_per_region: 150
+  basis: counts computed on the full labels.geojson (113,893 labels) restricted to labels that carry a
+    crop type and have a feature array on disk
+exclusions:
+  binary_only_source_datasets:
+  - geowiki-landcover-2017
+  - china-crop
+  - rwanda-ceo
+  - kenya-non-crop
+  - tanzania-ceo
+  - togo
+  - ethiopia
+  - sudan
+  - togo-eval
+  - mali-non-crop
+  - brazil-non-crop
+  drop_labels_without_feature_array: true
+  drop_label_to_pixel_offset_above_m: 14.14
+  fully_mismatched_source_datasets:
+  - tanzania
+  - uganda
+  drop_non_crop_type_labels:
+  - abandoned (overgrown)
+  - abandoned (shrubs)
+  - annual crop
+  - barren
+  - birdsfoot trefoil
+  - bois pature
+  - cerrado
+  - crop
+  - culture sous serre hors sol
+  - eucalyptus
+  - fallow
+  - forage crops
+  - fruit crop
+  - grasses and other fodder crop
+  - horticulture ornementale de plein champ
+  - horticulture ornementale sous abri
+  - meadows
+  - non-crop
+  - noncrop
+  - oil seeds
+  - orchard
+  - pasture
+  - pine
+  - ryegrass
+  - shrubland
+  - sod
+  - timothy
+  - too wet to seed
+  - uncultivated soil
+  - unimproved pasture
+  - urban
+  - vegetables (undiff)
+  - water
+  - weakly vegetated agricultural
+  - young fallow
+  drop_fao_groups:
+  - non_crop
+  - other
+  drop_label_years_before: 2017
+  merge_french_rpg_tenure_suffixes: true
+  flagged_low_geolocation_precision_sources:
+  - geowiki-landcover-2017
+  - croplands
+regions:
+  Central America & Caribbean:
+    task: small_multiclass_croptype
+    n_labels_total: 3517
+    n_polygon_with_array: 2129
+    crop_classes:
+    - banana
+    - sugarcane
+    crop_class_counts:
+      banana: 471
+      sugarcane: 209
+    aggregated_classes:
+    - perennial_fruit
+    - sugar
+    aggregated_class_counts:
+      perennial_fruit: 622
+      sugar: 209
+  Central Asia:
+    task: small_multiclass_croptype
+    n_labels_total: 6501
+    n_polygon_with_array: 4894
+    crop_classes:
+    - cotton
+    - wheat
+    crop_class_counts:
+      cotton: 3067
+      wheat: 1488
+    aggregated_classes:
+    - fibre
+    - cereals
+    aggregated_class_counts:
+      fibre: 3067
+      cereals: 1570
+  East & Southeast Asia:
+    task: binary_cropland
+    n_labels_total: 12835
+    n_polygon_with_array: 0
+    crop_classes: []
+    crop_class_counts: {}
+    aggregated_classes: []
+    aggregated_class_counts: {}
+  Europe:
+    task: small_multiclass_croptype
+    n_labels_total: 14375
+    n_polygon_with_array: 8734
+    crop_classes:
+    - maize
+    - wheat
+    - rye
+    - potato
+    crop_class_counts:
+      maize: 454
+      wheat: 307
+      rye: 279
+      potato: 200
+    aggregated_classes:
+    - cereals
+    - legumes
+    - oilseeds
+    - roots_tubers
+    aggregated_class_counts:
+      cereals: 1571
+      legumes: 200
+      oilseeds: 200
+      roots_tubers: 200
+  MENA:
+    task: binary_cropland
+    n_labels_total: 2365
+    n_polygon_with_array: 45
+    crop_classes: []
+    crop_class_counts: {}
+    aggregated_classes: []
+    aggregated_class_counts: {}
+  North America:
+    task: small_multiclass_croptype
+    n_labels_total: 13593
+    n_polygon_with_array: 0
+    crop_classes:
+    - barley
+    - maize
+    - wheat
+    crop_class_counts:
+      barley: 227
+      maize: 201
+      wheat: 200
+    aggregated_classes:
+    - cereals
+    - vegetables
+    - oilseeds
+    aggregated_class_counts:
+      cereals: 831
+      vegetables: 572
+      oilseeds: 198
+  Oceania:
+    task: binary_cropland
+    n_labels_total: 1169
+    n_polygon_with_array: 0
+    crop_classes: []
+    crop_class_counts: {}
+    aggregated_classes: []
+    aggregated_class_counts: {}
+  South America:
+    task: binary_cropland
+    n_labels_total: 20887
+    n_polygon_with_array: 2139
+    crop_classes:
+    - sugarcane
+    crop_class_counts:
+      sugarcane: 331
+    aggregated_classes:
+    - sugar
+    aggregated_class_counts:
+      sugar: 331
+  South Asia:
+    task: binary_cropland
+    n_labels_total: 2708
+    n_polygon_with_array: 0
+    crop_classes: []
+    crop_class_counts: {}
+    aggregated_classes: []
+    aggregated_class_counts: {}
+  Sub-Saharan Africa:
+    task: multiclass_croptype
+    n_labels_total: 35942
+    n_polygon_with_array: 13166
+    crop_classes:
+    - rice
+    - maize
+    - millet
+    - carrot
+    - potato
+    - sorghum
+    - groundnut
+    - soybean
+    - cotton
+    - cassava
+    - banana
+    - sugarcane
+    crop_class_counts:
+      rice: 2541
+      maize: 2329
+      millet: 664
+      carrot: 484
+      potato: 470
+      sorghum: 454
+      groundnut: 393
+      soybean: 360
+      cotton: 310
+      cassava: 221
+      banana: 205
+      sugarcane: 170
+    aggregated_classes:
+    - cereals
+    - roots_tubers
+    - oilseeds
+    - vegetables
+    - perennial_fruit
+    - fibre
+    - legumes
+    - sugar
+    aggregated_class_counts:
+      cereals: 5999
+      roots_tubers: 856
+      oilseeds: 785
+      vegetables: 679
+      perennial_fruit: 621
+      fibre: 310
+      legumes: 271
+      sugar: 171
+cross_region_transfer:
+  shared_crop_classes:
+  - banana
+  - cotton
+  - maize
+  - potato
+  - sugarcane
+  - wheat
+  shared_aggregated_classes:
+  - cereals
+  - fibre
+  - legumes
+  - oilseeds
+  - perennial_fruit
+  - roots_tubers
+  - sugar
+  - vegetables
+  admissible_region_pairs:
+  - region_a: Sub-Saharan Africa
+    region_b: Europe
+    shared_classes:
+    - maize
+    - potato
+  - region_a: Sub-Saharan Africa
+    region_b: Central America & Caribbean
+    shared_classes:
+    - banana
+    - sugarcane
+  - region_a: Europe
+    region_b: North America
+    shared_classes:
+    - maize
+    - wheat
+  note: a transfer pair is only admissible where both regions reach the minimum count on every class in
+    the intersection
+aggregation_map:
+  maize: cereals
+  rice: cereals
+  wheat: cereals
+  millet: cereals
+  sorghum: cereals
+  barley: cereals
+  oats: cereals
+  rye: cereals
+  buckwheat: cereals
+  triticale: cereals
+  soybean: oilseeds
+  groundnut: oilseeds
+  sunflower: oilseeds
+  rapeseed: oilseeds
+  sesame: oilseeds
+  cowpea: legumes
+  bean: legumes
+  pea: legumes
+  lentil: legumes
+  chickpea: legumes
+  pigeon pea: legumes
+  potato: roots_tubers
+  cassava: roots_tubers
+  sweet potato: roots_tubers
+  yam: roots_tubers
+  taro: roots_tubers
+  sugarcane: sugar
+  sugarbeet: sugar
+  cotton: fibre
+  banana: perennial_fruit
+  citrus: perennial_fruit
+  apple: perennial_fruit
+  pineapple: perennial_fruit
+  strawberry: perennial_fruit
+  mango: perennial_fruit
+  avocado: perennial_fruit
+  grape: perennial_fruit
+  coffee/cocoa: beverage_spice
+  coffee: beverage_spice
+  cocoa: beverage_spice
+  tea: beverage_spice
+  vanilla: beverage_spice
+  tobacco: beverage_spice
+  carrot: vegetables
+  eggplant: vegetables
+  cabbage: vegetables
+  cucumber: vegetables
+  tomato: vegetables
+  onion: vegetables
+  asparagus: vegetables
+  melon: vegetables
+  lettuce: vegetables
+  alfalfa: fodder
+label_normalisation_map:
+  corn: maize
+  sweet corn: maize
+  soybeans: soybean
+  soja: soybean
+  potatoes: potato
+  pomme de terre de consommation: potato
+  pomme de terre feculiere: potato
+  pomme de terre fculire: potato
+  barley (undiff): barley
+  spring barley: barley
+  winter barley: barley
+  rye (undiff): rye
+  spring wheat: wheat
+  winter wheat: wheat
+  wheat (undiff): wheat
+  oats (undiff): oats
+  sunflowers: sunflower
+  tournesol: sunflower
+  beans (undiff): bean
+  dry bean: bean
+  bush bean: bean
+  tomatoes: tomato
+  onions: onion
+  sugarbeets: sugarbeet
+  betterave non fourragere / bette: sugarbeet
+  betterave non fourragre / bette: sugarbeet
+  mais: maize
+  mas: maize
+  mais ensilage: maize
+  mas ensilage: maize
+  sorgho: sorghum
+  sarrasin: buckwheat
+  avoine dhiver: oats
+  avoine de printemps: oats
+  triticale dhiver: triticale
+  triticale de printemps: triticale
+  canne a sucre - fermage: sugarcane
+  canne  sucre - fermage: sugarcane
+  canne a sucre - propriete ou faire valoir direct: sugarcane
+  canne  sucre - proprit ou faire valoir direct: sugarcane
+  canne a sucre - autre: sugarcane
+  canne  sucre - autre: sugarcane
+  banane creole (fruit et legume) - fermage: banana
+  banane crole (fruit et lgume) - fermage: banana
+  banane creole (fruit et legume) - propriete ou faire valoir direct: banana
+  banane crole (fruit et lgume) - proprit ou faire valoir direct: banana
+  banane creole (fruit et legume) - autre: banana
+  banane crole (fruit et lgume) - autre: banana
+  banane export - fermage: banana
+  banane export - propriete ou faire valoir direct: banana
+  banane export - proprit ou faire valoir direct: banana
+  banane export - autre: banana
+  agrume: citrus
+  verger: orchard
+  verger (dom): orchard
+  ananas: pineapple
+  fraise: strawberry
+  cafe / cacao: coffee/cocoa
+  caf / cacao: coffee/cocoa
+  vanille sous bois: vanilla
+  lentille cultivee (non fourragere): lentil
+  lentille cultive (non fourragre): lentil
+  pois de printemps seme avant le 31/05: pea
+  pois de printemps sem avant le 31/05: pea
+  orange tree: citrus
+  apple tree: apple

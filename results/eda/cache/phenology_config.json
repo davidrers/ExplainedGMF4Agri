@@ -1,0 +1,33 @@
+{
+  "script": "results/eda/_phenology.py",
+  "random_seed": 42,
+  "parcels_per_class": 250,
+  "n_parcels_sampled": 14500,
+  "n_bins": 36,
+  "bin_length_days": 10,
+  "min_timesteps": 10,
+  "separability": {
+    "Estonia": {
+      "n_classes": 20,
+      "n_parcels": 5000,
+      "n_bins_used": 25,
+      "between_within_ratio": 0.5096,
+      "F_statistic": 133.56
+    },
+    "Latvia": {
+      "n_classes": 20,
+      "n_parcels": 5000,
+      "n_bins_used": 26,
+      "between_within_ratio": 0.4968,
+      "F_statistic": 130.22
+    },
+    "Portugal": {
+      "n_classes": 18,
+      "n_parcels": 4500,
+      "n_bins_used": 35,
+      "between_within_ratio": 0.3789,
+      "F_statistic": 99.89
+    }
+  },
+  "seconds_total": 7.3
+}

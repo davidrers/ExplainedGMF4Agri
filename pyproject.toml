@@ -1,0 +1,117 @@
+[project]
+name = "gfm4agri"
+version = "0.1.0"
+description = "Geospatial foundation models for transparent agricultural monitoring under label-scarce conditions"
+authors = [{ name = "David Reyes", email = "d.a.reyesmunoz@student.utwente.nl" }]
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+
+# Versions are the ones the exploratory work was already running on, so the
+# Phase 0 EDA outputs in results/eda remain reproducible. poetry.lock freezes
+# the exact resolution for every other machine.
+dependencies = [
+    # --- geospatial foundation models -----------------------------------
+    # terratorch transitively provides torchvision, rasterio, geopandas,
+    # h5py, timm, torchgeo, scikit-learn, tensorboard and albumentations;
+    # the ones imported directly by our own code are still declared below.
+    "terratorch (>=1.2.6,<2.0.0)",
+    "torch (>=2.11.0,<3.0.0)",
+    "torchvision (>=0.26.0,<0.27.0)",
+    "lightning (>=2.6.1,<3.0.0)",
+    "albumentations (>=2.0.8,<3.0.0)",
+    # Pulled in transitively by albumentations -> albucore, which declares an
+    # unbounded "stringzilla>=3.10.4". Release 5.1.2 dropped the CPython 3.11
+    # Windows wheel, so an unconstrained resolution tries to compile it from
+    # source and fails without MSVC. 5.1.1 still ships cp311-win_amd64.
+    # Revisit once a later release restores that wheel.
+    "stringzilla (>=3.10.4,<5.1.2)",
+    "huggingface-hub (>=1.8.0,<2.0.0)",
+    "tensorboard (>=2.20.0,<3.0.0)",
+
+    # --- precomputed-embedding GFMs -------------------------------------
+    "earthengine-api (>=1.7.20,<2.0.0)",   # AlphaEarth Foundations
+    "geotessera (>=0.7.5,<0.8.0)",         # TESSERA
+
+    # --- scientific stack -------------------------------------------------
+    "numpy (>=2.4.4,<3.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "scipy (>=1.17.1,<2.0.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)",
+    "xgboost (>=3.2.0,<4.0.0)",
+    "h5py (>=3.14.0,<4.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+
+    # --- geospatial -------------------------------------------------------
+    "geopandas (>=1.1.3,<2.0.0)",
+    "rasterio (>=1.4.4,<2.0.0)",
+    "shapely (>=2.1.2,<3.0.0)",
+    "pyproj (>=3.7.2,<4.0.0)",
+
+    # --- explainability and uncertainty (Phase 2) -------------------------
+    "shap (>=0.46,<1.0)",
+    "captum (>=0.8,<1.0)",
+
+    # --- figures ----------------------------------------------------------
+    "matplotlib (>=3.10.9,<4.0.0)",
+    "seaborn (>=0.13.2,<1.0.0)",
+
+    # setuptools is capped by the TerraMind hands-on script, which breaks on
+    # the pkg_resources removal in setuptools 81.
+    "setuptools (>=80.0.0,<81.0.0)",
+]
+
+[project.urls]
+Repository = "https://github.com/dareyes/ExplainedGMF4Agri"
+
+# ---------------------------------------------------------------------------
+# CUDA build of torch.
+#
+# This laptop carries an NVIDIA RTX PRO 1000 Blackwell (sm_120), which needs
+# CUDA 12.8 or newer. The PyPI torch wheel for Windows is CPU-only, so torch
+# and torchvision are pulled from the PyTorch cu128 index instead.
+#
+# On a machine WITHOUT an NVIDIA GPU, install the CPU build instead of a plain
+# `poetry install`; see README.md, section "Environment".
+# ---------------------------------------------------------------------------
+[[tool.poetry.source]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+priority = "explicit"
+
+[tool.poetry.dependencies]
+torch = { source = "pytorch-cu128" }
+torchvision = { source = "pytorch-cu128" }
+
+[tool.poetry]
+packages = [{ include = "gfm4agri", from = "src" }]
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=9.0.2,<10.0.0"
+ipykernel = ">=7.2.0,<8.0.0"
+jupyterlab = ">=4.5.7,<5.0.0"
+ruff = ">=0.14,<1.0"
+
+# Only needed to run the upstream TerraTorch tutorials in notebooks/terratorch.
+# Install with: poetry install --with tutorials
+[tool.poetry.group.tutorials]
+optional = true
+
+[tool.poetry.group.tutorials.dependencies]
+datasets = ">=3.0,<5.0"
+gdown = ">=5.2,<6.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

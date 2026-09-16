@@ -1,0 +1,535 @@
+name: eurocropsml_thesis_class_scheme
+version: 1
+generated_by: results/eda/_class_design.py
+source:
+  catalogue: data/catalogue_parcels_full.parquet
+  n_parcels_scanned: 706683
+  is_full_dataset: true
+  hcat_version: HCAT2, EuroCrops (maja601/EuroCrops, hcat_core/HCAT2.csv)
+random_seed: 42
+protocol:
+  K_grid_samples_per_class:
+  - 1
+  - 5
+  - 10
+  - 20
+  - 50
+  K_grid_extended_estonia_latvia_only:
+  - 100
+  - 200
+  K_definition: absolute number of labelled parcels per class, never a percentage
+    of the available labels
+  n_draws_per_K: 5
+  n_test_min_per_class: 100
+  n_val_min_per_class: 50
+  train_pool_multiplier: 2
+  K_max_supported: 50
+aggregation:
+  in_country: native HCAT level as published, no roll-up
+  seasonal_variants: kept separate; winter and spring variants of the same species
+    differ in phenology rather than in species, which is the discriminative signal
+    the benchmark is meant to test
+  cross_country_fallback_level: 4
+exclusions:
+  min_parcels_per_class_per_country: 250
+  max_classes_per_country: 20
+  min_timesteps: 10
+  drop_outside_national_bbox: true
+  national_bbox_lon_min_lon_max_lat_min_lat_max:
+    Estonia:
+    - 21.5
+    - 28.3
+    - 57.4
+    - 59.8
+    Latvia:
+    - 20.8
+    - 28.3
+    - 55.6
+    - 58.2
+    Portugal:
+    - -31.5
+    - -6.1
+    - 32.3
+    - 42.3
+  non_crop_and_catch_all_codes:
+  - hcat: '3399000000'
+    crop_name: not known and other
+    reason: not known and other; a level-3 catch-all that also absorbs national declarations
+      with no HCAT equivalent, including landscape features
+  - hcat: '3301990000'
+    crop_name: other arable land crops
+    reason: other arable land crops; a catch-all for mixed and unresolved arable declarations
+  - hcat: '3301110000'
+    crop_name: fallow land not crop
+    reason: fallow land, a land status rather than a crop
+  - hcat: '3301011500'
+    crop_name: unspecified cereals
+    reason: unspecified cereals; species unresolved
+  - hcat: '3301019900'
+    crop_name: other cereals
+    reason: other cereals; species unresolved
+  - hcat: '3301069900'
+    crop_name: other industrial crops
+    reason: other industrial non-food crops; a catch-all
+  - hcat: '3303990000'
+    crop_name: other permanent crops plantations
+    reason: other permanent crops; a catch-all within permanent crops
+  - hcat: '3303120000'
+    crop_name: unspecified permanent crops
+    reason: unspecified permanent crops; declared as mixed permanent cultures
+  - hcat: '3303080700'
+    crop_name: wire bush
+    reason: wire bush; the Portuguese declarations behind it are hedges, windbreaks
+      and non-grazable shrub, that is landscape features rather than a crop
+  - hcat: '3305000000'
+    crop_name: greenhouse foil film
+    reason: greenhouse, foil and film; a structure rather than a crop
+  - hcat: '3304000000'
+    crop_name: mushrooms energy genetically modified crops
+    reason: mushrooms, energy and genetically modified crops; a heterogeneous residual
+  - hcat: '3300000000'
+    crop_name: crop type
+    reason: crop type; a taxonomy root, uninformative as a label
+  - hcat: '3000000000'
+    crop_name: characteristics
+    reason: characteristics; a taxonomy root, uninformative as a label
+  excluded_branches_by_prefix:
+  - prefix: '3306'
+    reason: tree, wood and forest; forestry rather than an agricultural crop
+  borderline_may_be_reinstated:
+  - hcat: '3306060000'
+    crop_name: oak
+    note: oak; the Portuguese declarations are cork and holm oak plantations, that
+      is montado silvo-pastoral systems, which are agriculturally managed even though
+      the HCAT branch is forestry
+  - hcat: '3301110000'
+    crop_name: fallow land not crop
+    note: fallow land; a legitimate class if the task is framed as land use rather
+      than crop type, and it is the third largest Latvian class
+classes:
+- hcat: '3302000000'
+  crop_name: pasture meadow grassland grass
+  hcat_level: 3
+  thesis_class: pasture_meadow_grassland_grass
+  parent_level4: '3302000000'
+  parent_level4_name: pasture_meadow_grassland_grass
+  countries:
+    Estonia: 84054
+    Latvia: 215020
+    Portugal: 16434
+- hcat: '3301010101'
+  crop_name: winter common soft wheat
+  hcat_level: 6
+  thesis_class: winter_common_soft_wheat
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 13722
+    Latvia: 50603
+- hcat: '3301090300'
+  crop_name: legumes harvested green
+  hcat_level: 5
+  thesis_class: legumes_harvested_green
+  parent_level4: '3301090000'
+  parent_level4_name: plants_harvested_green
+  countries:
+    Estonia: 13144
+- hcat: '3301010402'
+  crop_name: spring barley
+  hcat_level: 6
+  thesis_class: spring_barley
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 10736
+    Latvia: 12934
+- hcat: '3301010500'
+  crop_name: oats
+  hcat_level: 5
+  thesis_class: oats
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 6911
+    Latvia: 22792
+    Portugal: 933
+- hcat: '3301090303'
+  crop_name: clover
+  hcat_level: 6
+  thesis_class: clover
+  parent_level4: '3301090000'
+  parent_level4_name: plants_harvested_green
+  countries:
+    Estonia: 6875
+    Latvia: 6461
+- hcat: '3301060401'
+  crop_name: winter rapeseed rape
+  hcat_level: 6
+  thesis_class: winter_rapeseed_rape
+  parent_level4: '3301060000'
+  parent_level4_name: industrial_nonfood_crops
+  countries:
+    Estonia: 6011
+    Latvia: 11836
+- hcat: '3301010102'
+  crop_name: spring common soft wheat
+  hcat_level: 6
+  thesis_class: spring_common_soft_wheat
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 5522
+    Latvia: 21524
+- hcat: '3301020600'
+  crop_name: peas
+  hcat_level: 5
+  thesis_class: peas
+  parent_level4: '3301020000'
+  parent_level4_name: legumes_dried_pulses_protein_crops
+  countries:
+    Estonia: 4209
+    Latvia: 2935
+- hcat: '3301030000'
+  crop_name: potatoes
+  hcat_level: 4
+  thesis_class: potatoes
+  parent_level4: '3301030000'
+  parent_level4_name: potatoes
+  countries:
+    Estonia: 3423
+    Latvia: 8653
+    Portugal: 523
+- hcat: '3301010401'
+  crop_name: winter barley
+  hcat_level: 6
+  thesis_class: winter_barley
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 2245
+    Latvia: 1568
+- hcat: '3301020100'
+  crop_name: beans
+  hcat_level: 5
+  thesis_class: beans
+  parent_level4: '3301020000'
+  parent_level4_name: legumes_dried_pulses_protein_crops
+  countries:
+    Estonia: 1719
+    Latvia: 3569
+- hcat: '3301070000'
+  crop_name: fresh vegetables
+  hcat_level: 4
+  thesis_class: fresh_vegetables
+  parent_level4: '3301070000'
+  parent_level4_name: fresh_vegetables
+  countries:
+    Estonia: 1569
+    Portugal: 1971
+- hcat: '3301010300'
+  crop_name: rye
+  hcat_level: 5
+  thesis_class: rye
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 1427
+    Latvia: 6357
+    Portugal: 280
+- hcat: '3301090301'
+  crop_name: alfalfa lucerne
+  hcat_level: 6
+  thesis_class: alfalfa_lucerne
+  parent_level4: '3301090000'
+  parent_level4_name: plants_harvested_green
+  countries:
+    Estonia: 1240
+    Latvia: 1845
+- hcat: '3301060402'
+  crop_name: spring rapeseed rape
+  hcat_level: 6
+  thesis_class: spring_rapeseed_rape
+  parent_level4: '3301060000'
+  parent_level4_name: industrial_nonfood_crops
+  countries:
+    Estonia: 1236
+- hcat: '3301150200'
+  crop_name: buckwheat
+  hcat_level: 5
+  thesis_class: buckwheat
+  parent_level4: '3301150000'
+  parent_level4_name: pseudocereal
+  countries:
+    Estonia: 1140
+    Latvia: 4470
+- hcat: '3301010600'
+  crop_name: grain maize corn popcorn
+  hcat_level: 5
+  thesis_class: grain_maize_corn_popcorn
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Estonia: 852
+    Latvia: 2215
+    Portugal: 4471
+- hcat: '3301020000'
+  crop_name: legumes dried pulses protein crops
+  hcat_level: 4
+  thesis_class: legumes_dried_pulses_protein_crops
+  parent_level4: '3301020000'
+  parent_level4_name: legumes_dried_pulses_protein_crops
+  countries:
+    Estonia: 831
+- hcat: '3303010000'
+  crop_name: orchards fruits
+  hcat_level: 4
+  thesis_class: orchards_fruits
+  parent_level4: '3303010000'
+  parent_level4_name: orchards_fruits
+  countries:
+    Estonia: 828
+    Portugal: 444
+- hcat: '3303020000'
+  crop_name: berries berry species
+  hcat_level: 4
+  thesis_class: berries_berry_species
+  parent_level4: '3303020000'
+  parent_level4_name: berries_berry_species
+  countries:
+    Latvia: 3245
+- hcat: '3303010200'
+  crop_name: apples
+  hcat_level: 5
+  thesis_class: apples
+  parent_level4: '3303010000'
+  parent_level4_name: orchards_fruits
+  countries:
+    Latvia: 2098
+    Portugal: 332
+- hcat: '3301060403'
+  crop_name: summer rapeseed rape
+  hcat_level: 6
+  thesis_class: summer_rapeseed_rape
+  parent_level4: '3301060000'
+  parent_level4_name: industrial_nonfood_crops
+  countries:
+    Latvia: 2076
+- hcat: '3301010801'
+  crop_name: winter triticale
+  hcat_level: 6
+  thesis_class: winter_triticale
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Latvia: 1309
+- hcat: '3301061400'
+  crop_name: phacelia
+  hcat_level: 5
+  thesis_class: phacelia
+  parent_level4: '3301060000'
+  parent_level4_name: industrial_nonfood_crops
+  countries:
+    Latvia: 1075
+- hcat: '3303050000'
+  crop_name: olive plantations
+  hcat_level: 4
+  thesis_class: olive_plantations
+  parent_level4: '3303050000'
+  parent_level4_name: olive_plantations
+  countries:
+    Portugal: 18683
+- hcat: '3303060000'
+  crop_name: vineyards wine vine rebland grapes
+  hcat_level: 4
+  thesis_class: vineyards_wine_vine_rebland_grapes
+  parent_level4: '3303060000'
+  parent_level4_name: vineyards_wine_vine_rebland_grapes
+  countries:
+    Portugal: 5329
+- hcat: '3301090100'
+  crop_name: temporary grass
+  hcat_level: 5
+  thesis_class: temporary_grass
+  parent_level4: '3301090000'
+  parent_level4_name: plants_harvested_green
+  countries:
+    Portugal: 4207
+- hcat: '3303030500'
+  crop_name: sweet chestnuts
+  hcat_level: 5
+  thesis_class: sweet_chestnuts
+  parent_level4: '3303030000'
+  parent_level4_name: nuts
+  countries:
+    Portugal: 3701
+- hcat: '3303011200'
+  crop_name: pears
+  hcat_level: 5
+  thesis_class: pears
+  parent_level4: '3303010000'
+  parent_level4_name: orchards_fruits
+  countries:
+    Portugal: 558
+- hcat: '3303030000'
+  crop_name: nuts
+  hcat_level: 4
+  thesis_class: nuts
+  parent_level4: '3303030000'
+  parent_level4_name: nuts
+  countries:
+    Portugal: 424
+- hcat: '3303030100'
+  crop_name: almond
+  hcat_level: 5
+  thesis_class: almond
+  parent_level4: '3303030000'
+  parent_level4_name: nuts
+  countries:
+    Portugal: 342
+- hcat: '3301090205'
+  crop_name: lolium ryegrass
+  hcat_level: 6
+  thesis_class: lolium_ryegrass
+  parent_level4: '3301090000'
+  parent_level4_name: plants_harvested_green
+  countries:
+    Portugal: 339
+- hcat: '3301010700'
+  crop_name: rice
+  hcat_level: 5
+  thesis_class: rice
+  parent_level4: '3301010000'
+  parent_level4_name: cereal
+  countries:
+    Portugal: 271
+- hcat: '3303040000'
+  crop_name: citrus plantations
+  hcat_level: 4
+  thesis_class: citrus_plantations
+  parent_level4: '3303040000'
+  parent_level4_name: citrus_plantations
+  countries:
+    Portugal: 255
+in_country_class_lists:
+  Estonia:
+  - '3302000000'
+  - '3301010101'
+  - '3301090300'
+  - '3301010402'
+  - '3301010500'
+  - '3301090303'
+  - '3301060401'
+  - '3301010102'
+  - '3301020600'
+  - '3301030000'
+  - '3301010401'
+  - '3301020100'
+  - '3301070000'
+  - '3301010300'
+  - '3301090301'
+  - '3301060402'
+  - '3301150200'
+  - '3301010600'
+  - '3301020000'
+  - '3303010000'
+  Latvia:
+  - '3302000000'
+  - '3301010101'
+  - '3301010500'
+  - '3301010102'
+  - '3301010402'
+  - '3301060401'
+  - '3301030000'
+  - '3301090303'
+  - '3301010300'
+  - '3301150200'
+  - '3301020100'
+  - '3303020000'
+  - '3301020600'
+  - '3301010600'
+  - '3303010200'
+  - '3301060403'
+  - '3301090301'
+  - '3301010401'
+  - '3301010801'
+  - '3301061400'
+  Portugal:
+  - '3303050000'
+  - '3302000000'
+  - '3303060000'
+  - '3301010600'
+  - '3301090100'
+  - '3303030500'
+  - '3301070000'
+  - '3301010500'
+  - '3303011200'
+  - '3301030000'
+  - '3303010000'
+  - '3303030000'
+  - '3303030100'
+  - '3301090205'
+  - '3303010200'
+  - '3301010300'
+  - '3301010700'
+  - '3303040000'
+in_country_class_counts:
+  Estonia: 20
+  Latvia: 20
+  Portugal: 18
+cross_country_shared:
+  Estonia|Latvia:
+  - '3302000000'
+  - '3301010101'
+  - '3301010402'
+  - '3301010500'
+  - '3301090303'
+  - '3301060401'
+  - '3301010102'
+  - '3301020600'
+  - '3301030000'
+  - '3301010401'
+  - '3301020100'
+  - '3301010300'
+  - '3301090301'
+  - '3301150200'
+  - '3301010600'
+  Estonia|Portugal:
+  - '3302000000'
+  - '3301010500'
+  - '3301030000'
+  - '3301070000'
+  - '3301010300'
+  - '3301010600'
+  - '3303010000'
+  Latvia|Portugal:
+  - '3302000000'
+  - '3301010500'
+  - '3301030000'
+  - '3301010300'
+  - '3301010600'
+  - '3303010200'
+  Estonia|Latvia|Portugal:
+  - '3302000000'
+  - '3301010500'
+  - '3301030000'
+  - '3301010300'
+  - '3301010600'
+cross_country_shared_counts:
+  Estonia|Latvia: 15
+  Estonia|Portugal: 7
+  Latvia|Portugal: 6
+  Estonia|Latvia|Portugal: 5
+cross_country_shared_level4:
+  Estonia|Latvia|Portugal:
+  - '3302000000'
+  - '3301010000'
+  - '3301090000'
+  - '3301020000'
+  - '3301030000'
+  - '3303010000'
+  - '3301070000'
+  counts:
+    Estonia|Latvia: 12
+    Estonia|Portugal: 7
+    Latvia|Portugal: 8
+    Estonia|Latvia|Portugal: 7

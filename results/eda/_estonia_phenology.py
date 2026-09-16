@@ -20,7 +20,8 @@ np.random.seed(0)
 
 HERE = Path(__file__).parent.resolve()
 FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
-DATA_DIR = Path(os.environ.get("EUROCROPSML_DATA", Path.home() / "eurocropsml_data")).expanduser() / "preprocess"
+REPO = Path(__file__).resolve().parents[2]
+DATA_DIR = Path(os.environ.get("EUROCROPSML_DATA", REPO / "data" / "eurocropsml")).expanduser() / "preprocess"
 RED, NIR = 3, 7  # B04, B08 in 0-indexed S2 order
 
 # Estonia parcels start with "EE"; we read filenames directly — fast.

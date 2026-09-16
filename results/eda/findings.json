@@ -1,222 +1,449 @@
 {
-  "n_parcels_total": 30000,
-  "centers_geographic": "True",
+  "n_parcels_total": 706683,
+  "source": "full catalogue, data/catalogue_parcels_full.parquet",
+  "is_full_dataset": true,
+  "random_seed": 42,
   "parcels_per_country": {
-    "Latvia": 18205,
-    "Estonia": 7582,
-    "Portugal": 4213
+    "Estonia": 175906,
+    "Latvia": 431143,
+    "Portugal": 99634
   },
-  "n_distinct_classes": 125,
-  "top10_classes": {
-    "3302000000": 13425,
-    "3301010101": 2600,
-    "3301010500": 1262,
-    "3399000000": 1227,
-    "3301010102": 1192,
-    "3301010402": 1069,
-    "3301110000": 926,
-    "3301990000": 912,
-    "3301060401": 800,
-    "3303050000": 759
+  "parcels_per_country_pct": {
+    "Estonia": 24.89,
+    "Latvia": 61.01,
+    "Portugal": 14.1
   },
-  "per_country_top10": {
-    "Estonia": {
-      "3302000000": 3624,
-      "3301010101": 579,
-      "3301090300": 551,
-      "3301010402": 472,
-      "3301010500": 300,
-      "3301090303": 292,
-      "3301060401": 282,
-      "3301010102": 251,
-      "3301020600": 182,
-      "3301030000": 131
+  "n_distinct_classes": 176,
+  "top10_classes": [
+    {
+      "hcat": "3302000000",
+      "crop_name": "pasture meadow grassland grass",
+      "n": 315519,
+      "share_pct": 44.65
     },
-    "Latvia": {
-      "3302000000": 9104,
-      "3301010101": 2021,
-      "3301010102": 941,
-      "3301010500": 920,
-      "3301990000": 818,
-      "3301110000": 767,
-      "3301010402": 597,
-      "3301060401": 518,
-      "3301030000": 369,
-      "3301090303": 292
+    {
+      "hcat": "3301010101",
+      "crop_name": "winter common soft wheat",
+      "n": 64325,
+      "share_pct": 9.1
     },
-    "Portugal": {
-      "3399000000": 1219,
-      "3303050000": 759,
-      "3302000000": 697,
-      "3303060000": 230,
-      "3301010600": 203,
-      "3303030500": 182,
-      "3301090100": 170,
-      "3306060000": 100,
-      "3301070000": 97,
-      "3301990000": 94
+    {
+      "hcat": "3301010500",
+      "crop_name": "oats",
+      "n": 30636,
+      "share_pct": 4.34
+    },
+    {
+      "hcat": "3399000000",
+      "crop_name": "not known and other",
+      "n": 29573,
+      "share_pct": 4.18
+    },
+    {
+      "hcat": "3301010102",
+      "crop_name": "spring common soft wheat",
+      "n": 27046,
+      "share_pct": 3.83
+    },
+    {
+      "hcat": "3301010402",
+      "crop_name": "spring barley",
+      "n": 23670,
+      "share_pct": 3.35
+    },
+    {
+      "hcat": "3301990000",
+      "crop_name": "other arable land crops",
+      "n": 21550,
+      "share_pct": 3.05
+    },
+    {
+      "hcat": "3301110000",
+      "crop_name": "fallow land not crop",
+      "n": 20666,
+      "share_pct": 2.92
+    },
+    {
+      "hcat": "3303050000",
+      "crop_name": "olive plantations",
+      "n": 18692,
+      "share_pct": 2.65
+    },
+    {
+      "hcat": "3301060401",
+      "crop_name": "winter rapeseed rape",
+      "n": 17847,
+      "share_pct": 2.53
     }
+  ],
+  "per_country_top10": {
+    "Estonia": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "n": 84057
+      },
+      {
+        "hcat": "3301010101",
+        "crop_name": "winter common soft wheat",
+        "n": 13722
+      },
+      {
+        "hcat": "3301090300",
+        "crop_name": "legumes harvested green",
+        "n": 13145
+      },
+      {
+        "hcat": "3301010402",
+        "crop_name": "spring barley",
+        "n": 10736
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "n": 6911
+      },
+      {
+        "hcat": "3301090303",
+        "crop_name": "clover",
+        "n": 6875
+      },
+      {
+        "hcat": "3301060401",
+        "crop_name": "winter rapeseed rape",
+        "n": 6011
+      },
+      {
+        "hcat": "3301010102",
+        "crop_name": "spring common soft wheat",
+        "n": 5522
+      },
+      {
+        "hcat": "3301020600",
+        "crop_name": "peas",
+        "n": 4209
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "n": 3423
+      }
+    ],
+    "Latvia": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "n": 215020
+      },
+      {
+        "hcat": "3301010101",
+        "crop_name": "winter common soft wheat",
+        "n": 50603
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "n": 22792
+      },
+      {
+        "hcat": "3301010102",
+        "crop_name": "spring common soft wheat",
+        "n": 21524
+      },
+      {
+        "hcat": "3301990000",
+        "crop_name": "other arable land crops",
+        "n": 19049
+      },
+      {
+        "hcat": "3301110000",
+        "crop_name": "fallow land not crop",
+        "n": 17000
+      },
+      {
+        "hcat": "3301010402",
+        "crop_name": "spring barley",
+        "n": 12934
+      },
+      {
+        "hcat": "3301060401",
+        "crop_name": "winter rapeseed rape",
+        "n": 11836
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "n": 8653
+      },
+      {
+        "hcat": "3301090303",
+        "crop_name": "clover",
+        "n": 6461
+      }
+    ],
+    "Portugal": [
+      {
+        "hcat": "3399000000",
+        "crop_name": "not known and other",
+        "n": 29328
+      },
+      {
+        "hcat": "3303050000",
+        "crop_name": "olive plantations",
+        "n": 18692
+      },
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "n": 16442
+      },
+      {
+        "hcat": "3303060000",
+        "crop_name": "vineyards wine vine rebland grapes",
+        "n": 5351
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "n": 4471
+      },
+      {
+        "hcat": "3301090100",
+        "crop_name": "temporary grass",
+        "n": 4215
+      },
+      {
+        "hcat": "3303030500",
+        "crop_name": "sweet chestnuts",
+        "n": 3707
+      },
+      {
+        "hcat": "3301990000",
+        "crop_name": "other arable land crops",
+        "n": 2490
+      },
+      {
+        "hcat": "3306060000",
+        "crop_name": "oak",
+        "n": 2106
+      },
+      {
+        "hcat": "3301070000",
+        "crop_name": "fresh vegetables",
+        "n": 1972
+      }
+    ]
   },
   "class_coverage": {
-    "50pct_covered_by_top_k": 2,
-    "80pct_covered_by_top_k": 10,
-    "95pct_covered_by_top_k": 26
+    "top_k_for_50pct": 2,
+    "top_k_for_80pct": 10,
+    "top_k_for_95pct": 26,
+    "top_k_for_99pct": 57
   },
   "top20_pivot": {
     "3302000000": {
-      "Estonia": 3624,
-      "Latvia": 9104,
-      "Portugal": 697
+      "crop_name": "pasture meadow grassland grass",
+      "Estonia": 84057,
+      "Latvia": 215020,
+      "Portugal": 16442
     },
     "3301010101": {
-      "Estonia": 579,
-      "Latvia": 2021,
+      "crop_name": "winter common soft wheat",
+      "Estonia": 13722,
+      "Latvia": 50603,
       "Portugal": 0
     },
     "3301010500": {
-      "Estonia": 300,
-      "Latvia": 920,
-      "Portugal": 42
+      "crop_name": "oats",
+      "Estonia": 6911,
+      "Latvia": 22792,
+      "Portugal": 933
     },
     "3399000000": {
-      "Estonia": 7,
-      "Latvia": 1,
-      "Portugal": 1219
+      "crop_name": "not known and other",
+      "Estonia": 234,
+      "Latvia": 11,
+      "Portugal": 29328
     },
     "3301010102": {
-      "Estonia": 251,
-      "Latvia": 941,
+      "crop_name": "spring common soft wheat",
+      "Estonia": 5522,
+      "Latvia": 21524,
       "Portugal": 0
     },
     "3301010402": {
-      "Estonia": 472,
-      "Latvia": 597,
+      "crop_name": "spring barley",
+      "Estonia": 10736,
+      "Latvia": 12934,
       "Portugal": 0
-    },
-    "3301110000": {
-      "Estonia": 91,
-      "Latvia": 767,
-      "Portugal": 68
     },
     "3301990000": {
-      "Estonia": 0,
-      "Latvia": 818,
-      "Portugal": 94
+      "crop_name": "other arable land crops",
+      "Estonia": 11,
+      "Latvia": 19049,
+      "Portugal": 2490
     },
-    "3301060401": {
-      "Estonia": 282,
-      "Latvia": 518,
-      "Portugal": 0
+    "3301110000": {
+      "crop_name": "fallow land not crop",
+      "Estonia": 1918,
+      "Latvia": 17000,
+      "Portugal": 1748
     },
     "3303050000": {
+      "crop_name": "olive plantations",
       "Estonia": 0,
       "Latvia": 0,
-      "Portugal": 759
+      "Portugal": 18692
+    },
+    "3301060401": {
+      "crop_name": "winter rapeseed rape",
+      "Estonia": 6011,
+      "Latvia": 11836,
+      "Portugal": 0
     },
     "3301090303": {
-      "Estonia": 292,
-      "Latvia": 292,
-      "Portugal": 0
+      "crop_name": "clover",
+      "Estonia": 6875,
+      "Latvia": 6461,
+      "Portugal": 3
     },
     "3301090300": {
-      "Estonia": 551,
+      "crop_name": "legumes harvested green",
+      "Estonia": 13145,
       "Latvia": 0,
-      "Portugal": 0
+      "Portugal": 1
     },
     "3301030000": {
-      "Estonia": 131,
-      "Latvia": 369,
-      "Portugal": 22
-    },
-    "3301010600": {
-      "Estonia": 50,
-      "Latvia": 94,
-      "Portugal": 203
+      "crop_name": "potatoes",
+      "Estonia": 3423,
+      "Latvia": 8653,
+      "Portugal": 525
     },
     "3301010300": {
-      "Estonia": 51,
-      "Latvia": 256,
-      "Portugal": 13
+      "crop_name": "rye",
+      "Estonia": 1427,
+      "Latvia": 6357,
+      "Portugal": 282
+    },
+    "3301010600": {
+      "crop_name": "grain maize corn popcorn",
+      "Estonia": 852,
+      "Latvia": 2215,
+      "Portugal": 4471
     },
     "3301020600": {
-      "Estonia": 182,
-      "Latvia": 133,
-      "Portugal": 4
-    },
-    "3303060000": {
-      "Estonia": 1,
-      "Latvia": 3,
-      "Portugal": 230
+      "crop_name": "peas",
+      "Estonia": 4209,
+      "Latvia": 2935,
+      "Portugal": 18
     },
     "3301150200": {
-      "Estonia": 39,
-      "Latvia": 190,
+      "crop_name": "buckwheat",
+      "Estonia": 1140,
+      "Latvia": 4470,
       "Portugal": 0
     },
     "3301020100": {
-      "Estonia": 65,
-      "Latvia": 144,
-      "Portugal": 4
+      "crop_name": "beans",
+      "Estonia": 1719,
+      "Latvia": 3569,
+      "Portugal": 188
+    },
+    "3303060000": {
+      "crop_name": "vineyards wine vine rebland grapes",
+      "Estonia": 38,
+      "Latvia": 42,
+      "Portugal": 5351
     },
     "3301070000": {
-      "Estonia": 72,
-      "Latvia": 27,
-      "Portugal": 97
+      "crop_name": "fresh vegetables",
+      "Estonia": 1569,
+      "Latvia": 833,
+      "Portugal": 1972
     }
   },
-  "classes_present_in_all_three": 11,
+  "top20_classes_present_in_all_three": 13,
   "nuts_summary": {
     "Estonia": {
-      "n_nuts3_regions": 5,
+      "n_nuts_regions": 5,
       "top3": {
-        "EE008": 3380,
-        "EE004": 1887,
-        "EE009": 1520
+        "EE008": 79054,
+        "EE004": 45053,
+        "EE009": 33335
       }
     },
     "Latvia": {
-      "n_nuts3_regions": 5,
+      "n_nuts_regions": 6,
       "top3": {
-        "LV005": 6238,
-        "LV008": 3859,
-        "LV003": 3057
+        "LV005": 150203,
+        "LV008": 91874,
+        "LV003": 72676
       }
     },
     "Portugal": {
-      "n_nuts3_regions": 21,
+      "n_nuts_regions": 23,
       "top3": {
-        "PT11E": 993,
-        "PT16E": 375,
-        "PT16H": 294
+        "PT11E": 23476,
+        "PT16E": 9019,
+        "PT16H": 6393
       }
     }
   },
   "timestep_stats": {
     "Estonia": {
-      "mean": 46.612767079926144,
-      "median": 44.0,
-      "min": 10,
-      "max": 146,
-      "std": 9.898929177368098
+      "mean": 46.65,
+      "median": 44,
+      "min": 7,
+      "max": 216,
+      "std": 9.83
     },
     "Latvia": {
-      "mean": 45.66344410876133,
-      "median": 45.0,
-      "min": 10,
-      "max": 82,
-      "std": 6.418055559097019
+      "mean": 45.76,
+      "median": 45,
+      "min": 9,
+      "max": 148,
+      "std": 6.55
     },
     "Portugal": {
-      "mean": 60.260384524092096,
-      "median": 49.0,
+      "mean": 60.15,
+      "median": 49,
       "min": 1,
       "max": 146,
-      "std": 23.038137577568836
+      "std": 23.0
+    }
+  },
+  "centroid_bounds": {
+    "Estonia": {
+      "lon_min": 21.78,
+      "lon_max": 28.156,
+      "lat_min": 57.518,
+      "lat_max": 59.645
+    },
+    "Latvia": {
+      "lon_min": 20.984,
+      "lon_max": 28.214,
+      "lat_min": 55.676,
+      "lat_max": 58.072
+    },
+    "Portugal": {
+      "lon_min": -9.453,
+      "lon_max": -6.468,
+      "lat_min": 37.322,
+      "lat_max": 42.137
     }
   },
   "plotted_classes": [
-    "3302000000",
-    "3301010101",
-    "3301010500"
+    {
+      "hcat": "3302000000",
+      "crop_name": "pasture meadow grassland grass"
+    },
+    {
+      "hcat": "3301010101",
+      "crop_name": "winter common soft wheat"
+    },
+    {
+      "hcat": "3301010500",
+      "crop_name": "oats"
+    }
   ]
 }

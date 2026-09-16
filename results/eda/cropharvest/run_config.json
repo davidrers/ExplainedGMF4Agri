@@ -1,0 +1,48 @@
+{
+  "script": "C:\\Users\\darey\\OneDrive - University of Twente\\Documents\\THESIS - ExplainedGMF4Agri\\results\\eda\\cropharvest\\_run_analysis.py",
+  "run_at": "2026-09-11T09:31:09Z",
+  "seed": 42,
+  "data_root": "C:\\Users\\darey\\OneDrive - University of Twente\\Documents\\THESIS - ExplainedGMF4Agri\\data\\cropharvest",
+  "labels_path": "C:\\Users\\darey\\OneDrive - University of Twente\\Documents\\THESIS - ExplainedGMF4Agri\\data\\cropharvest\\labels.geojson",
+  "arrays_dir": "C:\\Users\\darey\\OneDrive - University of Twente\\Documents\\THESIS - ExplainedGMF4Agri\\data\\cropharvest\\features\\arrays",
+  "natural_earth": "C:\\Users\\darey\\OneDrive - University of Twente\\Documents\\THESIS - ExplainedGMF4Agri\\data\\cropharvest\\aux\\ne_10m_admin_0_countries.geojson",
+  "array_sample_requested": 15000,
+  "skip_arrays": false,
+  "zenodo_record": 10251170,
+  "bands": [
+    "VV",
+    "VH",
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+    "B6",
+    "B7",
+    "B8",
+    "B8A",
+    "B9",
+    "B11",
+    "B12",
+    "temperature_2m",
+    "total_precipitation",
+    "elevation",
+    "slope",
+    "NDVI"
+  ],
+  "n_timesteps": 12,
+  "days_per_timestep": 30,
+  "class_floor": 150,
+  "alphaearth_years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "tessera_global_years": [
+    2024
+  ]
+}

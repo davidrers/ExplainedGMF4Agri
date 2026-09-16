@@ -1,0 +1,7 @@
+# The repository lives inside a OneDrive folder. A CUDA-enabled environment is
+# several gigabytes of small files, which OneDrive would attempt to synchronise
+# and which would consume the storage quota. The environment is a build
+# artefact, rebuildable from poetry.lock, so it is kept in Poetry's cache
+# directory outside OneDrive instead. Run `poetry env info --path` to locate it.
+[virtualenvs]
+in-project = false

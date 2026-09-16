@@ -1,0 +1,17 @@
+{
+  "script": "results/eda/_build_catalogue.py",
+  "preprocess_dir": "C:\\Users\\darey\\OneDrive - University of Twente\\Documents\\THESIS - ExplainedGMF4Agri\\data\\eurocropsml\\preprocess",
+  "n_files_listed": 706683,
+  "n_parcels_catalogued": 706683,
+  "is_full_scan": true,
+  "sample_limit": null,
+  "random_seed": 42,
+  "workers": 16,
+  "chunk_size": 1000,
+  "seconds_listing": 1.6,
+  "seconds_scanning": 901.7,
+  "seconds_total": 905.7,
+  "python": "3.11.9",
+  "numpy": "2.4.4",
+  "pandas": "2.3.3"
+}

@@ -1,0 +1,2577 @@
+{
+  "source_catalogue": "data/catalogue_parcels_full.parquet",
+  "n_parcels": 706683,
+  "random_seed": 42,
+  "design_parameters": {
+    "K_grid": [
+      1,
+      5,
+      10,
+      20,
+      50
+    ],
+    "K_grid_extended_baltic_only": [
+      100,
+      200
+    ],
+    "n_test_min": 100,
+    "n_val_min": 50,
+    "n_draws": 5,
+    "pool_multiplier": 2
+  },
+  "n_distinct_classes": 176,
+  "n_classes_unresolved_name": 0,
+  "unresolved_codes": [],
+  "parcels_per_country": {
+    "Estonia": 175906,
+    "Latvia": 431143,
+    "Portugal": 99634
+  },
+  "classes_per_country": {
+    "Estonia": 127,
+    "Latvia": 103,
+    "Portugal": 79
+  },
+  "class_coverage": {
+    "top_k_for_50pct": 2,
+    "top_k_for_80pct": 10,
+    "top_k_for_95pct": 26,
+    "top_k_for_99pct": 57
+  },
+  "level_distribution": {
+    "3": 4,
+    "4": 35,
+    "5": 92,
+    "6": 45
+  },
+  "top20_classes": [
+    {
+      "hcat": "3302000000",
+      "crop_name": "pasture meadow grassland grass",
+      "level": 3,
+      "n_estonia": 84057,
+      "n_latvia": 215020,
+      "n_portugal": 16442,
+      "n_total": 315519,
+      "share_pct": 44.6478831385501,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301010101",
+      "crop_name": "winter common soft wheat",
+      "level": 6,
+      "n_estonia": 13722,
+      "n_latvia": 50603,
+      "n_portugal": 0,
+      "n_total": 64325,
+      "share_pct": 9.102383954333131,
+      "n_countries": 2
+    },
+    {
+      "hcat": "3301010500",
+      "crop_name": "oats",
+      "level": 5,
+      "n_estonia": 6911,
+      "n_latvia": 22792,
+      "n_portugal": 933,
+      "n_total": 30636,
+      "share_pct": 4.335182818887676,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3399000000",
+      "crop_name": "not known and other",
+      "level": 3,
+      "n_estonia": 234,
+      "n_latvia": 11,
+      "n_portugal": 29328,
+      "n_total": 29573,
+      "share_pct": 4.184761767298775,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301010102",
+      "crop_name": "spring common soft wheat",
+      "level": 6,
+      "n_estonia": 5522,
+      "n_latvia": 21524,
+      "n_portugal": 0,
+      "n_total": 27046,
+      "share_pct": 3.827175692637293,
+      "n_countries": 2
+    },
+    {
+      "hcat": "3301010402",
+      "crop_name": "spring barley",
+      "level": 6,
+      "n_estonia": 10736,
+      "n_latvia": 12934,
+      "n_portugal": 0,
+      "n_total": 23670,
+      "share_pct": 3.3494508853333107,
+      "n_countries": 2
+    },
+    {
+      "hcat": "3301990000",
+      "crop_name": "other arable land crops",
+      "level": 4,
+      "n_estonia": 11,
+      "n_latvia": 19049,
+      "n_portugal": 2490,
+      "n_total": 21550,
+      "share_pct": 3.0494578191353123,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301110000",
+      "crop_name": "fallow land not crop",
+      "level": 4,
+      "n_estonia": 1918,
+      "n_latvia": 17000,
+      "n_portugal": 1748,
+      "n_total": 20666,
+      "share_pct": 2.924366370777279,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3303050000",
+      "crop_name": "olive plantations",
+      "level": 4,
+      "n_estonia": 0,
+      "n_latvia": 0,
+      "n_portugal": 18692,
+      "n_total": 18692,
+      "share_pct": 2.6450332044212184,
+      "n_countries": 1
+    },
+    {
+      "hcat": "3301060401",
+      "crop_name": "winter rapeseed rape",
+      "level": 6,
+      "n_estonia": 6011,
+      "n_latvia": 11836,
+      "n_portugal": 0,
+      "n_total": 17847,
+      "share_pct": 2.525460496431922,
+      "n_countries": 2
+    },
+    {
+      "hcat": "3301090303",
+      "crop_name": "clover",
+      "level": 6,
+      "n_estonia": 6875,
+      "n_latvia": 6461,
+      "n_portugal": 3,
+      "n_total": 13339,
+      "share_pct": 1.887550712271273,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301090300",
+      "crop_name": "legumes harvested green",
+      "level": 5,
+      "n_estonia": 13145,
+      "n_latvia": 0,
+      "n_portugal": 1,
+      "n_total": 13146,
+      "share_pct": 1.860240022754191,
+      "n_countries": 2
+    },
+    {
+      "hcat": "3301030000",
+      "crop_name": "potatoes",
+      "level": 4,
+      "n_estonia": 3423,
+      "n_latvia": 8653,
+      "n_portugal": 525,
+      "n_total": 12601,
+      "share_pct": 1.7831191637551773,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301010300",
+      "crop_name": "rye",
+      "level": 5,
+      "n_estonia": 1427,
+      "n_latvia": 6357,
+      "n_portugal": 282,
+      "n_total": 8066,
+      "share_pct": 1.1413887131854028,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301010600",
+      "crop_name": "grain maize corn popcorn",
+      "level": 5,
+      "n_estonia": 852,
+      "n_latvia": 2215,
+      "n_portugal": 4471,
+      "n_total": 7538,
+      "share_pct": 1.066673458962505,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301020600",
+      "crop_name": "peas",
+      "level": 5,
+      "n_estonia": 4209,
+      "n_latvia": 2935,
+      "n_portugal": 18,
+      "n_total": 7162,
+      "share_pct": 1.0134671415613508,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301150200",
+      "crop_name": "buckwheat",
+      "level": 5,
+      "n_estonia": 1140,
+      "n_latvia": 4470,
+      "n_portugal": 0,
+      "n_total": 5610,
+      "share_pct": 0.7938495761182879,
+      "n_countries": 2
+    },
+    {
+      "hcat": "3301020100",
+      "crop_name": "beans",
+      "level": 5,
+      "n_estonia": 1719,
+      "n_latvia": 3569,
+      "n_portugal": 188,
+      "n_total": 5476,
+      "share_pct": 0.7748877502359616,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3303060000",
+      "crop_name": "vineyards wine vine rebland grapes",
+      "level": 4,
+      "n_estonia": 38,
+      "n_latvia": 42,
+      "n_portugal": 5351,
+      "n_total": 5431,
+      "share_pct": 0.7685199728874191,
+      "n_countries": 3
+    },
+    {
+      "hcat": "3301070000",
+      "crop_name": "fresh vegetables",
+      "level": 4,
+      "n_estonia": 1569,
+      "n_latvia": 833,
+      "n_portugal": 1972,
+      "n_total": 4374,
+      "share_pct": 0.6189479582783228,
+      "n_countries": 3
+    }
+  ],
+  "class_size_survival": [
+    {
+      "threshold": 20,
+      "implied_k_max": 0,
+      "n_classes_estonia": 63,
+      "parcels_kept_estonia": 175527,
+      "pct_parcels_kept_estonia": 99.78,
+      "n_classes_latvia": 79,
+      "parcels_kept_latvia": 430951,
+      "pct_parcels_kept_latvia": 99.96,
+      "n_classes_portugal": 43,
+      "parcels_kept_portugal": 99403,
+      "pct_parcels_kept_portugal": 99.77,
+      "n_classes_all_three": 13
+    },
+    {
+      "threshold": 50,
+      "implied_k_max": 0,
+      "n_classes_estonia": 47,
+      "parcels_kept_estonia": 175041,
+      "pct_parcels_kept_estonia": 99.51,
+      "n_classes_latvia": 62,
+      "parcels_kept_latvia": 430410,
+      "pct_parcels_kept_latvia": 99.83,
+      "n_classes_portugal": 38,
+      "parcels_kept_portugal": 99256,
+      "pct_parcels_kept_portugal": 99.62,
+      "n_classes_all_three": 10
+    },
+    {
+      "threshold": 100,
+      "implied_k_max": 0,
+      "n_classes_estonia": 34,
+      "parcels_kept_estonia": 174098,
+      "pct_parcels_kept_estonia": 98.97,
+      "n_classes_latvia": 53,
+      "parcels_kept_latvia": 429711,
+      "pct_parcels_kept_latvia": 99.67,
+      "n_classes_portugal": 30,
+      "parcels_kept_portugal": 98631,
+      "pct_parcels_kept_portugal": 98.99,
+      "n_classes_all_three": 9
+    },
+    {
+      "threshold": 200,
+      "implied_k_max": 25,
+      "n_classes_estonia": 31,
+      "parcels_kept_estonia": 173660,
+      "pct_parcels_kept_estonia": 98.72,
+      "n_classes_latvia": 41,
+      "parcels_kept_latvia": 427956,
+      "pct_parcels_kept_latvia": 99.26,
+      "n_classes_portugal": 26,
+      "parcels_kept_portugal": 97975,
+      "pct_parcels_kept_portugal": 98.33,
+      "n_classes_all_three": 8
+    },
+    {
+      "threshold": 250,
+      "implied_k_max": 50,
+      "n_classes_estonia": 29,
+      "parcels_kept_estonia": 173217,
+      "pct_parcels_kept_estonia": 98.47,
+      "n_classes_latvia": 37,
+      "parcels_kept_latvia": 427075,
+      "pct_parcels_kept_latvia": 99.06,
+      "n_classes_portugal": 25,
+      "parcels_kept_portugal": 97726,
+      "pct_parcels_kept_portugal": 98.08,
+      "n_classes_all_three": 8
+    },
+    {
+      "threshold": 300,
+      "implied_k_max": 75,
+      "n_classes_estonia": 27,
+      "parcels_kept_estonia": 172649,
+      "pct_parcels_kept_estonia": 98.15,
+      "n_classes_latvia": 34,
+      "parcels_kept_latvia": 426299,
+      "pct_parcels_kept_latvia": 98.88,
+      "n_classes_portugal": 22,
+      "parcels_kept_portugal": 96918,
+      "pct_parcels_kept_portugal": 97.27,
+      "n_classes_all_three": 7
+    },
+    {
+      "threshold": 350,
+      "implied_k_max": 100,
+      "n_classes_estonia": 26,
+      "parcels_kept_estonia": 172327,
+      "pct_parcels_kept_estonia": 97.97,
+      "n_classes_latvia": 33,
+      "parcels_kept_latvia": 425995,
+      "pct_parcels_kept_latvia": 98.81,
+      "n_classes_portugal": 19,
+      "parcels_kept_portugal": 95902,
+      "pct_parcels_kept_portugal": 96.25,
+      "n_classes_all_three": 6
+    },
+    {
+      "threshold": 500,
+      "implied_k_max": 175,
+      "n_classes_estonia": 24,
+      "parcels_kept_estonia": 171498,
+      "pct_parcels_kept_estonia": 97.49,
+      "n_classes_latvia": 29,
+      "parcels_kept_latvia": 424315,
+      "pct_parcels_kept_latvia": 98.42,
+      "n_classes_portugal": 17,
+      "parcels_kept_portugal": 95030,
+      "pct_parcels_kept_portugal": 95.38,
+      "n_classes_all_three": 6
+    },
+    {
+      "threshold": 550,
+      "implied_k_max": 200,
+      "n_classes_estonia": 22,
+      "parcels_kept_estonia": 170443,
+      "pct_parcels_kept_estonia": 96.89,
+      "n_classes_latvia": 28,
+      "parcels_kept_latvia": 423783,
+      "pct_parcels_kept_latvia": 98.29,
+      "n_classes_portugal": 16,
+      "parcels_kept_portugal": 94505,
+      "pct_parcels_kept_portugal": 94.85,
+      "n_classes_all_three": 5
+    },
+    {
+      "threshold": 1000,
+      "implied_k_max": 425,
+      "n_classes_estonia": 18,
+      "parcels_kept_estonia": 167105,
+      "pct_parcels_kept_estonia": 95.0,
+      "n_classes_latvia": 23,
+      "parcels_kept_latvia": 420321,
+      "pct_parcels_kept_latvia": 97.49,
+      "n_classes_portugal": 11,
+      "parcels_kept_portugal": 90522,
+      "pct_parcels_kept_portugal": 90.85,
+      "n_classes_all_three": 2
+    },
+    {
+      "threshold": 2000,
+      "implied_k_max": 925,
+      "n_classes_estonia": 11,
+      "parcels_kept_estonia": 156856,
+      "pct_parcels_kept_estonia": 89.17,
+      "n_classes_latvia": 18,
+      "parcels_kept_latvia": 412837,
+      "pct_parcels_kept_latvia": 95.75,
+      "n_classes_portugal": 9,
+      "parcels_kept_portugal": 86802,
+      "pct_parcels_kept_portugal": 87.12,
+      "n_classes_all_three": 1
+    }
+  ],
+  "min_class_size_for_K": {
+    "1": 152,
+    "5": 160,
+    "10": 170,
+    "20": 190,
+    "50": 250,
+    "100": 350,
+    "200": 550
+  },
+  "non_crop_classes": [
+    {
+      "hcat": "3399000000",
+      "crop_name": "not known and other",
+      "n_estonia": 234,
+      "n_latvia": 11,
+      "n_portugal": 29328,
+      "n_total": 29573,
+      "share_pct": 4.184761767298775,
+      "reason": "not known and other; a level-3 catch-all that also absorbs national declarations with no HCAT equivalent, including landscape features"
+    },
+    {
+      "hcat": "3301990000",
+      "crop_name": "other arable land crops",
+      "n_estonia": 11,
+      "n_latvia": 19049,
+      "n_portugal": 2490,
+      "n_total": 21550,
+      "share_pct": 3.0494578191353123,
+      "reason": "other arable land crops; a catch-all for mixed and unresolved arable declarations"
+    },
+    {
+      "hcat": "3301110000",
+      "crop_name": "fallow land not crop",
+      "n_estonia": 1918,
+      "n_latvia": 17000,
+      "n_portugal": 1748,
+      "n_total": 20666,
+      "share_pct": 2.924366370777279,
+      "reason": "fallow land, a land status rather than a crop"
+    },
+    {
+      "hcat": "3306060000",
+      "crop_name": "oak",
+      "n_estonia": 0,
+      "n_latvia": 0,
+      "n_portugal": 2106,
+      "n_total": 2106,
+      "share_pct": 0.2980119799117851,
+      "reason": "tree, wood and forest; forestry rather than an agricultural crop"
+    },
+    {
+      "hcat": "3301011500",
+      "crop_name": "unspecified cereals",
+      "n_estonia": 127,
+      "n_latvia": 1687,
+      "n_portugal": 0,
+      "n_total": 1814,
+      "share_pct": 0.25669218022790985,
+      "reason": "unspecified cereals; species unresolved"
+    },
+    {
+      "hcat": "3303080700",
+      "crop_name": "wire bush",
+      "n_estonia": 0,
+      "n_latvia": 0,
+      "n_portugal": 967,
+      "n_total": 967,
+      "share_pct": 0.13683645991201146,
+      "reason": "wire bush; the Portuguese declarations behind it are hedges, windbreaks and non-grazable shrub, that is landscape features rather than a crop"
+    },
+    {
+      "hcat": "3303120000",
+      "crop_name": "unspecified permanent crops",
+      "n_estonia": 0,
+      "n_latvia": 0,
+      "n_portugal": 819,
+      "n_total": 819,
+      "share_pct": 0.11589354774347196,
+      "reason": "unspecified permanent crops; declared as mixed permanent cultures"
+    },
+    {
+      "hcat": "3306000000",
+      "crop_name": "tree wood forest",
+      "n_estonia": 3,
+      "n_latvia": 3,
+      "n_portugal": 706,
+      "n_total": 712,
+      "share_pct": 0.10075238827027111,
+      "reason": "tree, wood and forest; forestry rather than an agricultural crop"
+    },
+    {
+      "hcat": "3306080000",
+      "crop_name": "willows osiers",
+      "n_estonia": 5,
+      "n_latvia": 206,
+      "n_portugal": 0,
+      "n_total": 211,
+      "share_pct": 0.029857800456498884,
+      "reason": "tree, wood and forest; forestry rather than an agricultural crop"
+    },
+    {
+      "hcat": "3301019900",
+      "crop_name": "other cereals",
+      "n_estonia": 21,
+      "n_latvia": 0,
+      "n_portugal": 125,
+      "n_total": 146,
+      "share_pct": 0.020659899841937616,
+      "reason": "other cereals; species unresolved"
+    },
+    {
+      "hcat": "3306020000",
+      "crop_name": "aspen",
+      "n_estonia": 0,
+      "n_latvia": 80,
+      "n_portugal": 0,
+      "n_total": 80,
+      "share_pct": 0.011320493064075406,
+      "reason": "tree, wood and forest; forestry rather than an agricultural crop"
+    },
+    {
+      "hcat": "3306050000",
+      "crop_name": "eucalyptus",
+      "n_estonia": 0,
+      "n_latvia": 0,
+      "n_portugal": 27,
+      "n_total": 27,
+      "share_pct": 0.0038206664091254496,
+      "reason": "tree, wood and forest; forestry rather than an agricultural crop"
+    },
+    {
+      "hcat": "3301069900",
+      "crop_name": "other industrial crops",
+      "n_estonia": 23,
+      "n_latvia": 0,
+      "n_portugal": 0,
+      "n_total": 23,
+      "share_pct": 0.0032546417559216794,
+      "reason": "other industrial non-food crops; a catch-all"
+    },
+    {
+      "hcat": "3303990000",
+      "crop_name": "other permanent crops plantations",
+      "n_estonia": 11,
+      "n_latvia": 0,
+      "n_portugal": 5,
+      "n_total": 16,
+      "share_pct": 0.002264098612815081,
+      "reason": "other permanent crops; a catch-all within permanent crops"
+    }
+  ],
+  "borderline_classes": [
+    {
+      "hcat": "3306060000",
+      "crop_name": "oak",
+      "n_total": 2106,
+      "estonia": 0,
+      "latvia": 0,
+      "portugal": 2106,
+      "note": "oak; the Portuguese declarations are cork and holm oak plantations, that is montado silvo-pastoral systems, which are agriculturally managed even though the HCAT branch is forestry"
+    },
+    {
+      "hcat": "3301110000",
+      "crop_name": "fallow land not crop",
+      "n_total": 20666,
+      "estonia": 1918,
+      "latvia": 17000,
+      "portugal": 1748,
+      "note": "fallow land; a legitimate class if the task is framed as land use rather than crop type, and it is the third largest Latvian class"
+    }
+  ],
+  "non_crop_parcels_total": 78710,
+  "non_crop_parcels_pct": 11.14,
+  "suspicious_named_classes": [
+    {
+      "hcat": "3399000000",
+      "crop_name": "not known and other",
+      "n_estonia": 234,
+      "n_latvia": 11,
+      "n_portugal": 29328,
+      "n_total": 29573,
+      "share_pct": 4.184761767298775
+    },
+    {
+      "hcat": "3301990000",
+      "crop_name": "other arable land crops",
+      "n_estonia": 11,
+      "n_latvia": 19049,
+      "n_portugal": 2490,
+      "n_total": 21550,
+      "share_pct": 3.0494578191353123
+    },
+    {
+      "hcat": "3301110000",
+      "crop_name": "fallow land not crop",
+      "n_estonia": 1918,
+      "n_latvia": 17000,
+      "n_portugal": 1748,
+      "n_total": 20666,
+      "share_pct": 2.924366370777279
+    },
+    {
+      "hcat": "3301011500",
+      "crop_name": "unspecified cereals",
+      "n_estonia": 127,
+      "n_latvia": 1687,
+      "n_portugal": 0,
+      "n_total": 1814,
+      "share_pct": 0.25669218022790985
+    },
+    {
+      "hcat": "3303120000",
+      "crop_name": "unspecified permanent crops",
+      "n_estonia": 0,
+      "n_latvia": 0,
+      "n_portugal": 819,
+      "n_total": 819,
+      "share_pct": 0.11589354774347196
+    },
+    {
+      "hcat": "3301019900",
+      "crop_name": "other cereals",
+      "n_estonia": 21,
+      "n_latvia": 0,
+      "n_portugal": 125,
+      "n_total": 146,
+      "share_pct": 0.020659899841937616
+    },
+    {
+      "hcat": "3301069900",
+      "crop_name": "other industrial crops",
+      "n_estonia": 23,
+      "n_latvia": 0,
+      "n_portugal": 0,
+      "n_total": 23,
+      "share_pct": 0.0032546417559216794
+    },
+    {
+      "hcat": "3303990000",
+      "crop_name": "other permanent crops plantations",
+      "n_estonia": 11,
+      "n_latvia": 0,
+      "n_portugal": 5,
+      "n_total": 16,
+      "share_pct": 0.002264098612815081
+    }
+  ],
+  "grassland": {
+    "hcat": "3302000000",
+    "crop_name": "pasture meadow grassland grass",
+    "n_estonia": 84057,
+    "n_latvia": 215020,
+    "n_portugal": 16442,
+    "n_total": 315519,
+    "share_pct": 44.6478831385501
+  },
+  "catch_all_national_declarations": {
+    "3399000000": {
+      "Estonia": [
+        "Birdsfoot trefoil (100%)",
+        "Groundcherry ",
+        "Phacelia tanacetifolia",
+        "Phacelia tanacetifolia undersown with legumes"
+      ],
+      "Latvia": [
+        "Area where the proportion of naturally sown plants exceeds 40% the number of vegetable crops per square meter is less than the number specified in Annex 2.2 to these Regulations and no weed control agronomic measures have been implemented for at least t",
+        "Guilder rose"
+      ],
+      "Portugal": [
+        "ELEGIBLE LANDSCAPE FEATURES - WATER LINES",
+        "association of nitrogen-fixing plants"
+      ]
+    },
+    "3301990000": {
+      "Estonia": [
+        "Winter triticale with the exception of leguminous crops",
+        "other technical culture"
+      ],
+      "Latvia": [
+        "Different crops on a small area of arable land or several crops grown in a continuous field, where each of the crops occupies less than 0.3 ha in the field concerned, or areas used for the production of flowers",
+        "Other crops not elsewhere specified sown as a mixture of crops on arable land",
+        "Other crops sown on pure arable land"
+      ],
+      "Portugal": [
+        "ANNUAL AND OTHER CULT. FORAGE ANNUALS",
+        "CORN; ANNUAL AND OTHER CULT. FORAGE ANNUALS",
+        "CORN; OTHER VEGETABLES; ANNUAL CONSOCIATIONS AND OTHER CULT. FORAGE ANNUALS",
+        "MAIZE; BEANS; POTATOES; ANNUAL INTERCROPS AND OTHER CROPS. FORRAG. ANNUALS",
+        "MELON; OTHER VEGETABLES; ANNUAL AND OTHER CULT. FORAGE ANNUALS",
+        "OTHER TEMPORARY CROPS",
+        "OTHER VEGETABLES; ANNUAL CONSOCIATIONS AND OTHER CULT. FORAGE ANNUALS",
+        "OTHER VEGETABLES; POTATOES; ANNUAL CONSOCIATIONS AND OTHER CULT. FORAGE ANNUALS",
+        "POTATO; ANNUAL AND OTHER CULT. FORAGE ANNUALS",
+        "PUMPKINS AND COURGETTES; CHICKPEA; CORN; BEAN; POTATO; OTHER VEGETABLES; ANNUAL AND OTHER CULT. FORAGE ANNUALS",
+        "TEMPORARY MEADOW; ANNUAL AND OTHER CULT. FORAGE ANNUALS"
+      ]
+    },
+    "3302000000": {
+      "Estonia": [
+        "Mix of nitrogen-binding grasses (over 50% nitrogen-binding grasses less than 50% other leguminous grasses)",
+        "Mix of nitrogen-binding grasses and graminoids (over 50% nitrogen-binding grasses less than 50% graminoid grasses)",
+        "Mix of nitrogen-binding grasses and nitrogen-binding crops(over 50% nitrogen-binding crops mix contains mainly grasses)",
+        "Mix of nitrogen-binding grasses and other crops (over 50% nitrogen-binding grasses less than 50% other crops).",
+        "Other mix of grasses",
+        "Rough grazings",
+        "common trefoil (50-80% of witch tooth 20-50% other grasses)",
+        "grasses",
+        "grassland (at least 80% grasses)"
+      ],
+      "Latvia": [
+        "Grasses not elsewhere specified or included",
+        "Mixture of grasses or fodder grasses sown on arable land",
+        "Mixture of grasses or legumes sown on arable land with legumes> 50%",
+        "Permanent grasslands"
+      ],
+      "Portugal": [
+        "COMMON LAND PASTURE",
+        "PASTURE WITH BUSHES",
+        "PERMANENT PASTURES"
+      ]
+    },
+    "3301110000": {
+      "Estonia": [
+        "Fallow land",
+        "Fallow land (bare land)"
+      ],
+      "Latvia": [
+        "Idle land"
+      ],
+      "Portugal": [
+        "FALLOW; OTHER VEGETABLES",
+        "FALLOWING/ INTERCROPPING (INTERRUPTED CULTIVATEN TO MAKE SOIL MORE FERTILE)",
+        "MAIZE; FALLOW"
+      ]
+    }
+  },
+  "timestep_threshold_loss": [
+    {
+      "min_timesteps": 1,
+      "lost_estonia": 0,
+      "pct_lost_estonia": 0.0,
+      "lost_latvia": 0,
+      "pct_lost_latvia": 0.0,
+      "lost_portugal": 0,
+      "pct_lost_portugal": 0.0,
+      "lost_total": 0,
+      "pct_lost_total": 0.0
+    },
+    {
+      "min_timesteps": 3,
+      "lost_estonia": 0,
+      "pct_lost_estonia": 0.0,
+      "lost_latvia": 0,
+      "pct_lost_latvia": 0.0,
+      "lost_portugal": 25,
+      "pct_lost_portugal": 0.025,
+      "lost_total": 25,
+      "pct_lost_total": 0.004
+    },
+    {
+      "min_timesteps": 5,
+      "lost_estonia": 0,
+      "pct_lost_estonia": 0.0,
+      "lost_latvia": 0,
+      "pct_lost_latvia": 0.0,
+      "lost_portugal": 54,
+      "pct_lost_portugal": 0.054,
+      "lost_total": 54,
+      "pct_lost_total": 0.008
+    },
+    {
+      "min_timesteps": 10,
+      "lost_estonia": 4,
+      "pct_lost_estonia": 0.002,
+      "lost_latvia": 2,
+      "pct_lost_latvia": 0.0,
+      "lost_portugal": 168,
+      "pct_lost_portugal": 0.169,
+      "lost_total": 174,
+      "pct_lost_total": 0.025
+    },
+    {
+      "min_timesteps": 12,
+      "lost_estonia": 23,
+      "pct_lost_estonia": 0.013,
+      "lost_latvia": 22,
+      "pct_lost_latvia": 0.005,
+      "lost_portugal": 239,
+      "pct_lost_portugal": 0.24,
+      "lost_total": 284,
+      "pct_lost_total": 0.04
+    },
+    {
+      "min_timesteps": 15,
+      "lost_estonia": 118,
+      "pct_lost_estonia": 0.067,
+      "lost_latvia": 29,
+      "pct_lost_latvia": 0.007,
+      "lost_portugal": 383,
+      "pct_lost_portugal": 0.384,
+      "lost_total": 530,
+      "pct_lost_total": 0.075
+    },
+    {
+      "min_timesteps": 20,
+      "lost_estonia": 246,
+      "pct_lost_estonia": 0.14,
+      "lost_latvia": 193,
+      "pct_lost_latvia": 0.045,
+      "lost_portugal": 815,
+      "pct_lost_portugal": 0.818,
+      "lost_total": 1254,
+      "pct_lost_total": 0.177
+    },
+    {
+      "min_timesteps": 25,
+      "lost_estonia": 394,
+      "pct_lost_estonia": 0.224,
+      "lost_latvia": 2106,
+      "pct_lost_latvia": 0.488,
+      "lost_portugal": 1719,
+      "pct_lost_portugal": 1.725,
+      "lost_total": 4219,
+      "pct_lost_total": 0.597
+    },
+    {
+      "min_timesteps": 30,
+      "lost_estonia": 705,
+      "pct_lost_estonia": 0.401,
+      "lost_latvia": 3973,
+      "pct_lost_latvia": 0.922,
+      "lost_portugal": 3577,
+      "pct_lost_portugal": 3.59,
+      "lost_total": 8255,
+      "pct_lost_total": 1.168
+    }
+  ],
+  "timestep_stats": {
+    "Estonia": {
+      "mean": 46.65,
+      "std": 9.83,
+      "median": 44,
+      "p01": 32,
+      "p05": 36,
+      "min": 7,
+      "max": 216
+    },
+    "Latvia": {
+      "mean": 45.76,
+      "std": 6.55,
+      "median": 45,
+      "p01": 30,
+      "p05": 37,
+      "min": 9,
+      "max": 148
+    },
+    "Portugal": {
+      "mean": 60.15,
+      "std": 23.0,
+      "median": 49,
+      "p01": 21,
+      "p05": 32,
+      "min": 1,
+      "max": 146
+    }
+  },
+  "geometry": {
+    "Estonia": {
+      "n": 175906,
+      "n_outside_bbox": 0,
+      "pct_outside_bbox": 0.0,
+      "n_missing_coords": 0,
+      "lon_min": 21.7797,
+      "lon_max": 28.1557,
+      "lat_min": 57.5178,
+      "lat_max": 59.645
+    },
+    "Latvia": {
+      "n": 431143,
+      "n_outside_bbox": 0,
+      "pct_outside_bbox": 0.0,
+      "n_missing_coords": 0,
+      "lon_min": 20.9844,
+      "lon_max": 28.2142,
+      "lat_min": 55.6758,
+      "lat_max": 58.072
+    },
+    "Portugal": {
+      "n": 99634,
+      "n_outside_bbox": 0,
+      "pct_outside_bbox": 0.0,
+      "n_missing_coords": 0,
+      "lon_min": -9.4531,
+      "lon_max": -6.468,
+      "lat_min": 37.3216,
+      "lat_max": 42.1374,
+      "n_outside_mainland": 0,
+      "pct_outside_mainland": 0.0
+    }
+  },
+  "integrity": {
+    "n_rows_sharing_a_coordinate": 2,
+    "n_unique_coordinates": 706682,
+    "n_rows_duplicate_parcel_id_global": 0,
+    "n_rows_duplicate_parcel_id_within_country": 0,
+    "n_rows_duplicate_nuts_parcel_id": 0,
+    "n_parcel_ids_in_multiple_nuts": 0,
+    "n_parcels_zero_timesteps": 0,
+    "n_rows_duplicate_filename_key": 0,
+    "n_coordinate_groups_with_multiple_classes": 0,
+    "n_coordinate_groups_spanning_countries": 0
+  },
+  "aggregation_levels": [
+    {
+      "level": 3,
+      "n_classes": 6,
+      "gini": 0.5955,
+      "normalised_entropy": 0.587,
+      "imbalance_ratio": 105173.0,
+      "max_class_share_pct": 44.65,
+      "shared_all_three_min0": 5,
+      "n_classes_estonia_min0": 6,
+      "n_classes_latvia_min0": 5,
+      "n_classes_portugal_min0": 5,
+      "shared_all_three_min100": 3,
+      "n_classes_estonia_min100": 4,
+      "n_classes_latvia_min100": 4,
+      "n_classes_portugal_min100": 5,
+      "shared_all_three_min350": 3,
+      "n_classes_estonia_min350": 3,
+      "n_classes_latvia_min350": 3,
+      "n_classes_portugal_min350": 5,
+      "shared_all_three_min550": 3,
+      "n_classes_estonia_min550": 3,
+      "n_classes_latvia_min550": 3,
+      "n_classes_portugal_min550": 5,
+      "shared_ES_LA_min0": 5,
+      "shared_ES_LA_min350": 3,
+      "shared_ES_PO_min0": 5,
+      "shared_ES_PO_min350": 3,
+      "shared_LA_PO_min0": 5,
+      "shared_LA_PO_min350": 3
+    },
+    {
+      "level": 4,
+      "n_classes": 47,
+      "gini": 0.879,
+      "normalised_entropy": 0.4914,
+      "imbalance_ratio": 315519.0,
+      "max_class_share_pct": 44.65,
+      "shared_all_three_min0": 24,
+      "n_classes_estonia_min0": 36,
+      "n_classes_latvia_min0": 34,
+      "n_classes_portugal_min0": 35,
+      "shared_all_three_min100": 9,
+      "n_classes_estonia_min100": 17,
+      "n_classes_latvia_min100": 21,
+      "n_classes_portugal_min100": 19,
+      "shared_all_three_min350": 7,
+      "n_classes_estonia_min350": 13,
+      "n_classes_latvia_min350": 17,
+      "n_classes_portugal_min350": 16,
+      "shared_all_three_min550": 6,
+      "n_classes_estonia_min550": 12,
+      "n_classes_latvia_min550": 15,
+      "n_classes_portugal_min550": 15,
+      "shared_ES_LA_min0": 31,
+      "shared_ES_LA_min350": 13,
+      "shared_ES_PO_min0": 26,
+      "shared_ES_PO_min350": 7,
+      "shared_LA_PO_min0": 25,
+      "shared_LA_PO_min350": 8
+    },
+    {
+      "level": 5,
+      "n_classes": 133,
+      "gini": 0.9247,
+      "normalised_entropy": 0.4745,
+      "imbalance_ratio": 315519.0,
+      "max_class_share_pct": 44.65,
+      "shared_all_three_min0": 38,
+      "n_classes_estonia_min0": 96,
+      "n_classes_latvia_min0": 83,
+      "n_classes_portugal_min0": 76,
+      "shared_all_three_min100": 10,
+      "n_classes_estonia_min100": 28,
+      "n_classes_latvia_min100": 45,
+      "n_classes_portugal_min100": 30,
+      "shared_all_three_min350": 6,
+      "n_classes_estonia_min350": 20,
+      "n_classes_latvia_min350": 30,
+      "n_classes_portugal_min350": 19,
+      "shared_all_three_min550": 5,
+      "n_classes_estonia_min550": 18,
+      "n_classes_latvia_min550": 26,
+      "n_classes_portugal_min550": 16,
+      "shared_ES_LA_min0": 68,
+      "shared_ES_LA_min350": 17,
+      "shared_ES_PO_min0": 49,
+      "shared_ES_PO_min350": 7,
+      "shared_LA_PO_min0": 43,
+      "shared_LA_PO_min350": 7
+    },
+    {
+      "level": 6,
+      "n_classes": 176,
+      "gini": 0.9284,
+      "normalised_entropy": 0.4805,
+      "imbalance_ratio": 315519.0,
+      "max_class_share_pct": 44.65,
+      "shared_all_three_min0": 35,
+      "n_classes_estonia_min0": 127,
+      "n_classes_latvia_min0": 103,
+      "n_classes_portugal_min0": 79,
+      "shared_all_three_min100": 9,
+      "n_classes_estonia_min100": 34,
+      "n_classes_latvia_min100": 53,
+      "n_classes_portugal_min100": 30,
+      "shared_all_three_min350": 6,
+      "n_classes_estonia_min350": 26,
+      "n_classes_latvia_min350": 33,
+      "n_classes_portugal_min350": 19,
+      "shared_all_three_min550": 5,
+      "n_classes_estonia_min550": 22,
+      "n_classes_latvia_min550": 28,
+      "n_classes_portugal_min550": 16,
+      "shared_ES_LA_min0": 81,
+      "shared_ES_LA_min350": 20,
+      "shared_ES_PO_min0": 47,
+      "shared_ES_PO_min350": 7,
+      "shared_LA_PO_min0": 40,
+      "shared_LA_PO_min350": 7
+    }
+  ],
+  "seasonal_pairs": [
+    {
+      "parent": "3301010100",
+      "parent_name": "common soft wheat",
+      "winter_code": "3301010101",
+      "winter_n_total": 64325,
+      "winter_n_estonia": 13722,
+      "winter_n_latvia": 50603,
+      "winter_n_portugal": 0,
+      "spring_code": "3301010102",
+      "spring_n_total": 27046,
+      "spring_n_estonia": 5522,
+      "spring_n_latvia": 21524,
+      "spring_n_portugal": 0,
+      "merged_n_total": 91371
+    },
+    {
+      "parent": "3301010400",
+      "parent_name": "barley",
+      "winter_code": "3301010401",
+      "winter_n_total": 3813,
+      "winter_n_estonia": 2245,
+      "winter_n_latvia": 1568,
+      "winter_n_portugal": 0,
+      "spring_code": "3301010402",
+      "spring_n_total": 23670,
+      "spring_n_estonia": 10736,
+      "spring_n_latvia": 12934,
+      "spring_n_portugal": 0,
+      "merged_n_total": 27483
+    },
+    {
+      "parent": "3301060400",
+      "parent_name": "rapeseed rape",
+      "winter_code": "3301060401",
+      "winter_n_total": 17847,
+      "winter_n_estonia": 6011,
+      "winter_n_latvia": 11836,
+      "winter_n_portugal": 0,
+      "spring_code": "3301060402",
+      "spring_n_total": 1236,
+      "spring_n_estonia": 1236,
+      "spring_n_latvia": 0,
+      "spring_n_portugal": 0,
+      "merged_n_total": 19083
+    },
+    {
+      "parent": "3301010800",
+      "parent_name": "triticale",
+      "winter_code": "3301010801",
+      "winter_n_total": 1842,
+      "winter_n_estonia": 533,
+      "winter_n_latvia": 1309,
+      "winter_n_portugal": 0,
+      "spring_code": "3301010802",
+      "spring_n_total": 333,
+      "spring_n_estonia": 195,
+      "spring_n_latvia": 138,
+      "spring_n_portugal": 0,
+      "merged_n_total": 2175
+    },
+    {
+      "parent": "3301011000",
+      "parent_name": "spelt",
+      "winter_code": "3301011001",
+      "winter_n_total": 130,
+      "winter_n_estonia": 0,
+      "winter_n_latvia": 130,
+      "winter_n_portugal": 0,
+      "spring_code": "3301011002",
+      "spring_n_total": 15,
+      "spring_n_estonia": 0,
+      "spring_n_latvia": 15,
+      "spring_n_portugal": 0,
+      "merged_n_total": 145
+    }
+  ],
+  "recommended": {
+    "min_class_size_per_country": 250,
+    "K_max": 50,
+    "max_classes_per_country": 20,
+    "min_timesteps": 10,
+    "aggregation": "native HCAT level, no roll-up, for the in-country task",
+    "rationale_min_class_size": "2 * K_max(50) + validation(50) + test(100)"
+  },
+  "n_parcels_after_filters": 627897,
+  "pct_parcels_after_filters": 88.85,
+  "parcels_after_filters_per_country": {
+    "Estonia": 173549,
+    "Latvia": 393107,
+    "Portugal": 61241
+  },
+  "retained_classes_per_country_before_cap": {
+    "Estonia": 28,
+    "Latvia": 34,
+    "Portugal": 18
+  },
+  "max_classes_per_country": 20,
+  "retained_classes_per_country": {
+    "Estonia": 20,
+    "Latvia": 20,
+    "Portugal": 18
+  },
+  "retained_classes_detail": {
+    "Estonia": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "n": 84054
+      },
+      {
+        "hcat": "3301010101",
+        "crop_name": "winter common soft wheat",
+        "n": 13722
+      },
+      {
+        "hcat": "3301090300",
+        "crop_name": "legumes harvested green",
+        "n": 13144
+      },
+      {
+        "hcat": "3301010402",
+        "crop_name": "spring barley",
+        "n": 10736
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "n": 6911
+      },
+      {
+        "hcat": "3301090303",
+        "crop_name": "clover",
+        "n": 6875
+      },
+      {
+        "hcat": "3301060401",
+        "crop_name": "winter rapeseed rape",
+        "n": 6011
+      },
+      {
+        "hcat": "3301010102",
+        "crop_name": "spring common soft wheat",
+        "n": 5522
+      },
+      {
+        "hcat": "3301020600",
+        "crop_name": "peas",
+        "n": 4209
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "n": 3423
+      },
+      {
+        "hcat": "3301010401",
+        "crop_name": "winter barley",
+        "n": 2245
+      },
+      {
+        "hcat": "3301020100",
+        "crop_name": "beans",
+        "n": 1719
+      },
+      {
+        "hcat": "3301070000",
+        "crop_name": "fresh vegetables",
+        "n": 1569
+      },
+      {
+        "hcat": "3301010300",
+        "crop_name": "rye",
+        "n": 1427
+      },
+      {
+        "hcat": "3301090301",
+        "crop_name": "alfalfa lucerne",
+        "n": 1240
+      },
+      {
+        "hcat": "3301060402",
+        "crop_name": "spring rapeseed rape",
+        "n": 1236
+      },
+      {
+        "hcat": "3301150200",
+        "crop_name": "buckwheat",
+        "n": 1140
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "n": 852
+      },
+      {
+        "hcat": "3301020000",
+        "crop_name": "legumes dried pulses protein crops",
+        "n": 831
+      },
+      {
+        "hcat": "3303010000",
+        "crop_name": "orchards fruits",
+        "n": 828
+      }
+    ],
+    "Latvia": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "n": 215020
+      },
+      {
+        "hcat": "3301010101",
+        "crop_name": "winter common soft wheat",
+        "n": 50603
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "n": 22792
+      },
+      {
+        "hcat": "3301010102",
+        "crop_name": "spring common soft wheat",
+        "n": 21524
+      },
+      {
+        "hcat": "3301010402",
+        "crop_name": "spring barley",
+        "n": 12934
+      },
+      {
+        "hcat": "3301060401",
+        "crop_name": "winter rapeseed rape",
+        "n": 11836
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "n": 8653
+      },
+      {
+        "hcat": "3301090303",
+        "crop_name": "clover",
+        "n": 6461
+      },
+      {
+        "hcat": "3301010300",
+        "crop_name": "rye",
+        "n": 6357
+      },
+      {
+        "hcat": "3301150200",
+        "crop_name": "buckwheat",
+        "n": 4470
+      },
+      {
+        "hcat": "3301020100",
+        "crop_name": "beans",
+        "n": 3569
+      },
+      {
+        "hcat": "3303020000",
+        "crop_name": "berries berry species",
+        "n": 3245
+      },
+      {
+        "hcat": "3301020600",
+        "crop_name": "peas",
+        "n": 2935
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "n": 2215
+      },
+      {
+        "hcat": "3303010200",
+        "crop_name": "apples",
+        "n": 2098
+      },
+      {
+        "hcat": "3301060403",
+        "crop_name": "summer rapeseed rape",
+        "n": 2076
+      },
+      {
+        "hcat": "3301090301",
+        "crop_name": "alfalfa lucerne",
+        "n": 1845
+      },
+      {
+        "hcat": "3301010401",
+        "crop_name": "winter barley",
+        "n": 1568
+      },
+      {
+        "hcat": "3301010801",
+        "crop_name": "winter triticale",
+        "n": 1309
+      },
+      {
+        "hcat": "3301061400",
+        "crop_name": "phacelia",
+        "n": 1075
+      }
+    ],
+    "Portugal": [
+      {
+        "hcat": "3303050000",
+        "crop_name": "olive plantations",
+        "n": 18683
+      },
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "n": 16434
+      },
+      {
+        "hcat": "3303060000",
+        "crop_name": "vineyards wine vine rebland grapes",
+        "n": 5329
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "n": 4471
+      },
+      {
+        "hcat": "3301090100",
+        "crop_name": "temporary grass",
+        "n": 4207
+      },
+      {
+        "hcat": "3303030500",
+        "crop_name": "sweet chestnuts",
+        "n": 3701
+      },
+      {
+        "hcat": "3301070000",
+        "crop_name": "fresh vegetables",
+        "n": 1971
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "n": 933
+      },
+      {
+        "hcat": "3303011200",
+        "crop_name": "pears",
+        "n": 558
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "n": 523
+      },
+      {
+        "hcat": "3303010000",
+        "crop_name": "orchards fruits",
+        "n": 444
+      },
+      {
+        "hcat": "3303030000",
+        "crop_name": "nuts",
+        "n": 424
+      },
+      {
+        "hcat": "3303030100",
+        "crop_name": "almond",
+        "n": 342
+      },
+      {
+        "hcat": "3301090205",
+        "crop_name": "lolium ryegrass",
+        "n": 339
+      },
+      {
+        "hcat": "3303010200",
+        "crop_name": "apples",
+        "n": 332
+      },
+      {
+        "hcat": "3301010300",
+        "crop_name": "rye",
+        "n": 280
+      },
+      {
+        "hcat": "3301010700",
+        "crop_name": "rice",
+        "n": 271
+      },
+      {
+        "hcat": "3303040000",
+        "crop_name": "citrus plantations",
+        "n": 255
+      }
+    ]
+  },
+  "retained_coverage_pct": {
+    "Estonia": 96.63,
+    "Latvia": 97.32,
+    "Portugal": 97.15
+  },
+  "shared_three_way": [
+    {
+      "hcat": "3302000000",
+      "crop_name": "pasture meadow grassland grass",
+      "estonia": 84054,
+      "latvia": 215020,
+      "portugal": 16434
+    },
+    {
+      "hcat": "3301010500",
+      "crop_name": "oats",
+      "estonia": 6911,
+      "latvia": 22792,
+      "portugal": 933
+    },
+    {
+      "hcat": "3301030000",
+      "crop_name": "potatoes",
+      "estonia": 3423,
+      "latvia": 8653,
+      "portugal": 523
+    },
+    {
+      "hcat": "3301010300",
+      "crop_name": "rye",
+      "estonia": 1427,
+      "latvia": 6357,
+      "portugal": 280
+    },
+    {
+      "hcat": "3301010600",
+      "crop_name": "grain maize corn popcorn",
+      "estonia": 852,
+      "latvia": 2215,
+      "portugal": 4471
+    }
+  ],
+  "shared_pairwise": {
+    "Estonia|Latvia": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "estonia": 84054,
+        "latvia": 215020
+      },
+      {
+        "hcat": "3301010101",
+        "crop_name": "winter common soft wheat",
+        "estonia": 13722,
+        "latvia": 50603
+      },
+      {
+        "hcat": "3301010402",
+        "crop_name": "spring barley",
+        "estonia": 10736,
+        "latvia": 12934
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "estonia": 6911,
+        "latvia": 22792
+      },
+      {
+        "hcat": "3301090303",
+        "crop_name": "clover",
+        "estonia": 6875,
+        "latvia": 6461
+      },
+      {
+        "hcat": "3301060401",
+        "crop_name": "winter rapeseed rape",
+        "estonia": 6011,
+        "latvia": 11836
+      },
+      {
+        "hcat": "3301010102",
+        "crop_name": "spring common soft wheat",
+        "estonia": 5522,
+        "latvia": 21524
+      },
+      {
+        "hcat": "3301020600",
+        "crop_name": "peas",
+        "estonia": 4209,
+        "latvia": 2935
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "estonia": 3423,
+        "latvia": 8653
+      },
+      {
+        "hcat": "3301010401",
+        "crop_name": "winter barley",
+        "estonia": 2245,
+        "latvia": 1568
+      },
+      {
+        "hcat": "3301020100",
+        "crop_name": "beans",
+        "estonia": 1719,
+        "latvia": 3569
+      },
+      {
+        "hcat": "3301010300",
+        "crop_name": "rye",
+        "estonia": 1427,
+        "latvia": 6357
+      },
+      {
+        "hcat": "3301090301",
+        "crop_name": "alfalfa lucerne",
+        "estonia": 1240,
+        "latvia": 1845
+      },
+      {
+        "hcat": "3301150200",
+        "crop_name": "buckwheat",
+        "estonia": 1140,
+        "latvia": 4470
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "estonia": 852,
+        "latvia": 2215
+      }
+    ],
+    "Estonia|Portugal": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "estonia": 84054,
+        "portugal": 16434
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "estonia": 6911,
+        "portugal": 933
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "estonia": 3423,
+        "portugal": 523
+      },
+      {
+        "hcat": "3301070000",
+        "crop_name": "fresh vegetables",
+        "estonia": 1569,
+        "portugal": 1971
+      },
+      {
+        "hcat": "3301010300",
+        "crop_name": "rye",
+        "estonia": 1427,
+        "portugal": 280
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "estonia": 852,
+        "portugal": 4471
+      },
+      {
+        "hcat": "3303010000",
+        "crop_name": "orchards fruits",
+        "estonia": 828,
+        "portugal": 444
+      }
+    ],
+    "Latvia|Portugal": [
+      {
+        "hcat": "3302000000",
+        "crop_name": "pasture meadow grassland grass",
+        "latvia": 215020,
+        "portugal": 16434
+      },
+      {
+        "hcat": "3301010500",
+        "crop_name": "oats",
+        "latvia": 22792,
+        "portugal": 933
+      },
+      {
+        "hcat": "3301030000",
+        "crop_name": "potatoes",
+        "latvia": 8653,
+        "portugal": 523
+      },
+      {
+        "hcat": "3301010300",
+        "crop_name": "rye",
+        "latvia": 6357,
+        "portugal": 280
+      },
+      {
+        "hcat": "3301010600",
+        "crop_name": "grain maize corn popcorn",
+        "latvia": 2215,
+        "portugal": 4471
+      },
+      {
+        "hcat": "3303010200",
+        "crop_name": "apples",
+        "latvia": 2098,
+        "portugal": 332
+      }
+    ]
+  },
+  "shared_pairwise_counts": {
+    "Estonia|Latvia": 15,
+    "Estonia|Portugal": 7,
+    "Latvia|Portugal": 6
+  },
+  "level4_retained_per_country": {
+    "Estonia": 12,
+    "Latvia": 16,
+    "Portugal": 12
+  },
+  "level4_shared_three_way": [
+    {
+      "hcat": "3302000000",
+      "crop_name": "pasture meadow grassland grass",
+      "estonia": 84054,
+      "latvia": 215020,
+      "portugal": 16434
+    },
+    {
+      "hcat": "3301010000",
+      "crop_name": "cereal",
+      "estonia": 42219,
+      "latvia": 119617,
+      "portugal": 6337
+    },
+    {
+      "hcat": "3301090000",
+      "crop_name": "plants harvested green",
+      "estonia": 21798,
+      "latvia": 9017,
+      "portugal": 4563
+    },
+    {
+      "hcat": "3301020000",
+      "crop_name": "legumes dried pulses protein crops",
+      "estonia": 6762,
+      "latvia": 6581,
+      "portugal": 288
+    },
+    {
+      "hcat": "3301030000",
+      "crop_name": "potatoes",
+      "estonia": 3423,
+      "latvia": 8653,
+      "portugal": 523
+    },
+    {
+      "hcat": "3303010000",
+      "crop_name": "orchards fruits",
+      "estonia": 1282,
+      "latvia": 2965,
+      "portugal": 1726
+    },
+    {
+      "hcat": "3301070000",
+      "crop_name": "fresh vegetables",
+      "estonia": 1569,
+      "latvia": 833,
+      "portugal": 1971
+    }
+  ],
+  "level4_shared_pairwise_counts": {
+    "Estonia|Latvia": 12,
+    "Estonia|Portugal": 7,
+    "Latvia|Portugal": 8
+  },
+  "retained_class_survival": [
+    {
+      "threshold": 20,
+      "implied_k_max": 0,
+      "n_classes_estonia": 58,
+      "n_classes_level4_estonia": 21,
+      "pct_parcels_kept_estonia": 99.8,
+      "n_classes_latvia": 74,
+      "n_classes_level4_latvia": 25,
+      "pct_parcels_kept_latvia": 99.95,
+      "n_classes_portugal": 34,
+      "n_classes_level4_portugal": 19,
+      "pct_parcels_kept_portugal": 99.64,
+      "n_classes_all_three": 12,
+      "n_classes_all_three_level4": 14,
+      "shared_ES_LA": 43,
+      "shared_level4_ES_LA": 21,
+      "shared_ES_PO": 15,
+      "shared_level4_ES_PO": 14,
+      "shared_LA_PO": 17,
+      "shared_level4_LA_PO": 15
+    },
+    {
+      "threshold": 50,
+      "implied_k_max": 0,
+      "n_classes_estonia": 44,
+      "n_classes_level4_estonia": 17,
+      "pct_parcels_kept_estonia": 99.54,
+      "n_classes_latvia": 57,
+      "n_classes_level4_latvia": 20,
+      "pct_parcels_kept_latvia": 99.82,
+      "n_classes_portugal": 30,
+      "n_classes_level4_portugal": 15,
+      "pct_parcels_kept_portugal": 99.44,
+      "n_classes_all_three": 9,
+      "n_classes_all_three_level4": 9,
+      "shared_ES_LA": 31,
+      "shared_level4_ES_LA": 17,
+      "shared_ES_PO": 11,
+      "shared_level4_ES_PO": 9,
+      "shared_LA_PO": 13,
+      "shared_level4_LA_PO": 10
+    },
+    {
+      "threshold": 100,
+      "implied_k_max": 0,
+      "n_classes_estonia": 31,
+      "n_classes_level4_estonia": 15,
+      "pct_parcels_kept_estonia": 99.0,
+      "n_classes_latvia": 49,
+      "n_classes_level4_latvia": 18,
+      "pct_parcels_kept_latvia": 99.66,
+      "n_classes_portugal": 22,
+      "n_classes_level4_portugal": 12,
+      "pct_parcels_kept_portugal": 98.42,
+      "n_classes_all_three": 8,
+      "n_classes_all_three_level4": 8,
+      "shared_ES_LA": 25,
+      "shared_level4_ES_LA": 15,
+      "shared_ES_PO": 9,
+      "shared_level4_ES_PO": 8,
+      "shared_LA_PO": 11,
+      "shared_level4_LA_PO": 8
+    },
+    {
+      "threshold": 200,
+      "implied_k_max": 25,
+      "n_classes_estonia": 29,
+      "n_classes_level4_estonia": 13,
+      "pct_parcels_kept_estonia": 98.82,
+      "n_classes_latvia": 37,
+      "n_classes_level4_latvia": 17,
+      "pct_parcels_kept_latvia": 99.21,
+      "n_classes_portugal": 19,
+      "n_classes_level4_portugal": 12,
+      "pct_parcels_kept_portugal": 97.56,
+      "n_classes_all_three": 7,
+      "n_classes_all_three_level4": 7,
+      "shared_ES_LA": 23,
+      "shared_level4_ES_LA": 13,
+      "shared_ES_PO": 8,
+      "shared_level4_ES_PO": 7,
+      "shared_LA_PO": 7,
+      "shared_level4_LA_PO": 8
+    },
+    {
+      "threshold": 250,
+      "implied_k_max": 50,
+      "n_classes_estonia": 28,
+      "n_classes_level4_estonia": 12,
+      "pct_parcels_kept_estonia": 98.7,
+      "n_classes_latvia": 34,
+      "n_classes_level4_latvia": 16,
+      "pct_parcels_kept_latvia": 99.04,
+      "n_classes_portugal": 18,
+      "n_classes_level4_portugal": 12,
+      "pct_parcels_kept_portugal": 97.15,
+      "n_classes_all_three": 7,
+      "n_classes_all_three_level4": 7,
+      "shared_ES_LA": 22,
+      "shared_level4_ES_LA": 12,
+      "shared_ES_PO": 8,
+      "shared_level4_ES_PO": 7,
+      "shared_LA_PO": 7,
+      "shared_level4_LA_PO": 8
+    },
+    {
+      "threshold": 300,
+      "implied_k_max": 75,
+      "n_classes_estonia": 26,
+      "n_classes_level4_estonia": 12,
+      "pct_parcels_kept_estonia": 98.37,
+      "n_classes_latvia": 31,
+      "n_classes_level4_latvia": 15,
+      "pct_parcels_kept_latvia": 98.84,
+      "n_classes_portugal": 15,
+      "n_classes_level4_portugal": 9,
+      "pct_parcels_kept_portugal": 95.84,
+      "n_classes_all_three": 6,
+      "n_classes_all_three_level4": 6,
+      "shared_ES_LA": 20,
+      "shared_level4_ES_LA": 12,
+      "shared_ES_PO": 7,
+      "shared_level4_ES_PO": 6,
+      "shared_LA_PO": 6,
+      "shared_level4_LA_PO": 6
+    },
+    {
+      "threshold": 350,
+      "implied_k_max": 100,
+      "n_classes_estonia": 25,
+      "n_classes_level4_estonia": 12,
+      "pct_parcels_kept_estonia": 98.19,
+      "n_classes_latvia": 30,
+      "n_classes_level4_latvia": 15,
+      "pct_parcels_kept_latvia": 98.77,
+      "n_classes_portugal": 12,
+      "n_classes_level4_portugal": 9,
+      "pct_parcels_kept_portugal": 94.18,
+      "n_classes_all_three": 5,
+      "n_classes_all_three_level4": 6,
+      "shared_ES_LA": 19,
+      "shared_level4_ES_LA": 12,
+      "shared_ES_PO": 6,
+      "shared_level4_ES_PO": 6,
+      "shared_LA_PO": 5,
+      "shared_level4_LA_PO": 6
+    },
+    {
+      "threshold": 500,
+      "implied_k_max": 175,
+      "n_classes_estonia": 23,
+      "n_classes_level4_estonia": 11,
+      "pct_parcels_kept_estonia": 97.71,
+      "n_classes_latvia": 26,
+      "n_classes_level4_latvia": 14,
+      "pct_parcels_kept_latvia": 98.34,
+      "n_classes_portugal": 10,
+      "n_classes_level4_portugal": 9,
+      "pct_parcels_kept_portugal": 92.76,
+      "n_classes_all_three": 5,
+      "n_classes_all_three_level4": 6,
+      "shared_ES_LA": 18,
+      "shared_level4_ES_LA": 11,
+      "shared_ES_PO": 5,
+      "shared_level4_ES_PO": 6,
+      "shared_LA_PO": 5,
+      "shared_level4_LA_PO": 6
+    },
+    {
+      "threshold": 550,
+      "implied_k_max": 200,
+      "n_classes_estonia": 21,
+      "n_classes_level4_estonia": 11,
+      "pct_parcels_kept_estonia": 97.1,
+      "n_classes_latvia": 25,
+      "n_classes_level4_latvia": 13,
+      "pct_parcels_kept_latvia": 98.2,
+      "n_classes_portugal": 9,
+      "n_classes_level4_portugal": 8,
+      "pct_parcels_kept_portugal": 91.91,
+      "n_classes_all_three": 4,
+      "n_classes_all_three_level4": 5,
+      "shared_ES_LA": 17,
+      "shared_level4_ES_LA": 11,
+      "shared_ES_PO": 4,
+      "shared_level4_ES_PO": 5,
+      "shared_LA_PO": 4,
+      "shared_level4_LA_PO": 5
+    },
+    {
+      "threshold": 1000,
+      "implied_k_max": 425,
+      "n_classes_estonia": 17,
+      "n_classes_level4_estonia": 10,
+      "pct_parcels_kept_estonia": 95.18,
+      "n_classes_latvia": 20,
+      "n_classes_level4_latvia": 9,
+      "pct_parcels_kept_latvia": 97.32,
+      "n_classes_portugal": 7,
+      "n_classes_level4_portugal": 8,
+      "pct_parcels_kept_portugal": 89.48,
+      "n_classes_all_three": 1,
+      "n_classes_all_three_level4": 4,
+      "shared_ES_LA": 14,
+      "shared_level4_ES_LA": 9,
+      "shared_ES_PO": 2,
+      "shared_level4_ES_PO": 5,
+      "shared_LA_PO": 2,
+      "shared_level4_LA_PO": 4
+    },
+    {
+      "threshold": 2000,
+      "implied_k_max": 925,
+      "n_classes_estonia": 11,
+      "n_classes_level4_estonia": 6,
+      "pct_parcels_kept_estonia": 90.38,
+      "n_classes_latvia": 16,
+      "n_classes_level4_latvia": 9,
+      "pct_parcels_kept_latvia": 95.85,
+      "n_classes_portugal": 6,
+      "n_classes_level4_portugal": 6,
+      "pct_parcels_kept_portugal": 86.26,
+      "n_classes_all_three": 1,
+      "n_classes_all_three_level4": 3,
+      "shared_ES_LA": 9,
+      "shared_level4_ES_LA": 6,
+      "shared_ES_PO": 1,
+      "shared_level4_ES_PO": 3,
+      "shared_LA_PO": 2,
+      "shared_level4_LA_PO": 3
+    }
+  ],
+  "spatial_label_autocorrelation": [
+    {
+      "country": "Estonia",
+      "radius_km": 0.25,
+      "mean_same_class_fraction_in_ring": 0.5280943190731612,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 1.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 0.5,
+      "mean_same_class_fraction_in_ring": 0.4210671689791775,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 5.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 1.0,
+      "mean_same_class_fraction_in_ring": 0.3436256438884663,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 17.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 2.0,
+      "mean_same_class_fraction_in_ring": 0.30975393276122115,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 56.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 5.0,
+      "mean_same_class_fraction_in_ring": 0.29553512811877,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 284.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 10.0,
+      "mean_same_class_fraction_in_ring": 0.2840525729021234,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 972.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 20.0,
+      "mean_same_class_fraction_in_ring": 0.2738033936502245,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 3432.5,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Estonia",
+      "radius_km": 50.0,
+      "mean_same_class_fraction_in_ring": 0.264757890432774,
+      "background_prior": 0.2566314143055556,
+      "median_neighbours_cumulative": 17453.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 0.25,
+      "mean_same_class_fraction_in_ring": 0.5227851541268732,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 1.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 0.5,
+      "mean_same_class_fraction_in_ring": 0.46471531835168195,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 3.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 1.0,
+      "mean_same_class_fraction_in_ring": 0.4138959100602254,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 11.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 2.0,
+      "mean_same_class_fraction_in_ring": 0.3943746893426037,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 36.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 5.0,
+      "mean_same_class_fraction_in_ring": 0.3813066448832136,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 187.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 10.0,
+      "mean_same_class_fraction_in_ring": 0.3722800688562637,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 652.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 20.0,
+      "mean_same_class_fraction_in_ring": 0.3626345161632588,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 2337.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Latvia",
+      "radius_km": 50.0,
+      "mean_same_class_fraction_in_ring": 0.3482497951863402,
+      "background_prior": 0.32438121888888893,
+      "median_neighbours_cumulative": 12272.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 120000
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 0.25,
+      "mean_same_class_fraction_in_ring": 0.5665373543101122,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 1.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 0.5,
+      "mean_same_class_fraction_in_ring": 0.49221308341766085,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 4.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 1.0,
+      "mean_same_class_fraction_in_ring": 0.4551297604692886,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 12.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 2.0,
+      "mean_same_class_fraction_in_ring": 0.40849764641589775,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 38.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 5.0,
+      "mean_same_class_fraction_in_ring": 0.36842789722172514,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 164.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 10.0,
+      "mean_same_class_fraction_in_ring": 0.33727739942867513,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 546.0,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 20.0,
+      "mean_same_class_fraction_in_ring": 0.29949461059984894,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 1434.5,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    },
+    {
+      "country": "Portugal",
+      "radius_km": 50.0,
+      "mean_same_class_fraction_in_ring": 0.2508115512658068,
+      "background_prior": 0.1880847143457438,
+      "median_neighbours_cumulative": 5853.5,
+      "median_nn_distance_km": NaN,
+      "n_query_points": 2500,
+      "n_reference_parcels": 61241
+    }
+  ],
+  "median_nn_distance_km": {
+    "Estonia": 0.1807,
+    "Latvia": 0.223,
+    "Portugal": 0.1646
+  },
+  "block_occupancy": [
+    {
+      "country": "Estonia",
+      "block_km": 1,
+      "n_blocks": 26466,
+      "median_parcels_per_block": 5.0,
+      "p90_parcels_per_block": 13.0,
+      "min_blocks_per_class": 565,
+      "median_blocks_per_class": 2006.5,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Estonia",
+      "block_km": 2,
+      "n_blocks": 8901,
+      "median_parcels_per_block": 16.0,
+      "p90_parcels_per_block": 39.0,
+      "min_blocks_per_class": 434,
+      "median_blocks_per_class": 1483.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Estonia",
+      "block_km": 5,
+      "n_blocks": 1832,
+      "median_parcels_per_block": 83.0,
+      "p90_parcels_per_block": 186.0,
+      "min_blocks_per_class": 270,
+      "median_blocks_per_class": 811.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Estonia",
+      "block_km": 10,
+      "n_blocks": 532,
+      "median_parcels_per_block": 277.0,
+      "p90_parcels_per_block": 637.6000000000001,
+      "min_blocks_per_class": 154,
+      "median_blocks_per_class": 358.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Estonia",
+      "block_km": 20,
+      "n_blocks": 153,
+      "median_parcels_per_block": 1080.0,
+      "p90_parcels_per_block": 2031.6000000000001,
+      "min_blocks_per_class": 79,
+      "median_blocks_per_class": 119.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Estonia",
+      "block_km": 50,
+      "n_blocks": 35,
+      "median_parcels_per_block": 4260.0,
+      "p90_parcels_per_block": 9798.8,
+      "min_blocks_per_class": 24,
+      "median_blocks_per_class": 29.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Estonia",
+      "block_km": 100,
+      "n_blocks": 14,
+      "median_parcels_per_block": 6507.0,
+      "p90_parcels_per_block": 27376.5,
+      "min_blocks_per_class": 8,
+      "median_blocks_per_class": 11.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 18,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 1,
+      "n_blocks": 44976,
+      "median_parcels_per_block": 7.0,
+      "p90_parcels_per_block": 18.0,
+      "min_blocks_per_class": 786,
+      "median_blocks_per_class": 2747.5,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 2,
+      "n_blocks": 13963,
+      "median_parcels_per_block": 22.0,
+      "p90_parcels_per_block": 57.0,
+      "min_blocks_per_class": 716,
+      "median_blocks_per_class": 2198.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 5,
+      "n_blocks": 2659,
+      "median_parcels_per_block": 128.0,
+      "p90_parcels_per_block": 283.0,
+      "min_blocks_per_class": 476,
+      "median_blocks_per_class": 1175.5,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 10,
+      "n_blocks": 722,
+      "median_parcels_per_block": 497.5,
+      "p90_parcels_per_block": 1006.4999999999997,
+      "min_blocks_per_class": 286,
+      "median_blocks_per_class": 515.5,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 20,
+      "n_blocks": 204,
+      "median_parcels_per_block": 1799.5,
+      "p90_parcels_per_block": 3263.7000000000016,
+      "min_blocks_per_class": 138,
+      "median_blocks_per_class": 177.5,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 50,
+      "n_blocks": 43,
+      "median_parcels_per_block": 7645.0,
+      "p90_parcels_per_block": 16460.600000000006,
+      "min_blocks_per_class": 35,
+      "median_blocks_per_class": 40.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Latvia",
+      "block_km": 100,
+      "n_blocks": 16,
+      "median_parcels_per_block": 15215.5,
+      "p90_parcels_per_block": 48593.5,
+      "min_blocks_per_class": 11,
+      "median_blocks_per_class": 13.0,
+      "n_classes_with_ge_5_blocks": 20,
+      "n_classes_with_ge_10_blocks": 20,
+      "n_retained_classes": 20
+    },
+    {
+      "country": "Portugal",
+      "block_km": 1,
+      "n_blocks": 18607,
+      "median_parcels_per_block": 2.0,
+      "p90_parcels_per_block": 7.0,
+      "min_blocks_per_class": 107,
+      "median_blocks_per_class": 413.5,
+      "n_classes_with_ge_5_blocks": 18,
+      "n_classes_with_ge_10_blocks": 18,
+      "n_retained_classes": 18
+    },
+    {
+      "country": "Portugal",
+      "block_km": 2,
+      "n_blocks": 9153,
+      "median_parcels_per_block": 3.0,
+      "p90_parcels_per_block": 15.0,
+      "min_blocks_per_class": 77,
+      "median_blocks_per_class": 373.5,
+      "n_classes_with_ge_5_blocks": 18,
+      "n_classes_with_ge_10_blocks": 18,
+      "n_retained_classes": 18
+    },
+    {
+      "country": "Portugal",
+      "block_km": 5,
+      "n_blocks": 2490,
+      "median_parcels_per_block": 10.0,
+      "p90_parcels_per_block": 58.0,
+      "min_blocks_per_class": 47,
+      "median_blocks_per_class": 250.0,
+      "n_classes_with_ge_5_blocks": 18,
+      "n_classes_with_ge_10_blocks": 18,
+      "n_retained_classes": 18
+    },
+    {
+      "country": "Portugal",
+      "block_km": 10,
+      "n_blocks": 744,
+      "median_parcels_per_block": 36.0,
+      "p90_parcels_per_block": 189.10000000000014,
+      "min_blocks_per_class": 27,
+      "median_blocks_per_class": 161.5,
+      "n_classes_with_ge_5_blocks": 18,
+      "n_classes_with_ge_10_blocks": 18,
+      "n_retained_classes": 18
+    },
+    {
+      "country": "Portugal",
+      "block_km": 20,
+      "n_blocks": 222,
+      "median_parcels_per_block": 125.0,
+      "p90_parcels_per_block": 596.4000000000001,
+      "min_blocks_per_class": 18,
+      "median_blocks_per_class": 89.5,
+      "n_classes_with_ge_5_blocks": 18,
+      "n_classes_with_ge_10_blocks": 18,
+      "n_retained_classes": 18
+    },
+    {
+      "country": "Portugal",
+      "block_km": 50,
+      "n_blocks": 49,
+      "median_parcels_per_block": 606.0,
+      "p90_parcels_per_block": 2998.4,
+      "min_blocks_per_class": 8,
+      "median_blocks_per_class": 33.0,
+      "n_classes_with_ge_5_blocks": 18,
+      "n_classes_with_ge_10_blocks": 17,
+      "n_retained_classes": 18
+    },
+    {
+      "country": "Portugal",
+      "block_km": 100,
+      "n_blocks": 18,
+      "median_parcels_per_block": 3323.0,
+      "p90_parcels_per_block": 6865.7,
+      "min_blocks_per_class": 4,
+      "median_blocks_per_class": 14.0,
+      "n_classes_with_ge_5_blocks": 17,
+      "n_classes_with_ge_10_blocks": 15,
+      "n_retained_classes": 18
+    }
+  ],
+  "monthly_coverage_pct_parcels_with_obs": {
+    "Estonia": {
+      "m01": 6.98,
+      "m02": 37.71,
+      "m03": 78.07,
+      "m04": 99.67,
+      "m05": 99.92,
+      "m06": 99.99,
+      "m07": 99.99,
+      "m08": 93.22,
+      "m09": 99.94,
+      "m10": 99.99,
+      "m11": 86.47,
+      "m12": 10.16
+    },
+    "Latvia": {
+      "m01": 2.41,
+      "m02": 27.44,
+      "m03": 96.27,
+      "m04": 99.7,
+      "m05": 99.91,
+      "m06": 99.98,
+      "m07": 99.99,
+      "m08": 94.27,
+      "m09": 99.99,
+      "m10": 100.0,
+      "m11": 98.48,
+      "m12": 24.28
+    },
+    "Portugal": {
+      "m01": 98.76,
+      "m02": 99.92,
+      "m03": 99.79,
+      "m04": 98.23,
+      "m05": 98.26,
+      "m06": 96.1,
+      "m07": 92.94,
+      "m08": 92.21,
+      "m09": 99.28,
+      "m10": 99.52,
+      "m11": 99.9,
+      "m12": 97.39
+    }
+  },
+  "monthly_mean_observations": {
+    "Estonia": {
+      "m01": 0.08,
+      "m02": 0.43,
+      "m03": 1.8,
+      "m04": 5.33,
+      "m05": 5.67,
+      "m06": 8.92,
+      "m07": 7.98,
+      "m08": 3.24,
+      "m09": 4.97,
+      "m10": 5.98,
+      "m11": 2.15,
+      "m12": 0.12
+    },
+    "Latvia": {
+      "m01": 0.03,
+      "m02": 0.28,
+      "m03": 2.63,
+      "m04": 4.34,
+      "m05": 5.16,
+      "m06": 7.68,
+      "m07": 8.33,
+      "m08": 3.08,
+      "m09": 5.54,
+      "m10": 5.79,
+      "m11": 2.62,
+      "m12": 0.28
+    },
+    "Portugal": {
+      "m01": 3.61,
+      "m02": 3.66,
+      "m03": 5.87,
+      "m04": 3.69,
+      "m05": 5.37,
+      "m06": 5.05,
+      "m07": 5.91,
+      "m08": 5.7,
+      "m09": 4.82,
+      "m10": 5.71,
+      "m11": 6.56,
+      "m12": 3.71
+    }
+  },
+  "monthly_grid_completeness_pct": {
+    "Estonia": 76.01,
+    "Latvia": 78.56,
+    "Portugal": 97.69
+  },
+  "growing_season_grid_completeness_mar_oct_pct": {
+    "Estonia": 96.35,
+    "Latvia": 98.76,
+    "Portugal": 97.04
+  },
+  "seconds_total": 12.2
+}

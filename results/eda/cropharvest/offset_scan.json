@@ -1,0 +1,236 @@
+{
+  "generated_at": "2026-09-11T09:30:03Z",
+  "arrays_scanned": 87464,
+  "tolerance_m": 14.14,
+  "n_ok": 83402,
+  "n_bad": 4062,
+  "pct_bad": 4.64,
+  "n_over_1km": 2910,
+  "pct_over_1km": 3.33,
+  "median_m": 3.72,
+  "p95_m": 6.59,
+  "p99_m": 18412.29,
+  "max_km": 1456.8,
+  "per_dataset": [
+    {
+      "dataset": "uganda",
+      "n": 225,
+      "n_bad": 225,
+      "median_m": 82399.28,
+      "max_km": 266.51,
+      "pct_bad": 100.0
+    },
+    {
+      "dataset": "tanzania",
+      "n": 379,
+      "n_bad": 379,
+      "median_m": 129289.06,
+      "max_km": 290.24,
+      "pct_bad": 100.0
+    },
+    {
+      "dataset": "jecam",
+      "n": 12856,
+      "n_bad": 3458,
+      "median_m": 4.56,
+      "max_km": 1456.75,
+      "pct_bad": 26.9
+    },
+    {
+      "dataset": "central-asia",
+      "n": 4894,
+      "n_bad": 0,
+      "median_m": 3.53,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "china-crop",
+      "n": 4397,
+      "n_bad": 0,
+      "median_m": 3.38,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "ethiopia",
+      "n": 830,
+      "n_bad": 0,
+      "median_m": 3.98,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "croplands",
+      "n": 4519,
+      "n_bad": 0,
+      "median_m": 3.83,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "geowiki-landcover-2017",
+      "n": 24761,
+      "n_bad": 0,
+      "median_m": 3.6,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "germany",
+      "n": 2550,
+      "n_bad": 0,
+      "median_m": 3.1,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "canada",
+      "n": 7160,
+      "n_bad": 0,
+      "median_m": 3.33,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "brazil-non-crop",
+      "n": 36,
+      "n_bad": 0,
+      "median_m": 4.08,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "kenya",
+      "n": 319,
+      "n_bad": 0,
+      "median_m": 4.12,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "ile-de-france",
+      "n": 6184,
+      "n_bad": 0,
+      "median_m": 3.23,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "kenya-non-crop",
+      "n": 2686,
+      "n_bad": 0,
+      "median_m": 3.97,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "lem-brazil",
+      "n": 860,
+      "n_bad": 0,
+      "median_m": 3.92,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "mali-non-crop",
+      "n": 142,
+      "n_bad": 0,
+      "median_m": 3.8,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "martinique-france",
+      "n": 2129,
+      "n_bad": 0,
+      "median_m": 3.88,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "mali",
+      "n": 148,
+      "n_bad": 0,
+      "median_m": 3.76,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "mali-helmets-labelling-crops",
+      "n": 1506,
+      "n_bad": 0,
+      "median_m": 3.91,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "rwanda-ceo",
+      "n": 3591,
+      "n_bad": 0,
+      "median_m": 4.21,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "reunion-france",
+      "n": 2238,
+      "n_bad": 0,
+      "median_m": 3.83,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "tanzania-ceo",
+      "n": 2209,
+      "n_bad": 0,
+      "median_m": 3.99,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "sudan",
+      "n": 418,
+      "n_bad": 0,
+      "median_m": 3.74,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "tanzania-rice-ecaas",
+      "n": 800,
+      "n_bad": 0,
+      "median_m": 3.96,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "togo",
+      "n": 1272,
+      "n_bad": 0,
+      "median_m": 3.96,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "togo-eval",
+      "n": 306,
+      "n_bad": 0,
+      "median_m": 3.97,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    },
+    {
+      "dataset": "zimbabwe",
+      "n": 49,
+      "n_bad": 0,
+      "median_m": 3.97,
+      "max_km": 0.01,
+      "pct_bad": 0.0
+    }
+  ],
+  "fully_affected_datasets": [
+    "tanzania",
+    "uganda"
+  ]
+}
