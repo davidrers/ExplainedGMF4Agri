@@ -58,6 +58,14 @@ dependencies = [
     # setuptools is capped by the TerraMind hands-on script, which breaks on
     # the pkg_resources removal in setuptools 81.
     "setuptools (>=80.0.0,<81.0.0)",
+
+    # --- Sentinel-2 STAC access -------------------------------------------
+    # Required by the vendored space_time_deepsearch Sentinel-2 loader, which
+    # backs external/.../vis/parcel_timeseries.py. Pinned to the ranges the
+    # vendored package declares.
+    "pystac-client (>=0.9.0,<0.10.0)",
+    "stackstac (>=0.5.1,<0.6.0)",
+    "planetary-computer (>=1.0.0,<2.0.0)",
 ]
 
 [project.urls]
@@ -83,7 +91,16 @@ torch = { source = "pytorch-cu128" }
 torchvision = { source = "pytorch-cu128" }
 
 [tool.poetry]
-packages = [{ include = "gfm4agri", from = "src" }]
+# space_time_deepsearch is vendored under external/ and installed as a second
+# package of this project rather than as a path dependency. A path dependency
+# would resolve its own pyproject, which pulls osmnx, holoviews, panel, bokeh
+# and jupyter-bokeh, and would force rioxarray down from 0.19 to below 0.16.
+# Its Sentinel-2 loader needs pystac-client, stackstac and planetary-computer,
+# which are declared in the dependency list above.
+packages = [
+    { include = "gfm4agri", from = "src" },
+    { include = "space_time_deepsearch", from = "external/Space-Time-DeepSearch/src" },
+]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=9.0.2,<10.0.0"
