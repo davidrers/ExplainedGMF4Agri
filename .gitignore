@@ -54,3 +54,15 @@ desktop.ini
 
 # Experiments scratch space (runs, checkpoints, logs, ad-hoc outputs)
 /experiments/
+
+
+
+# Vendored external/Space-Time-DeepSearch: oversized notebooks and animations are
+# kept out of history. They remain available in the upstream repository at
+# https://github.com/davidrers/Space-Time-DeepSearch
+external/Space-Time-DeepSearch/notebooks/test2.ipynb
+external/Space-Time-DeepSearch/notebooks/example.ipynb
+external/Space-Time-DeepSearch/notebooks/examples/ndvi_timelapse.gif
+external/Space-Time-DeepSearch/notebooks/examples/ndvi_timelapse2.gif
+external/Space-Time-DeepSearch/notebooks/flevoland_rgb.gif
+external/Space-Time-DeepSearch/notebooks/flevoland_ndvi.gif
