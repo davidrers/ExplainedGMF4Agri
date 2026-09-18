@@ -2,32 +2,101 @@
 
 Nothing in this directory is tracked in git, apart from this file.
 
+## `eurocrops/`
+
+The **EuroCrops vector release**, version 11, the source of the parcel polygons and the
+declared crop labels. Zenodo record [14094196](https://zenodo.org/records/14094196), concept
+DOI `10.5281/zenodo.6866846`, licence CC-BY-SA-4.0, published 2024. Repository and wiki:
+https://github.com/maja601/EuroCrops.
+
+EuroCrops is a **single declaration year per country**, not a time series. The four countries
+downloaded here are all 2021, the season the thesis targets: Estonia, Latvia, Lithuania and
+Portugal. Other countries in the release sit on other years (France 2018, Denmark 2019,
+Netherlands and Finland 2020, Czechia, Brandenburg, Spain and Ireland 2023) and would not line
+up with 2021 imagery.
+
+```
+eurocrops/
+  raw/                        the Zenodo files, md5-verified, 1.4 GB
+    EE_2021.zip  LV_2021.zip  LT_2021.zip  PT_2021.zip
+    ee_2021.csv  lv_2021.csv  lt_2021.csv  pt_2021.csv   national crop code to HCAT mappings
+    HCAT3.csv  HCAT2.csv                                 the harmonised taxonomy
+  vector/<CC>/                the unpacked shapefiles, 2.3 GB
+  parquet/<CC>_2021.parquet   one GeoParquet per country, native CRS preserved, 1.7 GB
+  parquet/<CC>_2021.summary.json   schema, CRS, bounds, class counts, provenance
+  derived/<CC>_2021_metrics.parquet   per-parcel geometry metrics from the EDA, git-ignored
+  zenodo_record_14094196.json the full record metadata as downloaded
+```
+
+Re-download and rebuild with:
+
+```bash
+python scripts/data/fetch_eurocrops.py --countries EE LV LT PT
+```
+
+The script verifies every file against the md5 published by Zenodo, unpacks it, and writes the
+GeoParquet with `write_covering_bbox=True` so a chip-sized bounding-box read is cheap. Nothing
+is filtered, reprojected or reclassified on the way in.
+
+Every country carries the three harmonisation attributes `EC_trans_n` (national crop name in
+English), `EC_hcat_n` (HCAT3 name) and `EC_hcat_c` (the ten-digit HCAT3 code) beside its own
+national attribute table.
+
+| | parcels | CRS | declared area attribute | parcel identifier |
+|---|---|---|---|---|
+| EE | 176,064 | EPSG:4326 | `pindala_ha`, hectares | `pollu_id`, unique |
+| LV | 432,188 | EPSG:3059 | `AREA_DECLA`, hectares | `PARCEL_ID`, 1,005 duplicates |
+| LT | 1,102,471 | EPSG:4326 | `DKL_PLOTAS`, hectares | none |
+| PT | 100,000 | EPSG:4326 | `OSA_AREA`, **square metres** | `OSA_ID`, unique |
+
+Three traps worth remembering:
+
+- **Portugal's `OSA_AREA` is in square metres** while every other country reports hectares. Its
+  median parcel is 2,284 m², that is 0.23 ha.
+- **Lithuania has no parcel identifier.** `KZS_NR` is a field-block number (278,891 distinct
+  values) and `NMA_ID` a holding number (120,901), so an individual Lithuanian polygon cannot be
+  addressed through the attribute table. Lithuania also carries only 22 HCAT classes, against
+  128 for Estonia, because its national declaration scheme is far coarser.
+- **Portugal is exactly 100,000 features**, which is consistent with a sampled release rather
+  than the full national declaration.
+
 ## `eurocropsml/`
 
-The EuroCropsML benchmark (Reuss et al., 2025), moved here from `C:\Users\darey\eurocropsml_data`.
+The **EuroCropsML benchmark** (Reuss et al., 2025), the per-parcel Sentinel-2 time series and the
+official few-shot splits. Zenodo record [15095445](https://zenodo.org/records/15095445), concept
+DOI `10.5281/zenodo.10629609`, licence CC-BY-SA-4.0, published 2025-03-31. Estonia, Latvia and
+Portugal only.
 
 ```
 eurocropsml/
-  preprocess/       706,683 .npz files, one per parcel
-  preprocess.zip    the source archive from Zenodo, redundant once extracted
+  archives/                   the Zenodo files, md5-verified, 4.6 GB
+    preprocess.zip  raw_data.zip  split.zip
+  raw_data/
+    <Country>.parquet         the unfiltered annual observation series per parcel
+    geometries/<Country>.geojson   parcel polygons, CRS84, keyed by parcel_id
+    labels/<Country>_labels.parquet  parcel_id, EC_hcat_c, EC_hcat_n
+  split/<use case>/           the official pre-training, meta and fine-tuning splits
+  preprocess/                 the 706,683 .npz files, NOT unpacked by default
+  preprocess_index.parquet    706,683 rows parsed from the .npz filenames: NUTS3, parcel id, class
+  zenodo_record_15095445.json the full record metadata as downloaded
 ```
 
-Each `.npz` filename follows the pattern `<region><id>_<parcelid>_<crop class code>.npz`, for example
-`EE001_19990038_3302000000.npz`, where the leading two letters give the country (EE Estonia, LV Latvia, PT Portugal)
-and the trailing code is the harmonised HCAT crop class.
+Re-download with:
 
-Code should locate this directory through the `EUROCROPSML_DATA` environment variable and fall back to
-`<repo>/data/eurocropsml`:
-
-```python
-import os
-from pathlib import Path
-
-DATA_ROOT = Path(os.environ.get("EUROCROPSML_DATA", Path(__file__).parents[2] / "data" / "eurocropsml"))
+```bash
+python scripts/data/fetch_eurocropsml.py                      # all three archives
+python scripts/data/fetch_eurocropsml.py --stages extract --files preprocess.zip
 ```
 
-`preprocess.zip` is roughly 1.4 GB and duplicates the extracted tree. It can be deleted once the extraction is
-verified, which also removes 1.4 GB from OneDrive synchronisation.
+**`preprocess.zip` is left packed.** Unpacking 706,683 small files onto the network filesystem
+runs at a few thousand files per minute, and nothing in the exploratory analysis needs the
+arrays: the `.npz` filename `<NUTS3>_<parcelID>_<EC_hcat_c>.npz` already carries the region, the
+parcel and the class, and the archive's central directory lists all 706,683 of them. Unpack it
+before any work that reads the time series themselves.
+
+**EuroCropsML does ship parcel geometries**, in `raw_data/geometries/`, keyed by the same
+`parcel_id` that appears in the `.npz` filenames. They are compared against the EuroCrops
+polygons in `results/eda/eurocrops/` and in `notebooks/03_eurocrops_vector_eda.ipynb`.
 
 ## `cropharvest/`
 

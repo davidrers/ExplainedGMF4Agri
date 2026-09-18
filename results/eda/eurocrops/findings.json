@@ -1,0 +1,641 @@
+{
+  "source": "EuroCrops v11, Zenodo 14094196, declaration year 2021",
+  "countries": {
+    "EE": "Estonia",
+    "LV": "Latvia",
+    "LT": "Lithuania",
+    "PT": "Portugal"
+  },
+  "n_parcels_total": 1810723,
+  "is_full_dataset": true,
+  "equal_area_crs": "EPSG:3035",
+  "pixel_m": 10.0,
+  "random_seed": 42,
+  "inventory": {
+    "Estonia": {
+      "parcels": 176064,
+      "declared_area_ha": 974006.2,
+      "n_hcat_classes": 128
+    },
+    "Latvia": {
+      "parcels": 432188,
+      "declared_area_ha": 1788813.7,
+      "n_hcat_classes": 108
+    },
+    "Lithuania": {
+      "parcels": 1102471,
+      "declared_area_ha": 2918858.0,
+      "n_hcat_classes": 22
+    },
+    "Portugal": {
+      "parcels": 100000,
+      "declared_area_ha": 110731.7,
+      "n_hcat_classes": 84
+    }
+  },
+  "pixels_per_parcel": {
+    "Estonia": {
+      "n": 176064,
+      "mean": 553.2,
+      "p05": 14.8,
+      "p25": 90.9,
+      "p50": 255.2,
+      "p75": 650.5,
+      "p95": 2060.7
+    },
+    "Latvia": {
+      "n": 432188,
+      "mean": 413.9,
+      "p05": 30.1,
+      "p25": 75.3,
+      "p50": 185.8,
+      "p75": 450.5,
+      "p95": 1522.6
+    },
+    "Lithuania": {
+      "n": 1102471,
+      "mean": 264.8,
+      "p05": 8.1,
+      "p25": 34.9,
+      "p50": 100.5,
+      "p75": 257.3,
+      "p95": 1020.5
+    },
+    "Portugal": {
+      "n": 100000,
+      "mean": 110.7,
+      "p05": 2.9,
+      "p25": 9.1,
+      "p50": 22.8,
+      "p75": 61.5,
+      "p95": 393.0
+    }
+  },
+  "parcels_below_pixel_thresholds_pct": {
+    "Estonia": {
+      "lt_10px": 3.75,
+      "lt_100px": 27.01,
+      "lt_1000px": 84.62
+    },
+    "Latvia": {
+      "lt_10px": 1.64,
+      "lt_100px": 32.17,
+      "lt_1000px": 90.34
+    },
+    "Lithuania": {
+      "lt_10px": 5.92,
+      "lt_100px": 49.62,
+      "lt_1000px": 94.82
+    },
+    "Portugal": {
+      "lt_10px": 27.68,
+      "lt_100px": 83.5,
+      "lt_1000px": 97.8
+    }
+  },
+  "k_budget_pixels": {
+    "1": {
+      "Estonia": 255.0,
+      "Latvia": 186.0,
+      "Lithuania": 100.0,
+      "Portugal": 23.0
+    },
+    "5": {
+      "Estonia": 1276.0,
+      "Latvia": 929.0,
+      "Lithuania": 502.0,
+      "Portugal": 114.0
+    },
+    "10": {
+      "Estonia": 2552.0,
+      "Latvia": 1858.0,
+      "Lithuania": 1005.0,
+      "Portugal": 228.0
+    },
+    "20": {
+      "Estonia": 5104.0,
+      "Latvia": 3717.0,
+      "Lithuania": 2009.0,
+      "Portugal": 457.0
+    },
+    "50": {
+      "Estonia": 12760.0,
+      "Latvia": 9291.0,
+      "Lithuania": 5024.0,
+      "Portugal": 1142.0
+    },
+    "100": {
+      "Estonia": 25519.0,
+      "Latvia": 18583.0,
+      "Lithuania": 10047.0,
+      "Portugal": 2283.0
+    },
+    "200": {
+      "Estonia": 51038.0,
+      "Latvia": 37165.0,
+      "Lithuania": 20095.0,
+      "Portugal": 4566.0
+    },
+    "500": {
+      "Estonia": 127596.0,
+      "Latvia": 92914.0,
+      "Lithuania": 50237.0,
+      "Portugal": 11416.0
+    }
+  },
+  "edge_share": {
+    "Estonia": {
+      "n": 176064,
+      "mean": 0.429,
+      "p05": 0.112,
+      "p25": 0.201,
+      "p50": 0.337,
+      "p75": 0.6,
+      "p95": 1.0
+    },
+    "Latvia": {
+      "n": 432188,
+      "mean": 0.464,
+      "p05": 0.135,
+      "p25": 0.257,
+      "p50": 0.408,
+      "p75": 0.631,
+      "p95": 1.0
+    },
+    "Lithuania": {
+      "n": 1102471,
+      "mean": 0.59,
+      "p05": 0.156,
+      "p25": 0.322,
+      "p50": 0.54,
+      "p75": 0.957,
+      "p95": 1.0
+    },
+    "Portugal": {
+      "n": 100000,
+      "mean": 0.809,
+      "p05": 0.267,
+      "p25": 0.631,
+      "p50": 1.0,
+      "p75": 1.0,
+      "p95": 1.0
+    }
+  },
+  "compactness": {
+    "Estonia": {
+      "n": 176064,
+      "mean": 0.476,
+      "p05": 0.135,
+      "p25": 0.327,
+      "p50": 0.488,
+      "p75": 0.637,
+      "p95": 0.771
+    },
+    "Latvia": {
+      "n": 432188,
+      "mean": 0.467,
+      "p05": 0.155,
+      "p25": 0.312,
+      "p50": 0.467,
+      "p75": 0.627,
+      "p95": 0.77
+    },
+    "Lithuania": {
+      "n": 1102471,
+      "mean": 0.476,
+      "p05": 0.148,
+      "p25": 0.324,
+      "p50": 0.485,
+      "p75": 0.639,
+      "p95": 0.767
+    },
+    "Portugal": {
+      "n": 100000,
+      "mean": 0.515,
+      "p05": 0.171,
+      "p25": 0.376,
+      "p50": 0.537,
+      "p75": 0.673,
+      "p95": 0.778
+    }
+  },
+  "area_over_count_share_ratio": {
+    "Estonia": {
+      "pasture_meadow_grassland_grass": 0.65,
+      "winter_common_soft_wheat": 1.8,
+      "legumes_harvested_green": 1.12,
+      "spring_barley": 1.66,
+      "oats": 1.11,
+      "clover": 0.98,
+      "winter_rapeseed_rape": 2.06,
+      "spring_common_soft_wheat": 1.46,
+      "peas": 1.42,
+      "potatoes": 0.16,
+      "poaceae_grasses": 0.32,
+      "winter_barley": 2.01,
+      "fallow_land_not_crop": 0.63,
+      "beans": 1.67,
+      "fresh_vegetables": 0.02
+    },
+    "Latvia": {
+      "pasture_meadow_grassland_grass": 0.68,
+      "winter_common_soft_wheat": 2.04,
+      "poaceae_grasses": 0.88,
+      "oats": 0.95,
+      "spring_common_soft_wheat": 1.27,
+      "arable_crops": 0.09,
+      "fallow_land_not_crop": 0.85,
+      "spring_barley": 1.17,
+      "winter_rapeseed_rape": 2.77,
+      "potatoes": 0.2,
+      "rye": 1.31,
+      "clover": 0.97,
+      "buckwheat": 1.09,
+      "beans": 2.35,
+      "orchards_fruits": 0.11
+    },
+    "Lithuania": {
+      "pasture_meadow_grassland_grass": 0.65,
+      "winter_unspecified_cereals": 1.67,
+      "summer_unspecified_cereals": 1.11,
+      "other_arable_land_crops": 0.27,
+      "rapeseed_rape": 2.62,
+      "fresh_vegetables": 0.16,
+      "oats": 0.99,
+      "fallow_land_not_crop": 0.75,
+      "spring_unspecified_cereals": 1.79,
+      "buckwheat": 1.28,
+      "kitchen_gardens": 0.24,
+      "tree_wood_forest": 0.75,
+      "grain_maize_corn_popcorn": 2.5,
+      "berries_berry_species": 0.46,
+      "spinach": 0.79
+    },
+    "Portugal": {
+      "not_known_and_other": 0.69,
+      "olive_plantations": 0.64,
+      "pasture_meadow_grassland_grass": 1.73,
+      "vineyards_wine_vine_rebland_grapes": 0.63,
+      "grain_maize_corn_popcorn": 0.27,
+      "temporary_grass": 1.15,
+      "sweet_chestnuts": 0.31,
+      "other_arable_land_crops": 0.66,
+      "oak": 7.52,
+      "fresh_vegetables": 0.13,
+      "fallow_land_not_crop": 0.4,
+      "shrubberries_shrubs": 0.89,
+      "oats": 0.63,
+      "permanent_crops_perennial": 0.51,
+      "pears": 0.78
+    }
+  },
+  "class_concentration": {
+    "Estonia": {
+      "gini_count": 0.926,
+      "gini_area": 0.929
+    },
+    "Latvia": {
+      "gini_count": 0.911,
+      "gini_area": 0.919
+    },
+    "Lithuania": {
+      "gini_count": 0.761,
+      "gini_area": 0.764
+    },
+    "Portugal": {
+      "gini_count": 0.899,
+      "gini_area": 0.913
+    }
+  },
+  "class_coverage_pct": {
+    "Estonia": {
+      "top1": 45.9,
+      "top5": 71.4,
+      "top10": 86.2,
+      "top20": 95.5
+    },
+    "Latvia": {
+      "top1": 39.7,
+      "top5": 71.3,
+      "top10": 87.4,
+      "top20": 95.5
+    },
+    "Lithuania": {
+      "top1": 45.1,
+      "top5": 81.7,
+      "top10": 95.8,
+      "top20": 100.0
+    },
+    "Portugal": {
+      "top1": 29.7,
+      "top5": 74.7,
+      "top10": 89.2,
+      "top20": 96.5
+    }
+  },
+  "class_overlap_native": {
+    "Estonia": {
+      "Estonia": 128,
+      "Latvia": 84,
+      "Lithuania": 11,
+      "Portugal": 45
+    },
+    "Latvia": {
+      "Estonia": 84,
+      "Latvia": 108,
+      "Lithuania": 12,
+      "Portugal": 42
+    },
+    "Lithuania": {
+      "Estonia": 11,
+      "Latvia": 12,
+      "Lithuania": 22,
+      "Portugal": 12
+    },
+    "Portugal": {
+      "Estonia": 45,
+      "Latvia": 42,
+      "Lithuania": 12,
+      "Portugal": 84
+    }
+  },
+  "class_overlap_level4": {
+    "Estonia": {
+      "Estonia": 31,
+      "Latvia": 29,
+      "Lithuania": 10,
+      "Portugal": 24
+    },
+    "Latvia": {
+      "Estonia": 29,
+      "Latvia": 35,
+      "Lithuania": 11,
+      "Portugal": 26
+    },
+    "Lithuania": {
+      "Estonia": 10,
+      "Latvia": 11,
+      "Lithuania": 15,
+      "Portugal": 12
+    },
+    "Portugal": {
+      "Estonia": 24,
+      "Latvia": 26,
+      "Lithuania": 12,
+      "Portugal": 36
+    }
+  },
+  "classes_shared_by_all_four": [
+    "3301010500",
+    "3301010600",
+    "3301061200",
+    "3301070000",
+    "3301110000",
+    "3301990000",
+    "3302000000"
+  ],
+  "n_classes_shared_by_all_four": 7,
+  "bounding_box_laea_km": {
+    "Estonia": {
+      "x": [
+        5008.5,
+        5366.5
+      ],
+      "y": [
+        3926.6,
+        4168.8
+      ]
+    },
+    "Latvia": {
+      "x": [
+        4995.3,
+        5436.7
+      ],
+      "y": [
+        3716.4,
+        3982.1
+      ]
+    },
+    "Lithuania": {
+      "x": [
+        5007.7,
+        5379.8
+      ],
+      "y": [
+        3507.8,
+        3799.7
+      ]
+    },
+    "Portugal": {
+      "x": [
+        2642.0,
+        2957.0
+      ],
+      "y": [
+        1772.6,
+        2296.5
+      ]
+    }
+  },
+  "chip_occupancy": {
+    "Estonia": {
+      "chips_occupied": 7425,
+      "chips_for_90pct_of_parcels": 4683,
+      "median_parcels_per_chip": 20.0,
+      "export_gb_all_chips": 89.4,
+      "export_gb_90pct": 56.4
+    },
+    "Latvia": {
+      "chips_occupied": 11588,
+      "chips_for_90pct_of_parcels": 7319,
+      "median_parcels_per_chip": 31.0,
+      "export_gb_all_chips": 139.5,
+      "export_gb_90pct": 88.1
+    },
+    "Lithuania": {
+      "chips_occupied": 12536,
+      "chips_for_90pct_of_parcels": 8063,
+      "median_parcels_per_chip": 74.0,
+      "export_gb_all_chips": 151.0,
+      "export_gb_90pct": 97.1
+    },
+    "Portugal": {
+      "chips_occupied": 9908,
+      "chips_for_90pct_of_parcels": 5155,
+      "median_parcels_per_chip": 5.0,
+      "export_gb_all_chips": 119.3,
+      "export_gb_90pct": 62.1
+    }
+  },
+  "chip_assumptions": {
+    "chip_px": 224,
+    "pixel_m": 10.0,
+    "chip_m": 2240.0,
+    "crs": "EPSG:3035",
+    "bands": 10,
+    "timesteps": 12,
+    "bytes_per_value": 2,
+    "gb_per_chip": 0.012,
+    "note": "chips are counted from parcel centroids on a fixed grid, so a parcel straddling a chip edge is counted once"
+  },
+  "geometry_health": {
+    "Estonia": {
+      "id_column": "pollu_id",
+      "id_kind": "parcel",
+      "invalid_geometries": 6,
+      "multipart": 0,
+      "duplicate_parcel_ids": 0,
+      "area_below_1_pixel": 303,
+      "area_below_10_pixels": 6609,
+      "no_interior_pixel": 19021
+    },
+    "Latvia": {
+      "id_column": "PARCEL_ID",
+      "id_kind": "parcel",
+      "invalid_geometries": 0,
+      "multipart": 0,
+      "duplicate_parcel_ids": 1005,
+      "area_below_1_pixel": 0,
+      "area_below_10_pixels": 7082,
+      "no_interior_pixel": 32618
+    },
+    "Lithuania": {
+      "id_column": "KZS_NR",
+      "id_kind": "field_block",
+      "invalid_geometries": 1,
+      "multipart": 1,
+      "duplicate_parcel_ids": 823580,
+      "area_below_1_pixel": 4,
+      "area_below_10_pixels": 65317,
+      "no_interior_pixel": 271153
+    },
+    "Portugal": {
+      "id_column": "OSA_ID",
+      "id_kind": "parcel",
+      "invalid_geometries": 77,
+      "multipart": 1,
+      "duplicate_parcel_ids": 0,
+      "area_below_1_pixel": 841,
+      "area_below_10_pixels": 27684,
+      "no_interior_pixel": 54478
+    }
+  },
+  "declared_area_consistency": {
+    "Estonia": {
+      "attribute": "pindala_ha",
+      "native_unit": "ha",
+      "n_with_declared_area": 176064,
+      "median_ratio_computed_ha_over_declared": 1.0001,
+      "share_within_5pct": 98.2,
+      "share_below_half": 0.0
+    },
+    "Latvia": {
+      "attribute": "AREA_DECLA",
+      "native_unit": "ha",
+      "n_with_declared_area": 432188,
+      "median_ratio_computed_ha_over_declared": 1.0,
+      "share_within_5pct": 99.3,
+      "share_below_half": 0.0
+    },
+    "Lithuania": {
+      "attribute": "DKL_PLOTAS",
+      "native_unit": "ha",
+      "n_with_declared_area": 1102471,
+      "median_ratio_computed_ha_over_declared": 1.0043,
+      "share_within_5pct": 92.2,
+      "share_below_half": 0.02
+    },
+    "Portugal": {
+      "attribute": "OSA_AREA",
+      "native_unit": "m2",
+      "n_with_declared_area": 100000,
+      "median_ratio_computed_ha_over_declared": 0.9999,
+      "share_within_5pct": 100.0,
+      "share_below_half": 0.0
+    }
+  },
+  "class_survival": {
+    "1": {
+      "Estonia": 128,
+      "Latvia": 108,
+      "Lithuania": 22,
+      "Portugal": 84
+    },
+    "10": {
+      "Estonia": 81,
+      "Latvia": 91,
+      "Lithuania": 22,
+      "Portugal": 56
+    },
+    "50": {
+      "Estonia": 47,
+      "Latvia": 67,
+      "Lithuania": 22,
+      "Portugal": 38
+    },
+    "100": {
+      "Estonia": 35,
+      "Latvia": 57,
+      "Lithuania": 22,
+      "Portugal": 31
+    },
+    "200": {
+      "Estonia": 34,
+      "Latvia": 45,
+      "Lithuania": 21,
+      "Portugal": 26
+    },
+    "500": {
+      "Estonia": 25,
+      "Latvia": 32,
+      "Lithuania": 20,
+      "Portugal": 16
+    },
+    "1000": {
+      "Estonia": 19,
+      "Latvia": 25,
+      "Lithuania": 17,
+      "Portugal": 11
+    },
+    "5000": {
+      "Estonia": 8,
+      "Latvia": 12,
+      "Lithuania": 14,
+      "Portugal": 4
+    }
+  },
+  "edge_approximation_check": [
+    {
+      "country": "Estonia",
+      "n_sampled": 5000,
+      "median_true_edge_share": 0.3157398316202236,
+      "median_approx_edge_share": 0.33772121441921443,
+      "median_ratio_approx_over_true": 1.0509568730054992,
+      "pearson_r": 0.9852550743463444
+    },
+    {
+      "country": "Latvia",
+      "n_sampled": 5000,
+      "median_true_edge_share": 0.3781429181638094,
+      "median_approx_edge_share": 0.40911371682830255,
+      "median_ratio_approx_over_true": 1.0689233206291329,
+      "pearson_r": 0.9854951808137562
+    },
+    {
+      "country": "Lithuania",
+      "n_sampled": 5000,
+      "median_true_edge_share": 0.48066586588347904,
+      "median_approx_edge_share": 0.5345989218963343,
+      "median_ratio_approx_over_true": 1.0727675480953964,
+      "pearson_r": 0.9831885086435007
+    },
+    {
+      "country": "Portugal",
+      "n_sampled": 5000,
+      "median_true_edge_share": 0.816521343997131,
+      "median_approx_edge_share": 1.0,
+      "median_ratio_approx_over_true": 1.0828767234789711,
+      "pearson_r": 0.9626074467102211
+    }
+  ]
+}

@@ -1,0 +1,531 @@
+{
+  "eurocrops": "v11, Zenodo 14094196, declaration year 2021",
+  "eurocropsml": "Zenodo 15095445, published 2025-03-31",
+  "countries": {
+    "EE": "Estonia",
+    "LV": "Latvia",
+    "PT": "Portugal"
+  },
+  "random_seed": 42,
+  "pixel_m": 10.0,
+  "source_inventory": {
+    "Estonia": {
+      "eurocrops_parcels": 176064,
+      "eurocropsml_raw_labels": 176055,
+      "eurocropsml_npz": 175906,
+      "eurocrops_classes": 128,
+      "eurocropsml_classes": 127,
+      "npz_classes": 127,
+      "nuts3_regions": 5
+    },
+    "Latvia": {
+      "eurocrops_parcels": 432188,
+      "eurocropsml_raw_labels": 431174,
+      "eurocropsml_npz": 431143,
+      "eurocrops_classes": 108,
+      "eurocropsml_classes": 103,
+      "npz_classes": 103,
+      "nuts3_regions": 6
+    },
+    "Portugal": {
+      "eurocrops_parcels": 100000,
+      "eurocropsml_raw_labels": 100000,
+      "eurocropsml_npz": 99634,
+      "eurocrops_classes": 84,
+      "eurocropsml_classes": 79,
+      "npz_classes": 79,
+      "nuts3_regions": 23
+    }
+  },
+  "npz_total": 706683,
+  "identifier_join": {
+    "Estonia": {
+      "in_both": 176055,
+      "eurocrops_only": 9,
+      "eurocropsml_only": 0,
+      "npz_not_in_eurocrops": 0,
+      "eurocrops_with_npz": 175906
+    },
+    "Latvia": {
+      "in_both": 431174,
+      "eurocrops_only": 9,
+      "eurocropsml_only": 0,
+      "npz_not_in_eurocrops": 0,
+      "eurocrops_with_npz": 431143
+    },
+    "Portugal": {
+      "in_both": 100000,
+      "eurocrops_only": 0,
+      "eurocropsml_only": 0,
+      "npz_not_in_eurocrops": 0,
+      "eurocrops_with_npz": 99634
+    }
+  },
+  "join_keys": {
+    "Estonia": {
+      "join_key": "pollu_id",
+      "match_rate_pct": 100.0,
+      "candidates": {
+        "pollu_id": 100.0
+      }
+    },
+    "Latvia": {
+      "join_key": "PARCEL_ID",
+      "match_rate_pct": 100.0,
+      "candidates": {
+        "PARCEL_ID": 100.0,
+        "OBJECTID": 0.0
+      }
+    },
+    "Portugal": {
+      "join_key": "OSA_ID",
+      "match_rate_pct": 100.0,
+      "candidates": {
+        "OSA_ID": 100.0,
+        "PAR_ID": 0.0,
+        "OSA_NUM": 0.0
+      }
+    }
+  },
+  "class_exclusives": {
+    "Estonia": {
+      "classes_only_in_eurocrops": 13,
+      "classes_only_in_eurocropsml": 12,
+      "parcels_in_eurocrops_only_classes": 3602
+    },
+    "Latvia": {
+      "classes_only_in_eurocrops": 13,
+      "classes_only_in_eurocropsml": 8,
+      "parcels_in_eurocrops_only_classes": 69148
+    },
+    "Portugal": {
+      "classes_only_in_eurocrops": 8,
+      "classes_only_in_eurocropsml": 3,
+      "parcels_in_eurocrops_only_classes": 1605
+    }
+  },
+  "label_agreement": {
+    "Estonia": {
+      "joined_parcels": 176055,
+      "identical_hcat_pct": 96.97,
+      "top_mismatches": [
+        {
+          "eurocrops": "poaceae_grasses (3301090200)",
+          "eurocropsml": "pasture_meadow_grassland_grass (3302000000)",
+          "parcels": 2862
+        },
+        {
+          "eurocrops": "summer_rapeseed_rape (3301060403)",
+          "eurocropsml": "spring_rapeseed_rape (3301060402)",
+          "parcels": 1236
+        },
+        {
+          "eurocrops": "legumes_harvested_green (3301090300)",
+          "eurocropsml": "pasture_meadow_grassland_grass (3302000000)",
+          "parcels": 388
+        },
+        {
+          "eurocrops": "phacelia (3301061400)",
+          "eurocropsml": "not_known_and_other (3399000000)",
+          "parcels": 229
+        },
+        {
+          "eurocrops": "unspecified_legumes_harvested_green (3301090398)",
+          "eurocropsml": "legumes_dried_pulses_protein_crops (3301020000)",
+          "parcels": 202
+        },
+        {
+          "eurocrops": "cereal (3301010000)",
+          "eurocropsml": "unspecified_cereals (3301011500)",
+          "parcels": 127
+        },
+        {
+          "eurocrops": "caraway (3301061211)",
+          "eurocropsml": "black_cumin (3301061208)",
+          "parcels": 45
+        },
+        {
+          "eurocrops": "poaceae_grasses (3301090200)",
+          "eurocropsml": "lolium_ryegrass (3301090205)",
+          "parcels": 34
+        }
+      ]
+    },
+    "Latvia": {
+      "joined_parcels": 432179,
+      "identical_hcat_pct": 83.846,
+      "top_mismatches": [
+        {
+          "eurocrops": "poaceae_grasses (3301090200)",
+          "eurocropsml": "pasture_meadow_grassland_grass (3302000000)",
+          "parcels": 41522
+        },
+        {
+          "eurocrops": "arable_crops (3301000000)",
+          "eurocropsml": "other_arable_land_crops (3301990000)",
+          "parcels": 18842
+        },
+        {
+          "eurocrops": "orchards_fruits (3303010000)",
+          "eurocropsml": "berries_berry_species (3303020000)",
+          "parcels": 3251
+        },
+        {
+          "eurocrops": "plants_harvested_green (3301090000)",
+          "eurocropsml": "pasture_meadow_grassland_grass (3302000000)",
+          "parcels": 2532
+        },
+        {
+          "eurocrops": "legumes_dried_pulses_protein_crops (3301020000)",
+          "eurocropsml": "unspecified_cereals (3301011500)",
+          "parcels": 1693
+        },
+        {
+          "eurocrops": "melilot (3301090304)",
+          "eurocropsml": "clover (3301090303)",
+          "parcels": 887
+        },
+        {
+          "eurocrops": "not_known_and_other (3399000000)",
+          "eurocropsml": "currants (3303020600)",
+          "parcels": 637
+        },
+        {
+          "eurocrops": "chaenomeles_cathayensis (3303080200)",
+          "eurocropsml": "quinces (3303011500)",
+          "parcels": 470
+        }
+      ]
+    },
+    "Portugal": {
+      "joined_parcels": 100000,
+      "identical_hcat_pct": 97.456,
+      "top_mismatches": [
+        {
+          "eurocrops": "shrubberries_shrubs (3303080000)",
+          "eurocropsml": "wire_bush (3303080700)",
+          "parcels": 970
+        },
+        {
+          "eurocrops": "permanent_crops_perennial (3303000000)",
+          "eurocropsml": "unspecified_permanent_crops (3303120000)",
+          "parcels": 820
+        },
+        {
+          "eurocrops": "other_tree_wood_forest (3306990000)",
+          "eurocropsml": "nuts (3303030000)",
+          "parcels": 279
+        },
+        {
+          "eurocrops": "other_tree_wood_forest (3306990000)",
+          "eurocropsml": "tree_wood_forest (3306000000)",
+          "parcels": 210
+        },
+        {
+          "eurocrops": "unspecified_cereals (3301011500)",
+          "eurocropsml": "other_cereals (3301019900)",
+          "parcels": 117
+        },
+        {
+          "eurocrops": "not_known_and_other (3399000000)",
+          "eurocropsml": "permanent_crops_perennial (3303000000)",
+          "parcels": 103
+        },
+        {
+          "eurocrops": "unspecified_orchards_fruits (3303019800)",
+          "eurocropsml": "orchards_fruits (3303010000)",
+          "parcels": 22
+        },
+        {
+          "eurocrops": "other_permanent_crops_plantations (3303990000)",
+          "eurocropsml": "fig (3303010600)",
+          "parcels": 9
+        }
+      ]
+    }
+  },
+  "attrition": {
+    "Estonia": {
+      "dropped_parcels": 9,
+      "dropped_pct": 0.01,
+      "median_pixels_kept": 255.2,
+      "median_pixels_dropped": 328.9,
+      "top_dropped_classes": {
+        "pasture_meadow_grassland_grass": 3,
+        "winter_common_soft_wheat": 3,
+        "clover": 1,
+        "winter_rapeseed_rape": 1,
+        "legumes_harvested_green": 1
+      }
+    },
+    "Latvia": {
+      "dropped_parcels": 9,
+      "dropped_pct": 0.0,
+      "median_pixels_kept": 185.8,
+      "median_pixels_dropped": 211.3,
+      "top_dropped_classes": {
+        "pasture_meadow_grassland_grass": 6,
+        "spring_barley": 1,
+        "winter_common_soft_wheat": 1,
+        "poaceae_grasses": 1
+      }
+    },
+    "Portugal": {
+      "dropped_parcels": 0,
+      "dropped_pct": 0.0,
+      "median_pixels_kept": 22.8,
+      "median_pixels_dropped": null,
+      "top_dropped_classes": {}
+    }
+  },
+  "geometry_agreement": {
+    "Estonia": {
+      "n_compared": 5000,
+      "median_iou": 1.0,
+      "share_iou_above_0.99_pct": 100.0,
+      "share_iou_below_0.5_pct": 0.0,
+      "median_area_ratio_ml_over_ec": 1.0
+    },
+    "Latvia": {
+      "n_compared": 5014,
+      "median_iou": 1.0,
+      "share_iou_above_0.99_pct": 100.0,
+      "share_iou_below_0.5_pct": 0.0,
+      "median_area_ratio_ml_over_ec": 1.0
+    },
+    "Portugal": {
+      "n_compared": 5000,
+      "median_iou": 1.0,
+      "share_iou_above_0.99_pct": 100.0,
+      "share_iou_below_0.5_pct": 0.0,
+      "median_area_ratio_ml_over_ec": 1.0
+    }
+  },
+  "geometry_agreement_sample": 5000,
+  "official_splits": {
+    "latvia_portugal_vs_estonia": {
+      "budget_grid": [
+        "1",
+        "10",
+        "100",
+        "20",
+        "200",
+        "5",
+        "500",
+        "all"
+      ],
+      "finetune_sizes": {
+        "1": {
+          "train": 123,
+          "val": 1000,
+          "test": 35182
+        },
+        "10": {
+          "train": 840,
+          "val": 1000,
+          "test": 35182
+        },
+        "100": {
+          "train": 4393,
+          "val": 1000,
+          "test": 35182
+        },
+        "20": {
+          "train": 1402,
+          "val": 1000,
+          "test": 35182
+        },
+        "200": {
+          "train": 7264,
+          "val": 1000,
+          "test": 35182
+        },
+        "5": {
+          "train": 486,
+          "val": 1000,
+          "test": 35182
+        },
+        "500": {
+          "train": 14179,
+          "val": 1000,
+          "test": 35182
+        },
+        "all": {
+          "train": 105543,
+          "val": 1000,
+          "test": 35182
+        }
+      },
+      "has_pretrain": true,
+      "has_meta": true
+    },
+    "latvia_vs_estonia": {
+      "budget_grid": [
+        "1",
+        "10",
+        "100",
+        "20",
+        "200",
+        "5",
+        "500",
+        "all"
+      ],
+      "finetune_sizes": {
+        "1": {
+          "train": 123,
+          "val": 1000,
+          "test": 35182
+        },
+        "10": {
+          "train": 840,
+          "val": 1000,
+          "test": 35182
+        },
+        "100": {
+          "train": 4393,
+          "val": 1000,
+          "test": 35182
+        },
+        "20": {
+          "train": 1402,
+          "val": 1000,
+          "test": 35182
+        },
+        "200": {
+          "train": 7264,
+          "val": 1000,
+          "test": 35182
+        },
+        "5": {
+          "train": 486,
+          "val": 1000,
+          "test": 35182
+        },
+        "500": {
+          "train": 14179,
+          "val": 1000,
+          "test": 35182
+        },
+        "all": {
+          "train": 105543,
+          "val": 1000,
+          "test": 35182
+        }
+      },
+      "has_pretrain": true,
+      "has_meta": true
+    },
+    "overlap_latvia_portugal_vs_estonia": {
+      "budget_grid": [
+        "1",
+        "10",
+        "100",
+        "20",
+        "200",
+        "5",
+        "500",
+        "all"
+      ],
+      "finetune_sizes": {
+        "1": {
+          "train": 123,
+          "val": 1000,
+          "test": 35182
+        },
+        "10": {
+          "train": 840,
+          "val": 1000,
+          "test": 35182
+        },
+        "100": {
+          "train": 4393,
+          "val": 1000,
+          "test": 35182
+        },
+        "20": {
+          "train": 1402,
+          "val": 1000,
+          "test": 35182
+        },
+        "200": {
+          "train": 7264,
+          "val": 1000,
+          "test": 35182
+        },
+        "5": {
+          "train": 486,
+          "val": 1000,
+          "test": 35182
+        },
+        "500": {
+          "train": 14179,
+          "val": 1000,
+          "test": 35182
+        },
+        "all": {
+          "train": 105543,
+          "val": 1000,
+          "test": 35182
+        }
+      },
+      "has_pretrain": true,
+      "has_meta": true
+    },
+    "overlap_latvia_vs_estonia": {
+      "budget_grid": [
+        "1",
+        "10",
+        "100",
+        "20",
+        "200",
+        "5",
+        "500",
+        "all"
+      ],
+      "finetune_sizes": {
+        "1": {
+          "train": 123,
+          "val": 1000,
+          "test": 35182
+        },
+        "10": {
+          "train": 840,
+          "val": 1000,
+          "test": 35182
+        },
+        "100": {
+          "train": 4393,
+          "val": 1000,
+          "test": 35182
+        },
+        "20": {
+          "train": 1402,
+          "val": 1000,
+          "test": 35182
+        },
+        "200": {
+          "train": 7264,
+          "val": 1000,
+          "test": 35182
+        },
+        "5": {
+          "train": 486,
+          "val": 1000,
+          "test": 35182
+        },
+        "500": {
+          "train": 14179,
+          "val": 1000,
+          "test": 35182
+        },
+        "all": {
+          "train": 105543,
+          "val": 1000,
+          "test": 35182
+        }
+      },
+      "has_pretrain": true,
+      "has_meta": true
+    }
+  }
+}
