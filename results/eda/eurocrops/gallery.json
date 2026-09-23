@@ -1,0 +1,448 @@
+{
+  "source_imagery": "Sentinel-2 L2A, Microsoft Planetary Computer, pulled with space_time_deepsearch.io.get_sentinel2_imagery",
+  "reference_series": "EuroCropsML .npz, Sentinel-2 L1C top of atmosphere, spatial median over the same parcel",
+  "country": "EE",
+  "year": 2021,
+  "season": [
+    "2021-03-01",
+    "2021-11-15"
+  ],
+  "bands": [
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B08",
+    "B11",
+    "SCL"
+  ],
+  "cloud_cover_max": 70,
+  "min_coverage": 80,
+  "frame_min_clear": 0.6,
+  "buffer_m": 250,
+  "random_seed": 42,
+  "parcels": [
+    {
+      "crop": "winter_common_soft_wheat",
+      "label": "winter wheat",
+      "parcel_id": "21121746",
+      "hcat": "3301010101",
+      "area_ha": 10.97,
+      "n_pixels": 1096,
+      "compactness": 0.875,
+      "edge_share": 0.114,
+      "candidates_considered": 1009,
+      "nuts3": "EE009",
+      "boa_harmonisation": {
+        "baseline_source": "STAC item properties",
+        "baselines": [
+          "2.12",
+          "3.00",
+          "4.00"
+        ],
+        "dates_offset_corrected": 1,
+        "dates_left_as_is": 71,
+        "convention": "reflectance = DN / 10000 for every date after harmonisation"
+      },
+      "scenes_retained": 72,
+      "scenes_clear_over_parcel": 56,
+      "dates_before_screening": 66,
+      "dates_after_screening": 56,
+      "scl_drop": [
+        0,
+        1,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "min_valid_fraction": 0.6,
+      "median_clear_fraction": 1.0,
+      "ndvi_peak_here": 0.898,
+      "ndvi_peak_date_here": "2021-05-29",
+      "ndvi_peak_eurocropsml": 0.809,
+      "ndvi_peak_date_eurocropsml": "2021-05-29",
+      "gif": "data/eurocrops/gallery/winter_common_soft_wheat_rgb.gif",
+      "comparison": {
+        "dates_l2a_here": 56,
+        "dates_l1c_eurocropsml": 59,
+        "matched_dates": 51,
+        "pearson_r": 0.9741,
+        "mean_difference": 0.0964,
+        "rmse": 0.1119,
+        "max_abs_difference": 0.3297,
+        "roughness_here": 0.0367,
+        "roughness_eurocropsml": 0.0601,
+        "eurocropsml_on_dates_we_keep": {
+          "n": 50,
+          "median_ndvi": 0.4969
+        },
+        "eurocropsml_on_dates_we_reject": {
+          "n": 4,
+          "median_ndvi": 0.2453
+        }
+      }
+    },
+    {
+      "crop": "spring_barley",
+      "label": "spring barley",
+      "parcel_id": "20583785",
+      "hcat": "3301010402",
+      "area_ha": 9.19,
+      "n_pixels": 918,
+      "compactness": 0.872,
+      "edge_share": 0.125,
+      "candidates_considered": 666,
+      "nuts3": "EE004",
+      "boa_harmonisation": {
+        "baseline_source": "cube coordinate",
+        "baselines": [
+          "02.12",
+          "03.00"
+        ],
+        "dates_offset_corrected": 0,
+        "dates_left_as_is": 42,
+        "convention": "reflectance = DN / 10000 for every date after harmonisation"
+      },
+      "scenes_retained": 42,
+      "scenes_clear_over_parcel": 35,
+      "dates_before_screening": 38,
+      "dates_after_screening": 35,
+      "scl_drop": [
+        0,
+        1,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "min_valid_fraction": 0.6,
+      "median_clear_fraction": 1.0,
+      "ndvi_peak_here": 0.9,
+      "ndvi_peak_date_here": "2021-06-11",
+      "ndvi_peak_eurocropsml": 0.817,
+      "ndvi_peak_date_eurocropsml": "2021-06-11",
+      "gif": "data/eurocrops/gallery/spring_barley_rgb.gif",
+      "comparison": {
+        "dates_l2a_here": 35,
+        "dates_l1c_eurocropsml": 48,
+        "matched_dates": 35,
+        "pearson_r": 0.9946,
+        "mean_difference": 0.069,
+        "rmse": 0.0799,
+        "max_abs_difference": 0.1874,
+        "roughness_here": 0.0428,
+        "roughness_eurocropsml": 0.0658,
+        "eurocropsml_on_dates_we_keep": {
+          "n": 35,
+          "median_ndvi": 0.3681
+        },
+        "eurocropsml_on_dates_we_reject": {
+          "n": 1,
+          "median_ndvi": 0.5042
+        }
+      }
+    },
+    {
+      "crop": "winter_rapeseed_rape",
+      "label": "winter rapeseed",
+      "parcel_id": "21534249",
+      "hcat": "3301060401",
+      "area_ha": 17.46,
+      "n_pixels": 1746,
+      "compactness": 0.865,
+      "edge_share": 0.091,
+      "candidates_considered": 477,
+      "nuts3": "EE008",
+      "boa_harmonisation": {
+        "baseline_source": "cube coordinate",
+        "baselines": [
+          "02.12",
+          "03.00",
+          "04.00"
+        ],
+        "dates_offset_corrected": 1,
+        "dates_left_as_is": 45,
+        "convention": "reflectance = DN / 10000 for every date after harmonisation"
+      },
+      "scenes_retained": 46,
+      "scenes_clear_over_parcel": 35,
+      "dates_before_screening": 43,
+      "dates_after_screening": 35,
+      "scl_drop": [
+        0,
+        1,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "min_valid_fraction": 0.6,
+      "median_clear_fraction": 0.979,
+      "ndvi_peak_here": 0.861,
+      "ndvi_peak_date_here": "2021-06-18",
+      "ndvi_peak_eurocropsml": 0.783,
+      "ndvi_peak_date_eurocropsml": "2021-06-18",
+      "gif": "data/eurocrops/gallery/winter_rapeseed_rape_rgb.gif",
+      "comparison": {
+        "dates_l2a_here": 35,
+        "dates_l1c_eurocropsml": 44,
+        "matched_dates": 34,
+        "pearson_r": 0.9702,
+        "mean_difference": 0.0989,
+        "rmse": 0.1076,
+        "max_abs_difference": 0.2124,
+        "roughness_here": 0.0668,
+        "roughness_eurocropsml": 0.082,
+        "eurocropsml_on_dates_we_keep": {
+          "n": 34,
+          "median_ndvi": 0.4571
+        },
+        "eurocropsml_on_dates_we_reject": {
+          "n": 3,
+          "median_ndvi": 0.417
+        }
+      }
+    },
+    {
+      "crop": "potatoes",
+      "label": "potatoes",
+      "parcel_id": "21084265",
+      "hcat": "3301030000",
+      "area_ha": 13.67,
+      "n_pixels": 1367,
+      "compactness": 0.828,
+      "edge_share": 0.105,
+      "candidates_considered": 22,
+      "nuts3": "EE009",
+      "boa_harmonisation": {
+        "baseline_source": "cube coordinate",
+        "baselines": [
+          "02.12",
+          "03.00"
+        ],
+        "dates_offset_corrected": 0,
+        "dates_left_as_is": 39,
+        "convention": "reflectance = DN / 10000 for every date after harmonisation"
+      },
+      "scenes_retained": 39,
+      "scenes_clear_over_parcel": 30,
+      "dates_before_screening": 34,
+      "dates_after_screening": 30,
+      "scl_drop": [
+        0,
+        1,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "min_valid_fraction": 0.6,
+      "median_clear_fraction": 0.999,
+      "ndvi_peak_here": 0.847,
+      "ndvi_peak_date_here": "2021-08-10",
+      "ndvi_peak_eurocropsml": 0.795,
+      "ndvi_peak_date_eurocropsml": "2021-08-05",
+      "gif": "data/eurocrops/gallery/potatoes_rgb.gif",
+      "comparison": {
+        "dates_l2a_here": 30,
+        "dates_l1c_eurocropsml": 36,
+        "matched_dates": 23,
+        "pearson_r": 0.9907,
+        "mean_difference": 0.0367,
+        "rmse": 0.0477,
+        "max_abs_difference": 0.0869,
+        "roughness_here": 0.0446,
+        "roughness_eurocropsml": 0.0346,
+        "eurocropsml_on_dates_we_keep": {
+          "n": 23,
+          "median_ndvi": 0.2083
+        },
+        "eurocropsml_on_dates_we_reject": {
+          "n": 2,
+          "median_ndvi": 0.1696
+        }
+      }
+    },
+    {
+      "crop": "pasture_meadow_grassland_grass",
+      "label": "grassland",
+      "parcel_id": "21652845",
+      "hcat": "3302000000",
+      "area_ha": 13.31,
+      "n_pixels": 1331,
+      "compactness": 0.911,
+      "edge_share": 0.102,
+      "candidates_considered": 1132,
+      "nuts3": "EE009",
+      "boa_harmonisation": {
+        "baseline_source": "STAC item properties",
+        "baselines": [
+          "2.12",
+          "3.00",
+          "4.00"
+        ],
+        "dates_offset_corrected": 2,
+        "dates_left_as_is": 58,
+        "convention": "reflectance = DN / 10000 for every date after harmonisation"
+      },
+      "scenes_retained": 60,
+      "scenes_clear_over_parcel": 48,
+      "dates_before_screening": 56,
+      "dates_after_screening": 48,
+      "scl_drop": [
+        0,
+        1,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "min_valid_fraction": 0.6,
+      "median_clear_fraction": 1.0,
+      "ndvi_peak_here": 0.868,
+      "ndvi_peak_date_here": "2021-09-26",
+      "ndvi_peak_eurocropsml": 0.759,
+      "ndvi_peak_date_eurocropsml": "2021-09-19",
+      "gif": "data/eurocrops/gallery/pasture_meadow_grassland_grass_rgb.gif",
+      "comparison": {
+        "dates_l2a_here": 48,
+        "dates_l1c_eurocropsml": 54,
+        "matched_dates": 43,
+        "pearson_r": 0.9378,
+        "mean_difference": 0.0951,
+        "rmse": 0.1223,
+        "max_abs_difference": 0.3504,
+        "roughness_here": 0.0365,
+        "roughness_eurocropsml": 0.0498,
+        "eurocropsml_on_dates_we_keep": {
+          "n": 40,
+          "median_ndvi": 0.53
+        },
+        "eurocropsml_on_dates_we_reject": {
+          "n": 3,
+          "median_ndvi": 0.2241
+        }
+      }
+    },
+    {
+      "crop": "oats",
+      "label": "oats",
+      "parcel_id": "20908606",
+      "hcat": "3301010500",
+      "area_ha": 11.74,
+      "n_pixels": 1174,
+      "compactness": 0.849,
+      "edge_share": 0.112,
+      "candidates_considered": 299,
+      "nuts3": "EE004",
+      "boa_harmonisation": {
+        "baseline_source": "STAC item properties",
+        "baselines": [
+          "2.12",
+          "3.00"
+        ],
+        "dates_offset_corrected": 0,
+        "dates_left_as_is": 64,
+        "convention": "reflectance = DN / 10000 for every date after harmonisation"
+      },
+      "scenes_retained": 64,
+      "scenes_clear_over_parcel": 59,
+      "dates_before_screening": 63,
+      "dates_after_screening": 59,
+      "scl_drop": [
+        0,
+        1,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "min_valid_fraction": 0.6,
+      "median_clear_fraction": 1.0,
+      "ndvi_peak_here": 0.852,
+      "ndvi_peak_date_here": "2021-09-09",
+      "ndvi_peak_eurocropsml": 0.731,
+      "ndvi_peak_date_eurocropsml": "2021-09-04",
+      "gif": "data/eurocrops/gallery/oats_rgb.gif",
+      "comparison": {
+        "dates_l2a_here": 59,
+        "dates_l1c_eurocropsml": 72,
+        "matched_dates": 57,
+        "pearson_r": 0.9939,
+        "mean_difference": 0.0759,
+        "rmse": 0.0825,
+        "max_abs_difference": 0.1422,
+        "roughness_here": 0.0255,
+        "roughness_eurocropsml": 0.0451,
+        "eurocropsml_on_dates_we_keep": {
+          "n": 57,
+          "median_ndvi": 0.3746
+        },
+        "eurocropsml_on_dates_we_reject": {
+          "n": 1,
+          "median_ndvi": 0.55
+        }
+      }
+    }
+  ],
+  "sentinel1": {
+    "crop": "winter_common_soft_wheat",
+    "acquisitions": 149,
+    "orbits": [
+      80,
+      87,
+      153,
+      160
+    ],
+    "orbit_states": [
+      "ascending",
+      "descending"
+    ],
+    "vv_db_range": [
+      -15.0,
+      -6.07
+    ],
+    "vh_db_range": [
+      -21.85,
+      -13.48
+    ]
+  },
+  "comparison_summary": {
+    "median_pearson_r": 0.9824,
+    "median_mean_difference": 0.0855,
+    "median_rmse": 0.095,
+    "dates_here_vs_eurocropsml": {
+      "winter_common_soft_wheat": [
+        56,
+        59
+      ],
+      "spring_barley": [
+        35,
+        48
+      ],
+      "winter_rapeseed_rape": [
+        35,
+        44
+      ],
+      "potatoes": [
+        30,
+        36
+      ],
+      "pasture_meadow_grassland_grass": [
+        48,
+        54
+      ],
+      "oats": [
+        59,
+        72
+      ]
+    }
+  }
+}

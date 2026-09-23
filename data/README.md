@@ -76,7 +76,7 @@ eurocropsml/
     geometries/<Country>.geojson   parcel polygons, CRS84, keyed by parcel_id
     labels/<Country>_labels.parquet  parcel_id, EC_hcat_c, EC_hcat_n
   split/<use case>/           the official pre-training, meta and fine-tuning splits
-  preprocess/                 the 706,683 .npz files, NOT unpacked by default
+  preprocess/                 the 706,683 .npz files, 5.6 GB, unpacked
   preprocess_index.parquet    706,683 rows parsed from the .npz filenames: NUTS3, parcel id, class
   zenodo_record_15095445.json the full record metadata as downloaded
 ```
@@ -88,11 +88,18 @@ python scripts/data/fetch_eurocropsml.py                      # all three archiv
 python scripts/data/fetch_eurocropsml.py --stages extract --files preprocess.zip
 ```
 
-**`preprocess.zip` is left packed.** Unpacking 706,683 small files onto the network filesystem
-runs at a few thousand files per minute, and nothing in the exploratory analysis needs the
-arrays: the `.npz` filename `<NUTS3>_<parcelID>_<EC_hcat_c>.npz` already carries the region, the
-parcel and the class, and the archive's central directory lists all 706,683 of them. Unpack it
-before any work that reads the time series themselves.
+**Unpacking `preprocess.zip` is slow and the stage is resumable.** Writing 706,683 small files
+onto this network filesystem runs at roughly seventeen files per second: the last 162,637 of them
+took 2 h 35 min. The extract stage therefore compares each member against the size recorded in the
+archive and rewrites only what is missing or truncated, so an interrupted run resumes for the cost
+of the scan rather than starting again.
+
+Nothing in the exploratory analysis requires the unpacked tree. The `.npz` filename
+`<NUTS3>_<parcelID>_<EC_hcat_c>.npz` already carries the region, the parcel and the class, and the
+archive's central directory lists all 706,683 of them, which is where
+`results/eda/eurocrops/_ml_comparison.py` reads them from. `gfm4agri.data.sentinel.eurocropsml_series`
+reads a parcel's arrays from the unpacked tree when it is there and from the archive otherwise, so
+code works either way.
 
 **EuroCropsML does ship parcel geometries**, in `raw_data/geometries/`, keyed by the same
 `parcel_id` that appears in the `.npz` filenames. They are compared against the EuroCrops

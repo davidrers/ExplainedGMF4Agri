@@ -18,7 +18,9 @@ through the parcel identifier carried in the .npz filename.
 Two stages, both idempotent:
 
     download   pull the archives, verifying every file against the md5 published by Zenodo
-    extract    unpack into data/eurocropsml/, the 706,683 small files in parallel
+    extract    unpack into data/eurocropsml/, the 706,683 small files in parallel; the
+               stage is resumable, since it re-extracts only files that are absent or whose
+               size does not match the archive
 
 Usage:
     python scripts/data/fetch_eurocropsml.py
@@ -126,6 +128,27 @@ def _extract_chunk(args: tuple[str, str, list[str]]) -> int:
     return len(members)
 
 
+def _pending(src: Path, dest: Path, members: list[zipfile.ZipInfo]) -> list[str]:
+    """Members that are absent on disk or whose size does not match the archive.
+
+    Unpacking preprocess.zip writes 706,683 small files onto network storage and takes
+    hours, so an interrupted run must be resumable: the size check re-extracts only what is
+    missing or was left truncated, rather than rewriting the whole tree.
+    """
+    pending = []
+    for info in members:
+        if info.is_dir():
+            continue
+        target = dest / info.filename
+        try:
+            if target.stat().st_size == info.file_size:
+                continue
+        except FileNotFoundError:
+            pass
+        pending.append(info.filename)
+    return pending
+
+
 def stage_extract(files: list[str], dest: Path, workers: int) -> None:
     raw = dest / "archives"
     print(f"extract  -> {dest}", flush=True)
@@ -134,24 +157,26 @@ def stage_extract(files: list[str], dest: Path, workers: int) -> None:
         if not src.exists():
             raise FileNotFoundError(f"{src} missing, run the download stage first")
         with zipfile.ZipFile(src) as zf:
-            members = [m for m in zf.namelist() if not m.startswith("__MACOSX")]
-        # The archives carry their own top-level directory, so they all extract into dest.
-        target_root = dest / Path(members[0]).parts[0]
-        n_on_disk = sum(1 for _ in target_root.rglob("*")) if target_root.exists() else 0
-        if n_on_disk >= len(members):
-            print(f"  [have] {key:<16} {n_on_disk:,} entries under {target_root.name}/", flush=True)
-            continue
+            members = [m for m in zf.infolist() if not m.filename.startswith("__MACOSX")]
         started = time.time()
-        if len(members) > 10_000:
-            size = (len(members) + workers - 1) // workers
-            chunks = [(str(src), str(dest), members[i:i + size]) for i in range(0, len(members), size)]
+        pending = _pending(src, dest, members)
+        n_files = sum(1 for m in members if not m.is_dir())
+        if not pending:
+            print(f"  [have] {key:<16} {n_files:,} files already on disk", flush=True)
+            continue
+        if len(pending) < n_files:
+            print(f"  [rsme] {key:<16} {n_files - len(pending):,} of {n_files:,} files present, "
+                  f"extracting the remaining {len(pending):,}", flush=True)
+        if len(pending) > 10_000:
+            size = (len(pending) + workers - 1) // workers
+            chunks = [(str(src), str(dest), pending[i:i + size]) for i in range(0, len(pending), size)]
             with ProcessPoolExecutor(max_workers=workers) as pool:
                 done = sum(pool.map(_extract_chunk, chunks))
         else:
             with zipfile.ZipFile(src) as zf:
-                zf.extractall(dest, members=members)
-            done = len(members)
-        print(f"  [ok  ] {key:<16} {done:,} entries in {time.time() - started:.0f} s", flush=True)
+                zf.extractall(dest, members=pending)
+            done = len(pending)
+        print(f"  [ok  ] {key:<16} {done:,} files in {time.time() - started:.0f} s", flush=True)
 
 
 def main(argv: list[str] | None = None) -> int:
