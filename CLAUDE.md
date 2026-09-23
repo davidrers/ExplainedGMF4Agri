@@ -168,6 +168,87 @@ transfer sweep, then the decoder comparison across resolution groups.
 ITC and UTwente institutional GPU cluster, with project drive storage. This is what makes per-cell
 decoder training and backbone-tier attribution feasible at full scope.
 
+## Working environments
+
+Two machines carry this repository and they differ enough that a command written for one fails on the
+other. Establish which one you are on before running anything.
+
+**Windows laptop.** The machine the README documents. The repository sits inside OneDrive, the GPU is an
+NVIDIA RTX PRO 1000 Blackwell at compute capability 12.0, and both PowerShell and bash are available.
+
+**ITC JupyterHub, Linux.** The machine described in the rest of this section. Bash only, no PowerShell.
+
+| Item | Value |
+|---|---|
+| Repository | `/data/private/THESIS - ExplainedGMF4Agri`. `/home/jovyan/private` is a symlink to `/data/private`, so the two paths are the same directory |
+| Interpreter | Python 3.11.15 from pyenv, at `~/.pyenv/versions/3.11.15/bin/python`. The system `python3` is 3.8 and is not usable here |
+| Poetry | 2.2.1, reachable through `~/.local/bin`, which a non-interactive shell has to export itself |
+| Environment | `~/.cache/pypoetry/virtualenvs/gfm4agri-7U2rqC_9-py3.11`, outside the repository because `poetry.toml` sets `in-project = false`. Locate it with `poetry env info --path` |
+| GPU | NVIDIA RTX A4000, 16 GB, compute capability 8.6, driver 550.54.14, CUDA 12.4 |
+| Jupyter kernel | `Python 3.11 (gfm4agri)`, registered under the name `gfm4agri` |
+| Data | `data/eurocropsml/` and `data/eurocrops/` are present locally. Neither `EUROCROPSML_DATA` nor `CROPHARVEST_DATA` is exported, so the code takes its in repository fallback |
+
+Run everything through `poetry run`, or activate `$(poetry env info --path)/bin/activate`. After pulling a
+commit that touches `pyproject.toml` or `poetry.lock`, run `poetry install` again.
+
+### Traps specific to the JupyterHub machine
+
+**Poetry must be version 2.** `pyproject.toml` declares its metadata in the PEP 621 `[project]` table and
+`poetry.lock` is lock version 2.1. Poetry 1.8 reads neither, and the 1.8 that ships in this image runs on
+Python 3.8, so it cannot update itself. It was replaced using the official installer driven by the pyenv
+interpreter rather than the system one:
+
+```bash
+curl -sSL https://install.python-poetry.org | ~/.pyenv/versions/3.11.15/bin/python - --version 2.2.1
+```
+
+**The image exports a `PYTHONPATH` that shadows the environment.** JupyterHub sets `PYTHONPATH` to Spark's
+Python 3.8 trees for every process, and those directories land ahead of the environment's own
+`site-packages`. Any package present in both is then imported from the 3.8 build. `cv2`, `osgeo`, `vtk`,
+`itk` and `mpi4py` all collide this way, and `cv2` alone breaks `import terratorch` with an OpenCV loader
+error that names nothing of the real cause. The fix is a `sitecustomize.py` inside the environment, which
+runs at interpreter start, after `site` has finished, and drops those entries. It is scoped to this
+environment, so PySpark elsewhere is untouched, and it also covers the Jupyter kernel, which inherits the
+same `PYTHONPATH`. It lives in the environment, so **recreating the environment loses it and the failure
+returns.** Recreate it with:
+
+```bash
+cat > "$(poetry env info --path)/lib/python3.11/site-packages/sitecustomize.py" <<'PY'
+import sys
+
+_FOREIGN = ("/opt/spark/python", "python3.8", "/usr/local/lib/python3/dist-packages")
+sys.path[:] = [p for p in sys.path if not any(marker in p for marker in _FOREIGN)]
+PY
+```
+
+`poetry run python -c "import terratorch"` is the check. It fails without that file and succeeds with it.
+
+**The CUDA wheels are newer than the driver.** torch is pinned to the cu128 index for the Blackwell
+laptop, while this driver reports CUDA 12.4. The cu128 build nonetheless runs correctly on the A4000
+through CUDA minor version compatibility, confirmed with a GPU matmul, so do not substitute a cu124 build
+or the CPU build here. Verify with:
+
+```bash
+poetry run python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+```
+
+**Imports are slow because the environment is on NFS.** The home filesystem is a network mount, so the
+first `import terratorch` after an install took 8 minutes 46 seconds against 55 seconds of CPU time,
+nearly all of it waiting on I/O while bytecode was written. Warm imports settle at about 30 seconds. A
+long first import is not a hung process. Container local disk would be faster but does not survive a
+restart, which is why the environment stays in the home cache.
+
+### Rebuilding the environment on the JupyterHub machine
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+poetry env use ~/.pyenv/versions/3.11.15/bin/python
+poetry install
+# recreate sitecustomize.py at this point, see above
+poetry run python -m ipykernel install --user --name gfm4agri --display-name "Python 3.11 (gfm4agri)"
+poetry run pytest
+```
+
 ## Repository layout
 
 ```
@@ -194,7 +275,9 @@ figures/            scripts producing thesis and presentation figures
 ## Conventions
 
 - Working language is English. The user is a Spanish and English bilingual MSc student at ITC, comfortable with EO, ML and GIS terminology, so prefer concise technical responses.
-- Windows environment. Bash and PowerShell are both available and take their own syntax.
+- Two working environments, the Windows laptop and the ITC JupyterHub Linux machine, described under
+  Working environments. Confirm which one you are on before writing a command, since PowerShell exists
+  only on the laptop and the JupyterHub machine needs the handling documented there.
 - Python, with PyTorch, scikit-learn, TerraTorch, TorchGeo, rasterio and GDAL, and Earth Engine.
 - Every experiment must be reproducible: fixed seeds, the configuration recorded alongside the results, and the label budget, the country and the split protocol stated in every result file.
 - In prose drafted for the thesis, avoid dashes and use a formal academic register.
