@@ -87,7 +87,7 @@ def _terramind_s1rtc_stats(bands: list[str]) -> tuple[list[float], list[float]]:
 
 
 #: Sentinel-1 RTC as TerraMind's second modality: VV then VH in dB, twelve monthly composites
-#: in ``<chip>_s1rtc.tif``, written by ``scripts/data/build_s1_chips.py``.
+#: in ``<chip>_s1rtc.tif``, written by ``scripts/hub/build_s1_chips.py``.
 S1RTC = {"S1RTC": {"suffix": "_s1rtc.tif", "bands": ("VV", "VH"),
                    "stats": _terramind_s1rtc_stats, "sidecar": "s1_rtc.json"}}
 

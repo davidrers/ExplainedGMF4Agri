@@ -14,7 +14,7 @@ and, once per chip set, ``<root>/chip_parcels.parquet``: one row per ``(chip, pa
 with the parcel's labelled pixels in that chip, read from the masks and parcel rasters. It is
 shared by every split and by every label budget draw.
 
-    poetry run python scripts/data/build_chip_split.py --root data/eurocrops_chips/EE_2021
+    poetry run python scripts/hub/build_chip_split.py --root data/eurocrops_chips/EE_2021
 """
 
 from __future__ import annotations

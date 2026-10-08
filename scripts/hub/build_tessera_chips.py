@@ -17,10 +17,10 @@ split of its own, so the training chips are those of a spatial split directory, 
 adds them afterwards without downloading anything. A chip already on disk is skipped, so an
 interrupted run resumes.
 
-    poetry run python scripts/data/build_tessera_chips.py
-    poetry run python scripts/data/build_tessera_chips.py --root data/eurocrops_chips/EE_2021_pilot --workers 6
-    poetry run python scripts/data/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
-    poetry run python scripts/data/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 \
+    poetry run python scripts/hub/build_tessera_chips.py
+    poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021_pilot --workers 6
+    poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
+    poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 \
         --stats-only --split-dir data/eurocrops_chips/EE_2021/splits/<split>
 """
 

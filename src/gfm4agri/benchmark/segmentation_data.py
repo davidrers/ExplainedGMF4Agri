@@ -1,7 +1,8 @@
 """TerraTorch data plumbing for the EuroCrops segmentation chips.
 
-The chips written by ``scripts/data/build_pilot_chips.py`` (and later by the full export)
-already have the layout TerraTorch's generic segmentation datamodule reads, so the only
+The chips written by ``scripts/hub/build_country_chips.py`` (and earlier by the 12-chip pilot's
+builder, now in ``experiments/2026-09_pilot_12chips/``) already have the layout TerraTorch's
+generic segmentation datamodule reads, so the only
 things added here are the ones the thesis protocol needs and TerraTorch does not provide:
 
 * **Sparse supervision.** The annotation unit is the parcel polygon, so a label budget of a
@@ -14,7 +15,7 @@ things added here are the ones the thesis protocol needs and TerraTorch does not
   never copied by hand into a config.
 * **Two chip-set layouts.** A pilot set carries its split in ``training_chips/`` and
   ``validation_chips/``. A full-country set keeps every chip in ``chips/`` and takes its
-  partition from a spatial split directory written by ``scripts/data/build_chip_split.py``,
+  partition from a spatial split directory written by ``scripts/hub/build_chip_split.py``,
   passed as ``split_dir``; that directory also names the pool parcels the buffer withholds
   from training.
 * **Per-model inputs from the backbone registry**: the band subset the encoder consumes, and

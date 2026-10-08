@@ -22,8 +22,8 @@ A chip is skipped when its three rasters and its report are all present, so re-r
 command resumes. Transient network failures are retried, and a chip that still fails is
 recorded in ``failures.json`` and does not stop the run.
 
-    poetry run python scripts/data/build_country_chips.py --country EE --year 2021 --workers 12
-    poetry run python scripts/data/build_country_chips.py --assemble-only
+    poetry run python scripts/hub/build_country_chips.py --country EE --year 2021 --workers 12
+    poetry run python scripts/hub/build_country_chips.py --assemble-only
 """
 
 from __future__ import annotations

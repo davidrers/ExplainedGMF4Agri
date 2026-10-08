@@ -23,8 +23,8 @@ Two stages, both idempotent:
                size does not match the archive
 
 Usage:
-    python scripts/data/fetch_eurocropsml.py
-    python scripts/data/fetch_eurocropsml.py --files preprocess.zip split.zip
+    python scripts/hub/fetch_eurocropsml.py
+    python scripts/hub/fetch_eurocropsml.py --files preprocess.zip split.zip
 """
 
 from __future__ import annotations

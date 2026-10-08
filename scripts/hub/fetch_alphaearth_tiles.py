@@ -12,9 +12,9 @@ so that a chip needing a tile that is not on disk fails instead of coming back e
 Run it once per chip set before ``build_alphaearth_chips.py``; a tile already on disk with a
 verified checksum is skipped, so a second chip set only adds what it lacks.
 
-    poetry run python scripts/data/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021_pilot
-    poetry run python scripts/data/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --list-only
-    poetry run python scripts/data/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --workers 4
+    poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021_pilot
+    poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --list-only
+    poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --workers 4
 """
 
 from __future__ import annotations

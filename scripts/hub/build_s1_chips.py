@@ -19,8 +19,8 @@ Sentinel-2 reports so that neither manifest can pick up the other's. A chip is s
 its raster and report both exist, so the command resumes. ``<root>/s1_rtc.json`` records the
 source, the format and the normalisation statistics, assembled from the reports at the end.
 
-    poetry run python scripts/data/build_s1_chips.py --country EE --year 2021 --workers 12
-    poetry run python scripts/data/build_s1_chips.py --from-manifest \
+    poetry run python scripts/hub/build_s1_chips.py --country EE --year 2021 --workers 12
+    poetry run python scripts/hub/build_s1_chips.py --from-manifest \
         --root data/eurocrops_chips/EE_2021_pilot
 """
 

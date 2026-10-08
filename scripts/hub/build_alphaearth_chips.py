@@ -8,9 +8,9 @@ network. Provenance and the per-dimension normalisation statistics (training chi
 to ``<root>/alphaearth_v1.json``, through the export shared with TESSERA,
 :func:`gfm4agri.embeddings.export.export_chips`, which documents the layout and the resume.
 
-    poetry run python scripts/data/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021_pilot
-    poetry run python scripts/data/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021_pilot
-    poetry run python scripts/data/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021 \
+    poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021_pilot
+    poetry run python scripts/hub/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021_pilot
+    poetry run python scripts/hub/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021 \
         --workers 16 --split-dir data/eurocrops_chips/EE_2021/splits/<split>
 """
 

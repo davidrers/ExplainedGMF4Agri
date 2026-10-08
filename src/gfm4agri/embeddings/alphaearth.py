@@ -7,7 +7,7 @@ Optimized GeoTIFFs in ``gs://alphaearth_foundations``: one directory per year an
 8192 x 8192 pixels and 64 int8 bands per file, ``-128`` for a masked pixel. That bucket is
 requester pays. Source Cooperative mirrors it file for file (``tge-labs/aef``) at no charge
 and carries Google's MD5 for each file, so tiles are fetched from the mirror and checked
-against the checksum Google publishes (``scripts/data/fetch_alphaearth_tiles.py``, which can
+against the checksum Google publishes (``scripts/hub/fetch_alphaearth_tiles.py``, which can
 also read Google's bucket directly).
 
 Three properties of the files set how a chip is read:
@@ -205,7 +205,7 @@ class AlphaEarthStore:
         path = self.dir / tile.key
         if not path.exists():
             raise FileNotFoundError(f"{path} is listed but not on disk; run "
-                                    "scripts/data/fetch_alphaearth_tiles.py for this chip set")
+                                    "scripts/hub/fetch_alphaearth_tiles.py for this chip set")
         xmin, _, _, ymax = bounds
         out = np.full((N_DIMS, size_px, size_px), np.nan, dtype=np.float32)
         with rasterio.open(path) as src:

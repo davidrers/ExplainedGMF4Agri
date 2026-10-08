@@ -23,7 +23,7 @@ HERE = Path(__file__).resolve().parent
 SPECS = {
     "terramind": {
         "name": "TerraMind",
-        "config": "configs/seg/terramind_v1_small_ee_pilot.yaml",
+        "config": "experiments/2026-09_pilot_12chips/configs/terramind_v1_small_ee_pilot.yaml",
         "reference": "eurocrops_terramind_pilot.ipynb",
         "out": "eurocrops_terramind_pilot_embeddings.ipynb",
         "coords": False,
@@ -35,7 +35,7 @@ SPECS = {
     },
     "prithvi": {
         "name": "Prithvi-EO-2.0",
-        "config": "configs/seg/prithvi_eo_v2_300_tl_ee_pilot.yaml",
+        "config": "experiments/2026-09_pilot_12chips/configs/prithvi_eo_v2_300_tl_ee_pilot.yaml",
         "reference": "eurocrops_prithvi_pilot.ipynb",
         "out": "eurocrops_prithvi_pilot_embeddings.ipynb",
         "coords": True,
@@ -48,7 +48,7 @@ SPECS = {
     },
     "thor": {
         "name": "THOR",
-        "config": "configs/seg/thor_v1_large_ee_pilot.yaml",
+        "config": "experiments/2026-09_pilot_12chips/configs/thor_v1_large_ee_pilot.yaml",
         "reference": None,
         "out": "eurocrops_thor_pilot_embeddings.ipynb",
         "coords": False,

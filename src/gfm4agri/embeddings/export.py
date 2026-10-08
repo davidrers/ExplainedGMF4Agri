@@ -1,6 +1,6 @@
 """Write a precomputed embedding onto an existing chip set, on the same grid as its labels.
 
-Shared by the TESSERA and AlphaEarth builders, ``scripts/data/build_<name>_chips.py``. For
+Shared by the TESSERA and AlphaEarth builders, ``scripts/hub/build_<name>_chips.py``. For
 every chip in ``<root>/manifest.json`` the export writes ``<chip><suffix>`` next to the chip's
 image, mask and parcel raster: float32, EPSG:3035, the chip's exact transform, NaN where the
 provider has no embedding. The masks, the parcel rasters and the split files are shared with

@@ -24,8 +24,8 @@ Three stages, each idempotent and individually selectable through --stages:
 Nothing here filters, reprojects or reclassifies. Interpretation belongs downstream.
 
 Usage:
-    python scripts/data/fetch_eurocrops.py --countries EE LV LT PT
-    python scripts/data/fetch_eurocrops.py --countries EE --stages parquet
+    python scripts/hub/fetch_eurocrops.py --countries EE LV LT PT
+    python scripts/hub/fetch_eurocrops.py --countries EE --stages parquet
 """
 
 from __future__ import annotations
