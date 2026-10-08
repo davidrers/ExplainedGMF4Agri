@@ -1,10 +1,10 @@
-"""Build notebooks/05_explore_parcel.ipynb: the per-parcel explorer, S2 and S1."""
+"""Build notebooks/eda/05_explore_parcel.ipynb: the per-parcel explorer, S2 and S1."""
 from __future__ import annotations
 from pathlib import Path
 import pandas as pd
 import nbformat as nbf
 
-REPO = Path("/data/private/THESIS - ExplainedGMF4Agri")
+REPO = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 PARCELS = pd.read_parquet(REPO / "results/eda/eurocrops/cache/gallery_parcels.parquet")
 SHOWCASE = int(PARCELS.loc[PARCELS["crop"] == "winter_common_soft_wheat", "parcel_id"].iloc[0])
 
@@ -53,7 +53,7 @@ from gfm4agri.data.parcel_explorer import (COUNTRY_ID, COUNTRY_NAME, explore, ex
 pd.set_option("display.width", 180)
 pd.set_option("display.max_columns", 40)
 
-REPO = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+REPO = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "pyproject.toml").exists())
 print("identifier column per country:", COUNTRY_ID)
 print("outputs are written to results/explore/<country>_<parcel>_<year>/")
 ''')
@@ -161,6 +161,6 @@ A full season over one parcel costs seconds for the search and a minute or two f
 nb = nbf.v4.new_notebook(cells=cells)
 nb.metadata.update({"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                     "language_info": {"name": "python", "version": "3.11.15"}})
-out = REPO / "notebooks" / "05_explore_parcel.ipynb"
+out = REPO / "notebooks" / "eda" / "05_explore_parcel.ipynb"
 nbf.write(nb, str(out))
 print("wrote", out, "with", len(cells), "cells")

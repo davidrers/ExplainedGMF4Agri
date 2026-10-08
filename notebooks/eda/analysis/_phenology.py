@@ -17,7 +17,7 @@ Outputs
 
 Usage
 -----
-    python results/eda/_phenology.py [--per-class 250]
+    python notebooks/eda/analysis/_phenology.py [--per-class 250]
 """
 
 from __future__ import annotations
@@ -37,9 +37,10 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[1]
-sys.path.insert(0, str(HERE))
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
+sys.path.insert(0, str(CODE))
 import _hcat  # noqa: E402
 
 CATALOGUE = REPO / "data" / "catalogue_parcels_full.parquet"
@@ -86,7 +87,7 @@ def main(per_class: int, workers: int) -> None:
     FIG.mkdir(parents=True, exist_ok=True)
     ret_path = CACHE / "retained_classes.parquet"
     if not ret_path.exists():
-        raise SystemExit("run results/eda/_class_design.py first")
+        raise SystemExit("run notebooks/eda/analysis/_class_design.py first")
     retained = pd.read_parquet(ret_path)
     cat = pd.read_parquet(CATALOGUE)
     cat["hcat"] = cat["hcat"].astype(str)
@@ -159,7 +160,7 @@ def main(per_class: int, workers: int) -> None:
                         "between_within_ratio": round(ssb / max(ssw, 1e-9), 4),
                         "F_statistic": round((ssb / max(k - 1, 1)) / (ssw / max(n - k, 1)), 2)}
     (CACHE / "phenology_config.json").write_text(json.dumps({
-        "script": "results/eda/_phenology.py", "random_seed": SEED,
+        "script": "notebooks/eda/analysis/_phenology.py", "random_seed": SEED,
         "parcels_per_class": per_class, "n_parcels_sampled": int(len(sel)),
         "n_bins": N_BINS, "bin_length_days": 10, "min_timesteps": MIN_TS,
         "separability": sep, "seconds_total": round(time.perf_counter() - t0, 1)},

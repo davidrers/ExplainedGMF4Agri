@@ -1,6 +1,6 @@
 """End-to-end CropHarvest exploratory analysis.
 
-Mirrors results/eda/_run_analysis.py (EuroCropsML) for the thesis's secondary dataset.
+Mirrors notebooks/eda/analysis/_run_analysis.py (EuroCropsML) for the thesis's secondary dataset.
 
 Outputs, all written next to this file:
   catalogue_labels.parquet   one row per CropHarvest label + country/region/geometry metadata
@@ -16,8 +16,8 @@ Plus, at the repository level:
 Run after labels.geojson and features.tar.gz have been downloaded and extracted under
 <repo>/data/cropharvest (see data/README.md).
 
-    python results/eda/cropharvest/_run_analysis.py
-    python results/eda/cropharvest/_run_analysis.py --array-sample 2000   # quick pass
+    python notebooks/eda/analysis/cropharvest/_run_analysis.py
+    python notebooks/eda/analysis/cropharvest/_run_analysis.py --array-sample 2000   # quick pass
 """
 
 from __future__ import annotations
@@ -49,8 +49,9 @@ random.seed(SEED)
 np.random.seed(SEED)
 
 # ---------------------------------------------------------------- paths
-HERE = Path(__file__).parent.resolve()
-REPO = HERE.parents[2]
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda" / "cropharvest"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 DATA_ROOT = Path(os.environ.get("CROPHARVEST_DATA", REPO / "data" / "cropharvest")).expanduser()
 LABELS_PATH = DATA_ROOT / "labels.geojson"
 ARRAYS_DIR = DATA_ROOT / "features" / "arrays"
@@ -1075,7 +1076,7 @@ def write_scheme(g, F, floor=150):
 
     scheme = {
         "_meta": {
-            "generated_by": "results/eda/cropharvest/_run_analysis.py",
+            "generated_by": "notebooks/eda/analysis/cropharvest/_run_analysis.py",
             "generated_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
             "dataset": "CropHarvest",
             "zenodo_record": 10251170,
@@ -1189,7 +1190,7 @@ def main(array_sample: int = 15000, skip_arrays: bool = False):
 
     with open(OUT_RUNCFG, "w", encoding="utf-8") as f:
         json.dump({
-            "script": str(HERE / "_run_analysis.py"),
+            "script": str(CODE / "_run_analysis.py"),
             "run_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
             "seed": SEED,
             "data_root": str(DATA_ROOT),

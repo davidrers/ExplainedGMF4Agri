@@ -30,9 +30,9 @@ Outputs
 
 Usage
 -----
-    python results/eda/eurocrops/_class_phenology.py                  # everything
-    python results/eda/eurocrops/_class_phenology.py --stages fetch   # only the pulls
-    python results/eda/eurocrops/_class_phenology.py --windows 4 --years 2021
+    python notebooks/eda/analysis/eurocrops/_class_phenology.py                  # everything
+    python notebooks/eda/analysis/eurocrops/_class_phenology.py --stages fetch   # only the pulls
+    python notebooks/eda/analysis/eurocrops/_class_phenology.py --windows 4 --years 2021
 """
 
 from __future__ import annotations
@@ -53,8 +53,9 @@ import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 import yaml  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda" / "eurocrops"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 
 from gfm4agri.data.chip_grid import CHIP_M, apply_vector_aliases, chip_of, vector_layer_aliases  # noqa: E402
 from gfm4agri.data.sentinel import (  # noqa: E402

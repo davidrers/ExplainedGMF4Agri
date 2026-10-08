@@ -23,8 +23,8 @@ Outputs
 
 Usage
 -----
-    python results/eda/eurocrops/_parcel_gallery.py                 # all crops
-    python results/eda/eurocrops/_parcel_gallery.py --crops potatoes --no-gif
+    python notebooks/eda/analysis/eurocrops/_parcel_gallery.py                 # all crops
+    python notebooks/eda/analysis/eurocrops/_parcel_gallery.py --crops potatoes --no-gif
 """
 
 from __future__ import annotations
@@ -47,8 +47,9 @@ import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 import xarray as xr  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda" / "eurocrops"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 
 # The corrections that must be identical everywhere - the processing-baseline reflectance
 # offset, the cloud screening and the parcel mask - live in the package, so this script and

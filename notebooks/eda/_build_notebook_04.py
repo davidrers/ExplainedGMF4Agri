@@ -1,4 +1,4 @@
-"""Build notebooks/04_parcel_timelapse_and_series.ipynb from the gallery artefacts."""
+"""Build notebooks/eda/04_parcel_timelapse_and_series.ipynb from the gallery artefacts."""
 from __future__ import annotations
 import json
 from pathlib import Path
@@ -6,8 +6,9 @@ import numpy as np
 import pandas as pd
 import nbformat as nbf
 
-REPO = Path("/data/private/THESIS - ExplainedGMF4Agri")
+REPO = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 EDA = REPO / "results" / "eda" / "eurocrops"
+EDA_CODE = REPO / "notebooks" / "eda" / "analysis" / "eurocrops"
 G = json.loads((EDA / "gallery.json").read_text())
 SER = pd.read_parquet(EDA / "cache" / "gallery_ndvi_series.parquet")
 PARCELS = pd.read_parquet(EDA / "cache" / "gallery_parcels.parquet")
@@ -68,7 +69,7 @@ md(f"""
 | reference series | EuroCropsML `.npz`, Sentinel-2 **L1C top of atmosphere**, spatial median over the same polygon | Zenodo record 15095445 |
 | polygons | EuroCrops v11, Estonia 2021 | Zenodo record 14094196 |
 
-**Provenance.** Every figure and number here is produced by `results/eda/eurocrops/_parcel_gallery.py`, which writes `gallery.json`, the cached series under `results/eda/eurocrops/cache/` and the figures under `results/eda/eurocrops/figures/gallery/`. The animations are written to `data/eurocrops/gallery/`, which is git-ignored. Season {G['season'][0]} to {G['season'][1]}, scenes kept at tile cloud below {G['cloud_cover_max']} % and coverage at least {G['min_coverage']} %, bands {', '.join(G['bands'])}.
+**Provenance.** Every figure and number here is produced by `notebooks/eda/analysis/eurocrops/_parcel_gallery.py`, which writes `gallery.json`, the cached series under `results/eda/eurocrops/cache/` and the figures under `results/eda/eurocrops/figures/gallery/`. The animations are written to `data/eurocrops/gallery/`, which is git-ignored. Season {G['season'][0]} to {G['season'][1]}, scenes kept at tile cloud below {G['cloud_cover_max']} % and coverage at least {G['min_coverage']} %, bands {', '.join(G['bands'])}.
 """)
 
 md("## 0. Setup")
@@ -97,6 +98,7 @@ def find_repo(start: Path) -> Path:
 
 REPO = find_repo(Path.cwd().resolve())
 EDA = REPO / "results" / "eda" / "eurocrops"
+EDA_CODE = REPO / "notebooks" / "eda" / "analysis" / "eurocrops"
 FIG = EDA / "figures" / "gallery"
 CACHE = EDA / "cache"
 GIF = REPO / "data" / "eurocrops" / "gallery"
@@ -251,7 +253,7 @@ if small.exists():
     print("winter wheat, NDVI, one frame per clear acquisition, fixed colour scale:")
     display(Image(filename=str(small)))
 else:
-    print("run results/eda/eurocrops/_parcel_gallery.py to regenerate the animations")
+    print("run notebooks/eda/analysis/eurocrops/_parcel_gallery.py to regenerate the animations")
 ''')
 
 # --------------------------------------------------------------------- 5 comparison
@@ -352,6 +354,6 @@ md(f"""
 nb = nbf.v4.new_notebook(cells=cells)
 nb.metadata.update({"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                     "language_info": {"name": "python", "version": "3.11.15"}})
-out = REPO / "notebooks" / "04_parcel_timelapse_and_series.ipynb"
+out = REPO / "notebooks" / "eda" / "04_parcel_timelapse_and_series.ipynb"
 nbf.write(nb, str(out))
 print("wrote", out, "with", len(cells), "cells")

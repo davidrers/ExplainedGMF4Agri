@@ -12,7 +12,7 @@ Output
 
 Usage
 -----
-    python results/eda/_build_catalogue.py [--workers 16] [--limit N]
+    python notebooks/eda/analysis/_build_catalogue.py [--workers 16] [--limit N]
 """
 
 from __future__ import annotations
@@ -30,8 +30,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[1]
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 DATA_ROOT = Path(os.environ.get("EUROCROPSML_DATA", REPO / "data" / "eurocropsml")).expanduser()
 PREPROCESS_DIR = DATA_ROOT / "preprocess"
 OUT_PARQUET = REPO / "data" / "catalogue_parcels_full.parquet"
@@ -144,7 +145,7 @@ def main(workers: int, limit: int | None) -> None:
 
     total = time.perf_counter() - t0
     cfg = {
-        "script": "results/eda/_build_catalogue.py",
+        "script": "notebooks/eda/analysis/_build_catalogue.py",
         "preprocess_dir": str(PREPROCESS_DIR),
         "n_files_listed": len(names),
         "n_parcels_catalogued": int(len(df)),

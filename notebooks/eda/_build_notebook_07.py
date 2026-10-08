@@ -1,12 +1,13 @@
-"""Build notebooks/07_class_phenology_three_seasons.ipynb from the phenology artefacts."""
+"""Build notebooks/eda/07_class_phenology_three_seasons.ipynb from the phenology artefacts."""
 from __future__ import annotations
 import json
 from pathlib import Path
 import pandas as pd
 import nbformat as nbf
 
-REPO = Path("/data/private/THESIS - ExplainedGMF4Agri")
+REPO = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 EDA = REPO / "results" / "eda" / "eurocrops"
+EDA_CODE = REPO / "notebooks" / "eda" / "analysis" / "eurocrops"
 F = json.loads((EDA / "phenology.json").read_text())
 SAMPLE = pd.read_parquet(EDA / "cache" / "phenology_sample.parquet")
 S2 = pd.read_parquet(EDA / "cache" / "phenology_s2_curves.parquet")
@@ -49,7 +50,7 @@ md(f"""
 
 **Method.** {F['n_parcels_sampled']} parcels in {F['n_windows']} windows of {F['window_km']:.2f} km, drawn so that each window carries as many classes as possible and the windows sit at least 25 km apart. Every acquisition between {F['season'][0].format(year='YYYY')} and {F['season'][1].format(year='YYYY')} is reduced over each parcel polygon at {F['resolution_m']} m, Sentinel-2 after the processing-baseline offset and the scene-classification screening of `gfm4agri.data.sentinel`, Sentinel-1 in linear power with the per-track offset removed per parcel. Per-parcel series go onto a {F['dekad_days']}-day grid; each class then takes the median across its parcels, and the band is the interquartile range across parcels.
 
-Produced by `results/eda/eurocrops/_class_phenology.py`. One read serves every parcel in a window, which is what makes {F['n_parcels_sampled']} parcels across three seasons and two sensors affordable; the per-parcel reductions are cached under `data/eurocrops/phenology/`.
+Produced by `notebooks/eda/analysis/eurocrops/_class_phenology.py`. One read serves every parcel in a window, which is what makes {F['n_parcels_sampled']} parcels across three seasons and two sensors affordable; the per-parcel reductions are cached under `data/eurocrops/phenology/`.
 """)
 
 md("## 0. Setup")
@@ -75,6 +76,7 @@ def find_repo(start: Path) -> Path:
 
 REPO = find_repo(Path.cwd().resolve())
 EDA = REPO / "results" / "eda" / "eurocrops"
+EDA_CODE = REPO / "notebooks" / "eda" / "analysis" / "eurocrops"
 FIG = EDA / "figures" / "phenology"
 CACHE = EDA / "cache"
 
@@ -231,6 +233,6 @@ md(f"""
 nb = nbf.v4.new_notebook(cells=cells)
 nb.metadata.update({"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                     "language_info": {"name": "python", "version": "3.11.15"}})
-out = REPO / "notebooks" / "07_class_phenology_three_seasons.ipynb"
+out = REPO / "notebooks" / "eda" / "07_class_phenology_three_seasons.ipynb"
 nbf.write(nb, str(out))
 print("wrote", out, "with", len(cells), "cells")

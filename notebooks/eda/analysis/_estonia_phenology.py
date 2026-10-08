@@ -18,9 +18,10 @@ sns.set_theme(context="notebook", style="whitegrid")
 random.seed(0)
 np.random.seed(0)
 
-HERE = Path(__file__).parent.resolve()
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 FIG = HERE / "figures"; FIG.mkdir(exist_ok=True)
-REPO = Path(__file__).resolve().parents[2]
 DATA_DIR = Path(os.environ.get("EUROCROPSML_DATA", REPO / "data" / "eurocropsml")).expanduser() / "preprocess"
 RED, NIR = 3, 7  # B04, B08 in 0-indexed S2 order
 

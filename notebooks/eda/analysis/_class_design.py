@@ -17,7 +17,7 @@ Outputs
 
 Usage
 -----
-    python results/eda/_class_design.py
+    python notebooks/eda/analysis/_class_design.py
 """
 
 from __future__ import annotations
@@ -36,9 +36,10 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[1]
-sys.path.insert(0, str(HERE))
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
+sys.path.insert(0, str(CODE))
 import _hcat  # noqa: E402
 
 CATALOGUE = REPO / "data" / "catalogue_parcels_full.parquet"
@@ -155,7 +156,7 @@ def _norm_entropy(counts) -> float:
 def load_catalogue() -> pd.DataFrame:
     if not CATALOGUE.exists():
         raise SystemExit(f"catalogue not found: {CATALOGUE}\n"
-                         "run results/eda/_build_catalogue.py first")
+                         "run notebooks/eda/analysis/_build_catalogue.py first")
     df = pd.read_parquet(CATALOGUE)
     df["hcat"] = df["hcat"].astype(str)
     df["country"] = pd.Categorical(df["country"], categories=COUNTRIES + ["Unknown"])
@@ -821,7 +822,7 @@ def _write_scheme(out: dict, retained: dict, MIN_CLASS: int, MIN_TS: int, K_MAX:
     doc = {
         "name": "eurocropsml_thesis_class_scheme",
         "version": 1,
-        "generated_by": "results/eda/_class_design.py",
+        "generated_by": "notebooks/eda/analysis/_class_design.py",
         "source": {
             "catalogue": out["source_catalogue"],
             "n_parcels_scanned": out["n_parcels"],

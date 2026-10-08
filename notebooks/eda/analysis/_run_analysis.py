@@ -11,7 +11,7 @@ which is seeded.
 
 Usage
 -----
-    python results/eda/_run_analysis.py
+    python notebooks/eda/analysis/_run_analysis.py
 """
 
 from __future__ import annotations
@@ -29,9 +29,10 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[1]
-sys.path.insert(0, str(HERE))
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
+sys.path.insert(0, str(CODE))
 import _hcat  # noqa: E402
 
 DATA_ROOT = Path(os.environ.get("EUROCROPSML_DATA", REPO / "data" / "eurocropsml")).expanduser()
@@ -62,7 +63,7 @@ def main() -> None:
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     if not CATALOGUE.exists():
         raise SystemExit(f"catalogue not found: {CATALOGUE}\n"
-                         "run results/eda/_build_catalogue.py first")
+                         "run notebooks/eda/analysis/_build_catalogue.py first")
     df = pd.read_parquet(CATALOGUE)
     df["hcat"] = df["hcat"].astype(str)
     n_total = len(df)

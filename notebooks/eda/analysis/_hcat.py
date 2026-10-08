@@ -20,7 +20,9 @@ from pathlib import Path
 
 import pandas as pd
 
-HERE = Path(__file__).resolve().parent
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 CACHE = HERE / "cache" / "hcat"
 BASE_URL = "https://raw.githubusercontent.com/maja601/EuroCrops/main"
 TAXONOMY_FILES = {

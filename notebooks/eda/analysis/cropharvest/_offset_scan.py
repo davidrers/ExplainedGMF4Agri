@@ -10,7 +10,7 @@ coordinate of the pixel the CropHarvest engineer actually sampled (`instance_lat
 resolution. Where it does, the instance carries the spectral signature of a different
 place while keeping its original label.
 
-    python results/eda/cropharvest/_offset_scan.py
+    python notebooks/eda/analysis/cropharvest/_offset_scan.py
 """
 from __future__ import annotations
 
@@ -23,8 +23,9 @@ import h5py
 import numpy as np
 import pandas as pd
 
-HERE = Path(__file__).parent.resolve()
-REPO = HERE.parents[2]
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda" / "cropharvest"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
 DATA_ROOT = Path(os.environ.get("CROPHARVEST_DATA", REPO / "data" / "cropharvest"))
 ARRAYS_DIR = DATA_ROOT / "features" / "arrays"
 OUT = HERE / "offset_scan.parquet"

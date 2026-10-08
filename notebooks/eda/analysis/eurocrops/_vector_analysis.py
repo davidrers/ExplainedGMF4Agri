@@ -24,7 +24,7 @@ which is seeded.
 
 Usage
 -----
-    python results/eda/eurocrops/_vector_analysis.py [--force]
+    python notebooks/eda/analysis/eurocrops/_vector_analysis.py [--force]
 """
 
 from __future__ import annotations
@@ -42,9 +42,10 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
-sys.path.insert(0, str(REPO / "results" / "eda"))
+CODE = Path(__file__).resolve().parent
+REPO = next(p for p in CODE.parents if (p / "pyproject.toml").exists())
+HERE = REPO / "results" / "eda" / "eurocrops"  # outputs stay in results/eda; the code lives in notebooks/eda/analysis
+sys.path.insert(0, str(REPO / "notebooks" / "eda" / "analysis"))
 import _hcat  # noqa: E402  the HCAT helper shared with the EuroCropsML analysis
 
 PARQUET_DIR = REPO / "data" / "eurocrops" / "parquet"
