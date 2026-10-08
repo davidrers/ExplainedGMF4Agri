@@ -1,0 +1,33 @@
+# Full-country Estonia 2021: frozen Prithvi-EO-2.0 600M TL encoder, trainable UNet decoder, on the
+# spatial block split. The decoder settings are the pilot's; the fit budget under per-cell GPU
+# training is still an open protocol decision (docs/thesis_design.md, Phase 1, "Open").
+run_name: prithvi_eo_v2_600_tl_ee
+seed: 0
+
+data:
+  root: data/eurocrops_chips/EE_2021
+  split: data/eurocrops_chips/EE_2021/splits/blocks4_buf1600_seed0__6b0eb4cb  # written by scripts/data/build_chip_split.py
+  normalisation: backbone      # backbone = Prithvi-EO-2.0 HLS pretraining stats; chips = manifest stats
+  batch_size: 2                # the large encoder fits a micro-batch of 2 on a 16 GB A4000 end to end
+  num_workers: 8
+  augment: true                # D4 on the training chips; the two-stage fit draws a cached variant
+
+label_budget:
+  mode: pct                    # dense | pct; under a split, dense is the 100 % draw
+  pct: 100                     # per cent of the trainable parcels of each class
+  draw_seed: 0
+
+model:
+  backbone: prithvi_eo_v2_600_tl
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+
+trainer:
+  max_epochs: 40
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2   # effective batch 4, as in every other run
+
+output_root: results/seg

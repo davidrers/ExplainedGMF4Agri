@@ -1,0 +1,33 @@
+# Pilot wiring of THOR to the EuroCrops chips: frozen encoder, trainable UNet decoder.
+# A pipeline test, not a Phase 1 result: the pilot has no block split and no test chips,
+# so "test" metrics are computed on the validation chips.
+# THOR comes from its TerraTorch extension; install it with scripts/env/install_thor.sh.
+run_name: thor_v1_large_ee_pilot
+seed: 0
+
+data:
+  root: data/eurocrops_chips/EE_2021_pilot
+  normalisation: backbone      # backbone = THOR pretraining stats; chips = manifest stats
+  batch_size: 2                # as for the other large encoders on a 16 GB A4000
+  num_workers: 4
+  augment: true                # D4 on the training chips
+
+label_budget:
+  mode: dense                  # dense | pct
+  pct: 5                       # per cent of the training parcels of each class, when mode is pct
+  draw_seed: 0
+
+model:
+  backbone: thor_v1_large
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+
+trainer:
+  max_epochs: 40
+  precision: 16-mixed
+  log_every_n_steps: 1
+  accumulate_grad_batches: 2   # effective batch 4, as in the other pilot runs
+
+output_root: results/seg

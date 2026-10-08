@@ -1,0 +1,18 @@
+# TerraMind v1 large, frozen, on the twelve monthly Sentinel-2 composites; ChannelBottleneck and a
+# 12.9 M parameter UNet decoder fitted from cached features. Settings of the full-Estonia grid of
+# 2 October 2026 (configs/seg/terramind_v1_large_ee.yaml at the snapshot commit a81bd9e).
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # TerraMind v1 S2L2A pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # D4; the cached fit draws one of the eight cached variants
+model:
+  backbone: terramind_v1_large
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2

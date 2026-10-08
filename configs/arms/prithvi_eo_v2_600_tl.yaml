@@ -1,0 +1,18 @@
+# Prithvi-EO-2.0 600M TL, frozen, on the twelve monthly Sentinel-2 composites (its six HLS bands) with
+# date and location encodings; ChannelBottleneck and the UNet decoder fitted from cached features.
+# Settings of the full-Estonia grid of 2 October 2026 (configs/seg/prithvi_eo_v2_600_tl_ee.yaml at a81bd9e).
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # Prithvi-EO-2.0 HLS pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # D4; the cached fit draws one of the eight cached variants
+model:
+  backbone: prithvi_eo_v2_600_tl
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2
