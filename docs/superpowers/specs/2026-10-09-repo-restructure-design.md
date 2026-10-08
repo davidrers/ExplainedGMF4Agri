@@ -18,7 +18,7 @@ Two goals, both serving Phase 1:
 | Decision | Choice |
 |---|---|
 | Machine roles | The hub develops code, extracts chips and analyses results. The cluster encodes and fits. Code is never edited on the cluster |
-| Feature caches on the cluster | Job-scoped: one Slurm job per arm encodes onto the node's local NVMe, runs that arm's whole sweep, and deletes the cache on exit. The cache location is a parameter, so a project directory can replace it later without code changes |
+| Feature caches | Every run looks for the arm's cache first and computes it only if it is missing (5.3). On the cluster the lookup is a persistent location (`data/embeddings/` in the clone now, a project directory later); a missing cache is computed job-scoped, onto the node's local NVMe, used for that arm's whole sweep and deleted on exit |
 | What a pilot is | A smaller chip set: whole spatial blocks drawn from each partition of a country chip set, written as a chip set directory of its own. The workflow cannot tell it from a country |
 | Order of work | Restructure first, reproducing today's behaviour. The 2 October protocol decisions that change the numbers (nested repeated draws, equal training steps, no validation labels at low K) follow as a separate change, after they are written into `protocol.md` |
 | Arms | TerraMind v1 large, Prithvi-EO-2.0 600M TL, THOR v1 large at 160 m tokens (patch 16 on 10 m bands, 8 on 20 m, to match TerraMind), TESSERA v1, AlphaEarth v1. All five already exist in the code |
@@ -129,7 +129,7 @@ directory holds one split it is used; if it holds several, `--split` names one.
 |---|---|---|
 | `configs/arms/<arm>.yaml` | Backbone, route (`cache` or `raster`), normalisation, augmentation, decoder and head settings, optimiser, loss, precision, training batch | A chip set, a budget, a path |
 | `configs/experiments/<name>.yaml` | Arms, K values, draws, seeds, epochs, checkpoint criterion | Paths |
-| `configs/machines/{hub,cluster}.yaml` | Encode batch size, data loader workers, default cache root | Anything that changes a result |
+| `configs/machines/{hub,cluster}.yaml` | Encode batch size, data loader workers, cache root | Anything that changes a result |
 
 The training batch stays in the arm config, so a result does not depend on the machine. The encode batch size only
 affects stage 1 throughput. The arm values are those of today's `_ee` configs; THOR's arm takes the 160 m settings
@@ -141,17 +141,29 @@ today (`run_name`, `seed`, `data`, `label_budget`, `model`, `trainer`, `output_r
 
 ### 5.3 Routes
 
-- **Cache route** (TerraMind, Prithvi, THOR): `generate_embeddings` into `<cache root>/<backbone>/<chip set name>/`,
-  skipping chips already cached, then `fit_cached` per cell. Token-grid arms always take this route; end-to-end
-  training of a token-grid arm is no longer part of the workflow.
+- **Cache route** (TerraMind, Prithvi, THOR): the decoder is fitted from cached embeddings with `fit_cached`, per
+  cell. Token-grid arms always take this route; training a token-grid arm with the encoder inside the loop is no
+  longer part of the workflow. Where the embeddings come from is resolved once per arm, before the cells:
+  1. **Look up** `<cache root>/<backbone>/<chip set name>/`. If its `cache.json` matches the run (backbone,
+     manifest SHA-256, split `config_hash`, normalisation, precision, the eight training variants) and every chip
+     of the split is present, the cache is used as it is and nothing is encoded.
+  2. **Compute** otherwise, with `generate_embeddings` into `<scratch>/<backbone>/<chip set name>/`, which resumes
+     any chips already there. When the scratch root is the cache root, as on the hub, a half-finished cache is
+     resumed in place.
+  3. A cache that exists but does not match the run is never written into. When the scratch root is the cache
+     root the run stops and names the mismatching fields; otherwise it computes into the scratch root.
 - **Raster route** (TESSERA, AlphaEarth): `fit_end_to_end` per cell, reading the embedding rasters.
 
 ### 5.4 Interface
 
 ```
 python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021
-    [--split NAME] [--arms ARM ...] [--machine hub|cluster] [--cache-root DIR] [--dry-run] [--summarise]
+    [--split NAME] [--arms ARM ...] [--machine hub|cluster] [--cache-root DIR] [--scratch DIR]
+    [--dry-run] [--summarise]
 ```
+
+`--cache-root` is where caches are looked up and `--scratch` where missing ones are computed; both default from the
+machine profile, and `--scratch` defaults to the cache root.
 
 `--machine` defaults to `hub`. `--arms` restricts the run, which is how the cluster runs one arm per job.
 `--dry-run` prints the cells and runs the checks without compute. `--summarise` only collects finished cells.
@@ -161,7 +173,7 @@ python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/euroc
 1. **Checks** before any compute: the manifest and the split exist, and every chip has the rasters this arm needs
    (`_merged.tif` for the token-grid arms, `_tessera.tif` or `_alphaearth.tif` for the raster arms). It stops with
    the list of what is missing.
-2. **Encode** (cache route only).
+2. **Resolve the cache** (cache route only): look up, else compute, per 5.3.
 3. **Cells**: every K by draw by seed. A cell is finished when it has both `results.json` and
    `predictions_test.npz`; a finished cell is skipped, and a cell with only `results.json` gets its predictions
    written without a refit.
@@ -235,12 +247,16 @@ Steps 3 to 5 can be driven from the hub over `ssh utwente-hpc`.
 `scripts/cluster/kshot.sbatch` runs under `#!/bin/bash -l` on `itc-gpu` with account `itc-tech`, QoS `research`
 and one GPU; CPU, memory and time limits are set in `submit.sh`. It sets the UT proxy, creates
 `/local/$SLURM_JOB_ID`, removes it on exit, failure or termination, and runs
-`run_kshot.py --arms <arm> --machine cluster --cache-root /local/$SLURM_JOB_ID`. Results go to the home results
-directory as each cell finishes. A resubmitted job skips finished cells and re-encodes only if cells remain.
+`run_kshot.py --arms <arm> --machine cluster --scratch /local/$SLURM_JOB_ID`. The cluster profile's cache root is
+`data/embeddings/` in the clone, so a cache placed there (copied from the hub when space allows, or a project
+directory linked there later) is used and nothing is encoded; otherwise the job encodes into `/local`. Results go
+to the home results directory as each cell finishes. A resubmitted job skips finished cells, and encodes again only
+if cells remain and no persistent cache exists.
 
 ### 6.5 The hub
 
-The hub profile's cache root is `data/embeddings/`, so the existing TerraMind and Prithvi Estonia caches are reused
+The hub profile's cache root and scratch root are both `data/embeddings/`, so the existing TerraMind and Prithvi
+Estonia caches are found and reused (after the check of 5.3), a missing cache such as THOR's on Estonia is computed
 there, and the hub can run the workflow on any chip set as before.
 
 ## 7. Verification
@@ -250,7 +266,9 @@ there, and the hub can run the workflow on any chip set as before.
    15 epochs), except for `run_name`, `output_root` and machine-only fields, with copies of those configs kept
    as test fixtures since `configs/seg/` is removed; and the pilot builder on a synthetic
    chip set produces a valid chip set with whole blocks in every partition.
-2. `--dry-run` on `EE_2021` and `EE_2021_mini` lists 15 cells each and passes the checks.
+2. `--dry-run` on `EE_2021` and `EE_2021_mini` lists 15 cells each, passes the checks, and on the hub reports the
+   existing TerraMind and Prithvi `EE_2021` caches as reused and THOR's as to be computed. A unit test covers the
+   three outcomes of 5.3 (reuse, compute, mismatch) on a fake cache.
 3. The full `kshot` experiment on `EE_2021_mini` on the hub: 15 `results.json`, 15 prediction files, one
    `summary.csv`, nothing written outside `results/` and `data/embeddings/`.
 4. On the cluster: set-up, `pytest`, the same run on `EE_2021_mini` through `submit.sh` (5 jobs), results pulled
