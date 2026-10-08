@@ -133,9 +133,10 @@ def test_registry_fragments_are_well_formed():
             assert args["backbone"] == "IdentityBackbone" and spec.stats is None
             assert spec.resolution_group == "pixel_raster"
             continue
-        # A multimodal entry is its base encoder given a further modality.
-        assert args["backbone"] == name or (spec.extra_modalities
-                                            and name.startswith(args["backbone"]))
+        # A variant entry is its base encoder given a further modality or another token size.
+        assert args["backbone"] == name or (
+            (spec.extra_modalities or spec.resolution_group != "token_grid")
+            and name.startswith(args["backbone"] + "_"))
         if spec.extra_modalities:
             assert args["backbone_modalities"] == ["S2L2A", *spec.extra_modalities]
             assert args["backbone_merge_method"] == "mean"
