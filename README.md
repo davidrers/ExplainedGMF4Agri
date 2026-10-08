@@ -3,13 +3,16 @@
 Working repository for the MSc thesis *Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions* (David Reyes, ITC, University of Twente, 2026-2027).
 
 The research design, objectives, research questions and work plan are specified in
-[docs/proposal/current_proposal.md](docs/proposal/current_proposal.md). A condensed working summary, intended for
-day-to-day orientation, is in [CLAUDE.md](CLAUDE.md).
+[docs/proposal/current_proposal.md](docs/proposal/current_proposal.md). A condensed statement of the research design
+is in [docs/thesis_design.md](docs/thesis_design.md), and the working guide to the repository and its current state is
+in [CLAUDE.md](CLAUDE.md).
 
 ## Layout
 
 | Path | Contents |
 |---|---|
+| `docs/thesis_design.md` | The research design: objectives, research questions, task formulation, model set, phases |
+| `docs/phase1/` | The Phase 1 protocol, the implemented [pipeline](docs/phase1/pipeline.md) and its [plain-language overview](docs/phase1/pipeline_overview.md) |
 | `docs/proposal/` | The proposal, authoritative for the research design |
 | `docs/research/` | Research notes and deep-research documents from the proposal phase |
 | `docs/internship/` | The separate Terramind internship proposal, September to December 2026 |

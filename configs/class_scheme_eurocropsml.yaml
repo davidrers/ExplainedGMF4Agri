@@ -533,3 +533,11 @@ cross_country_shared_level4:
     Estonia|Portugal: 7
     Latvia|Portugal: 8
     Estonia|Latvia|Portugal: 7
+# Codes in the EuroCrops v11 vector layer (HCAT3) that name a scheme class under a different
+# code from the EuroCropsML one (HCAT2), applied to the vector layer before labels are
+# rasterised. Only one-to-one renames belong here. Verified by parcel id: all 1,236 Estonian
+# EuroCropsML parcels coded 3301060402 spring_rapeseed_rape carry 3301060403
+# summer_rapeseed_rape in v11, and no v11 parcel carries 3301060402.
+vector_layer_aliases:
+  '3301060402':
+  - '3301060403'

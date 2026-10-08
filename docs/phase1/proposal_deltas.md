@@ -1,14 +1,22 @@
 # Departures from the proposal and from CLAUDE.md
 
+`CLAUDE.md` in this document means the research design that now lives in `docs/thesis_design.md`; it was moved there on 7 October 2026.
+
 Every point at which `docs/phase1/protocol.md` departs from `docs/proposal/current_proposal.md` or from `CLAUDE.md`, with the original wording, the replacement, and the reason. Use this list to correct those two documents. Line numbers refer to `docs/proposal/current_proposal.md` as of commit `db663cb`.
 
 Twenty-four deltas. Deltas 1, 2, 3, 6, 13 and 21 are the consequential ones.
 
 ---
 
-## Delta 1. The definition of K is contradictory and the percentage definition is wrong
+## Delta 1. The definition of K is contradictory, and it is settled as the percentage definition
 
-**Severity: blocking.**
+**Severity: blocking. Resolved 24 September 2026, reversing the resolution first recorded here.**
+
+> **This delta was originally resolved the other way.** Version 1.0 of the protocol adopted the absolute-count definition, for the reasons set out below, which were sound for the per-parcel benchmark it described. Phase 1 has since been refocused on pixel-level segmentation, and under that task the annotation unit is the parcel polygon and the eligible pool is the polygons falling inside the training chips. That pool is both smaller and far more uneven between classes than the per-parcel pool was, so a fixed count is a different fraction of every class and exhausts the rare classes while barely touching the abundant ones. K is therefore now **a percentage of the independent training polygons of each class, applied per class**, as the proposal's line 135 originally stated. See protocol section 4.3.
+>
+> The one argument below that survives is comparability across countries: a percentage does confound the budget with country size. It is not a reason to prefer a count under segmentation, and it is handled by drawing every cross-country curve against both axes; see protocol section 5.5.
+
+The original argument is retained below, unedited, because it records why the count definition was chosen and therefore what changed.
 
 **Proposal, line 135:**
 > "K denotes the percentage of the available training labels used per crop class, and it is varied from 1 % up to the full training set over the grid `{1, 5, 10, 20, 50, 100}` %, tracing a learning curve of accuracy against label budget"

@@ -1,0 +1,33 @@
+# Pilot of AlphaEarth Foundations annual embeddings (Google Satellite Embedding V1, 64-d) on the
+# EuroCrops chips: the per-pixel MLP head of the TESSERA pilot (two hidden layers, 512 and 256).
+# No encoder runs; the embedding rasters come from scripts/data/build_alphaearth_chips.py.
+# A pipeline test, not a Phase 1 result: the pilot has no block split and no test chips,
+# so "test" metrics are computed on the validation chips.
+run_name: alphaearth_v1_mlp_ee_pilot
+seed: 0
+
+data:
+  root: data/eurocrops_chips/EE_2021_pilot
+  normalisation: chips         # embeddings have no pretraining stats; training-chip stats either way
+  batch_size: 4
+  num_workers: 4
+  augment: true                # D4 is exact for a per-pixel embedding
+
+label_budget:
+  mode: dense                  # dense | pct
+  pct: 5                       # per cent of the training parcels of each class, when mode is pct
+  draw_seed: 0
+
+model:
+  backbone: alphaearth_v1
+  lr: 1.0e-3                   # a small head trained from scratch; the token-grid runs use 1e-4
+  weight_decay: 0.05
+  head_dropout: 0.2
+  loss: ce
+
+trainer:
+  max_epochs: 40
+  precision: 16-mixed
+  log_every_n_steps: 1
+
+output_root: results/seg

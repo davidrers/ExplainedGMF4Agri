@@ -37,6 +37,7 @@ import json
 import logging
 import os
 import warnings
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -106,6 +107,32 @@ class S1Exploration:
     features: pd.DataFrame
     png: Path | None = None
     gif: Path | None = None
+
+
+@dataclass
+class MultiYearS2:
+    """One parcel's Sentinel-2 seasons, and the overlay that puts them on one axis."""
+
+    parcel_id: str
+    country: str
+    crop: str
+    years: tuple[int, ...]
+    by_year: dict[int, S2Exploration]
+    table: pd.DataFrame
+    png: Path | None = None
+
+
+@dataclass
+class MultiYearS1:
+    """One parcel's Sentinel-1 seasons, and the overlay that puts them on one axis."""
+
+    parcel_id: str
+    country: str
+    crop: str
+    years: tuple[int, ...]
+    by_year: dict[int, S1Exploration]
+    table: pd.DataFrame
+    png: Path | None = None
 
 
 # --------------------------------------------------------------------------- parcel lookup
@@ -202,19 +229,34 @@ def _out_dir(cc: str, parcel_id: str, year: int, out_dir: Path | None) -> Path:
 
 
 def explore(parcel_id: str | int, year: int | None = None, country: str | None = None, *,
+            years: Sequence[int] | None = None,
             season: tuple[str, str] | None = None, animation: bool = True,
             compare: bool = True, anim_band: str = "NDVI", fps: int = 2,
             resolution: int = 10, cloud_cover_max: int = 70, min_coverage: int = 80,
             min_pixels: int = 5, min_valid_fraction: float = MIN_VALID_FRACTION,
             out_dir: Path | None = None, verbose: bool = True,
-            show: bool = True) -> S2Exploration:
+            show: bool = True) -> S2Exploration | MultiYearS2:
     """Fetch Sentinel-2 for one parcel, chart the indices, animate, and compare.
 
     The chart is the vendored five-index panel with Moran's I; the animation is the
     vendored NDVI map with a cursor sweeping the series. When ``compare`` is set and the
     parcel is in EuroCropsML, its shipped L1C series is drawn against the series computed
     here, which is the check that matters for Phase 1.
+
+    With ``years`` the same parcel is followed through several seasons and a
+    :class:`MultiYearS2` comes back instead, carrying each season's own result and an overlay
+    of the seasons on one day-of-year axis. **Only the declaration year is labelled**: the
+    parcel's EuroCrops class describes 2021 and nothing else, so an off-year curve shows what
+    the field did, not what the label says it was. The comparison against EuroCropsML and the
+    animation are limited to the declaration year, since neither applies to the others.
     """
+    if years is not None:
+        return _explore_years(parcel_id, years, country, season=season, animation=animation,
+                              compare=compare, anim_band=anim_band, fps=fps,
+                              resolution=resolution, cloud_cover_max=cloud_cover_max,
+                              min_coverage=min_coverage, min_pixels=min_pixels,
+                              min_valid_fraction=min_valid_fraction, out_dir=out_dir,
+                              verbose=verbose, show=show)
     ensure_vendored()
     from space_time_deepsearch.vis.parcel_timeseries import animate, compute_indices, plot
 
@@ -311,10 +353,11 @@ def explore(parcel_id: str | int, year: int | None = None, country: str | None =
 
 
 def explore_s1(parcel_id: str | int, year: int | None = None, country: str | None = None, *,
+               years: Sequence[int] | None = None,
                season: tuple[str, str] | None = None, animation: bool = True,
                band: str = "vh", fps: int = 2, resolution: int = 10, min_pixels: int = 5,
                ndvi: pd.DataFrame | None = None, out_dir: Path | None = None,
-               verbose: bool = True, show: bool = True) -> S1Exploration:
+               verbose: bool = True, show: bool = True) -> S1Exploration | MultiYearS1:
     """Fetch Sentinel-1 RTC for one parcel, chart the backscatter, and animate it.
 
     ``parcel_series`` does the fetching, the per-date reduction in linear power and the
@@ -322,7 +365,17 @@ def explore_s1(parcel_id: str | int, year: int | None = None, country: str | Non
     that radar and optical can be read side by side for the same field.
 
     ``ndvi`` optionally overlays an optical series, normally ``explore(...).series["NDVI"]``.
+
+    With ``years`` the parcel is followed through several seasons and a :class:`MultiYearS1`
+    comes back, carrying each season and an overlay on one day-of-year axis. Radar needs no
+    cloud screening, so the seasons are directly comparable; what differs between them is the
+    crop, and only the declaration year is labelled.
     """
+    if years is not None:
+        return _explore_s1_years(parcel_id, years, country, season=season, animation=animation,
+                                 band=band, fps=fps, resolution=resolution,
+                                 min_pixels=min_pixels, out_dir=out_dir, verbose=verbose,
+                                 show=show)
     ensure_vendored()
     from space_time_deepsearch.io import parcel_series
 
@@ -380,6 +433,133 @@ def explore_both(parcel_id: str | int, year: int | None = None, country: str | N
                        if k in {"season", "animation", "fps", "resolution", "out_dir",
                                 "verbose", "show"}})
     return s2, s1
+
+
+# ------------------------------------------------------------------------ several seasons
+
+#: How a season is drawn in the overlays. The declaration year is the solid, dark one; the
+#: seasons on either side are lighter, so a reader can see at a glance which year is labelled.
+YEAR_STYLE = {-2: ("#c7d7e8", (0, (1, 1.4))), -1: ("#9fb8d4", (0, (4, 2))),
+              0: ("#1b4f8a", "solid"), 1: ("#d4845f", (0, (4, 2))),
+              2: ("#b35c37", (0, (1, 1.4)))}
+
+
+def _year_style(year: int, label_year: int):
+    return YEAR_STYLE.get(int(year) - int(label_year), ("#777777", (0, (2, 2))))
+
+
+def _season_for(year: int, season: tuple[str, str] | None) -> tuple[str, str] | None:
+    """A season template rendered for one year, or None to take the module default."""
+    if season is None:
+        return None
+    return tuple(part.format(year=year) if "{year}" in part else part for part in season)
+
+
+def _explore_years(parcel_id, years, country, *, season, animation, compare, anim_band, fps,
+                   resolution, cloud_cover_max, min_coverage, min_pixels, min_valid_fraction,
+                   out_dir, verbose, show) -> MultiYearS2:
+    """``explore`` over several seasons, plus the overlay that puts them on one axis."""
+    parcel, cc = find_parcel(parcel_id, country)
+    pid, crop = str(parcel_id), str(parcel.iloc[0]["EC_hcat_n"]).replace("_", " ")
+    label_year = COUNTRY_YEAR[cc]
+    years = tuple(sorted(int(y) for y in years))
+    if verbose:
+        print(f"Parcel {pid} ({COUNTRY_NAME[cc]}), {crop}, seasons {', '.join(map(str, years))}")
+        print(f"  only {label_year} is declared; the other seasons show what the field did, "
+              f"not what the label says")
+
+    by_year, frames = {}, []
+    for year in years:
+        is_label = year == label_year
+        by_year[year] = explore(
+            pid, year, cc, season=_season_for(year, season),
+            animation=animation and is_label, compare=compare and is_label,
+            anim_band=anim_band, fps=fps, resolution=resolution,
+            cloud_cover_max=cloud_cover_max, min_coverage=min_coverage, min_pixels=min_pixels,
+            min_valid_fraction=min_valid_fraction, out_dir=out_dir, verbose=verbose,
+            show=show and is_label)
+        for name, df in by_year[year].series.items():
+            frames.append(df.assign(index_name=name, year=year))
+    table = pd.concat(frames, ignore_index=True)
+    table["doy"] = pd.to_datetime(table["date"]).dt.dayofyear
+
+    dest = _out_dir(cc, pid, label_year, out_dir)
+    png = _multiyear_figure(table, crop, pid, cc, label_year, years,
+                            dest / f"{cc}_{pid}_{min(years)}_{max(years)}_s2_seasons.png",
+                            panels=[("NDVI", "NDVI"), ("NDMI", "NDMI")], show=show)
+    return MultiYearS2(pid, cc, crop, years, by_year, table, png)
+
+
+def _explore_s1_years(parcel_id, years, country, *, season, animation, band, fps, resolution,
+                      min_pixels, out_dir, verbose, show) -> MultiYearS1:
+    """``explore_s1`` over several seasons, plus the overlay."""
+    parcel, cc = find_parcel(parcel_id, country)
+    pid, crop = str(parcel_id), str(parcel.iloc[0]["EC_hcat_n"]).replace("_", " ")
+    label_year = COUNTRY_YEAR[cc]
+    years = tuple(sorted(int(y) for y in years))
+    if verbose:
+        print(f"Parcel {pid} ({COUNTRY_NAME[cc]}), {crop}, seasons {', '.join(map(str, years))}")
+
+    by_year, frames = {}, []
+    for year in years:
+        is_label = year == label_year
+        by_year[year] = explore_s1(pid, year, cc, season=_season_for(year, season),
+                                   animation=animation and is_label, band=band, fps=fps,
+                                   resolution=resolution, min_pixels=min_pixels,
+                                   out_dir=out_dir, verbose=verbose, show=show and is_label)
+        frames.append(by_year[year].features.assign(year=year))
+    table = pd.concat(frames, ignore_index=True)
+    table["doy"] = pd.to_datetime(table["date"]).dt.dayofyear
+
+    dest = _out_dir(cc, pid, label_year, out_dir)
+    png = _multiyear_figure(table, crop, pid, cc, label_year, years,
+                            dest / f"{cc}_{pid}_{min(years)}_{max(years)}_s1_seasons.png",
+                            panels=[("vv_median_db_adj", "VV gamma0 (dB)"),
+                                    ("vh_median_db_adj", "VH gamma0 (dB)")], show=show)
+    return MultiYearS1(pid, cc, crop, years, by_year, table, png)
+
+
+def _multiyear_figure(table: pd.DataFrame, crop: str, pid: str, cc: str, label_year: int,
+                      years: tuple[int, ...], dest: Path, panels: list[tuple[str, str]],
+                      show: bool = True) -> Path:
+    """The seasons on one day-of-year axis, one panel per quantity."""
+    import matplotlib.pyplot as plt
+
+    pt = _palette()
+    fig, axes = plt.subplots(len(panels), 1, figsize=(11.0, 3.4 * len(panels)), sharex=True)
+    axes = np.atleast_1d(axes)
+    for ax, (column, label) in zip(axes, panels):
+        for year in years:
+            colour, dash = _year_style(year, label_year)
+            if "index_name" in table:                      # the Sentinel-2 long frame
+                g = table[(table["year"] == year) & (table["index_name"] == column)]
+                values = g["median"]
+            else:                                          # the Sentinel-1 feature frame
+                g = table[table["year"] == year]
+                values = g[column] if column in g else g[column.replace("_adj", "")]
+            g = g.assign(_v=values).sort_values("doy")
+            ax.plot(g["doy"], g["_v"], color=colour, ls=dash,
+                    lw=2.2 if year == label_year else 1.5, marker="o", ms=2.6,
+                    label=f"{year}" + ("  (declared)" if year == label_year else ""))
+        ax.set_ylabel(label)
+        pt.style(ax)
+        ax.legend(fontsize=8, ncol=len(years), loc="best")
+    axes[-1].set_xlabel("day of year")
+    fig.tight_layout(rect=(0, 0, 1, 0.90))
+    fig.suptitle(f"Parcel {pid}  |  {crop.title()}  |  {COUNTRY_NAME[cc]}  |  "
+                 f"{min(years)} to {max(years)}",
+                 x=0.006, y=0.985, ha="left", fontsize=13, fontweight="600", color=pt.INK)
+    fig.text(0.006, 0.935, f"EuroCrops declares {label_year} only; the other seasons show what "
+                           "the field did, not what the label says it was",
+             ha="left", fontsize=9, color=pt.INK_2)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(dest, dpi=140, bbox_inches="tight")
+    print(f"wrote {dest}")
+    if show and _in_notebook():
+        from IPython.display import display as _display
+        _display(fig)
+    plt.close(fig)
+    return dest
 
 
 # ---------------------------------------------------------------------------------- charts

@@ -114,6 +114,11 @@ def harmonise_boa(cube: xr.DataArray, fallback: dict[str, float] | None = None
     days = [str(d)[:10] for d in np.atleast_1d(cube.time.values)]
     if coord in cube.coords:
         baselines = np.atleast_1d(cube[coord].values).astype(str)
+        if baselines.size == 1 and len(days) > 1:
+            # Every acquisition of this season shares one baseline, so stackstac keeps the
+            # coordinate scalar rather than per-time. Without this the shift is a length-one
+            # vector against a full time axis and the harmonisation raises.
+            baselines = np.repeat(baselines, len(days))
         numeric = np.array([float(b) if b.replace(".", "").isdigit() else 0.0 for b in baselines])
         source = "cube coordinate"
     elif fallback:

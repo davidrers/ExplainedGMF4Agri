@@ -1,0 +1,51 @@
+%% Phase 1 architecture: three GFM lanes from data extraction to K-shot segmentation.
+%% Blue = data, grey = frozen, amber = trainable, green = evaluation.
+%% Not yet implemented at time of writing: Sentinel-1 extraction (TerraMind only).
+flowchart TB
+  %% ---------- DATA ----------
+  SRC["<b>Source</b><br/>Planetary Computer STAC, 2021<br/>Sentinel-2 L2A (both) + Sentinel-1 RTC (TerraMind only)"]
+  PREP["<b>Preprocessing</b> · pystac + stackstac<br/>warp to EPSG:3035, 10 m<br/>S2: SCL cloud mask · S1: VV, VH<br/>monthly median, gap fill → T = 12"]
+  CHIP["<b>Chip</b> 224 × 224 × T=12<br/>+ crop mask + parcel-ID raster"]
+
+  TSRC["<b>Source</b><br/>geotessera, 2021<br/>precomputed S1 + S2 embeddings"]
+  TPREP["<b>Preprocessing</b><br/>crop and align to chip grid<br/>EPSG:3035, 10 m"]
+  TCHIP["<b>Chip</b> 224 × 224 × 128<br/>+ crop mask + parcel-ID raster"]
+
+  SRC --> PREP --> CHIP
+  TSRC --> TPREP --> TCHIP
+
+  %% ---------- TERRATORCH ----------
+  TM1["<b>Backbone</b> · TerraMind, frozen<br/>12 S2 bands + S1 VV, VH<br/><b>TemporalWrapper</b> (TerraMind is single-date):<br/>① fold 12 months into the batch<br/>② one ViT pass per month, months never see each other<br/>③ 12 monthly embeddings per token, concatenated<br/>→ 12 × D channels @ 14 × 14"]
+  PR1["<b>Backbone</b> · Prithvi-EO-2.0, frozen<br/>6 S2 bands + date and location<br/><b>no TemporalWrapper</b> (natively spatio-temporal):<br/>① all 12 months enter together, 3D patch embedding<br/>② one ViT pass, 12 × 196 tokens, space-time attention<br/>③ embeddings already fused across months<br/>→ 12 × D channels @ 14 × 14"]
+  TE1["<b>Backbone</b> · IdentityBackbone<br/>input is already the embedding"]
+
+  TM2["<b>Neck</b><br/>SelectIndices → ReshapeTokensToImage<br/>→ ChannelBottleneck 768 → Pyramid 56·28·14·7"]
+  PR2["<b>Neck</b><br/>SelectIndices → ReshapeTokensToImage<br/>→ ChannelBottleneck 768 → Pyramid 56·28·14·7"]
+  TE2["<b>Neck</b><br/>none, pass-through"]
+
+  TM3["<b>Decoder</b><br/>UNetDecoder → 64 × 56 × 56"]
+  PR3["<b>Decoder</b><br/>UNetDecoder → 64 × 56 × 56"]
+  TE3["<b>Decoder</b><br/>PixelMLP 128 → 512 → 256, per pixel"]
+
+  TM4["<b>Head</b><br/>SegmentationHead 1×1 conv<br/>bilinear ×4 → 224 × 224"]
+  PR4["<b>Head</b><br/>SegmentationHead 1×1 conv<br/>bilinear ×4 → 224 × 224"]
+  TE4["<b>Head</b><br/>SegmentationHead 1×1 conv<br/>native 224 × 224"]
+
+  CHIP --> TM1 --> TM2 --> TM3 --> TM4
+  CHIP --> PR1 --> PR2 --> PR3 --> PR4
+  TCHIP --> TE1 --> TE2 --> TE3 --> TE4
+
+  %% ---------- SEGMENTATION ----------
+  SEG["<b>Crop-type segmentation · K-shot protocol</b><br/>train: K % of parcels per class labelled, rest ignore_index<br/>CE on labelled pixels only · several draws per K<br/>test: fixed blocks, dense labels · Macro-F1 + 95 % CI"]
+  TM4 --> SEG
+  PR4 --> SEG
+  TE4 --> SEG
+
+  classDef data fill:#e8f1fb,stroke:#4a78b5,color:#000
+  classDef frozen fill:#eeeeee,stroke:#777,color:#000
+  classDef train fill:#fdf0dc,stroke:#c98a1b,color:#000
+  classDef out fill:#e6f4ea,stroke:#3b8a52,color:#000
+  class SRC,PREP,CHIP,TSRC,TPREP,TCHIP data
+  class TM1,PR1,TE1,TE2 frozen
+  class TM2,PR2,TM3,PR3,TE3,TM4,PR4,TE4 train
+  class SEG out
