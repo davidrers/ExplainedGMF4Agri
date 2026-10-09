@@ -21,8 +21,8 @@ sys.path[:0] = [str(HERE), str(REPO / "src"), str(REPO / "scripts")]
 
 
 def apply_overrides() -> None:
-    """Register ``thor_v1_large_40m`` and its decoder in the core registries, which every module reads, and
-    look arms up in ``arms_run/`` first."""
+    """Register ``thor_v1_large_40m`` and its decoder in the core registries, which every module reads, look
+    arms up in ``arms_run/`` first, and fit with at most four loader workers on the cluster."""
     from gfm4agri.benchmark import backbones as bb
     from gfm4agri.benchmark import segmentation as seg
     from gfm4agri.pipeline import config
@@ -30,6 +30,20 @@ def apply_overrides() -> None:
     core_arm_dirs = config.arm_dirs
     config.arm_dirs = lambda experiment, configs=config.CONFIGS: [HERE / "arms_run",
                                                                   *core_arm_dirs(experiment, configs)]
+
+    # A 40 m sample is 1.23 GB once the cached features are cast to float32, so the cluster profile's 16 fit
+    # workers, each prefetching two batches of 2, held about 79 GB of shared memory and job 617995 failed
+    # in its first fit. Four workers hold what 80 m's sixteen did. Workers change throughput and which
+    # worker draws a sample's D4 variant, nothing else.
+    core_load_machine = config.load_machine
+
+    def load_machine(name: str, configs: Path = config.CONFIGS) -> dict:
+        machine = core_load_machine(name, configs)
+        if name == "cluster":
+            machine["num_workers"] = min(machine["num_workers"], 4)
+        return machine
+
+    config.load_machine = load_machine
 
     bb.BACKBONES["thor_v1_large_40m"] = bb.BackboneSpec(
         name="thor_v1_large_40m", resolution_group="token_grid_40m",

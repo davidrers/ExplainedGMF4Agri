@@ -41,6 +41,14 @@ so the 40 m arm encodes one chip at a time on the cluster.
     poetry run python experiments/2026-10-09_thor_token_size/run.py -e experiments/2026-10-09_thor_token_size/experiment.yaml --chips data/eurocrops_chips/EE_2021_sample   # hub
     bash scripts/cluster/submit.sh experiments/2026-10-09_thor_token_size/experiment.yaml EE_2021_sample                                                                    # cluster
 
+**Runs on the cluster.** Commit `11fe4da`: 160 m (job 617993, 32 min) and 80 m (job 617994, 1 h 40 min)
+finished. 40 m (job 617995) encoded all 3,599 chip encodings in 2 h 25 min, then failed two minutes into its
+first fit: a DataLoader worker could not allocate shared memory. A 40 m sample is 1.23 GB in float32, so 16
+workers each prefetching two batches of 2 held about 79 GB, beyond the job's 120 GB. The job's exit trap
+removed the cache from the node's local disk. `run.py` now caps the cluster's fit workers at 4, which hold what
+80 m's sixteen did, and 40 m was submitted again. The worker count changes throughput and which worker draws a
+sample's D4 variant, nothing else.
+
 **Results.** `results/2026-10-09_thor_token_size/EE_2021_sample/`.
 
 **Outcome.** Filled in when the results are in.
