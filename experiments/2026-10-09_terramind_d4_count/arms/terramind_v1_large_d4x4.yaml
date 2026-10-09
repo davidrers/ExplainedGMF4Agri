@@ -1,0 +1,20 @@
+# TerraMind v1 large as configs/arms/terramind_v1_large.yaml, with the decoder trained on the four quarter turns
+# (0, 90, 180 and 270 degrees, no flip). train_variants is read by this folder's run.py and passed to the cached
+# fit, which otherwise draws all eight D4 variants; the cache still holds all eight, so the three arms of this
+# study share one cache.
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # TerraMind v1 S2L2A pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # the four rotations of train_variants, drawn uniformly per sample
+  train_variants: [k0, k1, k2, k3]
+model:
+  backbone: terramind_v1_large
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2

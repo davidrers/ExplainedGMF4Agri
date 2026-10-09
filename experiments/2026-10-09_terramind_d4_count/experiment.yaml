@@ -1,0 +1,11 @@
+# TerraMind v1 large with its decoder trained on 1, 4 or 8 cached D4 variants (identity; the four quarter turns;
+# all eight, the core arm) on half of Estonia's training blocks (EE_2021_half): does the augmentation add?
+# Three seeds, so that the variant counts are compared against the spread of the decoder fit.
+#   poetry run python experiments/2026-10-09_terramind_d4_count/run.py -e experiments/2026-10-09_terramind_d4_count/experiment.yaml --chips data/eurocrops_chips/EE_2021_half
+#   bash scripts/cluster/submit.sh experiments/2026-10-09_terramind_d4_count/experiment.yaml EE_2021_half
+arms: [terramind_v1_large_d4x1, terramind_v1_large_d4x4, terramind_v1_large]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss
