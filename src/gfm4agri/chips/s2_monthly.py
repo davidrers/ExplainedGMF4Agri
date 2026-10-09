@@ -7,9 +7,12 @@ clear. Three corrections are applied, and each is recorded in the chip manifest:
 
 * **BOA offset.** Acquisitions at processing baseline 04.00 or later are shifted by
   ``BOA_ADD_OFFSET`` so every date sits on ``reflectance = DN / 10000``, the same convention
-  :func:`gfm4agri.data.sentinel.harmonise_boa` enforces. Every 2021 scene predates the
-  change, so for the 2021 season this is a guard rather than a correction.
-* **Cloud and snow screening** with ``SCL_DROP``, as in :mod:`gfm4agri.data.sentinel`.
+  :func:`gfm4agri.data.sentinel.harmonise_boa` enforces. The Planetary Computer also serves
+  2021 scenes reprocessed at baseline 04.00 beside the originals, so for the 2021 season the
+  correction does apply.
+* **Cloud and snow screening** as a :class:`Screening`. ``EXPORT_2021``, the default, is
+  ``SCL_DROP`` alone, as in :mod:`gfm4agri.data.sentinel`, and is what the Estonian chip set
+  was exported with. ``REVISED`` closes the leaks found in its QA; see :class:`Screening`.
 * **Unreadable acquisitions.** An asset the archive cannot serve is dropped and its item id
   is recorded under ``unreadable_items``, rather than failing the chip. A handful of 2021
   scenes are permanently broken on the Planetary Computer, and one of them would otherwise
@@ -24,13 +27,14 @@ clear. Three corrections are applied, and each is recorded in the chip manifest:
 from __future__ import annotations
 
 import warnings
+from dataclasses import asdict, dataclass
 
 import numpy as np
 
 from gfm4agri.data.sentinel import BOA_ADD_OFFSET, OFFSET_BASELINE, SCL_DROP
 
-__all__ = ["BANDS", "BAND_NAMES", "N_MONTHS", "composite_window", "monthly_composite",
-           "window_report"]
+__all__ = ["BANDS", "BAND_NAMES", "EXPORT_2021", "N_MONTHS", "REVISED", "Screening",
+           "composite_window", "monthly_composite", "window_report"]
 
 #: The twelve L2A spectral bands, B10 being absent from L2A, in wavelength order.
 BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12"]
@@ -42,6 +46,92 @@ N_MONTHS = 12
 #: window is failed rather than composited; one dropped acquisition is always tolerated.
 MAX_UNREADABLE_SHARE = 0.05
 STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
+
+
+@dataclass(frozen=True)
+class Screening:
+    """What the compositor accepts as a clear observation of a pixel.
+
+    The default reproduces the export of the Estonian chip set: scene classification classes
+    in ``drop`` are excluded and every item is its own observation. Its QA found four leaks,
+    which the other fields close:
+
+    * SCL class 2 (dark area) rings every snow patch inside a cloud, and class 7
+      (unclassified) fringes cloud edges; both pass ``SCL_DROP`` and show as white rims.
+    * Cloud, shadow and snow edges a pixel or two beyond the classified object pass as clear;
+      ``dilate_px`` grows classes ``dilate_classes`` by that many pixels.
+    * Snow and haze the classification calls vegetation or bare soil; ``snow_test`` and
+      ``haze_test`` apply the Fmask snow test and haze-optimised transform (Zhu and Woodcock
+      2012) to the reflectance of each acquisition.
+    * One overpass is catalogued once per MGRS tile, and again where it was reprocessed, so a
+      pixel in a tile overlap entered the median up to four times. ``one_per_overpass`` merges
+      the copies of an overpass into one observation, flagged if any copy flags it, because
+      Sen2Cor classifies every tile on its own and a copy can call clear what another calls
+      cloud.
+    """
+
+    drop: tuple[int, ...] = SCL_DROP
+    dilate_px: int = 0
+    dilate_classes: tuple[int, ...] = (3, 8, 9, 10, 11)
+    snow_test: bool = False
+    haze_test: bool = False
+    one_per_overpass: bool = False
+
+
+#: The screening the Estonian 2021 chip set was exported with.
+EXPORT_2021 = Screening()
+#: Only vegetation, bare soil and water are clear; cloud, shadow and snow grown by 20 m.
+REVISED = Screening(drop=(0, 1, 2, 3, 7, 8, 9, 10, 11), dilate_px=2, snow_test=True,
+                    haze_test=True, one_per_overpass=True)
+
+
+def _screen(s: np.ndarray, c: np.ndarray, screening: Screening) -> tuple[np.ndarray, np.ndarray]:
+    """Per-acquisition ``(nodata, flagged)`` masks, each ``(n, H, W)``.
+
+    ``s`` is ``(n, 12, H, W)`` reflectance times 10000 after the BOA offset, ``c`` the scene
+    classification ``(n, H, W)``. A pixel is nodata where the acquisition does not cover it,
+    and flagged where it covers it but is not clear.
+    """
+    nodata = np.isnan(c) | np.isnan(s).any(1) | (c == 0)
+    flagged = np.isin(c, screening.drop)
+    if screening.dilate_px:
+        from scipy.ndimage import binary_dilation
+
+        grow = np.isin(c, screening.dilate_classes)
+        flagged |= np.stack([binary_dilation(g, iterations=screening.dilate_px) for g in grow])
+    r = {b: s[:, BANDS.index(b)] / 10000.0 for b in ("B02", "B03", "B04", "B08", "B11")}
+    with np.errstate(invalid="ignore", divide="ignore"):
+        if screening.snow_test:
+            ndsi = (r["B03"] - r["B11"]) / (r["B03"] + r["B11"])
+            flagged |= (ndsi > 0.15) & (r["B08"] > 0.11) & (r["B03"] > 0.1)
+        if screening.haze_test:
+            flagged |= r["B02"] - 0.5 * r["B04"] - 0.08 > 0
+    return nodata, flagged & ~nodata
+
+
+def _overpass_key(item) -> tuple[str, str]:
+    """Platform and sensing time: equal for every tile and reprocessing of one overpass."""
+    return item.properties.get("platform", ""), item.datetime.isoformat()
+
+
+def _merge_overpasses(s: np.ndarray, nodata: np.ndarray, flagged: np.ndarray,
+                      keys: list) -> tuple[np.ndarray, np.ndarray]:
+    """One observation per overpass: ``(g, 12, H, W)`` values and ``(g, H, W)`` bad mask.
+
+    A pixel is bad when no copy covers it or when any copy covering it is flagged; otherwise
+    its value is the mean of the copies, which differ only by the per-tile processing.
+    """
+    groups = [np.flatnonzero([k == key for k in keys]) for key in dict.fromkeys(keys)]
+    vals, bads = [], []
+    for g in groups:
+        data = ~nodata[g]
+        bad = (flagged[g] & data).any(0) | ~data.any(0)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            v = np.nanmean(np.where(data[:, None], s[g], np.nan), axis=0)
+        vals.append(v)
+        bads.append(bad)
+    return np.stack(vals), np.stack(bads)
 
 
 def _search(bbox_4326, year: int, cloud_cover_max: float):
@@ -95,6 +185,7 @@ def _fill_months(stack: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
 
 def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 80.0,
+                     screening: Screening = EXPORT_2021,
                      verbose: bool = False) -> tuple[np.ndarray, dict, dict]:
     """Monthly composite over any window on the chip grid, with per-pixel diagnostics.
 
@@ -108,11 +199,18 @@ def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 
     Returns the ``(144, H, W)`` int16 array, the per-pixel diagnostic maps that
     :func:`window_report` reduces to a chip's report, and the report of what was read for
     the window as a whole.
+
+    Growing the masks is the one spatial operation, so a screening with ``dilate_px`` reads
+    the window with that margin and crops it afterwards, and a chip cut from a window is
+    still the chip composited alone.
     """
     import stackstac
     from pyproj import Transformer
 
-    xmin, ymin, xmax, ymax = bounds_3035
+    pad = screening.dilate_px
+    xmin, ymin, xmax, ymax = (bounds_3035[0] - pad * 10, bounds_3035[1] - pad * 10,
+                              bounds_3035[2] + pad * 10, bounds_3035[3] + pad * 10)
+    read_bounds = (xmin, ymin, xmax, ymax)
     tr = Transformer.from_crs("EPSG:3035", "EPSG:4326", always_xy=True)
     lon, lat = tr.transform([xmin, xmax, xmin, xmax], [ymin, ymin, ymax, ymax])
     bbox = (min(lon), min(lat), max(lon), max(lat))
@@ -120,7 +218,7 @@ def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 
     items = _search(bbox, year, cloud_cover_max)
     if not items:
         raise RuntimeError(f"no Sentinel-2 L2A items for {bbox} in {year}")
-    kw = dict(epsg=3035, resolution=10, bounds=bounds_3035, dtype="float32",
+    kw = dict(epsg=3035, resolution=10, bounds=read_bounds, dtype="float32",
               fill_value=np.float32(np.nan), rescale=False, chunksize=2048)
 
     with warnings.catch_warnings():
@@ -147,6 +245,11 @@ def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 
     report = {"n_items": len(items), "items_per_month": [],
               "baselines": sorted({f"{b:.2f}" for b in baseline}),
               "dates_offset_corrected": int((baseline >= OFFSET_BASELINE).sum())}
+    if screening != EXPORT_2021:
+        # Recorded only when it departs from the export, so the reports of the existing chip
+        # set and of a default export stay identical.
+        report["screening"] = asdict(screening)
+        report["overpasses_per_month"] = [0] * N_MONTHS
     not_stacked = sorted(set(by_id) - set(stacked))
     if not_stacked:
         # stackstac leaves out an acquisition it finds empty over the window; recorded so
@@ -182,11 +285,18 @@ def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 
             if not keep_s:
                 continue
             s, c, kept = np.stack(keep_s), np.stack(keep_c), np.array(kept)
-        bad = np.isin(c, SCL_DROP) | np.isnan(c) | np.isnan(s).any(1)
         # The offset follows the acquisitions actually read, which after a dropped asset is
         # fewer than the month's items.
         shift = np.where(baseline[kept] >= OFFSET_BASELINE, BOA_ADD_OFFSET, 0.0)
         s = s + shift[:, None, None, None].astype(np.float32)
+        nodata, flagged = _screen(s, c, screening)
+        if screening.one_per_overpass:
+            keys = [_overpass_key(stacked_items[j]) for j in kept]
+            s, bad = _merge_overpasses(s, nodata, flagged, keys)
+        else:
+            bad = nodata | flagged
+        if "overpasses_per_month" in report:
+            report["overpasses_per_month"][m - 1] = int(len(s))
         s[np.broadcast_to(bad[:, None], s.shape)] = np.nan
         clear[m - 1] = (~bad).sum(0)
         with warnings.catch_warnings():
@@ -204,12 +314,14 @@ def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 
         raise RuntimeError(f"systematic read failure: {n_dropped} of {len(items)} acquisitions "
                            f"unreadable; refusing to gap-fill them")
 
-    filled, missing = _fill_months(out)
+    if pad:
+        out, clear = out[..., pad:-pad, pad:-pad], clear[..., pad:-pad, pad:-pad]
+    filled, missing = _fill_months(np.ascontiguousarray(out))
     maps = {"clear_obs": clear, "filled": missing.any(1),
             "never_observed": np.isnan(filled).any((0, 1))}
     filled = np.nan_to_num(filled, nan=0.0)
     arr = np.clip(np.round(filled), 0, 32767).astype(np.int16)
-    return arr.reshape(N_MONTHS * len(BANDS), h, w), maps, report
+    return arr.reshape(N_MONTHS * len(BANDS), *arr.shape[-2:]), maps, report
 
 
 def window_report(maps: dict, report: dict, rows: slice = slice(None),
@@ -230,6 +342,7 @@ def window_report(maps: dict, report: dict, rows: slice = slice(None),
 
 
 def monthly_composite(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 80.0,
+                      screening: Screening = EXPORT_2021,
                       verbose: bool = False) -> tuple[np.ndarray, dict]:
     """``(12 * 12, 224, 224)`` int16 composite of one chip, time-major, and its report.
 
@@ -237,7 +350,7 @@ def monthly_composite(bounds_3035, year: int = 2021, *, cloud_cover_max: float =
     ``(time channels)`` layout TerraTorch's ``expand_temporal_dimension`` expects.
     """
     arr, maps, report = composite_window(bounds_3035, year, cloud_cover_max=cloud_cover_max,
-                                         verbose=verbose)
+                                         screening=screening, verbose=verbose)
     assert arr.shape[-2:] == (224, 224), arr.shape
     return arr, window_report(maps, report)
 
