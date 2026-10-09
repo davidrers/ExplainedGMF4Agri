@@ -1,8 +1,9 @@
 """Two-stage training on a frozen encoder: embed every chip once, then train the decoder.
 
-This is the second of TerraTorch's two workflows. The first, used by ``scripts/seg/train.py``,
-keeps the frozen encoder inside the training loop, so every epoch of every fit re-encodes every
-chip although the encoder never changes. Here the encoder runs once per chip, through
+This is the second of TerraTorch's two workflows. The first, used by
+:func:`gfm4agri.benchmark.fit.fit_end_to_end`, keeps the frozen encoder inside the training
+loop, so every epoch of every fit re-encodes every chip although the encoder never changes.
+Here the encoder runs once per chip, through
 TerraTorch's ``EmbeddingGenerationTask``, and only the trainable part of the model is trained
 from the stored features.
 
@@ -544,8 +545,8 @@ def fit_cached(config: str | Path | dict, cache_dir, *, pct: float, draw_seed: i
     the learning rate, the weight decay, the dropout, the loss, the precision and the number of
     epochs are those of the end-to-end fit. The effective batch is kept; since the encoder is
     gone, the whole of it fits in one step and no gradient accumulation is needed. The result
-    file carries the same fields as ``scripts/seg/train.py`` writes, plus ``workflow`` and the
-    summary of the feature cache the fit read.
+    file carries the same fields as :func:`gfm4agri.benchmark.fit.fit_end_to_end` writes, plus
+    ``workflow`` and the summary of the feature cache the fit read.
     """
     import yaml
     from terratorch.tasks import SemanticSegmentationTask
