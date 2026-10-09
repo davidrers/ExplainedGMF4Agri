@@ -1,0 +1,86 @@
+{
+  "country": "Estonia",
+  "label_year": 2021,
+  "years": [
+    2020,
+    2021,
+    2022
+  ],
+  "season": [
+    "{year}-03-01",
+    "{year}-11-15"
+  ],
+  "resolution_m": 20,
+  "dekad_days": 10,
+  "n_windows": 12,
+  "window_km": 4.48,
+  "n_parcels_sampled": 580,
+  "min_area_ha": 1.0,
+  "min_valid_fraction": 0.6,
+  "scl_drop": [
+    0,
+    1,
+    3,
+    8,
+    9,
+    10,
+    11
+  ],
+  "random_seed": 42,
+  "parcels_per_class": {
+    "clover": 62,
+    "legumes harvested green": 55,
+    "oats": 50,
+    "pasture meadow grassland grass": 91,
+    "peas": 35,
+    "potatoes": 17,
+    "spring barley": 73,
+    "spring common soft wheat": 59,
+    "winter common soft wheat": 83,
+    "winter rapeseed rape": 55
+  },
+  "s2_parcel_dates": 64543,
+  "s1_parcel_dates": 235402,
+  "label_stability_ndvi": {
+    "clover": {
+      "2020": 0.587,
+      "2022": 0.694
+    },
+    "legumes harvested green": {
+      "2020": 0.716,
+      "2022": 0.854
+    },
+    "oats": {
+      "2020": 0.673,
+      "2022": 0.812
+    },
+    "pasture meadow grassland grass": {
+      "2020": 0.897,
+      "2022": 0.906
+    },
+    "peas": {
+      "2020": 0.764,
+      "2022": 0.802
+    },
+    "potatoes": {
+      "2020": 0.471,
+      "2022": 0.299
+    },
+    "spring barley": {
+      "2020": 0.719,
+      "2022": 0.775
+    },
+    "spring common soft wheat": {
+      "2020": 0.777,
+      "2022": 0.878
+    },
+    "winter common soft wheat": {
+      "2020": 0.527,
+      "2022": 0.296
+    },
+    "winter rapeseed rape": {
+      "2020": 0.524,
+      "2022": 0.684
+    }
+  }
+}

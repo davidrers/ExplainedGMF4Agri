@@ -1,0 +1,17 @@
+# AlphaEarth V1 (Google Satellite Embedding) precomputed embeddings, 64 dims per 10 m pixel, unit
+# vectors, with the per-pixel MLP head of the TESSERA arm, trained end to end on the embedding rasters.
+# Settings of configs/seg/alphaearth_v1_mlp_ee.yaml at the snapshot commit a81bd9e.
+route: raster                  # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: chips         # embeddings have no pretraining statistics; training-chip statistics
+  batch_size: 4
+  augment: true                # D4 is exact for a per-pixel embedding
+model:
+  backbone: alphaearth_v1
+  lr: 1.0e-3                   # a small head trained from scratch
+  weight_decay: 0.05
+  head_dropout: 0.2
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10

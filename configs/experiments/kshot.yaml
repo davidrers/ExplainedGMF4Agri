@@ -1,0 +1,9 @@
+# The K-shot workflow as run on full Estonia on 2 October 2026, for the five arms of Phase 1.
+# Run on any chip set:  poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips <dir>
+name: kshot
+arms: [terramind_v1_large, prithvi_eo_v2_600_tl, thor_v1_large, tessera_v1, alphaearth_v1]
+budgets_pct: [100, 20, 5]      # per cent of the trainable parcels of each class
+draws: [0]
+seeds: [0]
+epochs: 15
+checkpoint: val_loss           # the checkpoint of lowest validation loss, the only criterion implemented

@@ -1,10 +1,14 @@
 # Phase 1 evaluation protocol
 
-**Label-efficient benchmarking of geospatial foundation models for parcel-level crop type classification on EuroCropsML**
+**Label-efficient benchmarking of geospatial foundation models for pixel-level crop type segmentation on EuroCrops chips**
 
-Version 1.0, 11 September 2026. Author: David Reyes. Addresses SO1 and RQ1.
+Version 2.0, 24 September 2026. Author: David Reyes. Addresses SO1 and RQ1.
 
-This document specifies the evaluation protocol for Phase 1 in sufficient detail for an independent implementation. It supersedes the Phase 1 passages of `docs/proposal/current_proposal.md` and of `CLAUDE.md` wherever the two disagree; every such departure is itemised in `docs/phase1/proposal_deltas.md`.
+This document specifies the evaluation protocol for Phase 1 in sufficient detail for an independent implementation. It supersedes the Phase 1 passages of `docs/proposal/current_proposal.md` and of `docs/thesis_design.md`, formerly `CLAUDE.md`, wherever the two disagree; every such departure is itemised in `docs/phase1/proposal_deltas.md`.
+
+> **Version 2.0 revises this document onto the segmentation task.** Version 1.0 specified per-parcel classification over the EuroCropsML median time series, and was written before Phase 1 was refocused on pixel-level segmentation of EuroCrops polygons rasterised onto Sentinel-2 chips. Sections 2.4, 4.3, 4.4, 6.1 and 6.2 and decisions D1, D2, D8, D17 and D20 to D22 are rewritten. The spatial structure of section 3, the metrics of section 4.6, the matching criterion of section 4.8 and the transfer design of section 5 carry over, because they concern the evaluation rather than the input.
+>
+> The mechanism that implements this protocol is documented in [pipeline.md](pipeline.md), with a plain-language companion in [pipeline_overview.md](pipeline_overview.md).
 
 ---
 
@@ -12,14 +16,14 @@ This document specifies the evaluation protocol for Phase 1 in sufficient detail
 
 | # | Decision | Justification |
 |---|---|---|
-| D1 | K is defined as **labelled samples per class**, not as a percentage of the training pool. | RQ1 asks how few labelled samples are required; the answer must be a count. A percentage confounds the label budget with country size and makes the curves incomparable across Estonia, Latvia and Portugal. |
-| D2 | The grid is **K in {1, 5, 10, 20, 50, 100, 200, 500, ALL}**. | The union of the published EuroCropsML grid and the grid in the thesis work plan, so the curves are directly comparable with Reuss et al. (2025) while retaining the intermediate point at fifty. |
+| D1 | K is defined as a **percentage of the independent training parcel polygons of each class**, applied per class. | Superseded decision: version 1.0 defined K as a count per class. The annotation unit under segmentation is the polygon, and the number of polygons available differs by more than an order of magnitude between the retained classes, so a fixed count is a different fraction of each class's pool and exhausts the rare classes long before the abundant ones. Applying the percentage per class keeps every class represented at the scarce end. The cost, that percentages are not comparable across countries, is real and is handled in section 5.5. |
+| D2 | The grid is **K in {1, 5, 10, 20, 50, 100} %**, with a working subset of {5, 20, 100} % used while the pilot stands up. | The proposal's percentage grid. K = 100 % is the dense mask, which makes the top of every curve a consistency check on the budget machinery rather than a separate configuration. |
 | D3 | The official EuroCropsML splits are **extended, not adopted wholesale and not replaced**, through two parallel tracks. | The official splits deliver comparability with a published benchmark but cover only one target country, apply no spatial control and offer no per-budget seed control. Both requirements are met by running both. |
 | D4 | Track A, the thesis track, uses **spatially blocked partitions**; Track B reproduces the **official splits verbatim**. The difference between them on the shared cell is reported as the **spatial leakage gap**. | This reconciles "use the official protocol for comparability" with "control spatial autocorrelation" without sacrificing either, and turns the tension into a measured quantity. |
 | D5 | Blocks are cells of a **square tessellation anchored on the EPSG:3035 false origin**, with the edge length estimated **per country from the label-agreement decay**. | A fixed global grid makes block identifiers stable across countries and rebuilds. Choosing the edge length from the data satisfies the requirement that the block size not be picked arbitrarily. |
 | D6 | A **buffer of one kilometre** removes training-pool parcels adjacent to any held-out block. | Block assignment alone still permits leakage across a block boundary; buffering is the standard remedy (Roberts et al., 2017) and costs few parcels at the chosen block sizes. |
 | D7 | The test partition is **fixed once per country, at every budget, seed, model and head**, and is **naturally distributed rather than class balanced**. | A fixed test set is what makes a learning curve a learning curve. Natural priors preserve the precision penalty that rare classes incur from abundant ones, which is the operational failure mode of interest; Macro-F1 already equalises the weight of each class in the metric. |
-| D8 | Support sets are **nested across budgets** and drawn **spread across blocks** by default. | Nesting means that moving along the curve adds labels rather than exchanging them. Block spreading makes K mean K independent annotations rather than K parcels from one field. |
+| D8 | Support sets are **nested across budgets** and drawn **spread across blocks** by default. | Nesting means that moving along the curve adds labels rather than exchanging them. Block spreading makes K mean K independent annotations rather than K polygons from one field cluster. **Not yet implemented:** the current draw seeds on the budget itself, so adjacent budget points draw independently; see section 4.4. |
 | D9 | The support set at a given `(country, class, K, draw seed)` is a **pure function of the split configuration**, independent of model, head and iteration order. | Otherwise the comparison between foundation models is confounded by a difference in the labels each was given. |
 | D10 | Head hyperparameters are **fixed once at the full budget and frozen across all budgets**, with a declared set of label-free budget-aware rules as the only exception. | Tuning on a five-label support set is not possible honestly. The bias introduced runs against the low-budget end, which is the conservative direction. |
 | D11 | The headline metric is **Macro-F1**, with **seed variance and test-set variance reported separately** and the test-set interval computed by a **block cluster bootstrap**. | An independent parcel bootstrap on spatially clustered test data understates the interval. Pooling the two variance components into a single number overstates precision. |
@@ -28,12 +32,12 @@ This document specifies the evaluation protocol for Phase 1 in sufficient detail
 | D14 | In transfer, the head is **retrained on the intersected label space**, not masked at inference. | Masking leaves the decision boundaries shaped by classes that cannot occur, which conflates representation quality with an artefact of the label space. Retraining is cheap because the encoder is frozen. |
 | D15 | Transfer settings involving Portugal use a **coarsened HCAT level** for the intersection and are reported as a distinct low-overlap regime. | At full HCAT depth Portugal shares approximately one top-class with each Baltic country, which is not a usable label space. |
 | D16 | The class prior shift confound is separated from representation failure by **per-class F1, a prior-corrected variant, and a prior-matched test subsample**. | A drop in transfer score must not be attributed to the representation when it is attributable to the label distribution. |
-| D17 | Features are extracted **once per (model, representation, sampling rule)** into a parcel-keyed cache, and no budget, seed, head or experiment may trigger an extraction. | AlphaEarth and TESSERA sampling is network bound and patch extraction for the open-weight models is download bound; both are the true bottleneck of Phase 1. |
+| D17 | Imagery is exported **once per (country, year)** into a chip set, and no budget, seed, head or experiment may trigger a download. Frozen encoder feature maps are cached per `(model, chip)`. | Compositing is network bound and is the true bottleneck of Phase 1, at roughly 100 s per chip. A budget is a filter applied to the mask at training time, so one export serves every point on every curve. |
 | D18 | The training pool is **capped per class at a single protocol-level constant, set by the most restrictive model in the sweep**, and the full-budget point is labelled accordingly. | A per-model cap would make the full-budget point a different experiment for each model. The cap must be stated wherever the full-budget point appears. |
 | D19 | The recommended grid is a reduction of the full grid to approximately **fourteen thousand model fits**. | The full grid implies approximately thirty thousand fits. The reduction removes low-value cells from the transfer sweep, not from the in-country sweep, which carries the answer to RQ1. |
-| D20 | **Input representation is a declared experimental factor**, not a per-model implementation detail. Four levels are defined: parcel median time series, raw Sentinel-2 patch stack, precomputed embedding at the centroid, and precomputed embedding as a parcel zonal mean. | Raw imagery is obtainable, so patch-based models are in scope, and a Macro-F1 difference between a patch model and a point-sampled embedding model is then not attributable to the encoder. |
-| D21 | Macro-F1 comparisons are made **within a representation group**. The **parcel-support group is the headline group for RQ1**, since within it the encoder is the only factor that varies. | A comparison across representation groups answers a different question and must be labelled as such. |
-| D22 | Three **bridge experiments**, each holding the encoder fixed and varying only the representation, estimate the **representation offset** and are reported as a table. | The offset is what permits a reader to judge how much of a cross-group difference is the input rather than the encoder, and it answers the practitioner question of whether downloading imagery is worth the effort. |
+| D20 | **Decoder input resolution is a declared experimental factor**, not a per-model implementation detail. Two levels are defined: the per-pixel embedding raster at 10 m, and the ViT token grid at approximately 160 m upsampled back to 10 m. | Every model now consumes the same chip, so the representation confound of version 1.0 is gone. What remains is that a decoder over a 10 m embedding raster starts from 256 times more spatial detail than one over a token grid, and a Macro-F1 difference across that boundary is not attributable to the encoder. |
+| D21 | Macro-F1 comparisons are made **within a resolution group**, and **decoder capacity is matched within each group**. | Within a group the encoder is the only factor that varies. Matching capacity is not automatic: TerraMind concatenates twelve monthly feature maps, so without a channel bottleneck its trainable decoder reaches 815 M parameters against Prithvi's 63 M. Every token-grid backbone now carries an identical 12.9 M decoder, and the counts are reported with every result. |
+| D22 | A **resolution bridge** is run: the token-grid backbones are additionally scored with their features upsampled to 10 m before the decoder, and the per-pixel backbones with their embeddings pooled to the token grid. | The offset between the two is what permits a reader to judge how much of a cross-group difference is the decoder input resolution rather than the encoder. |
 | D23 | The buffer width is set from the **largest patch footprint used by any model in the sweep**, not from the 1 km default, and is identical for every model. | A test parcel's patch must not contain a training parcel. The buffer is a property of the shared test partition, so it must be set once from the most demanding model. |
 
 ---
@@ -125,25 +129,22 @@ Provisional figures from the thirty-thousand-parcel exploratory catalogue give t
 
 ### 2.4 Input representations
 
-The per-parcel median time series shipped with EuroCropsML is **not** the only available input. Raw Sentinel-2 imagery can be obtained for the parcel footprints, so patch-based models are fully in scope and the input format places no constraint on model selection. The consequence is that the input representation becomes an experimental factor in its own right and must be declared, held constant where a comparison demands it, and varied deliberately where it is the object of study.
+Under segmentation every model consumes the **same chip**, so the representation confound of version 1.0 largely dissolves: there is no longer a choice between a parcel median, a patch and a centroid sample. What a model consumes is a raster on the chip grid, and the levels are distinguished by what that raster holds and at what spatial resolution the decoder receives it.
 
-Four representation levels are defined. Each is a distinct function from a parcel to an input tensor, and each carries a different **spatial support**, that is, a different amount of the landscape.
-
-| Level | Notation | Input | Spatial support | Consumed by |
+| Level | Notation | Raster | Decoder input resolution | Consumed by |
 |---|---|---|---|---|
-| Parcel median time series | `R_ts` | the shipped `(T, 13)` array, the spatial median over the parcel's pixels at every cloud-free acquisition | parcel interior | raw-feature baselines; any time-series encoder |
-| Raw Sentinel-2 patch stack | `R_patch` | a fixed-footprint multi-date patch centred on the parcel centroid | parcel plus neighbourhood | TerraMind, THOR |
-| Parcel-masked patch stack | `R_patch_m` | `R_patch` with every pixel outside the parcel polygon blanked | parcel interior | TerraMind, THOR |
-| Precomputed embedding, centroid | `R_emb_c` | the provider's embedding vector at the parcel centroid | one pixel | AlphaEarth, TESSERA |
-| Precomputed embedding, zonal mean | `R_emb_z` | the mean of the provider's embedding vectors over the parcel's pixels | parcel interior | AlphaEarth, TESSERA |
+| Monthly Sentinel-2 stack | `R_s2` | `<chip>_merged.tif`, 12 bands x 12 monthly composites, int16 | ViT token grid, approximately 160 m, upsampled to 10 m | TerraMind, THOR, Prithvi |
+| Precomputed embedding raster | `R_emb` | `<chip>_<representation>.tif`, D dimensions per pixel, float32 | per-pixel, 10 m | TESSERA, AlphaEarth |
 
-A sixth derived level, `R_patch_ts`, is the patch-footprint mean time series, that is, the same reduction that produces `R_ts` but taken over the patch footprint rather than the parcel polygon. It exists solely to give the raw-feature baseline the same spatial support that a patch model receives, and it is the third bridge of section 2.5.
+The chip geometry is declared once and held identical for every model: a square of 224 by 224 pixels at 10 m in EPSG:3035, that is 2.24 km on a side, on a grid anchored to the projection origin; the twelve Sentinel-2 L2A bands, reduced per model to the subset that model was pretrained on and documented per model; and the temporal axis on a fixed grid of twelve monthly composites.
 
-The patch geometry is declared once and held identical for every model that consumes a patch, otherwise TerraMind against THOR is confounded as well: a square footprint of 224 by 224 pixels at 10 m ground sampling distance, that is 2.24 km on a side, resampled to the backbone's native input size where it differs; the thirteen Sentinel-2 L1C bands, reduced per model to the subset that model requires and documented per model; and the temporal axis resampled onto the same fixed monthly grid that the monthly-resample baseline uses, so that the temporal sampling is held constant across representations as well as across models.
+Band subsetting is a per-model property held in the backbone registry rather than in a configuration file, so it cannot drift between experiments. Prithvi consumes only its six pretrained HLS bands, which on Sentinel-2 means `NIR_NARROW` is B8A. Normalisation is by default the statistics the encoder was pretrained under, since a frozen encoder only interprets inputs on the scale it saw in pretraining; an embedding raster has no pretraining statistics of its own and uses training-chip statistics.
 
-`R_patch_m` requires parcel polygons, which the EuroCropsML `.npz` files do not carry; they must be taken from the EuroCrops vector release. If the polygons prove unavailable for a country, the substitute is a circular mask of that country's median parcel-equivalent radius centred on the centroid, which is a coarser but still valid context ablation. The substitution must be recorded in the feature cache manifest.
+The masks, the parcel rasters and the split files are **shared by every representation**. A label budget therefore draws the identical polygons whatever the model consumes, which is the condition under which a comparison between models is a comparison of encoders.
 
 ### 2.5 The representation confound, comparison groups and bridges
+
+> **Version 2.0 note.** This section was written when models consumed different inputs derived from a parcel. Under segmentation they consume the same chip, so the confound narrows to the decoder input resolution of section 2.4, and the three representation groups below collapse to the two resolution groups. The reasoning about comparison groups and bridges carries over unchanged; read "representation group" as "resolution group" and the bridge experiments as the single resolution bridge of D22.
 
 **The problem.** If TerraMind consumes `R_patch` and AlphaEarth consumes `R_emb_c`, a difference in Macro-F1 between them mixes at least three effects: the encoder itself, the input representation, and the spatial support. The patch model sees field boundaries, parcel shape, texture and the crops of neighbouring parcels; the centroid embedding sees a single pixel. Attributing the resulting difference to the encoder would be a straightforward error, and since the whole of SO1 is a comparison between encoders, it would be a fatal one. This is therefore treated as a first-class design requirement rather than a caveat in the discussion.
 
@@ -272,27 +273,39 @@ The cost is that a rare class receives few test parcels and its per-class F1 is 
 
 ### 4.3 The label budget
 
-**K denotes labelled samples per class.** The grid is
+**K denotes the percentage of the independent training parcel polygons of each class.** The grid is
 
 ```
-K in {1, 5, 10, 20, 50, 100, 200, 500, POOL}
+K in {1, 5, 10, 20, 50, 100} %
 ```
 
-where `POOL` is the whole capped training pool. This is the conventional meaning of K-shot in the few-shot literature, it is the definition used by the EuroCropsML benchmark, and it is the only definition under which the learning curves of Estonia, Latvia and Portugal can be drawn on the same axis. Under the percentage definition, one per cent of Latvia and one per cent of Portugal are budgets differing by a factor of several, so a curve comparison across countries would be a comparison of different experiments.
+with the working subset `{5, 20, 100}` % used while the pilot stands up, and `K = 100` % being the dense mask.
 
-The draw is **exactly K per class where the pool permits, and the whole class pool otherwise**. Because the eligibility filter requires at least five hundred pool parcels per class, the two coincide at every finite budget for every retained class, so the support set is exactly class balanced. The realised count per class is nonetheless recorded at every budget, so that any departure is visible rather than assumed away.
+The annotation unit is the polygon and the inference unit is the pixel, so the budget must be counted in polygons: one polygon is one act of annotation and yields a few thousand labelled pixels, and a budget counted in pixels would measure neither annotation effort nor anything a practitioner can act on.
+
+The percentage is applied **per class**, so a class holding `n` eligible training polygons contributes `ceil(K / 100 * n)` of them and a class present at all retains at least one. The alternative, drawing K per cent of the pooled training polygons, is rejected: the retained classes differ by more than an order of magnitude in polygon count, so a pooled draw at the scarce end removes the rare classes entirely and Macro-F1 then falls for a reason that has nothing to do with the encoder under test.
+
+This reverses decision D1 of version 1.0, which defined K as a count per class. The count definition is coherent for a per-parcel benchmark with an eligibility floor that guarantees a large pool for every retained class. Under segmentation the pool is the polygons falling inside the training chips, which is both smaller and far more uneven, so a fixed count is a different fraction of every class and saturates the rare classes while barely touching the abundant ones.
+
+The realised draw is recorded per class at every budget, as `available` and `drawn`, so any class that could not meet its quota is visible in the result file rather than assumed away.
+
+**The cost of the percentage definition is that budgets are not comparable across countries.** Five per cent of Estonia and five per cent of Portugal are different numbers of polygons, so the three national curves do not share an x-axis. This does not affect the in-country curves, which carry the answer to RQ1. It is handled for the cross-country comparison in section 5.5, where the curves are placed on a polygon-count axis as well as a percentage axis and the reader is told which one is being read.
 
 ### 4.4 Support-set sampling
 
-For each country and each draw seed `r` in `0 .. R-1`, a single **support ordering** is constructed per class and stored once, rather than a separate support set per budget. The support set at budget K is the prefix of rank below K. Three properties follow structurally rather than by convention.
+A parcel's class is the majority class of its labelled pixels across the training chips, and a parcel cut by a chip edge contributes only the pixels inside that chip. The eligible pool for a class is the set of its polygons holding at least one labelled pixel in a training chip.
 
-**Nesting.** The support set at K is contained in the support set at any larger K, so moving along the learning curve adds labels and never exchanges them. This removes a spurious source of variance between adjacent points and makes the curve interpretable as the effect of annotation effort.
+Three properties are required of the draw. Two hold today and one does not.
 
-**Block spreading.** The ordering is built by shuffling the parcels within each block, shuffling the blocks, and interleaving the per-block queues round-robin. The first K entries therefore fall in `min(K, B)` distinct blocks, where `B` is the number of blocks holding the class. Without this, an unconstrained draw at K equal to twenty can return twenty parcels from a single field cluster, which is closer to one independent label than to twenty, and the x-axis of the learning curve would not mean what it claims. The unconstrained variant, `support_sampling: random`, is run as a sensitivity check at the headline cells; on the exploratory catalogue, block spreading raises the mean number of distinct blocks per class at K equal to twenty from a materially lower figure to the maximum of twenty.
+**Model independence.** *Holds.* The draw for a class is derived from a generator seeded on `(country, hcat_code, K, draw_seed)` and on nothing else. Every foundation model, every baseline and every head therefore sees the identical support set at a given `(country, K, seed)`, the result does not depend on the order in which classes or countries are iterated, and a partially completed sweep may be resumed or parallelised without changing any answer.
 
-**Model independence.** The ordering is derived from a generator seeded on `(config_hash, country_code, hcat_code, draw_seed, support_sampling)` and on nothing else. Consequently every foundation model, every baseline variant and every head sees the identical support set at a given `(country, K, seed)`, the result does not depend on the order in which classes or countries are iterated, and a partially completed sweep may be resumed or parallelised without changing any answer. This is asserted by the test suite.
+**Budget realisation is recorded.** *Holds.* The per-class `available` and `drawn` counts are written into every result file, so the support set is inspectable after the fact.
 
-The number of draws is `R = 10` at K in {1, 5, 10}, where the between-draw variance is largest and the fits are cheapest, `R = 5` at K in {20, 50, 100, 200, 500}, and `R = 3` at `POOL`, where the fits are expensive and the variance is small. The proposal's requirement of at least five draws is met or exceeded everywhere except at the full-budget point, where the support set is the entire pool and the only remaining variation is the head's own initialisation.
+**Nesting.** *Not yet implemented.* Decision D8 requires the support set at one budget to be contained in the support set at every larger budget, so that moving along the curve adds labels rather than exchanging them. The current implementation seeds the generator on the budget itself, so the draws at 5 % and 20 % are independent; the only nesting that holds today is trivial, since `K = 100` % is the whole pool. Part of the movement between adjacent budget points is therefore a change of labels rather than an addition of them, which inflates the between-budget variance.
+
+The fix is the version 1.0 mechanism, which should be restored: construct a single **support ordering** per `(country, class, draw_seed)`, store it once, and take the support set at budget K as the prefix of rank below `ceil(K / 100 * n)`. The ordering is built by shuffling the polygons within each spatial block, shuffling the blocks, and interleaving the per-block queues round-robin, so that the first entries fall in as many distinct blocks as possible. Without block spreading, a draw can return a set of polygons from a single field cluster, which is closer to one independent label than to many, and the x-axis of the learning curve would not mean what it claims.
+
+The number of draws is `R = 10` at K in {1, 5} %, where the between-draw variance is largest and the fits are cheapest, `R = 5` at K in {10, 20, 50} %, and `R = 3` at `K = 100` %, where the support set is the entire pool and the only remaining variation is the decoder's own initialisation. Repeated fits of an identical configuration on the twelve-chip pilot have moved Macro-F1 by several hundredths, which is the same order as the differences between the token-grid backbones, so the draw count is not optional.
 
 ### 4.5 Validation and hyperparameter selection
 
@@ -330,7 +343,7 @@ with both components given numerically. A figure that shows only the bootstrap b
 
 ### 4.8 The matching criterion for RQ1
 
-RQ1 asks how few labelled samples per class are required for a GFM-based classifier to match a raw-feature baseline. The phrasing is ambiguous between matching the baseline at the same budget and matching the baseline at its full budget. The operationally meaningful reading, and the one adopted as primary, is the second: with only K labels per class the GFM reaches what the baseline needs the whole training pool to reach.
+RQ1 asks how few labelled samples per class are required for a GFM-based classifier to match a raw-feature baseline. The phrasing is ambiguous between matching the baseline at the same budget and matching the baseline at its full budget. The operationally meaningful reading, and the one adopted as primary, is the second: with only K per cent of each class's polygons the GFM reaches what the baseline needs the whole training pool to reach.
 
 **The criterion is evaluated within a representation group, and the headline `K*` is the G1 one.** Per section 2.5, a matching budget computed against a baseline in a different group would confound the encoder with the input representation and would not mean what its name says. The G1 `K*` is therefore the number reported as the answer to RQ1. A G2 `K*` is reported additionally, comparing patch models against the patch-footprint baseline, which answers the practitioner's question of what is achievable when imagery is available. No `K*` is computed across a group boundary.
 
@@ -422,6 +435,8 @@ With a frozen encoder, nothing in the representation transfers or fails to trans
 
 ### 5.5 Curves and reference lines
 
+> **Version 2.0 note on the percentage budget.** K is a percentage of each class's training polygons (section 4.3), so five per cent of Estonia and five per cent of Portugal are different numbers of annotations and the national curves do not share an x-axis. Every cross-country curve is therefore drawn twice: once against K in per cent, which is the budget a practitioner controls, and once against the realised median polygon count per class, which is the annotation effort actually spent. A claim comparing two countries must state which axis it is read from. Within a country the two axes are monotone transformations of each other and the distinction does not arise.
+
 The cross-country learning curve plots Macro-F1 on the target's fixed test set, restricted to the intersected label space, against `K_target`, the number of target labels per class, on a symmetric logarithmic axis so that the zero-shot point can be drawn at `K_target = 0`.
 
 Three reference lines accompany every transfer curve:
@@ -449,50 +464,52 @@ Portugal's class distribution and crop calendar differ from those of the Baltic 
 
 A split is reproducible from a configuration and a seed and is never regenerated ad hoc. The configuration is a frozen dataclass, `SplitConfig`, whose JSON serialisation is hashed with BLAKE2b to a sixteen-character `config_hash`; the artefact directory is `<name>__<hash[:8]>`. Any change to any knob produces a new directory rather than silently overwriting an old one.
 
+The unit of partition is the **chip**, not the parcel. A chip is a cell of a fixed 2,240 m grid anchored on the EPSG:3035 origin, so a chip nests inside a spatial block whenever the block edge is a multiple of 2,240 m, and the block assignment of section 3 applies to chips without a second tessellation.
+
 ```
 configs/
-  phase1/
-    incountry.yaml              # SplitConfig for Track A, in-country
-    transfer.yaml               # SplitConfig plus the transfer setting matrix
-    benchmark_trackB.yaml       # pointer to the official Zenodo split, plus draw seeds
-    heads.yaml                  # head battery and the Tier 0 / Tier 1 / Tier 2 grids
+  seg/<run>.yaml                # one fit: data root, budget, model, trainer
+  phase1/incountry.yaml         # SplitConfig for Track A, in-country
+  phase1/transfer.yaml          # SplitConfig plus the transfer setting matrix
   class_scheme_eurocropsml.yaml
 
-results/phase1/
-  splits/<protocol_id>/
-    manifest.json               # configuration, hashes, per-country summary, environment
-    partition_<CC>.parquet      # uid, hcat, partition, block_id, block_ix, block_iy, x_m, y_m, lat, lon, nuts
-    counts_<CC>.parquet         # per-class parcel counts per partition
-    support/<CC>__seed<r>.parquet   # uid, hcat, block_id, rank, draw_seed
-  runs/<run_id>.json            # one result file per fitted model
-  predictions/<run_id>.parquet  # uid, y_true, y_pred, probabilities
+data/eurocrops_chips/<CC>_<year>/
+  chips/                        # <chip>_merged.tif, .mask.tif, .parcels.tif, _tessera.tif
+  chips/<chip>.report.json      # per-chip provenance sidecar, written as the chip lands
+  manifest.json                 # assembled from the sidecars; classes, grid, imagery, stats
+  <representation>.json         # per-representation sidecar and normalisation statistics
+
+results/seg/<run_name>/<budget>_seed<s>/
+  config.yaml                   # the configuration as resolved
+  results.json                  # budget, realised draw, parameter counts, metrics
+  checkpoints/best-loss.ckpt
 ```
 
-The support artefact stores an **ordering** rather than a support set. One file per `(country, draw seed)` yields every budget by prefix, which reduces the artefact count by the size of the budget grid and makes the nesting property inspectable rather than merely asserted.
+The chip set carries **no split directory of its own** in the full-country export. Partition membership is an artefact of the split configuration, written as a chip-keyed table, so the same 56 GB export serves Track A, Track B and every robustness seed without being copied.
 
-### 6.2 The feature cache
+The support artefact stores an **ordering** rather than a support set, once the nesting of section 4.4 is implemented. One file per `(country, draw seed)` then yields every budget by prefix, which reduces the artefact count by the size of the budget grid and makes the nesting property inspectable rather than merely asserted.
 
-The cache is **representation-agnostic**. A cached feature vector is keyed by `(parcel uid, model, representation, model version)`, and there is explicitly **not** one vector per parcel per model: a single encoder contributes several cache entries, one per representation it consumes, and those entries are the bridge experiments of section 2.5.
+### 6.2 The chip set and the feature cache
+
+Two things are persisted, and the distinction matters because one is shared by every model and the other is not.
+
+**The chip set is shared and is exported once per `(country, year)`.** It holds the imagery, the dense mask, the parcel raster and any precomputed embedding raster. It is exported by `scripts/data/build_country_chips.py`, which takes every grid cell holding an in-scheme parcel, composites in a process pool, and writes a per-chip report sidecar so that an interrupted run loses at most the chip in flight. A chip whose rasters and report are all present is skipped, so the command resumes.
+
+Measured cost on the Estonian export is roughly 100 s and 7.6 MB per chip for the Sentinel-2 stack, plus 20.1 MB per chip for the 128-dimensional TESSERA raster in float32. Estonia's 7,398 chips therefore come to of the order of 56 GB of imagery and 149 GB of TESSERA, and roughly a day of wall clock at sixteen workers. **The export is the true bottleneck of Phase 1 and no budget, seed, model or experiment may trigger one.**
+
+The manifest records the class scheme, the label rule, the grid, the imagery parameters, the per-chip labelled share, parcel count, per-class pixel counts and imagery report, the band statistics and the per-class pixel totals. Its SHA-256 is stamped into every result file as `manifest_sha256`, so a result traces to the exact chip set that produced it.
+
+**The feature cache is per model and holds frozen encoder output.** Because the encoder is frozen, its multi-scale feature maps for a given chip are constant, so they are computed once per `(model, chip)` and decoder training reads from cache. This is an implementation optimisation and not a change of method. The eight D4 augmentation variants are cached rather than approximated in feature space, because a ViT is not exactly equivariant and rotating a feature map is not the same as encoding a rotated chip.
 
 ```
-data/features/<representation>/<model>/<model_version>/
-    <CC>.npy                # float32 or float16 memory map, shape (N, D), in catalogue uid order
-    <CC>_index.parquet      # uid -> row, plus country_code
-    manifest.json
-    shards_done.json        # completed shard identifiers, so extraction is resumable
+data/features/<model>/<model_version>/
+    <chip>_<d4>.npy         # float16 multi-scale feature maps
+    manifest.json           # model, model version, checkpoint SHA-256, band subset,
+                            # normalisation, chip manifest SHA-256, D4 variant list
+    shards_done.json        # completed chips, so extraction is resumable
 ```
 
-`representation` takes the values of section 2.4: `ts_parcel`, `patch_full`, `patch_masked`, `emb_centroid`, `emb_zonal`, `ts_patch`. `model` is `terramind`, `thor`, `alphaearth`, `tessera`, `baseline_phenometrics` or `baseline_monthly`; the two baselines are treated as encoders of a degenerate kind so that they flow through the same cache and the same manifest discipline as everything else.
-
-The manifest records the model, the model version, the checkpoint SHA-256, the representation, the patch footprint and band list where applicable, the temporal grid, the masking rule and whether a polygon or a circular substitute was used, the sampling rule, the CRS, the dtype, `N`, `D`, the extraction date, and the Earth Engine asset identifier where applicable. A SHA-256 over the sorted uid list of each cache file is stamped into every result file as `feature_sha256`, so a result traces to the exact features it consumed.
-
-A memory-mapped array plus a parquet index is preferred to a single parquet because slicing a support set is then a fancy index into a memory map rather than a scan.
-
-**Raw patches are transient and are not cached.** A patch stack of 224 by 224 pixels, thirteen bands and twelve monthly composites is approximately 18 MB per parcel in float16, so caching raw patches for a quarter of a million parcels would require of the order of a terabyte for no reuse. Patch extraction and encoder inference therefore run as a single streaming pass per `(model, representation)`, and only the D-dimensional output is persisted. The one exception is a **persisted patch sample** of a few thousand parcels, stratified by class and country, retained because the Phase 2 backbone tier needs the actual input tensor in order to attribute a prediction to bands, dates or patch positions. The sample is drawn from the test partition with a recorded seed.
-
-**The extracted parcel set is fixed in advance and is not the whole archive.** It is the union, over the three countries, of the test partition, the validation partition and the capped training pool, at `protocol_seed = 0` and at the four robustness seeds. With the pool capped at 2,000 parcels per class and the test set at 30,000 parcels, this is of the order of a quarter of a million parcels rather than 706,683, and it is the reason the pool cap exists. The cap is recorded in the feature manifest as well as in the split manifest, so that a later attempt to lift it fails loudly rather than reading a partial cache.
-
-**The extraction cost is the real constraint on Phase 1, and it is dominated by the patch representations.** The levers, in the order they should be pulled if the budget binds, are: reduce the temporal grid from twelve monthly composites to six bimonthly ones; reduce the patch footprint from 224 to 128 pixels, which also permits the buffer to fall from 1,600 m to 905 m and returns pool parcels; and reduce the pool cap below 2,000. The first two change the declared patch geometry and therefore require this document to be amended and every split regenerated. None of them may be applied to one model and not another.
+**Raw imagery is not re-downloaded and composites are not recomputed.** The chip set is the cache for that stage. The levers, in the order they should be pulled if the compute budget binds, are: reduce the temporal grid from twelve monthly composites to six bimonthly ones; restrict the export to cells above a labelled-area floor, which at 5 % retains 96 % of the parcels for 82 % of the cells; and cache fewer D4 variants. The first changes the declared chip geometry and therefore requires this document to be amended and every chip re-exported. None of them may be applied to one model and not another.
 
 ### 6.3 The result manifest
 

@@ -1,0 +1,18 @@
+# THOR v1 large, frozen, on 160 m tokens (patch 16 on the 10 m bands, 8 on the 20 m bands) to match
+# TerraMind, as decided on 9 October 2026; ChannelBottleneck and the UNet decoder fitted from cached
+# features. Settings of configs/seg/thor_v1_large_ee_pilot.yaml at the snapshot commit a81bd9e.
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # THOR pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # D4; the cached fit draws one of the eight cached variants
+model:
+  backbone: thor_v1_large
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2

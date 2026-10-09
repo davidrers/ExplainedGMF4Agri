@@ -1,0 +1,191 @@
+# Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions
+
+MSc thesis by David Reyes (student number 3598535), M-GEO 2026-2027, GEO-AI track, ITC, University of Twente.
+Supervisors: Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second).
+
+This document states the research design: the target system, the objectives and research questions,
+the task formulation, the datasets, the model set and the phases. It was the project `CLAUDE.md` until
+7 October 2026, when that file became the operational guide to the repository and its current state.
+
+Precedence: this file states the intent, [phase1/protocol.md](phase1/protocol.md) states the evaluation
+mechanism, and [phase1/pipeline.md](phase1/pipeline.md) traces the implemented pipeline and carries the
+reasoning for each step. When this file and the protocol disagree, the protocol is corrected to match. A
+plain-language walkthrough with diagrams is in [phase1/pipeline_overview.md](phase1/pipeline_overview.md).
+The working environments, repository layout and conventions are in [CLAUDE.md](../CLAUDE.md).
+
+## Target system
+
+A user supplies an area of interest or a bounding box. The system returns a pixel-level crop
+segmentation of that area, pixel-level explanations of why each region was classified as it was,
+calibrated per-pixel confidence, and an LLM-written report traceable to that evidence. Every design
+decision below serves that end state.
+
+## Main objective
+
+To investigate the potential of geospatial foundation models (GFMs) as a transparent and scalable foundation for agricultural monitoring under label-scarce conditions.
+
+## Sub-objectives and research questions
+
+- **SO1.** Label-budget characterisation of GFM-based crop segmentation against a raw-feature baseline, in-country and cross-country.
+  - **RQ1.** How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature baseline?
+- **SO2.** Transparency and reliability of GFM-based crop segmentation through explainability and uncertainty quantification.
+  - **RQ2.1.** Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?
+  - **RQ2.2.** Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?
+  - **RQ2.3.** Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?
+- **SO3.** An XAI-grounded LLM reporting pipeline producing reports traceable to the underlying evidence.
+  - **RQ3.** Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring reports?
+
+## Task formulation
+
+The task is **pixel-level crop-type semantic segmentation**, not per-parcel classification.
+
+The distinction that makes the label budget meaningful:
+
+> The **annotation unit** is the parcel polygon. The **inference unit** is the pixel.
+
+One polygon is one human annotation action and yields a few thousand labelled pixels, so K counts
+polygons per class. K counted in pixels would not measure annotation effort and would not answer RQ1.
+
+Supervision is **sparse**. Chips are exported in full, only the K selected polygons per class are
+burned into the training mask, and every other pixel carries `ignore_index`. Loss is computed on
+labelled pixels only. Test blocks are labelled **densely** from the full EuroCrops layer, because the
+budget restricts what the model trains on and not what it is evaluated against.
+
+Segmentation runs in **two stages**. Stage 1 predicts cropland against non-cropland, with the mask
+taken from ESA WorldCover and the declared-parcel extent. Stage 2 predicts crop type inside that mask
+only. This keeps crop-type Macro-F1 uncontaminated by easy background classes while still producing a
+complete wall-to-wall map for an arbitrary area of interest. Stage 1 errors propagate into stage 2 and
+must be reported as such.
+
+## Datasets
+
+**Primary, self-built: EuroCrops polygons rasterised onto Sentinel-2 chips.**
+Parcel polygons come from the EuroCrops vector release, joined to the EuroCropsML parcel index by
+`parcel_id`. Imagery is Sentinel-2 at 10 m, composited onto a **fixed monthly grid, T = 12**, over the
+2021 growing season. Chips are 224 x 224 pixels, that is 2.24 km on a side. Estonia and Latvia are
+built first; Portugal is staged and added if the schedule allows. Estimated export is roughly 100 GB
+for the two Baltic countries.
+
+**Reference index: EuroCropsML** (Reuss et al., 2025). The local copy in `data/eurocropsml/preprocess/`
+holds 706,683 `.npz` files, one per parcel, filename pattern `<NUTS><id>_<parcelid>_<class>.npz`, each
+carrying a `(T, 13)` per-parcel spatial median, its acquisition dates and a centroid. It ships **no
+polygon geometry**, so it serves as a parcel index, a class source and a sanity reference, not as the
+training data for segmentation.
+
+**Pipeline rig: `ibm-nasa-geospatial/multi-temporal-crop-classification`.**
+3,854 chips of 224 x 224 at 30 m, HLS S30, 6 bands across 3 timesteps, 13 classes from USDA CDL, CONUS
+2022. TerraTorch ships `MultiTemporalCropClassificationDataModule` and working notebooks exist in
+`notebooks/terratorch/`. Used to stand up and debug the segmentation, XAI and reporting chain end to
+end against a published Prithvi baseline (60.64 % accuracy, 0.4269 mIoU). It is **not** a scientific
+target: three timesteps cannot resolve phenology, CDL labels are themselves classifier output, it is
+30 m, and it is single-country.
+
+**Parked: CropHarvest** (Tseng et al., 2021). Its polygon subset numbers 35,169 labels with features,
+but the shipped feature arrays are a single 10 m pixel at the label coordinate rather than polygon
+aggregates, so it does not support segmentation without a 27 GB re-export. Reconsider only if the
+thesis needs a smallholder or tropical extension.
+
+## Selection of GFMs
+
+Four pretrained GFMs, all evaluated with **frozen encoders and trainable decoders**. Full encoder
+fine-tuning is out of scope, since it is unavailable for the precomputed-embedding models.
+
+| Model | Distribution | Access | Decoder input | Backbone-tier XAI |
+|---|---|---|---|---|
+| TerraMind (Jakubik et al., 2025) | open weights | TerraTorch | ViT token grid, ~160 m | yes |
+| THOR (Forgaard et al., 2026) | open weights | TerraTorch | ViT token grid, ~160 m | yes |
+| AlphaEarth Foundations (Brown et al., 2025) | precomputed annual embeddings | Earth Engine `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL` | per-pixel raster, 10 m | no |
+| TESSERA (Feng et al., 2025) | precomputed pixel-time-series embeddings | Python sampling library | per-pixel raster, 10 m | no |
+
+The weights-versus-embeddings split is not merely logistical: it sets the ceiling on explainability,
+because attribution back to bands, dates or patches requires gradients or perturbations through the
+encoder. This is why Phase 2 is organised into an embedding tier and a backbone tier.
+
+**Decoder input resolution is a declared experimental factor.** A UNet over a 10 m embedding raster
+begins with 256 times more spatial detail than a UperNet over a 14 x 14 token grid, so a Macro-F1
+difference across that boundary is not attributable to the encoder. Headline comparisons are made
+within a resolution group, one decoder family is fixed per group, and decoder parameter counts are
+reported alongside every result so that a reader can confirm capacity was matched.
+
+**AlphaEarth caveat.** AlphaEarth ships annual embeddings while the labels target a single growing
+season, so its per-pixel vector carries no intra-season phenology at all. This is expected to look
+like a disadvantage in the results and is a finding worth reporting, consistent with the limited
+temporal sensitivity noted by Ma et al. (2025), rather than a methodological flaw. State the protocol
+explicitly wherever AlphaEarth numbers appear.
+
+## Phases
+
+**Phase 1 is the sole active workstream.** Phases 2 and 3 are described only well enough to keep Phase 1
+decisions compatible with them, and are respecified once Phase 1 lands.
+
+### Phase 1 (SO1, RQ1): label-efficient crop segmentation
+
+A fit is a segmentation training run: frozen encoder, cached multi-scale feature maps, trainable
+decoder, per-pixel logits, cross-entropy with `ignore_index`. Because the encoder is frozen its output
+for a given chip is constant, so feature maps are cached once per `(model, chip)` and decoder training
+reads from cache. This is an implementation optimisation and not a change of method. `albumentations.D4`
+augmentation is not free under caching, because ViTs are not exactly equivariant, so the eight D4
+variants are cached rather than approximated in feature space.
+
+Raw-feature baseline in two per-pixel variants: TIMESAT phenometrics (NDVI and EVI peak value and
+day-of-year, length of season, sowing and harvest day-of-year, per-band mean and standard deviation)
+and the flattened monthly stack, which is the T = 12 chip itself.
+
+Protocol: the 15 to 20 most frequent crops per country; a label-budget grid K expressed as a
+**percentage of the independent parcel polygons available for training, applied per class**, so a class
+holding n parcels contributes ceil(K / 100 x n) of them and a class present at all keeps at least one;
+multiple random draws per K; the same fixed held-out test blocks at every K; Macro-F1 with 95 %
+bootstrap confidence intervals; spatial block cross-validation (Roberts et al., 2017). Run in-country
+within each country, then repeated as cross-country transfer on the intersection of each pair of
+countries' top classes.
+
+The percentage settles the inconsistency the proposal carried between a percentage grid and a count of
+samples per class. Counting polygons rather than pixels is what makes the budget a measure of
+annotation effort, and applying the percentage per class rather than over the pooled training set keeps
+the rare classes represented, without which Macro-F1 would fall at the scarce end for reasons that have
+nothing to do with the encoder. At K = 100 the draw is every parcel, which reproduces the dense mask and
+is the consistency check on the budget machinery.
+
+**Open, to be settled in the design sections still outstanding:** the values on the K grid beyond the
+working set of 5, 20 and 100 %, and the fit budget under per-cell GPU training; chip-to-block assignment
+and the buffer width; HCAT depth and the class eligibility filter under segmentation; the transfer
+protocol; and how pixel-level XAI is aggregated for Phase 3.
+
+**Matched decoder capacity.** Every token-grid backbone carries the same trainable stack: a
+`ChannelBottleneck` projecting the T x embed_dim channels to 768, then `LearnedInterpolateToPyramidal`
+and a 12.9 M parameter `UNetDecoder`. Without the bottleneck TerraMind, which concatenates twelve
+monthly feature maps, reaches 815 M trainable parameters for the large variant against Prithvi's 63 M,
+which is neither comparable nor trainable on a 16 GB card.
+
+### Phase 2 (SO2, RQ2.1 to RQ2.3): explainability and uncertainty
+
+Not active. Pixel-level segmentation makes Integrated Gradients, Occlusion and AttnLRP natively
+per-pixel, per-band and per-date, which is a stronger basis for RQ2.1 than attributing a pooled vector.
+The **embedding tier** applies to all four models and the **backbone tier** to TerraMind and THOR only.
+Uncertainty uses Monte Carlo Dropout as primary and Deep Ensembles as the heavier comparison, both at
+decoder level, reporting per-pixel predictive entropy with reliability diagrams and Expected
+Calibration Error. RQ2.3 is answered by placing the GFM importances, after binding to agronomic
+concepts, on the same axes as the baseline importances.
+
+### Phase 3 (SO3, RQ3): XAI-grounded LLM reporting
+
+Not active. A structured JSON context document per target zone with three blocks: predictions,
+explanations, and external context (ERA5 weather variables, geographic descriptors including country,
+elevation and soil class from SoilGrids, and image-texture descriptors where available). Select an LLM
+that follows the required output format reliably and is reproducible, generate at temperature zero,
+constrain it to the context document, and score each report for traceability against its source.
+Pixel-level attribution cannot be passed to an LLM directly, so the aggregation from pixels to zone
+summaries is a Phase 3 design problem that Phase 1 must not foreclose.
+
+## Priority under time pressure
+
+Phases 1 and 2 are core deliverables. Phase 3 is highly valuable but is the first to be reduced if the
+schedule slips. Phase 3 also degrades gracefully: if explanations fail their faithfulness checks, that
+is itself a reportable Phase 2 finding, and the context document can still operate from predictions and
+calibrated uncertainty alone. Within Phase 1, Portugal is the first thing cut, then the cross-country
+transfer sweep, then the decoder comparison across resolution groups.
+
+## Compute
+
+ITC and UTwente institutional GPU cluster, with project drive storage. This is what makes per-cell
+decoder training and backbone-tier attribution feasible at full scope.

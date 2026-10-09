@@ -1,284 +1,219 @@
-# Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions
+# ExplainedGFM4Agri: working guide
 
-MSc thesis by David Reyes (student number 3598535), M-GEO 2026-2027, GEO-AI track, ITC, University of Twente.
-Supervisors: Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second).
+MSc thesis of David Reyes, ITC, University of Twente, 2026-2027: frozen geospatial foundation models (GFMs) with
+trainable decoders for pixel-level crop-type segmentation under label scarcity, followed by explainability,
+uncertainty and LLM reporting. **Phase 1, the label-budget curves of RQ1, is the only active workstream.**
 
-The authoritative specification of the current work is this file together with [docs/phase1/protocol.md](docs/phase1/protocol.md).
-When the two disagree, this file states the intent and the protocol states the mechanism, and the protocol is corrected to match.
+## Where things are written down
 
-## Target system
+| Document | Holds |
+|---|---|
+| [docs/thesis_design.md](docs/thesis_design.md) | Research intent: objectives, RQs, task formulation, datasets, model set, phases, priorities. Read before any design decision |
+| [docs/phase1/protocol.md](docs/phase1/protocol.md) | Evaluation mechanism: blocking, partitions, budgets, metrics, transfer |
+| [docs/phase1/pipeline.md](docs/phase1/pipeline.md) | **The implemented pipeline**, stage by stage, with the reason for each decision, the faults found and fixed, and the known gaps (section 10). Read before touching the code |
+| [docs/phase1/pipeline_overview.md](docs/phase1/pipeline_overview.md) | The same pipeline in plain language, with diagrams |
+| [docs/phase1/proposal_deltas.md](docs/phase1/proposal_deltas.md) | Where the protocol departs from the proposal and from the research design |
 
-A user supplies an area of interest or a bounding box. The system returns a pixel-level crop
-segmentation of that area, pixel-level explanations of why each region was classified as it was,
-calibrated per-pixel confidence, and an LLM-written report traceable to that evidence. Every design
-decision below serves that end state.
+Precedence: `thesis_design.md` states the intent and `protocol.md` the mechanism; when they disagree the protocol
+is corrected to match.
 
-## Main objective
+### Documentation changes only by agreement
 
-To investigate the potential of geospatial foundation models (GFMs) as a transparent and scalable foundation for agricultural monitoring under label-scarce conditions.
+Change the documentation (this file, `thesis_design.md`, `protocol.md`, `pipeline.md`, `pipeline_overview.md`)
+**only when the user has agreed to that change**. Do not edit it while running experiments or explorations. When
+work produces something the docs should record, say so at the end and propose the edit; make it once agreed.
 
-## Sub-objectives and research questions
+When an agreed update is made, `pipeline.md` is where it goes:
 
-- **SO1.** Label-budget characterisation of GFM-based crop segmentation against a raw-feature baseline, in-country and cross-country.
-  - **RQ1.** How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature baseline?
-- **SO2.** Transparency and reliability of GFM-based crop segmentation through explainability and uncertainty quantification.
-  - **RQ2.1.** Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?
-  - **RQ2.2.** Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?
-  - **RQ2.3.** Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?
-- **SO3.** An XAI-grounded LLM reporting pipeline producing reports traceable to the underlying evidence.
-  - **RQ3.** Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring reports?
+- a new or changed stage, data product, script or config: its section, and the stage table of section 1;
+- a fault found and fixed: where the stage is described, say what went wrong, how it showed and what was discarded;
+- a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
+- a finished run or grid: section 11, Runs, and the Current state below.
 
-## Task formulation
+## Current state, 9 October 2026
 
-The task is **pixel-level crop-type semantic segmentation**, not per-parcel classification.
-
-The distinction that makes the label budget meaningful:
-
-> The **annotation unit** is the parcel polygon. The **inference unit** is the pixel.
-
-One polygon is one human annotation action and yields a few thousand labelled pixels, so K counts
-polygons per class. K counted in pixels would not measure annotation effort and would not answer RQ1.
-
-Supervision is **sparse**. Chips are exported in full, only the K selected polygons per class are
-burned into the training mask, and every other pixel carries `ignore_index`. Loss is computed on
-labelled pixels only. Test blocks are labelled **densely** from the full EuroCrops layer, because the
-budget restricts what the model trains on and not what it is evaluated against.
-
-Segmentation runs in **two stages**. Stage 1 predicts cropland against non-cropland, with the mask
-taken from ESA WorldCover and the declared-parcel extent. Stage 2 predicts crop type inside that mask
-only. This keeps crop-type Macro-F1 uncontaminated by easy background classes while still producing a
-complete wall-to-wall map for an arbitrary area of interest. Stage 1 errors propagate into stage 2 and
-must be reported as such.
-
-## Datasets
-
-**Primary, self-built: EuroCrops polygons rasterised onto Sentinel-2 chips.**
-Parcel polygons come from the EuroCrops vector release, joined to the EuroCropsML parcel index by
-`parcel_id`. Imagery is Sentinel-2 at 10 m, composited onto a **fixed monthly grid, T = 12**, over the
-2021 growing season. Chips are 224 x 224 pixels, that is 2.24 km on a side. Estonia and Latvia are
-built first; Portugal is staged and added if the schedule allows. Estimated export is roughly 100 GB
-for the two Baltic countries.
-
-**Reference index: EuroCropsML** (Reuss et al., 2025). The local copy in `data/eurocropsml/preprocess/`
-holds 706,683 `.npz` files, one per parcel, filename pattern `<NUTS><id>_<parcelid>_<class>.npz`, each
-carrying a `(T, 13)` per-parcel spatial median, its acquisition dates and a centroid. It ships **no
-polygon geometry**, so it serves as a parcel index, a class source and a sanity reference, not as the
-training data for segmentation.
-
-**Pipeline rig: `ibm-nasa-geospatial/multi-temporal-crop-classification`.**
-3,854 chips of 224 x 224 at 30 m, HLS S30, 6 bands across 3 timesteps, 13 classes from USDA CDL, CONUS
-2022. TerraTorch ships `MultiTemporalCropClassificationDataModule` and working notebooks exist in
-`notebooks/terratorch/`. Used to stand up and debug the segmentation, XAI and reporting chain end to
-end against a published Prithvi baseline (60.64 % accuracy, 0.4269 mIoU). It is **not** a scientific
-target: three timesteps cannot resolve phenology, CDL labels are themselves classifier output, it is
-30 m, and it is single-country.
-
-**Parked: CropHarvest** (Tseng et al., 2021). Its polygon subset numbers 35,169 labels with features,
-but the shipped feature arrays are a single 10 m pixel at the label coordinate rather than polygon
-aggregates, so it does not support segmentation without a 27 GB re-export. Reconsider only if the
-thesis needs a smallholder or tropical extension.
-
-## Selection of GFMs
-
-Four pretrained GFMs, all evaluated with **frozen encoders and trainable decoders**. Full encoder
-fine-tuning is out of scope, since it is unavailable for the precomputed-embedding models.
-
-| Model | Distribution | Access | Decoder input | Backbone-tier XAI |
-|---|---|---|---|---|
-| TerraMind (Jakubik et al., 2025) | open weights | TerraTorch | ViT token grid, ~160 m | yes |
-| THOR (Forgaard et al., 2026) | open weights | TerraTorch | ViT token grid, ~160 m | yes |
-| AlphaEarth Foundations (Brown et al., 2025) | precomputed annual embeddings | Earth Engine `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL` | per-pixel raster, 10 m | no |
-| TESSERA (Feng et al., 2025) | precomputed pixel-time-series embeddings | Python sampling library | per-pixel raster, 10 m | no |
-
-The weights-versus-embeddings split is not merely logistical: it sets the ceiling on explainability,
-because attribution back to bands, dates or patches requires gradients or perturbations through the
-encoder. This is why Phase 2 is organised into an embedding tier and a backbone tier.
-
-**Decoder input resolution is a declared experimental factor.** A UNet over a 10 m embedding raster
-begins with 256 times more spatial detail than a UperNet over a 14 x 14 token grid, so a Macro-F1
-difference across that boundary is not attributable to the encoder. Headline comparisons are made
-within a resolution group, one decoder family is fixed per group, and decoder parameter counts are
-reported alongside every result so that a reader can confirm capacity was matched.
-
-**AlphaEarth caveat.** AlphaEarth ships annual embeddings while the labels target a single growing
-season, so its per-pixel vector carries no intra-season phenology at all. This is expected to look
-like a disadvantage in the results and is a finding worth reporting, consistent with the limited
-temporal sensitivity noted by Ma et al. (2025), rather than a methodological flaw. State the protocol
-explicitly wherever AlphaEarth numbers appear.
-
-## Phases
-
-**Phase 1 is the sole active workstream.** Phases 2 and 3 are described only well enough to keep Phase 1
-decisions compatible with them, and are respecified once Phase 1 lands.
-
-### Phase 1 (SO1, RQ1): label-efficient crop segmentation
-
-A fit is a segmentation training run: frozen encoder, cached multi-scale feature maps, trainable
-decoder, per-pixel logits, cross-entropy with `ignore_index`. Because the encoder is frozen its output
-for a given chip is constant, so feature maps are cached once per `(model, chip)` and decoder training
-reads from cache. This is an implementation optimisation and not a change of method. `albumentations.D4`
-augmentation is not free under caching, because ViTs are not exactly equivariant, so the eight D4
-variants are cached rather than approximated in feature space.
-
-Raw-feature baseline in two per-pixel variants: TIMESAT phenometrics (NDVI and EVI peak value and
-day-of-year, length of season, sowing and harvest day-of-year, per-band mean and standard deviation)
-and the flattened monthly stack, which is the T = 12 chip itself.
-
-Protocol: the 15 to 20 most frequent crops per country; a label-budget grid K counted in polygons per
-class; multiple random draws per K; the same fixed held-out test blocks at every K; Macro-F1 with 95 %
-bootstrap confidence intervals; spatial block cross-validation (Roberts et al., 2017). Run in-country
-within each country, then repeated as cross-country transfer on the intersection of each pair of
-countries' top classes.
-
-**Open, to be settled in the design sections still outstanding:** the revised K grid and fit budget
-under per-cell GPU training; chip-to-block assignment and the buffer width; the decoder family fixed
-per resolution group; HCAT depth and the class eligibility filter under segmentation; the transfer
-protocol; and how pixel-level XAI is aggregated for Phase 3.
-
-### Phase 2 (SO2, RQ2.1 to RQ2.3): explainability and uncertainty
-
-Not active. Pixel-level segmentation makes Integrated Gradients, Occlusion and AttnLRP natively
-per-pixel, per-band and per-date, which is a stronger basis for RQ2.1 than attributing a pooled vector.
-The **embedding tier** applies to all four models and the **backbone tier** to TerraMind and THOR only.
-Uncertainty uses Monte Carlo Dropout as primary and Deep Ensembles as the heavier comparison, both at
-decoder level, reporting per-pixel predictive entropy with reliability diagrams and Expected
-Calibration Error. RQ2.3 is answered by placing the GFM importances, after binding to agronomic
-concepts, on the same axes as the baseline importances.
-
-### Phase 3 (SO3, RQ3): XAI-grounded LLM reporting
-
-Not active. A structured JSON context document per target zone with three blocks: predictions,
-explanations, and external context (ERA5 weather variables, geographic descriptors including country,
-elevation and soil class from SoilGrids, and image-texture descriptors where available). Select an LLM
-that follows the required output format reliably and is reproducible, generate at temperature zero,
-constrain it to the context document, and score each report for traceability against its source.
-Pixel-level attribution cannot be passed to an LLM directly, so the aggregation from pixels to zone
-summaries is a Phase 3 design problem that Phase 1 must not foreclose.
-
-## Priority under time pressure
-
-Phases 1 and 2 are core deliverables. Phase 3 is highly valuable but is the first to be reduced if the
-schedule slips. Phase 3 also degrades gracefully: if explanations fail their faithfulness checks, that
-is itself a reportable Phase 2 finding, and the context document can still operate from predictions and
-calibrated uncertainty alone. Within Phase 1, Portugal is the first thing cut, then the cross-country
-transfer sweep, then the decoder comparison across resolution groups.
-
-## Compute
-
-ITC and UTwente institutional GPU cluster, with project drive storage. This is what makes per-cell
-decoder training and backbone-tier attribution feasible at full scope.
-
-## Working environments
-
-Two machines carry this repository and they differ enough that a command written for one fails on the
-other. Establish which one you are on before running anything.
-
-**Windows laptop.** The machine the README documents. The repository sits inside OneDrive, the GPU is an
-NVIDIA RTX PRO 1000 Blackwell at compute capability 12.0, and both PowerShell and bash are available.
-
-**ITC JupyterHub, Linux.** The machine described in the rest of this section. Bash only, no PowerShell.
+The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
+EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
+per-class percentage label budget applied at load time, a frozen encoder with a trainable decoder, and a
+`results.json` per fit.
 
 | Item | Value |
 |---|---|
-| Repository | `/data/private/THESIS - ExplainedGMF4Agri`. `/home/jovyan/private` is a symlink to `/data/private`, so the two paths are the same directory |
-| Interpreter | Python 3.11.15 from pyenv, at `~/.pyenv/versions/3.11.15/bin/python`. The system `python3` is 3.8 and is not usable here |
-| Poetry | 2.2.1, reachable through `~/.local/bin`, which a non-interactive shell has to export itself |
-| Environment | `~/.cache/pypoetry/virtualenvs/gfm4agri-7U2rqC_9-py3.11`, outside the repository because `poetry.toml` sets `in-project = false`. Locate it with `poetry env info --path` |
-| GPU | NVIDIA RTX A4000, 16 GB, compute capability 8.6, driver 550.54.14, CUDA 12.4 |
-| Jupyter kernel | `Python 3.11 (gfm4agri)`, registered under the name `gfm4agri` |
-| Data | `data/eurocropsml/` and `data/eurocrops/` are present locally. Neither `EUROCROPSML_DATA` nor `CROPHARVEST_DATA` is exported, so the code takes its in repository fallback |
+| Chip set | `data/eurocrops_chips/EE_2021/`: 7,402 chips of 224 x 224 at 10 m, 20 classes. Per chip: `_merged.tif` (S2, 144 bands), `_s1rtc.tif` (S1 RTC, 24 bands), `_tessera.tif` (128-d), `_alphaearth.tif` (64-d), `.mask.tif`, `.parcels.tif` |
+| Split | `splits/blocks4_buf1600_seed0__6b0eb4cb`: blocks of 4 x 4 chips, 1,600 m parcel buffer; 4,898 train, 769 validation, 1,475 test chips |
+| Feature caches | `data/embeddings/<backbone>/EE_2021/`: TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB); THOR's is not built. Caches of `EE_2021_mini` for the three token-grid arms (about 25 GB) |
+| Pilot | `data/eurocrops_chips/EE_2021_mini/`: whole blocks of `EE_2021` as links, 32 training, 16 validation, 9 test chips, same split; `subset.json` records the blocks. The old 12-chip `EE_2021_pilot/` is archived with `experiments/2026-09_pilot_12chips/` |
+| Cluster | The UT HPC clone holds `EE_2021`, `EE_2021_mini` and `data/eurocrops/{parquet,vector}` (copied 9 October 2026), no caches |
 
-Run everything through `poetry run`, or activate `$(poetry env info --path)/bin/activate`. After pulling a
-commit that touches `pyproject.toml` or `poetry.lock`, run `poetry install` again.
+Arms implemented, one file each in `configs/arms/`: **TerraMind v1 large**, **Prithvi-EO-2.0 600M TL** and
+**THOR v1 large** on 160 m tokens (token grid; `ChannelBottleneck` plus a 12.9 M parameter UNet decoder; fitted from
+cached features), **TESSERA v1** and **AlphaEarth v1** (10 m pixel raster; per-pixel MLP; end to end on the
+embedding rasters). All five ran through the K-shot workflow on `EE_2021_mini` on 9 October 2026; THOR and AlphaEarth
+have not yet run on full Estonia. The small variants, TerraMind on S2 plus S1 and THOR on 80 m tokens are archived
+studies in `experiments/`.
 
-### Traps specific to the JupyterHub machine
+Full-Estonia grid, finished 2 October 2026. Test Macro-F1 over the 1,475 test chips, one draw and one seed per
+cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md section 11,
+[`results/seg_cached/ee_grid_summary.csv`](results/seg_cached/ee_grid_summary.csv) and
+[`notebooks/pipeline/eurocrops_ee_results.ipynb`](notebooks/pipeline/eurocrops_ee_results.ipynb).
 
-**Poetry must be version 2.** `pyproject.toml` declares its metadata in the PEP 621 `[project]` table and
-`poetry.lock` is lock version 2.1. Poetry 1.8 reads neither, and the 1.8 that ships in this image runs on
-Python 3.8, so it cannot update itself. It was replaced using the official installer driven by the pyenv
-interpreter rather than the system one:
+| K, % of parcels per class | TESSERA + MLP | TerraMind v1 large | Prithvi-EO-2.0 600M TL |
+|---|---|---|---|
+| 100 | 0.631 | 0.586 | 0.573 |
+| 20 | 0.611 | 0.479 | 0.496 |
+| 5 | 0.568 | 0.362 | 0.368 |
 
-```bash
-curl -sSL https://install.python-poetry.org | ~/.pyenv/versions/3.11.15/bin/python - --version 2.2.1
-```
+This does not answer RQ1 yet: TESSERA sits in another resolution group, no cell has an interval, and no
+baseline has run.
 
-**The image exports a `PYTHONPATH` that shadows the environment.** JupyterHub sets `PYTHONPATH` to Spark's
-Python 3.8 trees for every process, and those directories land ahead of the environment's own
-`site-packages`. Any package present in both is then imported from the 3.8 build. `cv2`, `osgeo`, `vtk`,
-`itk` and `mpi4py` all collide this way, and `cv2` alone breaks `import terratorch` with an OpenCV loader
-error that names nothing of the real cause. The fix is a `sitecustomize.py` inside the environment, which
-runs at interpreter start, after `site` has finished, and drops those entries. It is scoped to this
-environment, so PySpark elsewhere is untouched, and it also covers the Jupyter kernel, which inherits the
-same `PYTHONPATH`. It lives in the environment, so **recreating the environment loses it and the failure
-returns.** Recreate it with:
+**Not built:** the baseline arm; repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
+and Portugal; Phases 2 and 3.
 
-```bash
-cat > "$(poetry env info --path)/lib/python3.11/site-packages/sitecustomize.py" <<'PY'
-import sys
+**Decided on 2 October 2026, not yet in `protocol.md` or the code.** These live only in
+[`figures/phase1_experimental_setup_prompt.md`](figures/phase1_experimental_setup_prompt.md) and session memory, so
+confirm them with the user and write them into the protocol before building on them: THOR joins the arms, handled
+like TerraMind (now implemented, on 160 m tokens as confirmed on 9 October); the baseline becomes a plain U-Net
+trained from scratch on the same monthly Sentinel-2 chips, replacing the per-pixel TIMESAT and monthly-stack
+baselines in the K sweep, with the role of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %; nested
+repeated draws, with models compared on the same draws; equal tuning trials and training steps for every model and
+K; no validation labels at low K; cross-country transfer only within one GAEZ v5 agro-ecological zone. AlphaEarth
+was confirmed on 7 October and is implemented, handled like TESSERA.
 
-_FOREIGN = ("/opt/spark/python", "python3.8", "/usr/local/lib/python3/dist-packages")
-sys.path[:] = [p for p in sys.path if not any(marker in p for marker in _FOREIGN)]
-PY
-```
+**Open choices that move the numbers:** the checkpoint criterion (validation loss picks epoch 6 to 9 for the
+token-grid models while validation Macro-F1 peaks at 13), the treatment of the 0.66 % of test pixels without a
+TESSERA embedding (currently zeros), and the block size.
 
-`poetry run python -c "import terratorch"` is the check. It fails without that file and succeeds with it.
+## Running the pipeline
 
-**The CUDA wheels are newer than the driver.** torch is pinned to the cu128 index for the Blackwell
-laptop, while this driver reports CUDA 12.4. The cu128 build nonetheless runs correctly on the A4000
-through CUDA minor version compatibility, confirmed with a GPU matmul, so do not substitute a cu124 build
-or the CPU build here. Verify with:
+From the repository root. Every stage resumes from what is already on disk.
 
-```bash
-poetry run python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
-```
-
-**Imports are slow because the environment is on NFS.** The home filesystem is a network mount, so the
-first `import terratorch` after an install took 8 minutes 46 seconds against 55 seconds of CPU time,
-nearly all of it waiting on I/O while bytecode was written. Warm imports settle at about 30 seconds. A
-long first import is not a hung process. Container local disk would be faster but does not survive a
-restart, which is why the environment stays in the home cache.
-
-### Rebuilding the environment on the JupyterHub machine
+**Chip extraction, on the JupyterHub only** (`scripts/hub/`):
 
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
-poetry env use ~/.pyenv/versions/3.11.15/bin/python
-poetry install
-# recreate sitecustomize.py at this point, see above
-poetry run python -m ipykernel install --user --name gfm4agri --display-name "Python 3.11 (gfm4agri)"
-poetry run pytest
+poetry run python scripts/hub/build_country_chips.py --country EE --year 2021 --workers 12   # S2 chips, masks, manifest
+poetry run python scripts/hub/build_s1_chips.py --country EE --year 2021 --workers 12        # S1 RTC beside them
+poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
+poetry run python scripts/hub/build_chip_split.py --root data/eurocrops_chips/EE_2021       # block split, chip_parcels.parquet
+poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --workers 4
+poetry run python scripts/hub/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021 --workers 16 \
+    --split-dir data/eurocrops_chips/EE_2021/splits/blocks4_buf1600_seed0__6b0eb4cb    # statistics on the training chips
+poetry run python scripts/hub/build_pilot_chipset.py --parent data/eurocrops_chips/EE_2021 --name EE_2021_mini
 ```
+
+**The K-shot workflow, on either machine** (`scripts/run_kshot.py`): every arm, budget, draw and seed of an
+experiment on one chip set. A pilot and a country differ only in `--chips`.
+
+```bash
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021 --dry-run
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021_mini
+```
+
+Configs: `configs/arms/<arm>.yaml` (what is trained), `configs/experiments/<name>.yaml` (arms, budgets, draws, seeds,
+epochs), `configs/machines/{hub,cluster}.yaml` (throughput only). A token-grid arm reuses its cache in
+`data/embeddings/<backbone>/<chip set>/` when `cache.json` matches the run, and computes it otherwise. Results go to
+`results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/` (`results.json`, `predictions_test.npz`) and
+`summary.csv`; runs before 9 October stay in `results/seg/` and `results/seg_cached/`.
+
+**On the cluster** the loop is: push data from the hub (`scripts/cluster/push_data.sh`), `git pull` there,
+`bash scripts/cluster/submit.sh kshot <chip set>` (one Slurm job per arm), and `scripts/cluster/pull_results.sh kshot`
+back on the hub. Details in [docs/utwente_hpc.md](docs/utwente_hpc.md), section 9.
+
+The chip set took days of network time and the caches are terabytes. Never delete, overwrite or re-export them
+without asking. An export skips chips already on disk, so a faulty set must be removed before a corrected export
+runs into the same directory.
+
+## Working environments
+
+Three machines carry the repository. Establish which one you are on before running anything.
+
+**Windows laptop.** Repository inside OneDrive, RTX PRO 1000 Blackwell (compute capability 12.0), PowerShell and
+bash. Set-up in [README.md](README.md).
+
+**ITC JupyterHub, Linux.** Where the Estonian data and runs live. Bash only.
+
+| Item | Value |
+|---|---|
+| Repository | `/data/private/THESIS - ExplainedGMF4Agri`; `/home/jovyan/private` is a symlink to `/data/private` |
+| Interpreter | Python 3.11.15 at `~/.pyenv/versions/3.11.15/bin/python`. The system `python3` is 3.8 and unusable |
+| Poetry | 2.2.1 in `~/.local/bin`, which a non-interactive shell must add to `PATH` |
+| Environment | `~/.cache/pypoetry/virtualenvs/gfm4agri-7U2rqC_9-py3.11` (`poetry env info --path`); Jupyter kernel `gfm4agri` |
+| GPU | RTX A4000, 16 GB, compute capability 8.6, driver CUDA 12.4 |
+| Storage | `/data/private` is a 115 TB NFS project drive; local disk is about 335 GB and does not survive a restart |
+
+Run everything through `poetry run`, and run `poetry install` again after a pull touching `pyproject.toml` or
+`poetry.lock`. Traps on this machine:
+
+- **Poetry must be 2.x**, because of the PEP 621 metadata and lock version 2.1. The image's 1.8 runs on Python 3.8
+  and cannot update itself: `curl -sSL https://install.python-poetry.org | ~/.pyenv/versions/3.11.15/bin/python - --version 2.2.1`.
+- **The image's `PYTHONPATH` shadows the environment** with Spark's Python 3.8 trees (`cv2`, `osgeo`, `vtk`, `itk`,
+  `mpi4py`). `cv2` alone breaks `import terratorch` with an OpenCV error that names nothing of the cause. A
+  `sitecustomize.py` in the environment strips those entries, and **recreating the environment loses it**:
+
+  ```bash
+  cat > "$(poetry env info --path)/lib/python3.11/site-packages/sitecustomize.py" <<'PY'
+  import sys
+
+  _FOREIGN = ("/opt/spark/python", "python3.8", "/usr/local/lib/python3/dist-packages")
+  sys.path[:] = [p for p in sys.path if not any(marker in p for marker in _FOREIGN)]
+  PY
+  ```
+
+  Check with `poetry run python -c "import terratorch"`.
+- **torch is the cu128 build on a CUDA 12.4 driver.** It works through minor version compatibility; do not swap in
+  a cu124 or CPU build. Check with
+  `poetry run python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"`.
+- **Imports are slow on NFS.** The first `import terratorch` after an install took almost 9 minutes; warm imports
+  take about 30 s. That is not a hung process.
+- **Long jobs** run detached, `setsid nohup ... > log 2>&1 &`, as the docstring of `scripts/run_kshot.py` shows.
+
+Rebuilding the environment: `export PATH="$HOME/.local/bin:$PATH"`, `poetry env use ~/.pyenv/versions/3.11.15/bin/python`,
+`poetry install`, recreate `sitecustomize.py`, then
+`poetry run python -m ipykernel install --user --name gfm4agri --display-name "Python 3.11 (gfm4agri)"` and `poetry run pytest`.
+
+**UT HPC cluster, Linux, Slurm.** Reached with `ssh utwente-hpc` from the JupyterHub. Runs the K-shot workflow only;
+**code is never edited there**, every change goes hub, git, cluster.
+
+| Item | Value |
+|---|---|
+| Repository | `~/ExplainedGMF4Agri`, cloned over HTTPS (the repository is public) |
+| Environment | `bash -l scripts/cluster/setup_env.sh`: Python 3.11 from conda-forge via `miniconda3/25.7`, Poetry 2.2.1, the same lock, THOR, weights prefetched |
+| GPU | `itc-gpu`: RTX PRO 6000 Blackwell, 96 GB, one per job, account `itc-tech` |
+| Storage | 1 TB home; feature caches are job-scoped on the node's `/local` NVMe until a project directory exists |
 
 ## Repository layout
 
 ```
-docs/phase1/        the Phase 1 protocol and the record of decisions taken
-docs/research/      research notes and deep-research documents
-docs/internship/    the separate grazing-versus-mowing internship at Terramind, Sep to Dec 2026
-src/gfm4agri/       the pipeline package, subpackages mapping onto the work packages
-  data/             EuroCrops polygon loading, chip tiling, label rasterisation, splits, spatial blocking
-  chips/            Sentinel-2 export and monthly compositing onto the fixed T = 12 grid
-  embeddings/       frozen encoder feature caching (TerraTorch backbones, AlphaEarth, TESSERA)
-  baselines/        per-pixel TIMESAT phenometrics and monthly-stack raw-feature baselines
-  benchmark/        K-shot protocol, decoders, metrics, learning curves, transfer experiments
-  xai/              embedding-tier and backbone-tier explainability
-  uncertainty/      MC Dropout, Deep Ensembles, calibration
-  reporting/        context-document assembly and LLM reporting
-configs/            experiment configuration
-notebooks/          exploratory notebooks, including the TerraTorch rig notebooks
-scripts/legacy/     precursor AlphaEarth and TESSERA scripts from the ML-Embeddings project
-data/               datasets, git-ignored
-results/            experiment outputs, git-ignored apart from results/eda
-figures/            scripts producing thesis and presentation figures
+docs/thesis_design.md      research design, the former CLAUDE.md
+docs/phase1/               protocol, pipeline, plain-language overview, proposal deltas
+docs/utwente_hpc.md        the cluster, and the hub, git and cluster workflow
+docs/superpowers/          design specs and implementation plans
+docs/proposal/, docs/research/, docs/internship/   proposal, research notes, the separate Terramind internship
+src/gfm4agri/data/         EuroCrops loading, class scheme, chip grid and label rasters, spatial blocks, chip split, pilot subset
+src/gfm4agri/chips/        Sentinel-2 and Sentinel-1 monthly compositing
+src/gfm4agri/embeddings/   TESSERA Zarr reader, AlphaEarth tile reader, shared raster export
+src/gfm4agri/benchmark/    backbone registry, necks, decoders, datamodule and budget draw, end-to-end and two-stage fits, reload and predict
+src/gfm4agri/pipeline/     the K-shot workflow: config composition, cache lookup, runner
+src/gfm4agri/{baselines,xai,uncertainty,reporting}/   empty placeholders for later work
+scripts/hub/               JupyterHub only: vector fetch; chip, S1, TESSERA, AlphaEarth, split and pilot builders
+scripts/run_kshot.py       the one entry point of the fit, on either machine
+scripts/cluster/           cluster environment, sbatch job, submit, data push, results pull
+scripts/env/               THOR installer (outside the Poetry lock)
+configs/                   class schemes; arms/, experiments/, machines/
+experiments/               archived studies, one dated folder each with a README; deletable once pipeline.md records the outcome
+notebooks/eda/             EDA notebooks 01 to 07, their builders, analysis/ (code whose outputs go to results/eda)
+notebooks/pipeline/        cache anatomy and full-Estonia results notebooks, with builders
+data/, results/            git-ignored, apart from results/eda
+figures/                   figure scripts and diagram prompts
+tests/                     pytest suite; tests/fixtures/legacy_configs/ holds the configs of the 2 October grid
 ```
+
+Notebooks with a `_build_*.py` beside them are generated: edit the builder and regenerate, as its docstring shows.
 
 ## Conventions
 
-- Working language is English. The user is a Spanish and English bilingual MSc student at ITC, comfortable with EO, ML and GIS terminology, so prefer concise technical responses.
-- Two working environments, the Windows laptop and the ITC JupyterHub Linux machine, described under
-  Working environments. Confirm which one you are on before writing a command, since PowerShell exists
-  only on the laptop and the JupyterHub machine needs the handling documented there.
-- Python, with PyTorch, scikit-learn, TerraTorch, TorchGeo, rasterio and GDAL, and Earth Engine.
-- Every experiment must be reproducible: fixed seeds, the configuration recorded alongside the results, and the label budget, the country and the split protocol stated in every result file.
-- In prose drafted for the thesis, avoid dashes and use a formal academic register.
-- Do not commit data or large binaries. `data/` and `results/` are git-ignored, apart from `results/eda`.
+- Working language is English. The user is a bilingual Spanish and English MSc student comfortable with EO, ML and
+  GIS terminology, so keep responses concise and technical.
+- Every experiment is reproducible: fixed seeds, and the configuration, label budget, country and split protocol
+  recorded in every result file. `results.json` stamps the chip manifest's SHA-256.
+- Thesis prose avoids dashes and uses a formal academic register.
+- Do not commit data or large binaries.
