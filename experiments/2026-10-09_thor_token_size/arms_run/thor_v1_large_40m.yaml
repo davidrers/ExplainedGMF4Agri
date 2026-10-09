@@ -1,0 +1,22 @@
+# THOR v1 large, frozen, on 40 m tokens (patch 4 on the 10 m bands, 2 on the 20 m bands), a 56 x 56 grid.
+# 2 px is below the 4 px THOR was pretrained with: the 20 m bands' 16 px kernels are resized further than
+# pretraining ever did, and the 6,272 tokens per month are almost five times its 1,296-token budget. The
+# backbone is registered by ../run.py, which also adds this folder to the arm search path; the folder is kept
+# apart from ../arms/ because the core tests check the arms there against the core registry. Everything
+# trainable is that of thor_v1_large. About 616 MB per chip encoding.
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # THOR pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # D4; the cached fit draws one of the eight cached variants
+model:
+  backbone: thor_v1_large_40m
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2
+encode_batch_size: {hub: 1, cluster: 1}   # chips per encoding batch; the core profiles do not know this arm

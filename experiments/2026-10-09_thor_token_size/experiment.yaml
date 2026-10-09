@@ -1,0 +1,11 @@
+# THOR v1 large on 160, 80 and 40 m tokens on a sample of Estonia (EE_2021_sample): the token-size study.
+# thor_v1_large is the core arm; the 80 m and 40 m arms are in arms/, and run.py registers the 40 m backbone.
+# Three seeds, so that the token sizes are compared against the spread of the decoder fit.
+#   poetry run python experiments/2026-10-09_thor_token_size/run.py -e experiments/2026-10-09_thor_token_size/experiment.yaml --chips data/eurocrops_chips/EE_2021_sample
+#   bash scripts/cluster/submit.sh experiments/2026-10-09_thor_token_size/experiment.yaml EE_2021_sample
+arms: [thor_v1_large, thor_v1_large_80m, thor_v1_large_40m]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss
