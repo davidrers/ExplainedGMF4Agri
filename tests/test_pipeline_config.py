@@ -62,6 +62,32 @@ def test_every_arm_route_matches_its_backbone():
                       "thor_v1_large": "cache", "tessera_v1": "raster", "alphaearth_v1": "raster"}
 
 
+def test_the_thor_80m_add_on_follows_the_kshot_protocol():
+    main = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
+    add_on = load_experiment(CONFIGS / "experiments" / "kshot_thor80.yaml")
+    assert add_on["arms"] == ["thor_v1_large_80m"] and "thor_v1_large_80m" not in main["arms"]
+    for key in ("name", "budgets_pct", "draws", "seeds", "epochs", "checkpoint"):
+        assert add_on[key] == main[key], key
+
+
+def test_thor_80m_arm_keeps_the_settings_of_its_study():
+    arm, study = load_arm("thor_v1_large_80m"), yaml.safe_load(
+        (LEGACY / "thor_v1_large_80m_ee_pilot.yaml").read_text())
+    assert arm["model"] == study["model"]
+    assert {k: arm["data"][k] for k in ("normalisation", "batch_size", "augment")} == \
+           {k: study["data"][k] for k in ("normalisation", "batch_size", "augment")}
+    assert arm["trainer"]["accumulate_grad_batches"] == study["trainer"]["accumulate_grad_batches"]
+    from gfm4agri.benchmark.backbones import get_backbone
+    assert get_backbone(arm["model"]["backbone"]).resolution_group == "token_grid_80m"
+
+
+def test_every_cache_arm_has_an_encode_batch_on_both_machines():
+    arms = [load_arm(p.stem) for p in sorted((CONFIGS / "arms").glob("*.yaml"))]
+    cache_arms = {a["model"]["backbone"] for a in arms if a["route"] == "cache"}
+    for machine in ("hub", "cluster"):
+        assert cache_arms <= set(load_machine(machine)["encode_batch_size"]), machine
+
+
 def test_a_route_that_contradicts_the_backbone_is_refused(tmp_path):
     (tmp_path / "arms").mkdir()
     bad = yaml.safe_load((CONFIGS / "arms" / "tessera_v1.yaml").read_text()) | {"route": "cache"}

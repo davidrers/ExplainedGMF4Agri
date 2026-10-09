@@ -502,8 +502,10 @@ bands and the six 20 m bands (B01 and B09 at 60 m are left out, since 60 m pixel
 2,240 m chip and THOR's authors drop the two atmospheric bands too), at patch sizes chosen at
 inference. The arm uses **160 m tokens**, 16 px on the 10 m bands and 8 px on the 20 m bands,
 which gives the 14 x 14 grid TerraMind has on the same chip; the user fixed this on 9 October
-2026 for parity with TerraMind, and the 80 m variant is an archived study
-(`experiments/2026-10-08_thor_80m/`). The two groups' token maps are concatenated on the channel
+2026 for parity with TerraMind. The 80 m variant, 8 and 4 px patches on a 28 x 28 grid, was studied on the
+12-chip pilot (`experiments/2026-10-08_thor_80m/`) and is now an add-on arm, `thor_v1_large_80m` in its own
+resolution group `token_grid_80m`, outside the `kshot` experiment because its full-Estonia cache, 154 MB per chip
+encoding, comes to about 6.4 TB. The two groups' token maps are concatenated on the channel
 axis, as THOR's authors do for dense tasks, and THOR's pretraining statistics, given in
 reflectance, are scaled to the chips' reflectance x 10,000. THOR is not part of TerraTorch: its
 backbones register through `thor_terratorch_ext`, which `scripts/env/install_thor.sh` installs
@@ -595,7 +597,8 @@ the three and the chip set into the configuration dictionary the fit functions a
 checks that every cell of the full-Estonia grid of 2 October composes to the configuration that
 grid ran with. The experiment `kshot` holds the five arms, TerraMind v1 large, Prithvi-EO-2.0
 600M TL, THOR v1 large on 160 m tokens, TESSERA v1 and AlphaEarth v1, at 100, 20 and 5 %, draw 0,
-seed 0 and 15 epochs.
+seed 0 and 15 epochs. `kshot_thor80.yaml` runs THOR on 80 m tokens under the same protocol and the same
+experiment name, so its cells land beside `kshot`'s; a test keeps the two protocols identical.
 
 **Two routes.** The token-grid arms are always fitted from cached features with `fit_cached`;
 training them with the encoder inside the loop is no longer part of the workflow. The raster
@@ -720,8 +723,16 @@ A4000. With 32 training and 9 test chips this checks the workflow, not the model
 | TerraMind v1 large | 0.132 | 0.150 | 0.083 |
 | Prithvi-EO-2.0 600M TL | 0.101 | 0.077 | 0.088 |
 | THOR v1 large, 160 m | 0.129 | 0.071 | 0.096 |
+| THOR v1 large, 80 m (add-on, run after the others) | 0.146 | 0.110 | 0.109 |
 | TESSERA v1 + MLP | 0.164 | 0.155 | 0.147 |
 | AlphaEarth v1 + MLP | 0.161 | 0.126 | 0.132 |
+
+The same 15 cells then ran on the UT HPC cluster the same day, as five Slurm jobs on `itc-gpu` at commit
+`0250e4c`, 2.5 to 6.5 minutes each on an RTX PRO 6000 Blackwell, with every token-grid cache computed on the node's
+local NVMe and gone after the job. Every cell drew the same parcels as on the JupyterHub. The raster arms
+reproduced the hub's Macro-F1 to within 0.001; the token-grid arms differed by up to 0.034 (TerraMind at 20 %),
+which is the run-to-run variation of GPU fits on another GPU type and encoding batch, and on nine test chips is as
+large as the gaps between arms. The cluster's results are in `results/_cluster_check/kshot/EE_2021_mini/`.
 
 ### Full Estonia
 

@@ -2,4 +2,4 @@
 cache_root: data/embeddings    # caches are looked up here, and missing ones computed here
 num_workers: 16                # data loader workers of a fit and of the test predictions
 encode_num_workers: 8
-encode_batch_size: {terramind_v1_large: 4, prithvi_eo_v2_600_tl: 2, thor_v1_large: 2}
+encode_batch_size: {terramind_v1_large: 4, prithvi_eo_v2_600_tl: 2, thor_v1_large: 2, thor_v1_large_80m: 1}

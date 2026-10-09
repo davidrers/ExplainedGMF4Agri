@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Bring an experiment's results back from the cluster to the JupyterHub:
 #
+# The first argument is the experiment's name field, which names its results folder.
+#
 #     bash scripts/cluster/pull_results.sh kshot                  # every chip set
 #     bash scripts/cluster/pull_results.sh kshot EE_2021          # one chip set
 #     DEST=results/_cluster bash scripts/cluster/pull_results.sh kshot EE_2021_mini   # elsewhere

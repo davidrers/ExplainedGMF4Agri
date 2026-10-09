@@ -1,0 +1,19 @@
+# THOR v1 large, frozen, on 80 m tokens (patch 8 on the 10 m bands, 4 on the 20 m bands), a 28 x 28
+# grid: the token-size variant of thor_v1_large, everything trainable identical. Studied on the
+# 12-chip pilot on 8 October 2026 (experiments/2026-10-08_thor_80m/) and added to the K-shot
+# experiment on 9 October 2026. Its cache is four times THOR's at 160 m, 154 MB per chip encoding.
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # THOR pretraining statistics
+  batch_size: 1                # with accumulate_grad_batches 4, an effective batch of 4
+  augment: true                # D4; the cached fit draws one of the eight cached variants
+model:
+  backbone: thor_v1_large_80m
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 4
