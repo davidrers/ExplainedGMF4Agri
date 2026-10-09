@@ -49,9 +49,9 @@ Arms implemented, one file each in `configs/arms/`: **TerraMind v1 large**, **Pr
 **THOR v1 large** on 160 m tokens (token grid; `ChannelBottleneck` plus a 12.9 M parameter UNet decoder; fitted from
 cached features), **TESSERA v1** and **AlphaEarth v1** (10 m pixel raster; per-pixel MLP; end to end on the
 embedding rasters). All five ran through the K-shot workflow on `EE_2021_mini` on 9 October 2026; THOR and AlphaEarth
-have not yet run on full Estonia. **THOR v1 large on 80 m tokens** is an add-on arm (`configs/arms/thor_v1_large_80m.yaml`,
-run through `configs/experiments/kshot_thor80.yaml`), kept out of `kshot` because its full-Estonia cache, about
-6.4 TB, fits no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
+have not yet run on full Estonia. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
+workflow (`experiments/2026-10-08_thor_80m/`, with its own arm file): its full-Estonia cache, about 6.4 TB, fits
+no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
 archived studies in `experiments/`.
 
 Full-Estonia grid, finished 2 October 2026. Test Macro-F1 over the 1,475 test chips, one draw and one seed per
@@ -116,47 +116,57 @@ epochs), `configs/machines/{hub,cluster}.yaml` (throughput only). A token-grid a
 `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/` (`results.json`, `predictions_test.npz`) and
 `summary.csv`; runs before 9 October stay in `results/seg/` and `results/seg_cached/`.
 
-### Running an experiment on the cluster: the standard loop
+### Two instructions: run an experiment, or add to the main workflow
 
-When the user asks to create an experiment and run it on the cluster, carry out the whole loop below without
-asking for each step. **Committing and pushing to `main` for this loop is authorised by the user** (9 October
-2026); anything outside it, and every documentation change, still needs agreement.
+The user gives one of two instructions, and they are kept apart:
 
-**Words.** An *experiment* is a runner spec, `configs/experiments/<file>.yaml`: arms, budgets, draws, seeds,
-epochs, and a `name` that names its results folder `results/<name>/<chip set>/`. An *arm* is
-`configs/arms/<arm>.yaml`; the runner only runs arms the experiment lists. A *study* is a one-off question (an
-ablation, a variant): it also gets `experiments/<date>_<name>/README.md` with the question, the config, the results
-path and, once known, the outcome. A new backbone, decoder or protocol change is implementation, not an
-experiment: agree it with the user first.
+* **"Run an experiment of X"** (on the hub or the cluster). **The main workflow is not touched**: `src/`,
+  `configs/{arms,experiments,machines}`, `scripts/` and `tests/` stay as they are. Everything X needs lives in
+  `experiments/<YYYY-MM-DD>_<name>/`, started by copying `experiments/_template/`: a `README.md`, an
+  `experiment.yaml` (arms, budgets, draws, seeds, epochs, optional `name`), arm files in `arms/` (found before
+  `configs/arms/`, so a copy there varies a core arm), and, only if code must change, a `run.py` with copies of
+  the changed modules swapped in (see the template). The whole run below, commits and pushes to `main`
+  included, is authorised without asking at each step (user, 9 October 2026).
+* **"Add X to the main workflow."** Only on that instruction: move what the experiment proved from its folder into
+  the core, with tests and documentation, and describe the change before making it.
 
-1. **Create, on the hub.** Write the experiment file, and any new arm file (copy an existing one; `load_arm`
-   checks its route against the backbone registry). For a study, add its `experiments/` README.
-2. **Check, on the hub.** `poetry run pytest -q` and a dry run on the target chip set:
-   `poetry run python scripts/run_kshot.py -e configs/experiments/<file>.yaml --chips data/eurocrops_chips/<set> --dry-run`.
-   Every cell must be listed and the chip-set check must pass. For a first run of something new, run it on
-   `EE_2021_mini` on the hub or the cluster before a full country.
-3. **Commit and push.** Stage files **by name**, never `git add -A`: other sessions may be editing this checkout.
-   `git commit` (attribution line as usual), `git push origin main`.
-4. **Update the cluster.** `ssh -n utwente-hpc 'cd ~/ExplainedGMF4Agri && git pull --ff-only'`; add
-   `poetry install` if `poetry.lock` changed. Never edit or commit on the cluster. If the chip set is not there
-   yet, copy it first from the hub: `bash scripts/cluster/push_data.sh eurocrops_chips/<set>` (a pilot needs its
-   parent copied too).
-5. **Submit.** `ssh -n utwente-hpc 'cd ~/ExplainedGMF4Agri && bash scripts/cluster/submit.sh <file> <set> [arms]'`,
-   one Slurm job per arm; `TIME=`, `CPUS=`, `MEM=` override 2 days, 32 CPUs, 120 GB; `DRY_RUN=1` prints the
-   commands. A full-country run with `kshot_thor80` would fail on disk space. Commands that call `poetry` over ssh
-   need `export PATH=$HOME/.local/bin:$PATH` first (the scripts set it themselves).
-6. **Wait without polling.** `itc-gpu` has four GPUs and our jobs the lowest priority, so hours of queueing are
-   normal (`squeue -u $USER --start` gives Slurm's estimate). Start one background command that loops on
-   `squeue -u $USER -h -n <job names>` with a sleep of a few minutes and, when the jobs are gone, prints
-   `sacct -j <ids> --format=JobID,JobName%28,State,Elapsed` and the `=== ... exit` lines of
-   `results/<name>/<set>/logs/*.log`. A job that fails leaves its traceback in that log.
-7. **Bring the results back.** `bash scripts/cluster/pull_results.sh <name> <set>` (the experiment's `name`, not
-   its file). If the same `<name>/<set>` also has hub results, pull with `DEST=results/_cluster` to keep them
-   apart. Every `results.json` records the machine and the commit.
-8. **Look.** `notebooks/pipeline/kshot_results.ipynb` with `EXPERIMENT = "<name>"`, `CHIPS = "<set>"`; run it with
-   the `gfm4agri` kernel (`jupyter nbconvert --execute --inplace` from `poetry run` works headless).
-9. **Report and record.** Give the user the outcome. Proposing the run's entry for `pipeline.md` section 11, and a
-   study README's outcome, is part of the loop; writing them waits for the user's agreement.
+If running an experiment seems to need a change to the core, copy the file into the experiment folder instead;
+if it cannot be done that way, ask.
+
+**Running an experiment, step by step:**
+
+1. **Create, on the hub.** Copy `experiments/_template/` to `experiments/<YYYY-MM-DD>_<name>/`; fill the README's
+   question, `experiment.yaml` and any arm files; keep `run.py` only if code changes, otherwise delete it.
+2. **Check, on the hub.** `poetry run pytest -q`, then a dry run on the target chip set:
+   `poetry run python scripts/run_kshot.py -e experiments/<folder>/experiment.yaml --chips data/eurocrops_chips/<set> --dry-run`
+   (or the folder's `run.py`). Every cell must be listed and the chip-set check must pass. Something new runs on
+   `EE_2021_mini` before a full country.
+3. **Commit and push.** Stage the experiment folder **by name**, never `git add -A`: other sessions may be
+   editing this checkout. `git commit` with the attribution line, `git push origin main`.
+4. **Update the cluster.** `ssh -n utwente-hpc 'cd ~/ExplainedGMF4Agri && git pull --ff-only'`, plus
+   `poetry install` if `poetry.lock` changed. Never edit or commit on the cluster. A chip set not yet there is
+   copied from the hub first: `bash scripts/cluster/push_data.sh eurocrops_chips/<set>` (a pilot needs its
+   parent too).
+5. **Submit.** `ssh -n utwente-hpc 'cd ~/ExplainedGMF4Agri && bash scripts/cluster/submit.sh experiments/<folder>/experiment.yaml <set> [arms]'`:
+   one Slurm job per arm, running the folder's `run.py` if it has one. `TIME=`, `CPUS=`, `MEM=` override 2 days,
+   32 CPUs, 120 GB; `DRY_RUN=1` prints the commands. Over ssh, a command that calls `poetry` needs
+   `export PATH=$HOME/.local/bin:$PATH` first (the scripts set it themselves).
+6. **Wait without polling.** `itc-gpu` has four GPUs and our jobs the lowest priority, so hours of queueing
+   happen (`squeue -u $USER --start`), though the 9 October pilot started within two hours. Start one background
+   command that loops on `squeue -u $USER -h -n <job names>` with a sleep of a few minutes and, once the jobs are
+   gone, prints `sacct -j <ids> --format=JobID,JobName%28,State,Elapsed` and the `=== ... exit` lines of
+   `results/<name>/<set>/logs/*.log`. A failed job leaves its traceback in that log.
+7. **Bring the results back.** `bash scripts/cluster/pull_results.sh <name> <set>`, with the experiment's `name`
+   (by default its folder's name). Results already on the hub under the same `<name>/<set>` are kept apart with
+   `DEST=results/_cluster`. Every `results.json` records the spec, the entry script, the arm files, the machine
+   and the commit.
+8. **Look.** `notebooks/pipeline/kshot_results.ipynb` with `EXPERIMENT = "<name>"`, `CHIPS = "<set>"`, run with
+   the `gfm4agri` kernel (`poetry run jupyter nbconvert --execute --inplace` works headless).
+9. **Report and record.** Give the user the outcome, write it into the experiment's README, commit and push it.
+   An entry in `pipeline.md` section 11 is proposed and written only once agreed.
+
+The main workflow itself runs the same way with its spec by name: `scripts/run_kshot.py -e
+configs/experiments/kshot.yaml` and `submit.sh kshot <set>`.
 
 The chip set took days of network time and the caches are terabytes. Never delete, overwrite or re-export them
 without asking. An export skips chips already on disk, so a faulty set must be removed before a corrected export
@@ -238,8 +248,9 @@ scripts/hub/               JupyterHub only: vector fetch; chip, S1, TESSERA, Alp
 scripts/run_kshot.py       the one entry point of the fit, on either machine
 scripts/cluster/           cluster environment, sbatch job, submit, data push, results pull
 scripts/env/               THOR installer (outside the Poetry lock)
-configs/                   class schemes; arms/ (one per arm), experiments/ (runner specs), machines/ (hub, cluster)
-experiments/               studies, one dated folder each with a README; deletable once pipeline.md records the outcome
+configs/                   class schemes; the main workflow's arms/, experiments/ (kshot.yaml) and machines/ (hub, cluster)
+experiments/               one dated folder per experiment (README, experiment.yaml, arms/, optional run.py); _template/ to copy;
+                           an experiment never edits the core and is deletable once pipeline.md records its outcome
 notebooks/eda/             EDA notebooks 01 to 07, their builders, analysis/ (code whose outputs go to results/eda)
 notebooks/pipeline/        cache anatomy and full-Estonia results notebooks, with builders
 data/, results/            git-ignored, apart from results/eda

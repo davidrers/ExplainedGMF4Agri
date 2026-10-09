@@ -11,10 +11,11 @@ import yaml
 pytest.importorskip("terratorch")
 
 from gfm4agri.pipeline.config import (  # noqa: E402
-    CONFIGS, REPO, Cell, compose, load_arm, load_experiment, load_machine, plan_cells,
-    repo_relative, resolve_split)
+    CONFIGS, REPO, Cell, arm_dirs, compose, encode_batch_size, load_arm, load_experiment,
+    load_machine, plan_cells, repo_relative, resolve_split)
 
 LEGACY = Path(__file__).parent / "fixtures" / "legacy_configs"
+THOR80 = REPO / "experiments" / "2026-10-08_thor_80m"
 EE = REPO / "data" / "eurocrops_chips" / "EE_2021"
 SPLIT = EE / "splits" / "blocks4_buf1600_seed0__6b0eb4cb"
 GRID = {"terramind_v1_large": "terramind_v1_large_ee.yaml",
@@ -62,16 +63,17 @@ def test_every_arm_route_matches_its_backbone():
                       "thor_v1_large": "cache", "tessera_v1": "raster", "alphaearth_v1": "raster"}
 
 
-def test_the_thor_80m_add_on_follows_the_kshot_protocol():
+def test_the_thor_80m_experiment_follows_the_kshot_protocol():
     main = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
-    add_on = load_experiment(CONFIGS / "experiments" / "kshot_thor80.yaml")
+    add_on = load_experiment(THOR80 / "experiment.yaml")
     assert add_on["arms"] == ["thor_v1_large_80m"] and "thor_v1_large_80m" not in main["arms"]
     for key in ("name", "budgets_pct", "draws", "seeds", "epochs", "checkpoint"):
         assert add_on[key] == main[key], key
 
 
 def test_thor_80m_arm_keeps_the_settings_of_its_study():
-    arm, study = load_arm("thor_v1_large_80m"), yaml.safe_load(
+    search = arm_dirs(THOR80 / "experiment.yaml")
+    arm, study = load_arm("thor_v1_large_80m", search=search), yaml.safe_load(
         (LEGACY / "thor_v1_large_80m_ee_pilot.yaml").read_text())
     assert arm["model"] == study["model"]
     assert {k: arm["data"][k] for k in ("normalisation", "batch_size", "augment")} == \
@@ -82,10 +84,44 @@ def test_thor_80m_arm_keeps_the_settings_of_its_study():
 
 
 def test_every_cache_arm_has_an_encode_batch_on_both_machines():
-    arms = [load_arm(p.stem) for p in sorted((CONFIGS / "arms").glob("*.yaml"))]
-    cache_arms = {a["model"]["backbone"] for a in arms if a["route"] == "cache"}
+    # Core arms through the machine profiles; experiment arms may carry their own.
+    core = [load_arm(p.stem) for p in sorted((CONFIGS / "arms").glob("*.yaml"))]
     for machine in ("hub", "cluster"):
-        assert cache_arms <= set(load_machine(machine)["encode_batch_size"]), machine
+        profile = load_machine(machine)
+        assert {a["model"]["backbone"] for a in core if a["route"] == "cache"} <= \
+               set(profile["encode_batch_size"]), machine
+        for f in sorted((REPO / "experiments").glob("*/arms/*.yaml")):
+            arm = load_arm(f.stem, search=[f.parent])
+            if arm["route"] == "cache":
+                assert machine in (arm.get("encode_batch_size") or {}) or \
+                    arm["model"]["backbone"] in profile["encode_batch_size"], (f, machine)
+
+
+def test_the_main_workflow_holds_only_its_own_experiment_and_arms():
+    assert sorted(p.name for p in (CONFIGS / "experiments").glob("*.yaml")) == ["kshot.yaml"]
+    exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
+    assert sorted(p.stem for p in (CONFIGS / "arms").glob("*.yaml")) == sorted(exp["arms"])
+
+
+def test_an_experiment_folder_arm_shadows_the_core_arm(tmp_path):
+    folder = tmp_path / "2026-01-01_try"
+    (folder / "arms").mkdir(parents=True)
+    arm = yaml.safe_load((CONFIGS / "arms" / "tessera_v1.yaml").read_text())
+    arm["model"]["lr"] = 0.5
+    (folder / "arms" / "tessera_v1.yaml").write_text(yaml.safe_dump(arm))
+    (folder / "experiment.yaml").write_text(yaml.safe_dump({"arms": ["tessera_v1", "alphaearth_v1"]}))
+    search = arm_dirs(folder / "experiment.yaml")
+    assert load_arm("tessera_v1", search=search)["model"]["lr"] == 0.5        # the experiment's copy
+    assert load_arm("alphaearth_v1", search=search)["model"]["lr"] == 1.0e-3  # the core's arm
+    assert load_experiment(folder / "experiment.yaml")["name"] == "2026-01-01_try"
+    assert arm_dirs(CONFIGS / "experiments" / "kshot.yaml") == [CONFIGS / "arms"]
+
+
+def test_an_arm_may_carry_its_own_encode_batch():
+    arm = {"model": {"backbone": "x"}, "encode_batch_size": {"hub": 3}}
+    assert encode_batch_size(arm, {"encode_batch_size": {"x": 7}}, "hub") == 3
+    assert encode_batch_size(arm, {"encode_batch_size": {"x": 7}}, "cluster") == 7
+    assert encode_batch_size({"model": {"backbone": "y"}}, {"encode_batch_size": {}}, "hub") == 1
 
 
 def test_a_route_that_contradicts_the_backbone_is_refused(tmp_path):

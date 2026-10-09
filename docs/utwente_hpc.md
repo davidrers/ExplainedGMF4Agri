@@ -279,7 +279,7 @@ the encoder weights on the login node, where the internet is direct, and ends wi
 | 1. Change code, run `pytest`, commit, push | JupyterHub | git |
 | 2. A new chip set: build it, then copy it | JupyterHub | `bash scripts/cluster/push_data.sh eurocrops_chips/<set> ...` (rsync, resumable, checks the free space first, leaves logs and pid files behind) |
 | 3. Update | Cluster | `git pull`, and `poetry install` if the lock changed |
-| 4. Run | Cluster | `bash scripts/cluster/submit.sh kshot <set> [arms]`, one job per arm; `DRY_RUN=1` prints the `sbatch` commands; `TIME`, `CPUS` and `MEM` override the defaults of 2 days, 32 CPUs and 120 GB |
+| 4. Run | Cluster | `bash scripts/cluster/submit.sh kshot <set> [arms]` for the main workflow, or `submit.sh experiments/<folder>/experiment.yaml <set>` for an experiment, one job per arm; `DRY_RUN=1` prints the `sbatch` commands; `TIME`, `CPUS` and `MEM` override the defaults of 2 days, 32 CPUs and 120 GB |
 | 5. Bring the results back | JupyterHub | `bash scripts/cluster/pull_results.sh kshot [<set>]`; `DEST=` puts them elsewhere than `results/` |
 
 Steps 3 to 5 can be driven from the JupyterHub with `ssh utwente-hpc '<command>'`. `squeue -u $USER` shows the jobs;

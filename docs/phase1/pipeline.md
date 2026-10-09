@@ -503,9 +503,9 @@ bands and the six 20 m bands (B01 and B09 at 60 m are left out, since 60 m pixel
 inference. The arm uses **160 m tokens**, 16 px on the 10 m bands and 8 px on the 20 m bands,
 which gives the 14 x 14 grid TerraMind has on the same chip; the user fixed this on 9 October
 2026 for parity with TerraMind. The 80 m variant, 8 and 4 px patches on a 28 x 28 grid, was studied on the
-12-chip pilot (`experiments/2026-10-08_thor_80m/`) and is now an add-on arm, `thor_v1_large_80m` in its own
-resolution group `token_grid_80m`, outside the `kshot` experiment because its full-Estonia cache, 154 MB per chip
-encoding, comes to about 6.4 TB. The two groups' token maps are concatenated on the channel
+12-chip pilot and run again under the K-shot protocol as an experiment (`experiments/2026-10-08_thor_80m/`),
+`thor_v1_large_80m` in its own resolution group `token_grid_80m`. It is not an arm of the main workflow: its
+full-Estonia cache, 154 MB per chip encoding, comes to about 6.4 TB. The two groups' token maps are concatenated on the channel
 axis, as THOR's authors do for dense tasks, and THOR's pretraining statistics, given in
 reflectance, are scaled to the chips' reflectance x 10,000. THOR is not part of TerraTorch: its
 backbones register through `thor_terratorch_ext`, which `scripts/env/install_thor.sh` installs
@@ -597,8 +597,15 @@ the three and the chip set into the configuration dictionary the fit functions a
 checks that every cell of the full-Estonia grid of 2 October composes to the configuration that
 grid ran with. The experiment `kshot` holds the five arms, TerraMind v1 large, Prithvi-EO-2.0
 600M TL, THOR v1 large on 160 m tokens, TESSERA v1 and AlphaEarth v1, at 100, 20 and 5 %, draw 0,
-seed 0 and 15 epochs. `kshot_thor80.yaml` runs THOR on 80 m tokens under the same protocol and the same
-experiment name, so its cells land beside `kshot`'s; a test keeps the two protocols identical.
+seed 0 and 15 epochs.
+
+**Experiments run on the same runner without touching it.** An experiment lives in its own folder,
+`experiments/<date>_<name>/`, with an `experiment.yaml` the runner takes by path, arm files in `arms/` that are
+found before `configs/arms/`, an arm's own `encode_batch_size` when the machine profiles do not know its backbone,
+and, if code must change, its own `run.py` with copies of the changed modules swapped in; `submit.sh` takes the
+spec's path and uses that `run.py` when present. Each `results.json` records the spec, the entry script and the
+arm files. THOR on 80 m tokens runs this way, with the name `kshot` so its cells land beside the main
+workflow's.
 
 **Two routes.** The token-grid arms are always fitted from cached features with `fit_cached`;
 training them with the encoder inside the loop is no longer part of the workflow. The raster

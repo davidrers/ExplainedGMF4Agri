@@ -1,7 +1,8 @@
 # THOR v1 large, frozen, on 80 m tokens (patch 8 on the 10 m bands, 4 on the 20 m bands), a 28 x 28
 # grid: the token-size variant of thor_v1_large, everything trainable identical. Studied on the
-# 12-chip pilot on 8 October 2026 (experiments/2026-10-08_thor_80m/) and added to the K-shot
-# experiment on 9 October 2026. Its cache is four times THOR's at 160 m, 154 MB per chip encoding.
+# 12-chip pilot on 8 October 2026 and run under the K-shot protocol on 9 October 2026 (../experiment.yaml).
+# An arm of this experiment, not of the main workflow. Its cache is four times THOR's at 160 m, 154 MB per
+# chip encoding, about 6.4 TB on full Estonia.
 route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
 data:
   normalisation: backbone      # THOR pretraining statistics
@@ -17,3 +18,4 @@ trainer:
   precision: 16-mixed
   log_every_n_steps: 10
   accumulate_grad_batches: 4
+encode_batch_size: {hub: 1, cluster: 4}   # chips per encoding batch; the core profiles do not know this arm

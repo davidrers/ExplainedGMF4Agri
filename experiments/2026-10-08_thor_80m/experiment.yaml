@@ -1,8 +1,9 @@
-# THOR on 80 m tokens under the protocol of kshot.yaml, as an add-on arm rather than an arm of kshot: its
-# full-Estonia cache (about 6.4 TB) does not fit a cluster node, so kshot runs never schedule it. The name is
-# kshot, so its cells land in results/kshot/<chip set>/ beside kshot's and read as one comparison; keep the
-# budgets, draws, seeds, epochs and checkpoint identical to kshot.yaml.
-#   poetry run python scripts/run_kshot.py -e configs/experiments/kshot_thor80.yaml --chips data/eurocrops_chips/EE_2021_mini
+# THOR on 80 m tokens under the protocol of configs/experiments/kshot.yaml: an experiment, not part of the main
+# workflow; its arm is in arms/ beside this file. Its full-Estonia cache (about 6.4 TB) fits no cluster node.
+# The name is kshot, so its cells land in results/kshot/<chip set>/ beside kshot's and read as one comparison;
+# keep the budgets, draws, seeds, epochs and checkpoint identical to kshot.yaml (a test checks this).
+#   poetry run python scripts/run_kshot.py -e experiments/2026-10-08_thor_80m/experiment.yaml --chips data/eurocrops_chips/EE_2021_mini
+#   bash scripts/cluster/submit.sh experiments/2026-10-08_thor_80m/experiment.yaml EE_2021_mini
 name: kshot
 arms: [thor_v1_large_80m]
 budgets_pct: [100, 20, 5]

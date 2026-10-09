@@ -9,12 +9,17 @@ The `thor_v1_large_80m` entry stays in the backbone registry so this study can b
 
 **Outcome.** Test Macro-F1 (on the pilot's validation chips), mean of three seeds: 80 m 0.283, 0.176, 0.106 against
 160 m 0.230, 0.092, 0.088 at 100, 20 and 5 %. On 9 October 2026 the user kept 160 m as the THOR arm for parity
-with TerraMind. The same day 80 m became an arm file with the settings of this study
-(`configs/arms/thor_v1_large_80m.yaml`), run as an add-on to the K-shot experiment through
-`configs/experiments/kshot_thor80.yaml` rather than as an arm of `kshot`, since its full-Estonia cache, about
-6.4 TB, does not fit a cluster node. Its pilot cells are in `results/kshot/EE_2021_mini/thor_v1_large_80m/`.
+with TerraMind. The same day 80 m was run again under the K-shot protocol on `EE_2021_mini`, as an experiment
+of this folder: `experiment.yaml` (name `kshot`, so its cells sit beside the main workflow's) and
+`arms/thor_v1_large_80m.yaml`, the settings of this study. It is not part of the main workflow: its full-Estonia
+cache, about 6.4 TB at 154 MB per chip encoding, fits no cluster node. On `EE_2021_mini` it scored test Macro-F1
+0.146, 0.110 and 0.109 at 100, 20 and 5 %, above THOR at 160 m at every budget, on one seed and nine test chips.
 
-**Results.** `results/seg_cached/thor_v1_large_80m_ee_pilot/`, `results/seg_cached/thor_v1_large_ee_pilot/`.
+    poetry run python scripts/run_kshot.py -e experiments/2026-10-08_thor_80m/experiment.yaml --chips data/eurocrops_chips/EE_2021_mini
+    bash scripts/cluster/submit.sh experiments/2026-10-08_thor_80m/experiment.yaml EE_2021_mini
+
+**Results.** 12-chip pilot: `results/seg_cached/thor_v1_large_80m_ee_pilot/`, `results/seg_cached/thor_v1_large_ee_pilot/`.
+`EE_2021_mini`: `results/kshot/EE_2021_mini/thor_v1_large_80m/`.
 
 **Re-run.** `git checkout a81bd9e`, then `scripts/seg/encode.py` and `scripts/seg/fit_cached.py` with
 `configs/seg/thor_v1_large_80m_ee_pilot.yaml`.

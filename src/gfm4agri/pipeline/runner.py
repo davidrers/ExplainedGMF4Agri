@@ -16,13 +16,15 @@ import json
 import os
 import socket
 import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from gfm4agri.pipeline.config import (CONFIGS, REPO, compose, load_arm, load_experiment,
-                                      load_machine, plan_cells, repo_relative, resolve_split)
+from gfm4agri.pipeline.config import (CONFIGS, REPO, arm_dirs, compose, encode_batch_size,
+                                      load_arm, load_experiment, load_machine, plan_cells,
+                                      repo_relative, resolve_split)
 
 __all__ = ["PREDICTIONS", "check_chipset", "run", "summarise"]
 
@@ -155,7 +157,8 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
     chips = Path(chips) if Path(chips).is_absolute() else Path.cwd() / chips
     split_dir = resolve_split(chips, split)
     cells = plan_cells(exp, arms)
-    arm_cfgs = {a: load_arm(a, configs) for a in dict.fromkeys(c.arm for c in cells)}
+    search = arm_dirs(experiment, configs)
+    arm_cfgs = {a: load_arm(a, configs, search) for a in dict.fromkeys(c.arm for c in cells)}
     problems = check_chipset(chips, split_dir, arm_cfgs)
     if problems:
         raise SystemExit("chip set check failed:\n  " + "\n  ".join(problems))
@@ -165,7 +168,10 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
     root = root if root.is_absolute() else REPO / root
     scratch = Path(scratch) if scratch else root
     test_ids = _lists(chips, split_dir)["test"]
-    provenance = {"experiment": exp["name"], "chip_set": repo_relative(chips),
+    provenance = {"experiment": exp["name"], "experiment_file": repo_relative(experiment),
+                  "entry": repo_relative(sys.argv[0]) if sys.argv and sys.argv[0] else None,
+                  "arm_files": {a: repo_relative(c["_file"]) for a, c in arm_cfgs.items()},
+                  "chip_set": repo_relative(chips),
                   "split": split_dir.name, "git_commit": _git("rev-parse", "HEAD"),
                   "git_dirty": bool(_git("status", "--porcelain")), "machine": machine,
                   "host": socket.gethostname()}
@@ -200,7 +206,7 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
             _say(f"{arm_name}: encoding into {decision.cache_dir}")
             generate_embeddings(backbone, chips, decision.cache_dir,
                                 normalisation=arm["data"]["normalisation"],
-                                batch_size=mach["encode_batch_size"][backbone],
+                                batch_size=encode_batch_size(arm, mach, machine),
                                 num_workers=mach["encode_num_workers"],
                                 precision=arm["trainer"]["precision"], split_dir=split_dir)
             gc.collect()

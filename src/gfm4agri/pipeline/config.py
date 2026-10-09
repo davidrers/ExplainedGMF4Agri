@@ -8,6 +8,10 @@ workflow keeps that layout and builds it from three smaller files, so each is wr
 * ``configs/experiments/<name>.yaml``: which arms, budgets, draws, seeds and epochs;
 * ``configs/machines/<machine>.yaml``: throughput settings that never change a result.
 
+An experiment outside the main workflow lives in its own folder, ``experiments/<date>_<name>/``,
+as ``experiment.yaml`` with its own arm files in ``arms/``; those are found before the core's
+``configs/arms/``, so an experiment never has to change the core to vary an arm.
+
 The chip set is a path. Paths inside the repository are stored relative to it, so a result
 reads the same on the JupyterHub and on the cluster, whose clone mirrors the hub's layout.
 """
@@ -23,8 +27,8 @@ import yaml
 REPO = Path(__file__).resolve().parents[3]
 CONFIGS = REPO / "configs"
 
-__all__ = ["CONFIGS", "REPO", "Cell", "compose", "load_arm", "load_experiment", "load_machine",
-           "plan_cells", "repo_relative", "resolve_split"]
+__all__ = ["CONFIGS", "REPO", "Cell", "arm_dirs", "compose", "encode_batch_size", "load_arm",
+           "load_experiment", "load_machine", "plan_cells", "repo_relative", "resolve_split"]
 
 
 @dataclass(frozen=True)
@@ -45,11 +49,24 @@ def _yaml(path: Path) -> dict:
     return yaml.safe_load(Path(path).read_text())
 
 
-def load_arm(name: str, configs: Path = CONFIGS) -> dict:
-    """``configs/arms/<name>.yaml``, checked against the backbone registry."""
+def arm_dirs(experiment: Path, configs: Path = CONFIGS) -> list[Path]:
+    """Where an experiment's arms are looked up: its own ``arms/`` folder, then the core's."""
+    local = Path(experiment).parent / "arms"
+    core = Path(configs) / "arms"
+    return [local, core] if local.is_dir() and local.resolve() != core.resolve() else [core]
+
+
+def load_arm(name: str, configs: Path = CONFIGS, search: list[Path] | None = None) -> dict:
+    """``<dir>/<name>.yaml`` from the first of ``search`` holding it (default the core's
+    ``configs/arms/``), checked against the backbone registry."""
     from gfm4agri.benchmark.backbones import get_backbone
 
-    arm = _yaml(Path(configs) / "arms" / f"{name}.yaml")
+    dirs = search or [Path(configs) / "arms"]
+    path = next((d / f"{name}.yaml" for d in dirs if (d / f"{name}.yaml").exists()), None)
+    if path is None:
+        raise FileNotFoundError(f"arm {name!r} not found in {[str(d) for d in dirs]}")
+    arm = _yaml(path)
+    arm["_file"] = str(path)
     spec = get_backbone(arm["model"]["backbone"])
     want = "cache" if spec.representation == "s2_monthly" else "raster"
     if arm["route"] != want:
@@ -58,8 +75,11 @@ def load_arm(name: str, configs: Path = CONFIGS) -> dict:
 
 
 def load_experiment(path: Path) -> dict:
+    """An experiment spec. Its ``name`` names the results folder; without one it is the file's
+    stem, or the folder's name for an ``experiment.yaml`` in an experiment folder."""
     exp = _yaml(path)
-    exp.setdefault("name", Path(path).stem)
+    stem = Path(path).stem
+    exp.setdefault("name", Path(path).parent.name if stem == "experiment" else stem)
     if exp.get("checkpoint", "val_loss") != "val_loss":
         raise ValueError(f"checkpoint {exp['checkpoint']!r}: only 'val_loss' is implemented")
     return exp
@@ -67,6 +87,15 @@ def load_experiment(path: Path) -> dict:
 
 def load_machine(name: str, configs: Path = CONFIGS) -> dict:
     return _yaml(Path(configs) / "machines" / f"{name}.yaml")
+
+
+def encode_batch_size(arm: dict, machine: dict, machine_name: str) -> int:
+    """The arm's own ``encode_batch_size: {hub: .., cluster: ..}`` if it sets one, else the
+    machine profile's entry for its backbone, else 1."""
+    own = arm.get("encode_batch_size") or {}
+    if machine_name in own:
+        return int(own[machine_name])
+    return int(machine.get("encode_batch_size", {}).get(arm["model"]["backbone"], 1))
 
 
 def plan_cells(exp: dict, arms: list[str] | None = None) -> list[Cell]:

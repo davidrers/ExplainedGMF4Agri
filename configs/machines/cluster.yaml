@@ -2,4 +2,4 @@
 cache_root: data/embeddings    # persistent caches are looked up here; a job computes missing ones into its --scratch
 num_workers: 16
 encode_num_workers: 16
-encode_batch_size: {terramind_v1_large: 16, prithvi_eo_v2_600_tl: 8, thor_v1_large: 8, thor_v1_large_80m: 4}
+encode_batch_size: {terramind_v1_large: 16, prithvi_eo_v2_600_tl: 8, thor_v1_large: 8}

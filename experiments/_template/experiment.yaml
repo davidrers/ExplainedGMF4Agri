@@ -1,0 +1,8 @@
+# The experiment's spec: the arms it runs and the protocol. Arms are looked up in arms/ beside this file first,
+# then in configs/arms/. Without a name, the results folder is named after this experiment folder.
+arms: [tessera_v1]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0]
+epochs: 15
+checkpoint: val_loss
