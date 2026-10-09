@@ -33,26 +33,28 @@ EuroCropsML index ──┘                                 │
                                                       ├─→ chip set ──→ supervision ──→ fit
 Sentinel-2 L2A (Planetary Computer) ──→ monthly composites ──┤
 Sentinel-1 RTC (Planetary Computer) ──→ monthly composites ──┤
-TESSERA v1 (Source Cooperative Zarr) ──→ embedding rasters ──┘
+TESSERA v1 (Source Cooperative Zarr) ──→ embedding rasters ──┤
+AlphaEarth v1 (annual COG tiles) ──────→ embedding rasters ──┘
 ```
 
-Every stage writes to disk and is resumable, because the two network-bound stages, the
-Sentinel-2 composites and the TESSERA reads, dominate the wall clock and must never be
+Every stage writes to disk and is resumable, because the network-bound stages, the Sentinel-2
+composites and the TESSERA and AlphaEarth reads, dominate the wall clock and must never be
 repeated by accident.
 
 | Stage | Code | Output |
 |---|---|---|
-| 1. Vector labels | `scripts/data/fetch_eurocrops.py`, `scripts/data/fetch_eurocropsml.py` | `data/eurocrops/parquet/<CC>_<year>.parquet` |
+| 1. Vector labels | `scripts/hub/fetch_eurocrops.py`, `scripts/hub/fetch_eurocropsml.py` | `data/eurocrops/parquet/<CC>_<year>.parquet` |
 | 2. Chip grid and label rasters | `src/gfm4agri/data/chip_grid.py` | `<chip>.mask.tif`, `<chip>.parcels.tif` |
 | 3. Sentinel-2 composites | `src/gfm4agri/chips/s2_monthly.py` | `<chip>_merged.tif` |
-| 3b. Sentinel-1 composites | `src/gfm4agri/chips/s1_monthly.py`, `scripts/data/build_s1_chips.py` | `<chip>_s1rtc.tif`, `s1_rtc.json` |
-| 4. Chip export | `scripts/data/build_country_chips.py`, `scripts/data/build_pilot_chips.py` | `manifest.json` and the chip set |
-| 5. TESSERA embeddings | `src/gfm4agri/embeddings/tessera.py`, `scripts/data/build_tessera_chips.py` | `<chip>_tessera.tif`, `tessera_v1.json` |
-| 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/data/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
+| 3b. Sentinel-1 composites | `src/gfm4agri/chips/s1_monthly.py`, `scripts/hub/build_s1_chips.py` | `<chip>_s1rtc.tif`, `s1_rtc.json` |
+| 4. Chip export | `scripts/hub/build_country_chips.py`; a pilot cut from it by `scripts/hub/build_pilot_chipset.py` | `manifest.json` and the chip set |
+| 5. TESSERA embeddings | `src/gfm4agri/embeddings/tessera.py`, `scripts/hub/build_tessera_chips.py` | `<chip>_tessera.tif`, `tessera_v1.json` |
+| 5b. AlphaEarth embeddings | `src/gfm4agri/embeddings/alphaearth.py`, `scripts/hub/fetch_alphaearth_tiles.py`, `scripts/hub/build_alphaearth_chips.py` | tiles in `data/alphaearth/aef_v1_annual/<year>/`; `<chip>_alphaearth.tif`, `alphaearth_v1.json` |
+| 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/hub/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
 | 7. Supervision | `src/gfm4agri/benchmark/segmentation_data.py` | the training mask at a budget |
 | 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py` | a `SemanticSegmentationTask` |
-| 9. The fit | `scripts/seg/train.py` end to end, or `scripts/seg/encode.py` then `scripts/seg/fit_cached.py` in two stages | `results/seg/<run>/<budget>_seed<s>/results.json` end to end, `results/seg_cached/...` in two stages; the stage 1 cache in `data/embeddings/<backbone>/<chip set>/` |
-| 10. Inspection | `src/gfm4agri/benchmark/evaluation.py`, `notebooks/terratorch/eurocrops_ee_results.ipynb` | reloaded fits, test-chip predictions in `results/seg_cached/ee_predictions/` |
+| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms, `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` and `predictions_test.npz`, `summary.csv`; the feature cache in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
+| 10. Inspection | `src/gfm4agri/benchmark/evaluation.py`, `notebooks/pipeline/eurocrops_ee_results.ipynb` | reloaded fits, test-chip predictions in `results/seg_cached/ee_predictions/` |
 
 ---
 
@@ -201,7 +203,7 @@ from April; the threshold is what prevents that.
 Resampling is bilinear for the spectral bands and nearest for the scene classification, because
 interpolating a categorical layer would invent classes that were never observed.
 
-**What the screening misses.** `notebooks/06_monthly_composites_qa.ipynb` opens the stored
+**What the screening misses.** `notebooks/eda/06_monthly_composites_qa.ipynb` opens the stored
 composites of six parcels exactly as the datamodule reads them, beside their Sentinel-1 composites
 and, for two parcels, the individual acquisitions. Three faults show there, and none is corrected
 yet. Snow and cloud that the scene classification marks clear enter the median: the few pixels
@@ -239,7 +241,7 @@ Acquisitions are identified by item id and months are read from the stack's own 
 position, because `stackstac` reorders acquisitions and silently drops any that are empty over the
 window, and positional indexing is what reversed the Sentinel-2 season.
 
-`scripts/data/build_s1_chips.py` writes the rasters beside the Sentinel-2 chips, either for every cell
+`scripts/hub/build_s1_chips.py` writes the rasters beside the Sentinel-2 chips, either for every cell
 of a country or, with `--from-manifest`, for the chips of an existing set such as the pilot. Reports go
 to `s1_reports/<chip>.json` and the provenance and normalisation statistics to `s1_rtc.json`, kept apart
 from the Sentinel-2 manifest so that neither picks up the other's chips and the manifest hash stamped
@@ -259,10 +261,12 @@ capacity. So far only the pilot has been fitted with Sentinel-1 (section 11).
 
 Two scripts write chip sets with the same on-disk layout.
 
-`build_pilot_chips.py` selects a handful of well-labelled, widely separated cells and splits
-them into `training_chips/` and `validation_chips/`. It exists to wire up and debug the
-TerraTorch connection, and its manifest says so: *pipeline test set for the TerraTorch
-connection; not a Phase 1 split*.
+`build_pilot_chips.py`, now archived with the 12-chip pilot in
+`experiments/2026-09_pilot_12chips/`, selected a handful of well-labelled, widely separated cells
+and split them into `training_chips/` and `validation_chips/`. It existed to wire up and debug
+the TerraTorch connection, and its manifest says so: *pipeline test set for the TerraTorch
+connection; not a Phase 1 split*. Its successor is the pilot chip set at the end of this
+section.
 
 `build_country_chips.py` exports **every** cell holding an in-scheme parcel, which for Estonia
 2021 is 7,398 chips. Three differences follow from the scale.
@@ -299,7 +303,7 @@ so a result can always be tied to the exact chip set that produced it.
 
 ### The spatial split of a full-country chip set
 
-`scripts/data/build_chip_split.py`, with the logic in `src/gfm4agri/data/chip_split.py`, assigns
+`scripts/hub/build_chip_split.py`, with the logic in `src/gfm4agri/data/chip_split.py`, assigns
 the partition that the export deliberately leaves out. The unit of partition is the chip. A
 block is a square of `block_chips x block_chips` chips, which makes it a cell of the EPSG:3035
 tessellation of `blocks.py` with an edge of `block_chips x 2,240 m`, and every chip nests in
@@ -332,13 +336,30 @@ stale one:
 It also writes `chip_parcels.parquet` once per chip set, one row per `(chip, parcel, class)` with
 the parcel's labelled pixels in that chip. `draw_support` reads that table under a split, so a
 draw costs under a second instead of a pass over every parcel raster, and removes the withheld
-parcels before drawing. At 100 % the draw is therefore every trainable parcel, and `train.py`
-treats `dense` under a split as that draw, so a buffered parcel is never trained on.
+parcels before drawing. At 100 % the draw is therefore every trainable parcel, and
+`fit_end_to_end` treats `dense` under a split as that draw, so a buffered parcel is never
+trained on.
 
 Every consumer takes the split directory as `data.split` in the run configuration:
 `EuroCropsSegDataModule`, `draw_support`, the stage 1 encoder of `cached.py` and its stage 2
 datamodule. The result file records the split's name, hash, protocol and chip counts under
 `split_protocol`.
+
+### The pilot chip set
+
+A pilot is a smaller chip set, not a different procedure. `scripts/hub/build_pilot_chipset.py`,
+with the logic in `src/gfm4agri/data/chip_subset.py`, draws whole blocks of a country chip set
+with a fixed seed, by default three from the pool, one validation and one test block, among
+blocks that hold a trainable parcel (pool) or a labelled one (validation and test). It writes a
+chip set directory of its own beside the parent: `chips/` holds relative links into the
+parent's chips, the manifest, the per-source records and `chip_parcels.parquet` are links to the
+parent's, and the split keeps its name and holds the parent's lists restricted to the chosen
+chips, with `split.json` recording the parent and the blocks under `subset`. The normalisation
+statistics and the manifest hash are therefore the parent's, the pilot costs no disk space, and
+the K-shot workflow of section 9 cannot tell it from a country. `EE_2021_mini`, built with the
+defaults on 9 October 2026, holds blocks `582_450`, `586_447` and `591_463` (pool), `563_444`
+(validation) and `566_444` (test): 32 training, 16 validation and 9 test chips. A pilot is copied
+to the cluster after its parent, whose chips its links point to.
 
 ---
 
@@ -396,6 +417,37 @@ label budget therefore draws the same parcels whatever the model consumes. Prove
 per-dimension normalisation statistics go to `tessera_v1.json`; `manifest.json` is left
 untouched, because results already trained on the chips are stamped with its hash.
 
+### AlphaEarth embeddings
+
+AlphaEarth Foundations V1 summarises each 10 m pixel's calendar year of multi-source observation
+into one 64-dimensional unit vector. Google publishes the annual layers, the Earth Engine
+collection `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`, as Cloud Optimized GeoTIFFs of 8,192 x 8,192
+pixels and 64 int8 bands per UTM tile. `src/gfm4agri/embeddings/alphaearth.py` reads them, and the
+export shares `src/gfm4agri/embeddings/export.py` with TESSERA, so the two embeddings land on the
+chip grid in the same way.
+
+**Tiles are downloaded whole rather than read by window.** The files are band interleaved in
+1,024-pixel blocks, so one chip window costs a block per band, about 60 MB and one to three
+minutes per chip over HTTP. `scripts/hub/fetch_alphaearth_tiles.py` instead fetches every tile a
+chip set touches from the Source Cooperative mirror, which serves Google's requester-pays bucket
+file for file at no charge, and keeps a file only if its MD5 matches the one Google publishes.
+The Estonian chips need 22 tiles in zones 34 and 35, 42 GB in `data/alphaearth/aef_v1_annual/2021/`;
+after that a chip takes a few seconds.
+
+**Two properties of the files set how a chip is read.** The tiles are stored bottom-up, with the
+origin at the south-west corner, so a window is read in raw rows and flipped to north-up before
+the warp. The values are quantised, and `((q / 127.5) ** 2) * sign(q)` recovers the embedding as
+the dataset README specifies; the de-quantised vectors keep norms within about 1 % of one and are
+not renormalised. As for TESSERA, the window is warped from the tile's UTM grid onto the chip's
+EPSG:3035 grid by nearest neighbour, so every output pixel is a genuine AlphaEarth vector, and a
+chip near a zone edge is filled from the neighbouring zone.
+
+`scripts/hub/build_alphaearth_chips.py` wrote `<chip>_alphaearth.tif` for all 7,402 Estonian chips
+in 61 minutes on 7 October 2026, with the per-dimension statistics of the 4,898 training chips in
+`alphaearth_v1.json`. **No labelled pixel lacks an embedding**: the masked value `-128` occurs in
+none of the chips, so the zero filling that affects 0.66 % of TESSERA's test pixels does not
+arise for AlphaEarth.
+
 ---
 
 ## 8. Supervision and the label budget
@@ -444,7 +496,18 @@ by hand.
 consumes only its six pretrained HLS bands, so on Sentinel-2 `NIR_NARROW` is B8A. TerraMind is
 single-date, so a temporal wrapper runs it per month and concatenates the monthly features.
 Prithvi is natively multi-temporal, so the twelve months enter one ViT as twelve token planes
-with a 3D positional embedding. Encoders with date and location encodings additionally receive
+with a 3D positional embedding. THOR v1 large, like TerraMind, is single-date and runs per month
+through the same temporal wrapper. It tokenises its two Sentinel-2 groups apart, the four 10 m
+bands and the six 20 m bands (B01 and B09 at 60 m are left out, since 60 m pixels do not tile the
+2,240 m chip and THOR's authors drop the two atmospheric bands too), at patch sizes chosen at
+inference. The arm uses **160 m tokens**, 16 px on the 10 m bands and 8 px on the 20 m bands,
+which gives the 14 x 14 grid TerraMind has on the same chip; the user fixed this on 9 October
+2026 for parity with TerraMind, and the 80 m variant is an archived study
+(`experiments/2026-10-08_thor_80m/`). The two groups' token maps are concatenated on the channel
+axis, as THOR's authors do for dense tasks, and THOR's pretraining statistics, given in
+reflectance, are scaled to the chips' reflectance x 10,000. THOR is not part of TerraTorch: its
+backbones register through `thor_terratorch_ext`, which `scripts/env/install_thor.sh` installs
+outside the Poetry lock at fixed commits on both machines. Encoders with date and location encodings additionally receive
 `temporal_coords`, the year and zero-based day of year of the fifteenth of each month, and
 `location_coords`, the chip centre in latitude and longitude.
 
@@ -460,18 +523,21 @@ score difference is attributable to the encoder.
   `LearnedInterpolateToPyramidal` and a 12.9 M parameter `UNetDecoder`. The bottleneck is not
   cosmetic. TerraMind concatenates twelve monthly feature maps, so without it the large variant
   carries 815 M trainable parameters against Prithvi's 63 M, which is neither comparable nor
-  trainable on a 16 GB card. The projection also mixes the months of each token position, so it
+  trainable on a 16 GB card. THOR's two concatenated groups double that width to 24,576
+  channels per selected layer, so its bottleneck carries more weights than TerraMind's. The projection also mixes the months of each token position, so it
   is where the decoder first learns which dates matter.
 * `pixel_raster`: `PixelMLPDecoder`, a per-pixel MLP written as 1 x 1 convolutions, two hidden
   layers of 512 and 256. Every output pixel depends only on that pixel's embedding, so the
   score measures the embedding itself. This follows the head the TESSERA authors use for crop
-  classification.
+  classification. AlphaEarth uses the same head with the same hyperparameters, so the two
+  precomputed embeddings differ only in the embedding.
 
 The task is a TerraTorch `SemanticSegmentationTask` built through `EncoderDecoderFactory`, with
 `freeze_backbone=True`, AdamW, and cross-entropy that ignores the unlabelled pixels.
 
-`train.py` resolves the configuration, draws the support set, builds the datamodule and the
-task, fits, tests from the best validation-loss checkpoint, and writes `results.json` carrying
+`fit_end_to_end` (`src/gfm4agri/benchmark/fit.py`, formerly `scripts/seg/train.py`) resolves the
+configuration, draws the support set, builds the datamodule and the task, fits, tests from the
+best validation-loss checkpoint, and writes `results.json` carrying
 the configuration, the label budget and its realised per-class draw, the country, the split
 protocol, the parameter counts by component, the fit time, the peak GPU memory and every
 metric. Gradient accumulation keeps the effective batch identical across backbones when a
@@ -479,9 +545,9 @@ larger encoder forces a smaller micro-batch onto the card.
 
 ### The two-stage fit
 
-Because the encoder is frozen, its output for a given chip never changes, so `train.py`
+Because the encoder is frozen, its output for a given chip never changes, so an end-to-end fit
 re-encodes every chip at every epoch of every fit for nothing. `src/gfm4agri/benchmark/cached.py`
-implements TerraTorch's second workflow instead. **Stage 1**, `scripts/seg/encode.py`, runs the
+implements TerraTorch's second workflow instead. **Stage 1**, `generate_embeddings`, runs the
 encoder once per chip through `EmbeddingGenerationTask` and stores the features at the cache
 point, the output of `SelectIndices` and `ReshapeTokensToImage` just before the first trainable
 neck, as float16 NumPy arrays, one per chip and encoder layer. **Stage 2**, `fit_cached`, builds the
@@ -508,6 +574,59 @@ reader and about 140 MB/s from sixteen, so one stage 2 epoch over the TerraMind 
 set, 94 GB, takes on the order of ten minutes of reading. Neither cache fits the 335 GB of local
 disk.
 
+### The K-shot workflow
+
+`scripts/run_kshot.py`, with the logic in `src/gfm4agri/pipeline/`, is the single entry point of
+the fit. It takes an experiment and the path of a chip set, and runs every arm, budget, draw and
+seed of the experiment on that chip set, the same way on the JupyterHub and on the cluster:
+
+```
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021 [--dry-run]
+```
+
+**Three configuration files replace the per-run YAML.** `configs/arms/<arm>.yaml` describes what
+is trained and nothing about a country or a budget: the backbone, the route, the normalisation,
+the decoder and head settings, the optimiser, the loss, the precision and the training batch.
+`configs/experiments/<name>.yaml` lists the arms, the budgets, the draws, the seeds, the epochs
+and the checkpoint criterion. `configs/machines/{hub,cluster}.yaml` holds what only changes
+throughput: the encoding batch, the data loader workers and the cache root. `config.py` composes
+the three and the chip set into the configuration dictionary the fit functions already took, so
+`fit_cached`, `generate_embeddings`, `fit_end_to_end` and `FitPredictor` are unchanged; a test
+checks that every cell of the full-Estonia grid of 2 October composes to the configuration that
+grid ran with. The experiment `kshot` holds the five arms, TerraMind v1 large, Prithvi-EO-2.0
+600M TL, THOR v1 large on 160 m tokens, TESSERA v1 and AlphaEarth v1, at 100, 20 and 5 %, draw 0,
+seed 0 and 15 epochs.
+
+**Two routes.** The token-grid arms are always fitted from cached features with `fit_cached`;
+training them with the encoder inside the loop is no longer part of the workflow. The raster
+arms train end to end on their embedding rasters with `fit_end_to_end`.
+
+**A cache is looked up before it is computed.** For a token-grid arm the runner looks for
+`<cache root>/<backbone>/<chip set>/`. It reuses that cache as it is only when its `cache.json`
+matches the run on everything that changes the stored features (backbone, manifest SHA-256,
+split hash, normalisation, precision and the eight training variants) and every chip of the
+split is on disk; the existing TerraMind and Prithvi caches of `EE_2021` pass this check.
+Otherwise the cache is computed into the scratch root, which resumes any chips already there. A
+cache that exists but does not match is never written into: when the scratch root is the cache
+root, as on the hub, the run stops and names the fields that differ. Before this check the only
+test was the backbone's name.
+
+**What a run writes.** Before any compute the runner checks that the chip set holds the split and
+every raster the arms read. A cell is finished when its directory holds `results.json` and
+`predictions_test.npz`, the test-chip predictions in the format of the results notebook, and a
+finished cell is skipped, so a run resumes. `results.json` gains a `provenance` block with the
+experiment, the chip set, the split, the git commit, whether the tree was dirty, the machine and
+the host. `summary.csv` collects every finished cell of an experiment and chip set. Results land
+in `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/`, logs in
+`results/<experiment>/<chip set>/logs/`.
+
+**On the cluster** each arm runs as one Slurm job (`scripts/cluster/submit.sh`,
+`scripts/cluster/kshot.sbatch`). The cluster profile looks for caches under `data/embeddings/` in
+its clone; a missing cache is computed onto the node's local NVMe, used for that arm's whole sweep
+and deleted when the job ends. The test predictions are written inside the job for this reason,
+since two-stage prediction reads the cache. The workflow between the two machines is in
+[`docs/utwente_hpc.md`](../utwente_hpc.md).
+
 ---
 
 ## 10. Known gaps
@@ -515,10 +634,11 @@ disk.
 These are places where the implementation and [protocol.md](protocol.md) do not yet agree, or
 where the pilot is knowingly not the designed experiment.
 
-**The pilot is not a Phase 1 split.** Train and validation chips are separated by the minimum
-chip spacing only, with no block assignment, and there is no test partition, so test metrics
-are computed on the validation chips. Every `results.json` from the pilot records this in
-`split_protocol`. The full-country chip set carries the spatial block split of section 6.
+**The 12-chip pilot was not a Phase 1 split.** Its train and validation chips were separated by
+the minimum chip spacing only, with no block assignment, and it had no test partition, so its
+test metrics were computed on the validation chips; every `results.json` from it records this in
+`split_protocol`. The pilot chip set of section 6 replaces it and carries the parent's block
+split, test partition included.
 
 **Support sets are not nested across budgets.** Protocol decision D8 requires the support set at
 one budget to be contained in the support set at any larger one, so that moving along the curve
@@ -543,8 +663,8 @@ non-cropland and then crop type inside the mask. Only the crop-type stage exists
 chips carry `ignore_index` outside the declared parcels rather than a cropland mask from ESA
 WorldCover.
 
-**Checkpoint selection consults validation labels at every budget.** `train.py` and `fit_cached`
-test the checkpoint of lowest validation loss. [protocol.md](protocol.md) allows the validation
+**Checkpoint selection consults validation labels at every budget.** `fit_end_to_end` and
+`fit_cached` test the checkpoint of lowest validation loss. [protocol.md](protocol.md) allows the validation
 partition only for early stopping within the full-budget fits and never at a finite budget, so
 the 20 % and 5 % fits of section 11 depart from it. The criterion also moves the scores: on the
 full Estonian grid the token-grid models reach their lowest validation loss at epoch 6 to 9 while
@@ -558,13 +678,21 @@ datamodule replaces the missing vector with 0 when the chip is loaded, before no
 those pixels are still scored, so TESSERA is tested on pixels it has no input for. The comment beside that replacement in `segmentation_data.py`
 says the share is zero over Estonian farmland, which predates the coverage check.
 
+**Feature caches on the cluster are job-scoped.** The cluster home holds 1 TB, which the Estonian
+chip set (284 GB) and one token-grid cache (744 GB to 1.3 TB) do not fit together, and no project
+directory has been granted. Each cluster job therefore encodes its arm's chip set again unless a
+persistent cache is placed under `data/embeddings/` in the clone. A project directory linked there
+would remove the repetition without a change to the code.
+
 ---
 
 ## 11. Runs
 
 Every run so far is Estonia 2021, with one draw (`draw_seed` 0) and one training seed per cell
 unless stated. Each fit directory holds the resolved configuration, the checkpoint, the Lightning
-logs and `results.json`.
+logs and `results.json`. The runs up to 8 October were made before the K-shot workflow, with the
+scripts of the snapshot commit `a81bd9e`, and stay in `results/seg/` and `results/seg_cached/`;
+runs of the workflow are in `results/<experiment>/<chip set>/`.
 
 ### Pilot, 12 chips
 
@@ -580,15 +708,30 @@ validation chips, so these runs wire and debug the chain and are not results.
 * Adding Sentinel-1 moved TerraMind's pilot Macro-F1 by at most 0.05 in either direction, within
   what repeated fits move on the pilot, so no conclusion is drawn from it.
 
+### The K-shot workflow pilot, `EE_2021_mini`
+
+`EE_2021_mini` (section 6), 9 October 2026, the experiment `kshot` on the JupyterHub: the five arms at 100, 20 and
+5 %, draw 0, seed 0, 15 epochs, 15 cells in `results/kshot/EE_2021_mini/`. The three token-grid caches were computed
+on the fly, 5.1 GB for TerraMind, 8.3 GB for Prithvi and 11 GB for THOR, and the whole run took 68 minutes on the
+A4000. With 32 training and 9 test chips this checks the workflow, not the models. Test Macro-F1:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large | 0.132 | 0.150 | 0.083 |
+| Prithvi-EO-2.0 600M TL | 0.101 | 0.077 | 0.088 |
+| THOR v1 large, 160 m | 0.129 | 0.071 | 0.096 |
+| TESSERA v1 + MLP | 0.164 | 0.155 | 0.147 |
+| AlphaEarth v1 + MLP | 0.161 | 0.126 | 0.132 |
+
 ### Full Estonia
 
 `EE_2021`, manifest `4fb7b380`, split `blocks4_buf1600_seed0__6b0eb4cb`, 1 to 2 October 2026, run
-by `scripts/seg/run_ee_grid.sh` with 15 epochs and the checkpoint of lowest validation loss. Every
-model is scored on the same 1,475 test chips. TerraMind v1 large and Prithvi-EO-2.0 600M TL train
-in two stages from the caches of section 9; TESSERA trains end to end on its embedding rasters.
-The summary is `results/seg_cached/ee_grid_summary.csv`, and
-`notebooks/terratorch/eurocrops_ee_results.ipynb` holds the curves, the validation histories,
-the per-class scores and maps of segmented test chips.
+by `scripts/seg/run_ee_grid.sh` (snapshot commit `a81bd9e`) with 15 epochs and the checkpoint of
+lowest validation loss. Every model is scored on the same 1,475 test chips. TerraMind v1 large and
+Prithvi-EO-2.0 600M TL train in two stages from the caches of section 9; TESSERA trains end to end
+on its embedding rasters. The summary is `results/seg_cached/ee_grid_summary.csv`, and
+`notebooks/pipeline/eurocrops_ee_results.ipynb` holds the curves, the validation histories, the
+per-class scores and maps of segmented test chips.
 
 | Model | K, % | Training chips | Parcels drawn | Test Macro-F1 | Test mIoU | Fit, h |
 |---|---|---|---|---|---|---|
@@ -616,3 +759,6 @@ The fit hours of the two-stage models exclude stage 1, which took 11.5 h for Ter
 * The 100 % fits' test-chip predictions are stored in `results/seg_cached/ee_predictions/`.
 * None of this answers RQ1 yet. No baseline has run, every cell is a single draw and seed, and
   the checkpoint criterion of section 10 is unsettled.
+* THOR v1 large and AlphaEarth v1 were implemented after this grid, on 7 and 8 October, and have
+  not run on full Estonia yet; THOR ran only on the 12-chip pilot. Both are arms of the K-shot
+  experiment, so its full-Estonia run adds their cells to this table.

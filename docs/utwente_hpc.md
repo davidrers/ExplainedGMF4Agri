@@ -249,13 +249,50 @@ Relevant for this project:
 - **Installing:** into your home (a virtual environment, or `pip install --user`). Software that needs root goes
   through the cluster admins.
 
-## 9. Open points for using it in the thesis
+## 9. Running this project's workflow
 
-1. **Storage:** request a project directory under `/projects/itc` (or membership of `itc-tech-members`), since the
-   data does not fit in the 1 TB home.
-2. **Environment:** build the `gfm4agri` Poetry environment on the cluster with a Python 3.11 interpreter from
-   conda.
-3. **Data:** either copy the chips and caches from the JupyterHub (hours of network time) or copy only the chips and
-   rebuild the caches on the faster GPUs.
-4. **Scripts:** the `scripts/seg/run_*.sh` grids run cells one after another on one GPU. On the cluster each cell can
-   be its own job, up to 8 at a time.
+The JupyterHub develops the code, extracts the chips and analyses the results. The cluster runs the K-shot workflow
+(`scripts/run_kshot.py`): feature encoding and decoder fitting. **Code is never edited on the cluster.** Every change
+goes JupyterHub, git, cluster, so the two machines cannot drift apart. The repository is public, so the cluster
+clones and pulls over HTTPS without a key; a read-only deploy key, `~/.ssh/id_ed25519_github`, is ready on the
+cluster for the day the repository is made private.
+
+The clone mirrors the JupyterHub's layout, so every path in a configuration or a result file reads the same on both:
+
+```
+~/ExplainedGMF4Agri/                    clone of github.com/davidrers/ExplainedGMF4Agri
+  data/eurocrops_chips/EE_2021/         copied from the JupyterHub, 284 GB
+  data/eurocrops_chips/EE_2021_mini/    the pilot chip set, links into EE_2021
+  data/eurocrops/{parquet,vector}/      copied from the JupyterHub, about 3.6 GB
+  results/                              written by the jobs
+```
+
+**One-time set-up**, on the login node, from the clone: `bash -l scripts/cluster/setup_env.sh`. It creates a
+Python 3.11 environment with the `miniconda3/25.7` module (from conda-forge), installs Poetry 2.2.1, runs
+`poetry install` from the same lock as the JupyterHub, installs THOR with `scripts/env/install_thor.sh`, downloads
+the encoder weights on the login node, where the internet is direct, and ends with `pytest`.
+
+**The loop:**
+
+| Step | Where | Command |
+|---|---|---|
+| 1. Change code, run `pytest`, commit, push | JupyterHub | git |
+| 2. A new chip set: build it, then copy it | JupyterHub | `bash scripts/cluster/push_data.sh eurocrops_chips/<set> ...` (rsync, resumable, checks the free space first, leaves logs and pid files behind) |
+| 3. Update | Cluster | `git pull`, and `poetry install` if the lock changed |
+| 4. Run | Cluster | `bash scripts/cluster/submit.sh kshot <set> [arms]`, one job per arm; `DRY_RUN=1` prints the `sbatch` commands; `TIME`, `CPUS` and `MEM` override the defaults of 2 days, 32 CPUs and 120 GB |
+| 5. Bring the results back | JupyterHub | `bash scripts/cluster/pull_results.sh kshot [<set>]`; `DEST=` puts them elsewhere than `results/` |
+
+Steps 3 to 5 can be driven from the JupyterHub with `ssh utwente-hpc '<command>'`. `squeue -u $USER` shows the jobs;
+their logs are in `results/<experiment>/<set>/logs/<arm>_<job id>.log`.
+
+**One job** (`scripts/cluster/kshot.sbatch`) runs one arm on `itc-gpu` with one GPU. It sets the UT proxy, creates
+`/local/$SLURM_JOB_ID` on the node's NVMe, and runs the workflow with that directory as scratch. A feature cache
+found under `data/embeddings/` in the clone is used as it is; a missing one is computed into `/local`, serves the
+arm's whole sweep and is deleted when the job ends, fails or is cancelled. Each cell writes its `results.json` and its
+test predictions to the home results directory as it finishes, so a resubmitted job skips the finished cells.
+
+## 10. Open points
+
+1. **Storage:** request a project directory under `/projects/itc` (or membership of `itc-tech-members`). The chips
+   and one token-grid cache do not fit together in the 1 TB home, so every job encodes its arm again; a project
+   directory linked to `data/embeddings/` in the clone would keep the caches between jobs.

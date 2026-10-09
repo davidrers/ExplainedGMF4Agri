@@ -30,7 +30,7 @@ When an agreed update is made, `pipeline.md` is where it goes:
 - a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
 - a finished run or grid: section 11, Runs, and the Current state below.
 
-## Current state, 7 October 2026
+## Current state, 9 October 2026
 
 The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
 EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
@@ -39,19 +39,23 @@ per-class percentage label budget applied at load time, a frozen encoder with a 
 
 | Item | Value |
 |---|---|
-| Chip set | `data/eurocrops_chips/EE_2021/`: 7,402 chips of 224 x 224 at 10 m, 20 classes. Per chip: `_merged.tif` (S2, 144 bands), `_s1rtc.tif` (S1 RTC, 24 bands), `_tessera.tif` (128-d), `.mask.tif`, `.parcels.tif` |
+| Chip set | `data/eurocrops_chips/EE_2021/`: 7,402 chips of 224 x 224 at 10 m, 20 classes. Per chip: `_merged.tif` (S2, 144 bands), `_s1rtc.tif` (S1 RTC, 24 bands), `_tessera.tif` (128-d), `_alphaearth.tif` (64-d), `.mask.tif`, `.parcels.tif` |
 | Split | `splits/blocks4_buf1600_seed0__6b0eb4cb`: blocks of 4 x 4 chips, 1,600 m parcel buffer; 4,898 train, 769 validation, 1,475 test chips |
-| Feature caches | `data/embeddings/<backbone>/EE_2021/`: TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB) |
-| Pilot | `data/eurocrops_chips/EE_2021_pilot/`: 12 chips, no test partition, for wiring and debugging only |
+| Feature caches | `data/embeddings/<backbone>/EE_2021/`: TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB); THOR's is not built. Caches of `EE_2021_mini` for the three token-grid arms (about 25 GB) |
+| Pilot | `data/eurocrops_chips/EE_2021_mini/`: whole blocks of `EE_2021` as links, 32 training, 16 validation, 9 test chips, same split; `subset.json` records the blocks. The old 12-chip `EE_2021_pilot/` is archived with `experiments/2026-09_pilot_12chips/` |
+| Cluster | The UT HPC clone holds `EE_2021`, `EE_2021_mini` and `data/eurocrops/{parquet,vector}` (copied 9 October 2026), no caches |
 
-Arms implemented: **Prithvi-EO-2.0 600M TL** and **TerraMind v1 large** (token grid; `ChannelBottleneck` plus a
-12.9 M parameter UNet decoder; two-stage fit from cached features) and **TESSERA v1** (10 m pixel raster; per-pixel
-MLP; end to end). The small variants and TerraMind on S2 plus S1 have run on the pilot only.
+Arms implemented, one file each in `configs/arms/`: **TerraMind v1 large**, **Prithvi-EO-2.0 600M TL** and
+**THOR v1 large** on 160 m tokens (token grid; `ChannelBottleneck` plus a 12.9 M parameter UNet decoder; fitted from
+cached features), **TESSERA v1** and **AlphaEarth v1** (10 m pixel raster; per-pixel MLP; end to end on the
+embedding rasters). All five ran through the K-shot workflow on `EE_2021_mini` on 9 October 2026; THOR and AlphaEarth
+have not yet run on full Estonia. The small variants, TerraMind on S2 plus S1 and THOR on 80 m tokens are archived
+studies in `experiments/`.
 
 Full-Estonia grid, finished 2 October 2026. Test Macro-F1 over the 1,475 test chips, one draw and one seed per
 cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md section 11,
 [`results/seg_cached/ee_grid_summary.csv`](results/seg_cached/ee_grid_summary.csv) and
-[`notebooks/terratorch/eurocrops_ee_results.ipynb`](notebooks/terratorch/eurocrops_ee_results.ipynb).
+[`notebooks/pipeline/eurocrops_ee_results.ipynb`](notebooks/pipeline/eurocrops_ee_results.ipynb).
 
 | K, % of parcels per class | TESSERA + MLP | TerraMind v1 large | Prithvi-EO-2.0 600M TL |
 |---|---|---|---|
@@ -62,17 +66,18 @@ cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md se
 This does not answer RQ1 yet: TESSERA sits in another resolution group, no cell has an interval, and no
 baseline has run.
 
-**Not built:** the baseline arm; THOR and AlphaEarth; repeated, nested draws with bootstrap intervals; the stage 1
-cropland mask; Latvia and Portugal; Phases 2 and 3.
+**Not built:** the baseline arm; repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
+and Portugal; Phases 2 and 3.
 
 **Decided on 2 October 2026, not yet in `protocol.md` or the code.** These live only in
-[`figures/phase1_experimental_setup_prompt.md`](figures/phase1_experimental_setup_prompt.md) and session memory,
-so confirm them with the user and write them into the protocol before building on them:
-THOR joins the arms, handled like TerraMind; the baseline becomes a plain U-Net trained from scratch on the same
-monthly Sentinel-2 chips, replacing the per-pixel TIMESAT and monthly-stack baselines in the K sweep, with the role
-of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %; nested repeated draws, with models compared on
-the same draws; equal tuning trials and training steps for every model and K; no validation labels at low K;
-cross-country transfer only within one GAEZ v5 agro-ecological zone. AlphaEarth is not confirmed for this set-up.
+[`figures/phase1_experimental_setup_prompt.md`](figures/phase1_experimental_setup_prompt.md) and session memory, so
+confirm them with the user and write them into the protocol before building on them: THOR joins the arms, handled
+like TerraMind (now implemented, on 160 m tokens as confirmed on 9 October); the baseline becomes a plain U-Net
+trained from scratch on the same monthly Sentinel-2 chips, replacing the per-pixel TIMESAT and monthly-stack
+baselines in the K sweep, with the role of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %; nested
+repeated draws, with models compared on the same draws; equal tuning trials and training steps for every model and
+K; no validation labels at low K; cross-country transfer only within one GAEZ v5 agro-ecological zone. AlphaEarth
+was confirmed on 7 October and is implemented, handled like TESSERA.
 
 **Open choices that move the numbers:** the checkpoint criterion (validation loss picks epoch 6 to 9 for the
 token-grid models while validation Macro-F1 peaks at 13), the treatment of the 0.66 % of test pixels without a
@@ -80,21 +85,38 @@ TESSERA embedding (currently zeros), and the block size.
 
 ## Running the pipeline
 
-From the repository root on the JupyterHub machine. Every stage resumes from what is already on disk.
+From the repository root. Every stage resumes from what is already on disk.
+
+**Chip extraction, on the JupyterHub only** (`scripts/hub/`):
 
 ```bash
-poetry run python scripts/data/build_country_chips.py --country EE --year 2021 --workers 12   # S2 chips, masks, manifest
-poetry run python scripts/data/build_s1_chips.py --country EE --year 2021 --workers 12        # S1 RTC beside them
-poetry run python scripts/data/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
-poetry run python scripts/data/build_chip_split.py --root data/eurocrops_chips/EE_2021       # block split, chip_parcels.parquet
-poetry run python scripts/seg/encode.py -c configs/seg/terramind_v1_large_ee.yaml            # stage 1: feature cache
-poetry run python scripts/seg/fit_cached.py -c configs/seg/terramind_v1_large_ee.yaml --pct 5  # stage 2: decoder
-poetry run python scripts/seg/train.py -c configs/seg/tessera_v1_mlp_ee.yaml --set label_budget.mode=pct label_budget.pct=5
-EPOCHS=15 setsid nohup bash scripts/seg/run_ee_grid.sh > results/seg_cached/ee_grid.log 2>&1 &   # the full grid
+poetry run python scripts/hub/build_country_chips.py --country EE --year 2021 --workers 12   # S2 chips, masks, manifest
+poetry run python scripts/hub/build_s1_chips.py --country EE --year 2021 --workers 12        # S1 RTC beside them
+poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
+poetry run python scripts/hub/build_chip_split.py --root data/eurocrops_chips/EE_2021       # block split, chip_parcels.parquet
+poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --workers 4
+poetry run python scripts/hub/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021 --workers 16 \
+    --split-dir data/eurocrops_chips/EE_2021/splits/blocks4_buf1600_seed0__6b0eb4cb    # statistics on the training chips
+poetry run python scripts/hub/build_pilot_chipset.py --parent data/eurocrops_chips/EE_2021 --name EE_2021_mini
 ```
 
-Configs live in `configs/seg/`, one per run: `*_ee` for full Estonia, `*_ee_pilot` for the pilot. End-to-end fits
-write to `results/seg/<run>/P<pct>_draw<d>_seed<s>/`, two-stage fits to `results/seg_cached/...`.
+**The K-shot workflow, on either machine** (`scripts/run_kshot.py`): every arm, budget, draw and seed of an
+experiment on one chip set. A pilot and a country differ only in `--chips`.
+
+```bash
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021 --dry-run
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021_mini
+```
+
+Configs: `configs/arms/<arm>.yaml` (what is trained), `configs/experiments/<name>.yaml` (arms, budgets, draws, seeds,
+epochs), `configs/machines/{hub,cluster}.yaml` (throughput only). A token-grid arm reuses its cache in
+`data/embeddings/<backbone>/<chip set>/` when `cache.json` matches the run, and computes it otherwise. Results go to
+`results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/` (`results.json`, `predictions_test.npz`) and
+`summary.csv`; runs before 9 October stay in `results/seg/` and `results/seg_cached/`.
+
+**On the cluster** the loop is: push data from the hub (`scripts/cluster/push_data.sh`), `git pull` there,
+`bash scripts/cluster/submit.sh kshot <chip set>` (one Slurm job per arm), and `scripts/cluster/pull_results.sh kshot`
+back on the hub. Details in [docs/utwente_hpc.md](docs/utwente_hpc.md), section 9.
 
 The chip set took days of network time and the caches are terabytes. Never delete, overwrite or re-export them
 without asking. An export skips chips already on disk, so a faulty set must be removed before a corrected export
@@ -102,7 +124,7 @@ runs into the same directory.
 
 ## Working environments
 
-Two machines carry the repository. Establish which one you are on before running anything.
+Three machines carry the repository. Establish which one you are on before running anything.
 
 **Windows laptop.** Repository inside OneDrive, RTX PRO 1000 Blackwell (compute capability 12.0), PowerShell and
 bash. Set-up in [README.md](README.md).
@@ -142,30 +164,47 @@ Run everything through `poetry run`, and run `poetry install` again after a pull
   `poetry run python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"`.
 - **Imports are slow on NFS.** The first `import terratorch` after an install took almost 9 minutes; warm imports
   take about 30 s. That is not a hung process.
-- **Long jobs** run detached, `setsid nohup ... > log 2>&1 &`, as the `scripts/seg/run_*.sh` headers show.
+- **Long jobs** run detached, `setsid nohup ... > log 2>&1 &`, as the docstring of `scripts/run_kshot.py` shows.
 
 Rebuilding the environment: `export PATH="$HOME/.local/bin:$PATH"`, `poetry env use ~/.pyenv/versions/3.11.15/bin/python`,
 `poetry install`, recreate `sitecustomize.py`, then
 `poetry run python -m ipykernel install --user --name gfm4agri --display-name "Python 3.11 (gfm4agri)"` and `poetry run pytest`.
+
+**UT HPC cluster, Linux, Slurm.** Reached with `ssh utwente-hpc` from the JupyterHub. Runs the K-shot workflow only;
+**code is never edited there**, every change goes hub, git, cluster.
+
+| Item | Value |
+|---|---|
+| Repository | `~/ExplainedGMF4Agri`, cloned over HTTPS (the repository is public) |
+| Environment | `bash -l scripts/cluster/setup_env.sh`: Python 3.11 from conda-forge via `miniconda3/25.7`, Poetry 2.2.1, the same lock, THOR, weights prefetched |
+| GPU | `itc-gpu`: RTX PRO 6000 Blackwell, 96 GB, one per job, account `itc-tech` |
+| Storage | 1 TB home; feature caches are job-scoped on the node's `/local` NVMe until a project directory exists |
 
 ## Repository layout
 
 ```
 docs/thesis_design.md      research design, the former CLAUDE.md
 docs/phase1/               protocol, pipeline, plain-language overview, proposal deltas
+docs/utwente_hpc.md        the cluster, and the hub, git and cluster workflow
+docs/superpowers/          design specs and implementation plans
 docs/proposal/, docs/research/, docs/internship/   proposal, research notes, the separate Terramind internship
-src/gfm4agri/data/         EuroCrops loading, class scheme, chip grid and label rasters, spatial blocks, chip split
+src/gfm4agri/data/         EuroCrops loading, class scheme, chip grid and label rasters, spatial blocks, chip split, pilot subset
 src/gfm4agri/chips/        Sentinel-2 and Sentinel-1 monthly compositing
-src/gfm4agri/embeddings/   TESSERA Zarr reader
-src/gfm4agri/benchmark/    backbone registry, necks, decoders, datamodule and budget draw, two-stage fit, reload and predict
+src/gfm4agri/embeddings/   TESSERA Zarr reader, AlphaEarth tile reader, shared raster export
+src/gfm4agri/benchmark/    backbone registry, necks, decoders, datamodule and budget draw, end-to-end and two-stage fits, reload and predict
+src/gfm4agri/pipeline/     the K-shot workflow: config composition, cache lookup, runner
 src/gfm4agri/{baselines,xai,uncertainty,reporting}/   empty placeholders for later work
-scripts/data/              vector fetch; chip, S1, TESSERA and split builders
-scripts/seg/               train.py, encode.py, fit_cached.py and the run_*.sh grids
-configs/                   class scheme; configs/seg/ one YAML per run
-notebooks/                 EDA notebooks 01 to 06; terratorch/ per-model pilot notebooks and the full-Estonia results
+scripts/hub/               JupyterHub only: vector fetch; chip, S1, TESSERA, AlphaEarth, split and pilot builders
+scripts/run_kshot.py       the one entry point of the fit, on either machine
+scripts/cluster/           cluster environment, sbatch job, submit, data push, results pull
+scripts/env/               THOR installer (outside the Poetry lock)
+configs/                   class schemes; arms/, experiments/, machines/
+experiments/               archived studies, one dated folder each with a README; deletable once pipeline.md records the outcome
+notebooks/eda/             EDA notebooks 01 to 07, their builders, analysis/ (code whose outputs go to results/eda)
+notebooks/pipeline/        cache anatomy and full-Estonia results notebooks, with builders
 data/, results/            git-ignored, apart from results/eda
 figures/                   figure scripts and diagram prompts
-tests/                     pytest suite
+tests/                     pytest suite; tests/fixtures/legacy_configs/ holds the configs of the 2 October grid
 ```
 
 Notebooks with a `_build_*.py` beside them are generated: edit the builder and regenerate, as its docstring shows.

@@ -16,12 +16,16 @@ in [CLAUDE.md](CLAUDE.md).
 | `docs/proposal/` | The proposal, authoritative for the research design |
 | `docs/research/` | Research notes and deep-research documents from the proposal phase |
 | `docs/internship/` | The separate Terramind internship proposal, September to December 2026 |
-| `src/gfm4agri/` | The pipeline package |
-| `configs/` | Experiment configuration |
-| `notebooks/` | Exploratory notebooks |
-| `scripts/legacy/` | Precursor AlphaEarth and TESSERA scripts carried over from the ML-Embeddings project |
+| `docs/utwente_hpc.md` | The UT HPC cluster and the JupyterHub, git and cluster workflow |
+| `src/gfm4agri/` | The pipeline package; `pipeline/` holds the K-shot workflow |
+| `configs/` | Class schemes; `arms/`, `experiments/` and `machines/` for the K-shot workflow |
+| `scripts/hub/` | Chip extraction, run on the JupyterHub |
+| `scripts/run_kshot.py` | The K-shot workflow: every arm, budget, draw and seed of an experiment on one chip set |
+| `scripts/cluster/` | Cluster environment, Slurm job, submission, data push and results pull |
+| `experiments/` | Archived studies, one dated folder each with a README |
+| `notebooks/` | `eda/` exploratory notebooks and their analysis code; `pipeline/` notebooks on the fitted models |
 | `data/` | Datasets, not tracked in git. See [data/README.md](data/README.md) |
-| `results/eda/` | EuroCropsML exploratory analysis carried over from the proposal phase |
+| `results/eda/` | Outputs of the exploratory analysis; every other result is git-ignored |
 | `figures/` | Scripts producing thesis and presentation figures |
 
 ## Environment
@@ -39,12 +43,6 @@ poetry install
 
 This installs the project package `gfm4agri` in editable mode, so `import gfm4agri` works from
 anywhere without manipulating `sys.path`.
-
-To also run the upstream TerraTorch tutorials in `notebooks/terratorch/`:
-
-```powershell
-poetry install --with tutorials
-```
 
 ### GPU and CPU builds
 
