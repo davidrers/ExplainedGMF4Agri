@@ -47,8 +47,32 @@ first fit: a DataLoader worker could not allocate shared memory. A 40 m sample i
 workers each prefetching two batches of 2 held about 79 GB, beyond the job's 120 GB. The job's exit trap
 removed the cache from the node's local disk. `run.py` now caps the cluster's fit workers at 4, which hold what
 80 m's sixteen did, and 40 m was submitted again. The worker count changes throughput and which worker draws a
-sample's D4 variant, nothing else.
+sample's D4 variant, nothing else. Commit `0bedeeb`: 40 m (job 618057) finished in 8 h 28 min.
 
 **Results.** `results/2026-10-09_thor_token_size/EE_2021_sample/`.
 
-**Outcome.** Filled in when the results are in.
+**Outcome, 10 October 2026.** Smaller tokens are better at every budget, and 40 m is the best of the three even
+though it lies below THOR's pretraining range. Test Macro-F1 on the 207 test chips, mean of seeds 0 to 2 with
+their range:
+
+| K | 160 m | 80 m | 40 m |
+|---|---|---|---|
+| 100 % | 0.365 (0.355 to 0.380) | 0.376 (0.361 to 0.384) | **0.411** (0.383 to 0.451) |
+| 20 % | 0.210 (0.205 to 0.217) | 0.249 (0.223 to 0.264) | **0.262** (0.253 to 0.276) |
+| 5 % | 0.170 (0.152 to 0.181) | 0.175 (0.146 to 0.193) | **0.221** (0.212 to 0.231) |
+
+Test mIoU follows the same order: 0.266, 0.281 and 0.310 at K = 100 %; 0.114, 0.123 and 0.156 at K = 5 %. 40 m
+beats 160 m by about 0.05 Macro-F1 at every budget, and the seed ranges do not overlap. Against 80 m it is
+clearly ahead at 5 % and overlaps at 20 % and 100 %. 80 m is clearly ahead of 160 m only at 20 %.
+
+Limits: one draw, 18 test blocks, and the three seeds measure only the spread of the decoder fit. 40 m ran
+with four fit workers against sixteen for the others, so its D4 variant draws come from another stream. The design
+cannot say whether the gain at 40 m comes from the 10 m bands at 4 px, which pretraining covered, or survives
+the 20 m bands at 2 px, which it did not; 40 m on the 10 m bands with 80 m on the 20 m bands would separate them.
+
+Cost on the cluster (encoding, cache, fit of one cell at K = 100 %): 160 m 5 min, 139 GB, 3 min; 80 m 22 min,
+555 GB, 9 min; 40 m 2 h 20 min, 2.22 TB, 46 min. On full Estonia (41,428 chip encodings) the 40 m cache would be
+about 25.5 TB and its encoding about 27 h, far beyond a node's 6.4 TB of local disk.
+
+Notebook: `results/2026-10-09_thor_token_size/EE_2021_sample/kshot_results.ipynb`, a copy of
+`notebooks/pipeline/kshot_results.ipynb` that registers the 40 m backbone and gives it a line style.
