@@ -18,5 +18,10 @@ itself.)
 
 **Results.** `results/<name>/<set>/`, where `<name>` is `experiment.yaml`'s `name` (default: this folder's name).
 
-**Outcome.** Filled in when the results are in. Once `docs/phase1/pipeline.md` records it, this folder and its
-results may be deleted; adding what it proved to the main workflow is a separate decision of the user.
+**Report.** Once the results are in, `poetry run python experiments/<folder>/report.py --chips <set>` writes the
+figures and tables into `figures/`, and `REPORT.md` is written from them: answer, setup, results with the
+figures, analysis, caveats, next steps. The experiment is finished only with its report.
+
+**Outcome.** A few lines once the report is written: the answer and a link to `REPORT.md`. Once
+`docs/phase1/pipeline.md` records it, this folder and its results may be deleted; adding what it proved to the
+main workflow is a separate decision of the user.

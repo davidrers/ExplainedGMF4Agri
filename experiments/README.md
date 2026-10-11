@@ -11,10 +11,16 @@ Whatever an experiment needs beyond it lives in its folder:
 | `experiment.yaml` | the spec the runner reads: arms, budgets, draws, seeds, epochs, and optionally `name` |
 | `arms/<arm>.yaml` | arms of this experiment; found before `configs/arms/`, so a copy here varies a core arm |
 | `run.py` and module copies | only when code must change: the runner with this folder's copies swapped in |
+| `report.py` | figures and tables of the results into `figures/`; set its `ARMS` and `PAIRS` |
+| `REPORT.md` and `figures/` | **required once the results are in**: the answer, the setup, the figures, the results, the analysis, the caveats and the next steps |
 
 `scripts/run_kshot.py -e experiments/<folder>/experiment.yaml` runs it on the hub, and
 `scripts/cluster/submit.sh experiments/<folder>/experiment.yaml <set>` on the cluster (using `run.py` when the
 folder has one). Results go to `results/<name>/<set>/`.
+
+**Every experiment ends with its report.** Once the results are in, `report.py --chips <set>` writes the figures
+and tables, and `REPORT.md` is written from them, following the template's sections; the README's outcome
+summarises it in a few lines and links to it. An experiment without a report is not finished.
 
 **Adding to the main workflow** is a separate decision of the user: what an experiment proved is then moved from
 its folder into the core, with tests and documentation.

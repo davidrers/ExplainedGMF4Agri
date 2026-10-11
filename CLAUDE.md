@@ -124,9 +124,10 @@ The user gives one of two instructions, and they are kept apart:
   `configs/{arms,experiments,machines}`, `scripts/` and `tests/` stay as they are. Everything X needs lives in
   `experiments/<YYYY-MM-DD>_<name>/`, started by copying `experiments/_template/`: a `README.md`, an
   `experiment.yaml` (arms, budgets, draws, seeds, epochs, optional `name`), arm files in `arms/` (found before
-  `configs/arms/`, so a copy there varies a core arm), and, only if code must change, a `run.py` with copies of
-  the changed modules swapped in (see the template). The whole run below, commits and pushes to `main`
-  included, is authorised without asking at each step (user, 9 October 2026).
+  `configs/arms/`, so a copy there varies a core arm), a `report.py` for the figures, and, only if code must
+  change, a `run.py` with copies of the changed modules swapped in (see the template). **Every experiment ends
+  with a `REPORT.md`**: clear figures, the results and their analysis (user, 11 October 2026). The whole run
+  below, commits and pushes to `main` included, is authorised without asking at each step (user, 9 October 2026).
 * **"Add X to the main workflow."** Only on that instruction: move what the experiment proved from its folder into
   the core, with tests and documentation, and describe the change before making it.
 
@@ -160,10 +161,15 @@ if it cannot be done that way, ask.
    (by default its folder's name). Results already on the hub under the same `<name>/<set>` are kept apart with
    `DEST=results/_cluster`. Every `results.json` records the spec, the entry script, the arm files, the machine
    and the commit.
-8. **Look.** `notebooks/pipeline/kshot_results.ipynb` with `EXPERIMENT = "<name>"`, `CHIPS = "<set>"`, run with
-   the `gfm4agri` kernel (`poetry run jupyter nbconvert --execute --inplace` works headless).
-9. **Report and record.** Give the user the outcome, write it into the experiment's README, commit and push it.
-   An entry in `pipeline.md` section 11 is proposed and written only once agreed.
+8. **Figures.** Set `ARMS` (short labels, colour slots) and `PAIRS` (arms compared fit by fit on shared draws
+   and seeds) in the folder's `report.py`, adapt it if the question needs another figure, and run
+   `poetry run python experiments/<folder>/report.py --chips <set>`. It writes `figures/` (K curves, paired
+   differences, validation curves with the checkpoint epochs, per-class F1) and `figures/tables.md`. For a quick
+   look, `notebooks/pipeline/kshot_results.ipynb` with `EXPERIMENT` and `CHIPS` set still works.
+9. **Report and record.** Write `REPORT.md` from the template's sections: the answer first, the setup and the
+   runs, every figure with what it shows, the tables, the analysis, the caveats and the next steps. Put a
+   few-line outcome with a link to it in the README, commit the folder with `figures/`, push, and give the user
+   the outcome. An entry in `pipeline.md` section 11 is proposed and written only once agreed.
 
 The main workflow itself runs the same way with its spec by name: `scripts/run_kshot.py -e
 configs/experiments/kshot.yaml` and `submit.sh kshot <set>`.
@@ -249,8 +255,9 @@ scripts/run_kshot.py       the one entry point of the fit, on either machine
 scripts/cluster/           cluster environment, sbatch job, submit, data push, results pull
 scripts/env/               THOR installer (outside the Poetry lock)
 configs/                   class schemes; the main workflow's arms/, experiments/ (kshot.yaml) and machines/ (hub, cluster)
-experiments/               one dated folder per experiment (README, experiment.yaml, arms/, optional run.py); _template/ to copy;
-                           an experiment never edits the core and is deletable once pipeline.md records its outcome
+experiments/               one dated folder per experiment (README, experiment.yaml, arms/, optional run.py, report.py,
+                           REPORT.md with figures/); _template/ to copy; an experiment never edits the core and is
+                           deletable once pipeline.md records its outcome
 notebooks/eda/             EDA notebooks 01 to 07, their builders, analysis/ (code whose outputs go to results/eda)
 notebooks/pipeline/        cache anatomy and full-Estonia results notebooks, with builders
 data/, results/            git-ignored, apart from results/eda
