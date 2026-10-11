@@ -41,6 +41,38 @@ the three arms.
     poetry run python experiments/2026-10-09_terramind_d4_count/run.py -e experiments/2026-10-09_terramind_d4_count/experiment.yaml --chips data/eurocrops_chips/EE_2021_half   # hub
     bash scripts/cluster/submit.sh experiments/2026-10-09_terramind_d4_count/experiment.yaml EE_2021_half                                                                    # cluster
 
-**Results.** `results/2026-10-09_terramind_d4_count/EE_2021_half/`.
+**Results.** `results/2026-10-09_terramind_d4_count/EE_2021_half/`, read by `kshot_results.ipynb` in this folder: a copy of
+`notebooks/pipeline/kshot_results.ipynb` with the two arms in its colour table and a table of paired differences.
 
-**Outcome.** Filled in when the results are in.
+**Run.** UT HPC, 9 October 2026, jobs 618042 (d4x1, node29, 1 h 37 min), 618044 (core arm, node30, 1 h 39 min)
+and 618043 (d4x4, node30), at commit `389cf61`. 618043 failed after two cells: a DataLoader worker could not
+allocate shared memory (`/dev/shm`) while node30 also ran the THOR 80 m and 40 m token-size jobs. Its partial
+third cell was moved to `logs/failed_618043_P100_draw0_seed2/`, since a refit into the same folder would have
+saved `best-loss-v1.ckpt` beside the stale `best-loss.ckpt` that the prediction step reads. The arm was resubmitted
+with `--exclude=hpc-node30` as job 618104 (node29, 1 h 14 min), which re-encoded its cache and finished the other
+seven cells at commit `0bedeeb`; that commit changed only `../2026-10-09_thor_token_size/`.
+
+**Outcome.** Test Macro-F1 on the 1,475 test chips, mean of seeds 0 to 2, and the paired difference per seed, mean
++- standard deviation with the seeds won (`kshot_results.ipynb`):
+
+| K | 1 variant | 4 variants | 8 variants | 8 - 1 | 4 - 1 | 8 - 4 |
+|---|---|---|---|---|---|---|
+| 100 % | 0.518 | 0.543 | 0.551 | +0.033 +- 0.010 (3/3) | +0.025 +- 0.011 (3/3) | +0.008 +- 0.006 (3/3) |
+| 20 % | 0.368 | 0.407 | 0.438 | +0.070 +- 0.012 (3/3) | +0.040 +- 0.061 (2/3) | +0.031 +- 0.051 (2/3) |
+| 5 % | 0.258 | 0.282 | 0.278 | +0.020 +- 0.070 (1/3) | +0.024 +- 0.047 (2/3) | -0.004 +- 0.061 (2/3) |
+
+* **The augmentation adds at K = 100 and 20 %.** All eight beat the identity in every seed, by 0.033 and 0.070
+  Macro-F1, several times the seed spread of the difference. At 100 % the ordering 1 < 4 < 8 holds in every seed,
+  and the four quarter turns give three quarters of the gain.
+* **At K = 5 % three seeds do not decide it.** Single fits range over 0.07 to 0.09 within an arm, which is larger
+  than any difference between the means. The 8 October ablation on full Estonia at 5 % was noisy too (seed
+  standard deviation up to 0.049).
+* **Without augmentation the decoder overfits sooner.** The checkpoint of lowest validation loss is at epoch 3 to 6
+  for the identity, against 7 to 10 with all eight at K = 100 and 20 %. At K = 20 % the four-variant seeds follow
+  their checkpoint epoch: 0.376 and 0.396 at epochs 5 and 6, 0.450 at epoch 10. So part of the low-K spread comes
+  from the checkpoint criterion, which is the open choice of pipeline.md section 10.
+* Against the full-Estonia grid of 2 October, with all eight variants, half the training blocks cost 0.035, 0.041
+  and 0.084 Macro-F1 at K = 100, 20 and 5 % (0.551 against 0.586, 0.438 against 0.479, 0.278 against 0.362).
+
+The main workflow keeps all eight variants. Halving the training cache with four would cost about 0.01 at 100 % and
+an unresolved amount at lower K.
