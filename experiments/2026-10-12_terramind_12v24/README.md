@@ -61,4 +61,4 @@ data/eurocrops_chips/<set>`.
 **Report.** `report.py` reads both sets and reports them as two arms, `12 monthly frames` and
 `24 half-month frames`, with the paired difference 24 minus 12. `REPORT.md` is written from its figures.
 
-**Outcome.** Pending: submitted to the cluster.
+**Outcome.** 24 half-month frames are slightly ahead of 12 monthly ones in test Macro-F1, and only with more labels ([REPORT.md](REPORT.md)). Paired, 24 minus 12: +0.015 at K = 100 % (2 of 3 fits), +0.035 at 20 % (2 of 3, carried by one fit of +0.090) and +0.001 at 5 %, all within the spread between seeds. No sign that the interpolated half months hurt. The cost is twice the encoding and cache, and twice the bottleneck parameters. Jobs 619877 and 619878, 23 and 33 minutes on `itc-gpu`.

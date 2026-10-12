@@ -366,8 +366,7 @@ def main() -> None:
         parts.append([x.assign(arm=arm) if not x.empty else x for x in (d, c, v)])
         facts["commits"] |= f["commits"]
         facts["machines"] |= f["machines"]
-        facts["split"], facts["support"] = f["split"], f["support"]
-        facts["chips"] = " and ".join(args.chips)
+        facts["split"], facts["support"], facts["chips"] = f["split"], f["support"], f["chips"]
     df, classes, curves = (pd.concat([p[i] for p in parts], ignore_index=True) for i in range(3))
     styles = arm_styles(sorted(df["arm"].unique()))
     args.out.mkdir(parents=True, exist_ok=True)
