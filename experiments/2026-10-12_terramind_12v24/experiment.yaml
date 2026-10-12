@@ -1,0 +1,14 @@
+# TerraMind v1 large on 12 monthly against 24 half-month Sentinel-2 frames, on the chips of EE_2021_sample: the same
+# arm run on two chip sets that differ only in their temporal grid (both under the REVISED screening).
+#   EE_2021_sample_rev: 12 monthly composites, cut from EE_2021_rev   (experiments/2026-10-12_s2_semimonthly)
+#   EE_2021_sample_24:  24 half-month composites                      (experiments/2026-10-12_s2_semimonthly)
+# run.py gives the datamodule the frame count of a set that declares n_periods. Three seeds, as the token-size study.
+#   poetry run python experiments/2026-10-12_terramind_12v24/run.py -e experiments/2026-10-12_terramind_12v24/experiment.yaml --chips data/eurocrops_chips/EE_2021_sample_24
+#   bash scripts/cluster/submit.sh experiments/2026-10-12_terramind_12v24/experiment.yaml EE_2021_sample_rev
+#   bash scripts/cluster/submit.sh experiments/2026-10-12_terramind_12v24/experiment.yaml EE_2021_sample_24
+arms: [terramind_v1_large]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss
