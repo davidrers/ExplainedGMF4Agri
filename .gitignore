@@ -6,6 +6,10 @@
 /results/*
 !/results/eda/
 
+# Internship: a separate project kept beside the thesis, never tracked
+# (root-anchored, so docs/internship/ stays in the repository)
+/internship/
+
 # Python
 __pycache__/
 *.py[cod]
