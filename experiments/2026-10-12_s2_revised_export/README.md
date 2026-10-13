@@ -41,7 +41,7 @@ rest), `manifest.json` (stamped with the screening and the parent), `export.log`
 **Report.** `REPORT.md`, once the export and `check.py` have finished: what was exported, how long it took,
 failures, the checks, and the gap-filled shares against the parent.
 
-**Outcome.** Pending: the export is running.
+**Outcome.** `EE_2021_rev` is complete: 7,402 chips in 36.5 h, none failed, labels identical to the parent. White pixels nearly vanish, while February, March and November become mostly gap-filled ([REPORT.md](REPORT.md)).
 
 **Adding it to the main workflow** is a separate decision of the user. It would mean pointing the workflow at
 `EE_2021_rev`, or renaming it into place, and adding a `--screening` option to the export script.

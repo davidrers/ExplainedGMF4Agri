@@ -56,7 +56,9 @@ def main() -> None:
     ids = sorted(parent)
     missing = [c for c in ids if c not in new]
     linked = [c for c in ids if (NEW / "chips" / f"{c}_merged.tif").is_symlink()]
-    wrong_screening = [c for c in new if new[c]["imagery"].get("screening") != asdict(REVISED)]
+    # Compared as JSON, since the reports store the screening's tuples as lists.
+    revised = json.loads(json.dumps(asdict(REVISED)))
+    wrong_screening = [c for c in new if new[c]["imagery"].get("screening") != revised]
     present = [c for c in ids if c in new]
     with ProcessPoolExecutor(args.workers) as pool:
         eq = list(pool.map(labels_equal, present, chunksize=32))
