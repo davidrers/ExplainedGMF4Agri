@@ -236,6 +236,10 @@ def fig_validation(df: pd.DataFrame, curves: pd.DataFrame, styles: dict, path: P
                 ax.scatter(kept, mean.loc[kept], s=46, marker=marker, color=colour, edgecolor=SURFACE, lw=1.5,
                            zorder=3)
             ax.set_title(f"{title}, K = {k:g} %")
+            if metric == "val_loss":
+                # A network trained from scratch starts at a validation loss of hundreds (BatchNorm's running
+                # statistics have not settled), which would flatten every later epoch on a linear axis.
+                ax.set_yscale("log")
     for ax in axes[-1]:
         ax.set_xlabel("Epoch")
     fig.legend(*axes[0][0].get_legend_handles_labels(), loc="upper center", ncol=min(len(styles), 4),
@@ -384,6 +388,9 @@ def main() -> None:
     df, classes, curves, facts = load(results, refs)
     if df.empty:
         raise SystemExit(f"no finished fits in {results}")
+    # A pair is drawn only once both of its arms have fits, so a partial run still reports.
+    global PAIRS
+    PAIRS = [p for p in PAIRS if {p[1], p[2]} <= set(df["arm"])]
     styles = arm_styles(sorted(df["arm"].unique()))
     args.out.mkdir(parents=True, exist_ok=True)
     fig_kshot(df, styles, args.out / "kshot_curves.png")
@@ -396,7 +403,8 @@ def main() -> None:
     text = tables(df, styles, facts, curves)
     (args.out / "tables.md").write_text(text)
     print(text)
-    print(f"figures and tables in {args.out.relative_to(REPO)}")
+    out = args.out.resolve()
+    print(f"figures and tables in {out.relative_to(REPO) if out.is_relative_to(REPO) else out}")
 
 
 if __name__ == "__main__":
