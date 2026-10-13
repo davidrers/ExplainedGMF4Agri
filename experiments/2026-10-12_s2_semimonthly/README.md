@@ -46,7 +46,7 @@ whose screening differs.
 **Report.** `REPORT.md` once both sets exist. It covers the gap-filled share per frame, clear dates per frame,
 and how often a half month has no clear overpass where its month has one.
 
-**Outcome.** Pending: the build is running.
+**Outcome.** Both sets are built and checked identical in chips, split, screening, composite windows and labels ([REPORT.md](REPORT.md)). `EE_2021_sample_24` took 12.6 h with no failures. Half months keep April to July observed (at most 18 % of pixels filled) but open gaps a month hides. 16 to 31 October has no acquisition for 532 of 733 chips; August half months are 32 and 40 % filled against 17 % for the month; 545 chips have at least one empty half month. The TerraMind comparison on these sets is in [`../2026-10-12_terramind_12v24/`](../2026-10-12_terramind_12v24/REPORT.md).
 
 **For the 12 against 24 experiment.** Two things will need attention when that experiment is set up:
 - **Frame count.** The datamodule takes the frame count from `gfm4agri.chips.s2_monthly.N_MONTHS` (12).
