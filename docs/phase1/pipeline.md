@@ -47,7 +47,7 @@ repeated by accident.
 | 2. Chip grid and label rasters | `src/gfm4agri/data/chip_grid.py` | `<chip>.mask.tif`, `<chip>.parcels.tif` |
 | 3. Sentinel-2 composites | `src/gfm4agri/chips/s2_monthly.py` | `<chip>_merged.tif` |
 | 3b. Sentinel-1 composites | `src/gfm4agri/chips/s1_monthly.py`, `scripts/hub/build_s1_chips.py` | `<chip>_s1rtc.tif`, `s1_rtc.json` |
-| 4. Chip export | `scripts/hub/build_country_chips.py`; a pilot cut from it by `scripts/hub/build_pilot_chipset.py` | `manifest.json` and the chip set |
+| 4. Chip export | `scripts/hub/build_country_chips.py` (`--screening revised` by default); a pilot cut from it by `scripts/hub/build_pilot_chipset.py` | `manifest.json` and the chip set; for Estonia `EE_2021_rev` and its pilot `EE_2021_rev_mini` |
 | 5. TESSERA embeddings | `src/gfm4agri/embeddings/tessera.py`, `scripts/hub/build_tessera_chips.py` | `<chip>_tessera.tif`, `tessera_v1.json` |
 | 5b. AlphaEarth embeddings | `src/gfm4agri/embeddings/alphaearth.py`, `scripts/hub/fetch_alphaearth_tiles.py`, `scripts/hub/build_alphaearth_chips.py` | tiles in `data/alphaearth/aef_v1_annual/<year>/`; `<chip>_alphaearth.tif`, `alphaearth_v1.json` |
 | 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/hub/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
@@ -178,13 +178,27 @@ Four corrections apply on top of that, and each is recorded in the chip manifest
 see what happened rather than trust that it did.
 
 **BOA offset.** Acquisitions at processing baseline 04.00 or later are shifted so every date
-sits on the `reflectance = DN / 10000` convention. Every 2021 scene predates the change, so for
-this season the correction is a guard rather than an adjustment, and it is kept because the
-pipeline is meant to extend to later years.
+sits on the `reflectance = DN / 10000` convention. The Planetary Computer also serves 2021 scenes
+reprocessed at baseline 04.00 beside the originals, 10,767 items over 5,068 chips of the first
+Estonian export, so the correction does apply to this season.
 
-**Cloud and snow screening** from the scene classification layer. This is the correction that
-matters most and the one the vendored loaders do not perform: nodata, saturated, cloud shadow,
-cloud medium and high probability, thin cirrus and snow are all excluded from the median.
+**Cloud and snow screening.** This is the correction that matters most and the one the vendored
+loaders do not perform. It is a named `Screening` of `s2_monthly.py`, chosen with
+`build_country_chips.py --screening` and recorded in every chip report and in the manifest.
+
+* `revised`, the main workflow's since 13 October 2026 and the screening of `EE_2021_rev`.
+  - **Clear classes.** A pixel of an acquisition is clear only if the scene classification calls
+    it vegetation, bare soil or water (classes 4, 5, 6).
+  - **Buffer.** It must also lie at least 2 px from cloud, cloud shadow, cirrus and snow.
+  - **Spectral tests.** It must pass the Fmask snow test and the haze-optimised transform
+    (Zhu and Woodcock 2012).
+  - **One observation per overpass.** The tile copies and reprocessings of one overpass are merged
+    into one observation, flagged if any copy is flagged.
+* `export_2021`, the screening of the first export, `EE_2021`. It excludes nodata, saturated,
+  cloud shadow, cloud medium and high probability, thin cirrus and snow (`SCL_DROP`), and counts
+  every catalogue item as an observation.
+
+The change is a fault found and fixed, described below under *What the screening missed*.
 
 **Gap filling.** A pixel with no clear acquisition in a month is filled by linear interpolation
 along the month axis from its nearest clear months, and by the nearest clear month at the ends
@@ -203,17 +217,56 @@ from April; the threshold is what prevents that.
 Resampling is bilinear for the spectral bands and nearest for the scene classification, because
 interpolating a categorical layer would invent classes that were never observed.
 
-**What the screening misses.** `notebooks/eda/06_monthly_composites_qa.ipynb` opens the stored
-composites of six parcels exactly as the datamodule reads them, beside their Sentinel-1 composites
-and, for two parcels, the individual acquisitions. Three faults show there, and none is corrected
-yet. Snow and cloud that the scene classification marks clear enter the median: the few pixels
-observed in an Estonian January or December are mostly such leaks, and one grassland parcel's
-December composite is snow, at NDVI -0.04. Residual cloud and haze also survive in months
-reported as fully observed, so the filled share is not a measure of composite quality. And because
-each pixel takes its median over its own clear acquisitions, a cloud edge on a single date becomes
-a straight seam inside a field. Separately, and by design, the monthly median dilutes canopy peaks
-shorter than a month: a potato parcel above NDVI 0.8 for three weeks has July and August
-composites of 0.53 and 0.51, in agreement with the monthly median of its acquisitions.
+**What the screening missed, and the fix.** `notebooks/eda/06_monthly_composites_qa.ipynb` opens the
+stored composites of six parcels exactly as the datamodule reads them. Under `export_2021`, three
+faults show there.
+- **Leaks.** Snow and cloud that the scene classification marks clear enter the median. One
+  grassland parcel's December composite is snow, at NDVI -0.04.
+- **Residual haze.** Cloud and haze survive in months reported as fully observed, so the filled
+  share is not a measure of composite quality.
+- **Seams.** Because each pixel takes its median over its own clear acquisitions, a cloud edge on a
+  single date becomes a straight seam inside a field.
+
+The leaks showed as irregular white rings and streaks in the composites. They have four causes.
+1. **Dark area rims.** Sen2Cor rings snow inside cloud with class 2, dark area. In one January,
+   2,307 of the 2,317 observed white pixels of a chip were class 2.
+2. **Unclassified fringes.** It fringes cloud edges with class 7, unclassified. Neither class 2 nor
+   class 7 is in `SCL_DROP`.
+3. **Edges.** Cloud, shadow and snow edges a pixel or two beyond the classified object pass as clear.
+4. **Duplicate copies.** One overpass is catalogued once per MGRS tile and again where reprocessed,
+   so it entered the median up to four times, and one copy could pass what another flagged.
+
+`experiments/2026-10-12_s2_screening` compared seven screenings on every 2021 acquisition of 30
+chips. Each rule of `revised` removes observations with a contamination signature against the
+same pixel's clean ones:
+- **Class 2:** near infrared 55 % lower, so cloud shadow.
+- **Class 7:** bluer by +0.022, NDVI 0.085 lower.
+- **The buffer:** bluer by +0.033, NDVI 0.115 lower.
+- **The haze test:** bluer by +0.133.
+
+Each relaxation tested kept contamination.
+
+The composites of `EE_2021` were superseded and nothing was deleted. `EE_2021_rev` replaces its
+Sentinel-2 composites and links its other products, and `EE_2021` stays as their parent. Every
+result fitted before 13 October 2026 used `export_2021`.
+
+**What `revised` costs and leaves.** On all 7,402 Estonian chips, the mean share of chip pixels
+gap-filled rises.
+
+| Month | `export_2021` | `revised` |
+|---|---|---|
+| February | 50 % | 89 % |
+| March | 22 % | 64 % |
+| August | 11 % | 19 % |
+| October | 8 % | 19 % |
+| November | 21 % | 50 % |
+
+April to July stays at 2 % or less. White pixels in a 300-chip sample fall from 454,256 to 85 in
+January and from 624,764 to 1,240 in December.
+
+The per-pixel seams remain, and so does haze that passes all four tests. Separately, and by design,
+the monthly median dilutes canopy peaks shorter than a month: a potato parcel above NDVI 0.8 for
+three weeks has July and August composites of 0.53 and 0.51.
 
 The per-pixel filled mask is not stored, but it can be recovered exactly from the stack: a filled
 month lies on the line between its neighbours in all twelve bands at once, with a second difference
@@ -291,10 +344,25 @@ hours and 56 GB on disk; the machine was at about a third of its CPU and 50 MB/s
 during that run, so the limit is request latency rather than either resource.
 
 `--group-size G` composites a G x G block of adjacent chips in one read, which fetches each COG
-block once instead of once per chip and cuts the downloaded bytes by about sixteen times on a
-densely chipped scene. It is **not validated**. A window takes long enough that the download
-tokens issued at search time expire partway through, and its speed gain has not been measured
-cleanly. The chip-by-chip export is the one in use.
+block once instead of once per chip. The re-export of 12 and 13 October 2026, `EE_2021_rev`, ran
+with `--group-size 2` and 8 workers: 2,245 windows for 7,402 chips, in 36.5 h with no failed chip,
+against 53.6 h for the chip-by-chip first export at 4 workers.
+
+One property comes with it. GDAL's warp uses an approximate coordinate transform whose sampling
+depends on the output extent, so a chip read in a group differs slightly from the same chip read
+alone: a median of zero, and up to a few hundred digital numbers at single pixels. No export
+reproduces another bit for bit unless it uses the same windows.
+
+`--screening` names the Sentinel-2 screening of section 5, `revised` by default. A chip set holds
+one screening only. An export into a set whose manifest names another is refused, and the
+manifest's screening is read from the chip reports, so a manifest rebuilt with `--assemble-only`
+states what its chips were made with.
+
+`EE_2021_rev` was derived from `EE_2021` by `experiments/2026-10-12_s2_revised_export/run.py`. It
+runs this script with `revised` and with the parent's chip list, re-rasterises the labels (checked
+identical to the parent's), and links the Sentinel-1, TESSERA and AlphaEarth products,
+`chip_parcels.parquet` and the split from `EE_2021`. The links are relative, so the two sets are
+copied together. That folder's `PROCESS.md` follows one chip through every step.
 
 The manifest is the provenance record: the class scheme, the label rule, the grid, the imagery
 parameters, the per-chip labelled share, parcel count, per-class pixel counts and imagery
@@ -358,8 +426,10 @@ chips, with `split.json` recording the parent and the blocks under `subset`. The
 statistics and the manifest hash are therefore the parent's, the pilot costs no disk space, and
 the K-shot workflow of section 9 cannot tell it from a country. `EE_2021_mini`, built with the
 defaults on 9 October 2026, holds blocks `582_450`, `586_447` and `591_463` (pool), `563_444`
-(validation) and `566_444` (test): 32 training, 16 validation and 9 test chips. A pilot is copied
-to the cluster after its parent, whose chips its links point to.
+(validation) and `566_444` (test): 32 training, 16 validation and 9 test chips. `EE_2021_rev_mini`,
+the main workflow's pilot since 13 October 2026, is cut from `EE_2021_rev` with the same defaults
+and holds the same blocks. A pilot is copied to the cluster after its parent, whose chips its links
+point to.
 
 ---
 
@@ -682,6 +752,16 @@ validation Macro-F1 keeps rising to epoch 13, so a checkpoint chosen on Macro-F1
 epoch of a fixed budget, would score higher. TESSERA is still improving on both at epoch 15, so
 it is undertrained rather than overfitted. The fit budget, fixed at 15 epochs for that grid
 against 40 in the configurations, is open with it.
+
+**Pixels never observed in the year enter as zeros.** A pixel with no clear observation in any
+month of the year is written as 0 in every band. Under `revised` that holds for 100,367 pixels of
+`EE_2021_rev`, against 20 under `export_2021`. Only 520 of them lie on labelled parcels. The rest
+are bright, unvegetated surfaces, probably quarries, sand or built-up land, that the haze test
+flags on every date. The datamodule does not treat them as nodata.
+
+**Results before 13 October 2026 are on `EE_2021`.** The full-Estonia grid of section 11 and every
+experiment before that date used the `export_2021` composites. They are not paired with fits on
+`EE_2021_rev`, so a difference between the two includes the screening.
 
 **TESSERA pixels without an embedding enter as zeros.** Section 7 gives their share. The
 datamodule replaces the missing vector with 0 when the chip is loaded, before normalisation, and

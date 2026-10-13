@@ -33,7 +33,8 @@ import numpy as np
 
 from gfm4agri.data.sentinel import BOA_ADD_OFFSET, OFFSET_BASELINE, SCL_DROP
 
-__all__ = ["BANDS", "BAND_NAMES", "EXPORT_2021", "N_MONTHS", "REVISED", "Screening",
+__all__ = ["BANDS", "BAND_NAMES", "EXPORT_2021", "N_MONTHS", "REVISED", "SCREENINGS", "Screening",
+           "screening_name", "screening_record",
            "composite_window", "monthly_composite", "window_report"]
 
 #: The twelve L2A spectral bands, B10 being absent from L2A, in wavelength order.
@@ -83,6 +84,24 @@ EXPORT_2021 = Screening()
 #: Only vegetation, bare soil and water are clear; cloud, shadow and snow grown by 20 m.
 REVISED = Screening(drop=(0, 1, 2, 3, 7, 8, 9, 10, 11), dilate_px=2, snow_test=True,
                     haze_test=True, one_per_overpass=True)
+#: The screenings an export can name. ``revised`` is the main workflow's since 13 October 2026, chosen by
+#: ``experiments/2026-10-12_s2_screening``; ``export_2021`` reproduces the first Estonian export.
+SCREENINGS = {"export_2021": EXPORT_2021, "revised": REVISED}
+
+
+def screening_record(screening: Screening) -> dict:
+    """The screening as a chip report stores it: JSON types, so tuples are lists."""
+    return {k: list(v) if isinstance(v, tuple) else v for k, v in asdict(screening).items()}
+
+
+def screening_name(record: dict | None) -> str:
+    """The name in :data:`SCREENINGS` of a chip report's screening; a report without one is ``export_2021``."""
+    if record is None:
+        return "export_2021"
+    for name, s in SCREENINGS.items():
+        if screening_record(s) == record:
+            return name
+    raise ValueError(f"screening {record} is none of {sorted(SCREENINGS)}")
 
 
 def _screen(s: np.ndarray, c: np.ndarray, screening: Screening) -> tuple[np.ndarray, np.ndarray]:
@@ -248,7 +267,7 @@ def composite_window(bounds_3035, year: int = 2021, *, cloud_cover_max: float = 
     if screening != EXPORT_2021:
         # Recorded only when it departs from the export, so the reports of the existing chip
         # set and of a default export stay identical.
-        report["screening"] = asdict(screening)
+        report["screening"] = screening_record(screening)
         report["overpasses_per_month"] = [0] * N_MONTHS
     not_stacked = sorted(set(by_id) - set(stacked))
     if not_stacked:

@@ -115,3 +115,17 @@ def test_tile_copies_of_one_overpass_become_one_observation():
     assert vals.shape == (2, 1, 1, 3)
     assert bad[:, 0].tolist() == [[False, True, False], [False, False, False]]
     assert vals[0, 0, 0, 0] == 15 and vals[0, 0, 0, 2] == 20 and vals[1, 0, 0, 0] == 50
+
+
+def test_screening_names_round_trip_through_a_report():
+    import json
+
+    from gfm4agri.chips.s2_monthly import SCREENINGS, screening_name, screening_record
+
+    for name, s in SCREENINGS.items():
+        stored = json.loads(json.dumps(screening_record(s)))   # as a chip report holds it
+        assert screening_name(stored) == name
+    # A report of the first export carries no screening at all.
+    assert screening_name(None) == "export_2021"
+    with pytest.raises(ValueError, match="none of"):
+        screening_name({**screening_record(REVISED), "dilate_px": 5})

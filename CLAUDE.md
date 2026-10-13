@@ -30,7 +30,7 @@ When an agreed update is made, `pipeline.md` is where it goes:
 - a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
 - a finished run or grid: section 11, Runs, and the Current state below.
 
-## Current state, 9 October 2026
+## Current state, 13 October 2026
 
 The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
 EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
@@ -39,11 +39,11 @@ per-class percentage label budget applied at load time, a frozen encoder with a 
 
 | Item | Value |
 |---|---|
-| Chip set | `data/eurocrops_chips/EE_2021/`: 7,402 chips of 224 x 224 at 10 m, 20 classes. Per chip: `_merged.tif` (S2, 144 bands), `_s1rtc.tif` (S1 RTC, 24 bands), `_tessera.tif` (128-d), `_alphaearth.tif` (64-d), `.mask.tif`, `.parcels.tif` |
+| Chip set | **`data/eurocrops_chips/EE_2021_rev/`**, the main workflow's since 13 October 2026: 7,402 chips of 224 x 224 at 10 m, 20 classes, Sentinel-2 composites under the `revised` screening (pipeline.md section 5). Per chip: `_merged.tif` (S2, 144 bands), `.mask.tif`, `.parcels.tif`, and as links into `EE_2021`: `_s1rtc.tif` (S1 RTC, 24 bands), `_tessera.tif` (128-d), `_alphaearth.tif` (64-d). `EE_2021/` is the first export, under the `export_2021` screening; it stays as the parent of those links, and every result before 13 October 2026 was fitted on it |
 | Split | `splits/blocks4_buf1600_seed0__6b0eb4cb`: blocks of 4 x 4 chips, 1,600 m parcel buffer; 4,898 train, 769 validation, 1,475 test chips |
-| Feature caches | `data/embeddings/<backbone>/EE_2021/`: TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB); THOR's is not built. Caches of `EE_2021_mini` for the three token-grid arms (about 25 GB) |
-| Pilot | `data/eurocrops_chips/EE_2021_mini/`: whole blocks of `EE_2021` as links, 32 training, 16 validation, 9 test chips, same split; `subset.json` records the blocks. The old 12-chip `EE_2021_pilot/` is archived with `experiments/2026-09_pilot_12chips/` |
-| Cluster | The UT HPC clone holds `EE_2021`, `EE_2021_mini` and `data/eurocrops/{parquet,vector}` (copied 9 October 2026), no caches |
+| Feature caches | None for `EE_2021_rev` yet: every token-grid cache is recomputed for it, since its manifest differs. Of `EE_2021`: `data/embeddings/<backbone>/EE_2021/`, TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB), and `EE_2021_mini` for the three token-grid arms (about 25 GB) |
+| Pilot | **`data/eurocrops_chips/EE_2021_rev_mini/`**: whole blocks of `EE_2021_rev` as links, 32 training, 16 validation, 9 test chips, same split and the same blocks as `EE_2021_mini` (its counterpart on `EE_2021`); `subset.json` records the blocks. The old 12-chip `EE_2021_pilot/` is archived with `experiments/2026-09_pilot_12chips/` |
+| Cluster | The UT HPC clone holds `EE_2021`, `EE_2021_rev`, `EE_2021_rev_mini`, `EE_2021_mini`, the sample sets and `data/eurocrops/{parquet,vector}`, no caches |
 
 Arms implemented, one file each in `configs/arms/`: **TerraMind v1 large**, **Prithvi-EO-2.0 600M TL** and
 **THOR v1 large** on 160 m tokens (token grid; `ChannelBottleneck` plus a 12.9 M parameter UNet decoder; fitted from
@@ -92,22 +92,27 @@ From the repository root. Every stage resumes from what is already on disk.
 **Chip extraction, on the JupyterHub only** (`scripts/hub/`):
 
 ```bash
-poetry run python scripts/hub/build_country_chips.py --country EE --year 2021 --workers 12   # S2 chips, masks, manifest
+poetry run python scripts/hub/build_country_chips.py --country LV --year 2021 --workers 8 --group-size 2   # S2 chips, masks, manifest; --screening revised by default
 poetry run python scripts/hub/build_s1_chips.py --country EE --year 2021 --workers 12        # S1 RTC beside them
 poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
 poetry run python scripts/hub/build_chip_split.py --root data/eurocrops_chips/EE_2021       # block split, chip_parcels.parquet
 poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --workers 4
 poetry run python scripts/hub/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021 --workers 16 \
     --split-dir data/eurocrops_chips/EE_2021/splits/blocks4_buf1600_seed0__6b0eb4cb    # statistics on the training chips
-poetry run python scripts/hub/build_pilot_chipset.py --parent data/eurocrops_chips/EE_2021 --name EE_2021_mini
+poetry run python scripts/hub/build_pilot_chipset.py --parent data/eurocrops_chips/EE_2021_rev --name EE_2021_rev_mini
 ```
+
+`EE_2021_rev` itself was derived from `EE_2021` by `experiments/2026-10-12_s2_revised_export/run.py`, which re-exports
+the Sentinel-2 composites and links everything else. The export script refuses to write one screening into a chip set
+made with another, so `EE_2021` cannot be overwritten by accident. The other builders above still name `EE_2021`, where
+the Sentinel-1, TESSERA and AlphaEarth products live.
 
 **The K-shot workflow, on either machine** (`scripts/run_kshot.py`): every arm, budget, draw and seed of an
 experiment on one chip set. A pilot and a country differ only in `--chips`.
 
 ```bash
-poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021 --dry-run
-poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021_mini
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021_rev --dry-run
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021_rev_mini
 ```
 
 Configs: `configs/arms/<arm>.yaml` (what is trained), `configs/experiments/<name>.yaml` (arms, budgets, draws, seeds,
@@ -141,7 +146,7 @@ if it cannot be done that way, ask.
 2. **Check, on the hub.** `poetry run pytest -q`, then a dry run on the target chip set:
    `poetry run python scripts/run_kshot.py -e experiments/<folder>/experiment.yaml --chips data/eurocrops_chips/<set> --dry-run`
    (or the folder's `run.py`). Every cell must be listed and the chip-set check must pass. Something new runs on
-   `EE_2021_mini` before a full country.
+   `EE_2021_rev_mini` before a full country.
 3. **Commit and push.** Stage the experiment folder **by name**, never `git add -A`: other sessions may be
    editing this checkout. `git commit` with the attribution line, `git push origin main`.
 4. **Update the cluster.** `ssh -n utwente-hpc 'cd ~/ExplainedGMF4Agri && git pull --ff-only'`, plus

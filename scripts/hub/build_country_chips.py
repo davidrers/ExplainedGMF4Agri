@@ -18,6 +18,11 @@ Three differences from the pilot follow from the scale:
   the Planetary Computer, so the work is network bound and parallelises well. Each worker
   loads the parcel layer once.
 
+The Sentinel-2 screening is named with ``--screening`` (``gfm4agri.chips.s2_monthly.SCREENINGS``):
+``revised``, the default since 13 October 2026, or ``export_2021``, which reproduces the first
+Estonian export. A chip set holds one screening only, so an export into a set made with another is
+refused, and the manifest records the screening the chip reports carry.
+
 A chip is skipped when its three rasters and its report are all present, so re-running the
 command resumes. Transient network failures are retried, and a chip that still fails is
 recorded in ``failures.json`` and does not stop the run.
@@ -46,7 +51,10 @@ from gfm4agri.chips.s2_monthly import (  # noqa: E402
     BAND_NAMES,
     BANDS,
     N_MONTHS,
+    SCREENINGS,
     composite_window,
+    screening_name,
+    screening_record,
     window_report,
 )
 from gfm4agri.data.chip_grid import (  # noqa: E402
@@ -132,7 +140,7 @@ def _export_group(task: tuple[list[tuple[int, int]], str, int, float, int]) -> l
 
     Runs in a worker process. A group of one is the chip-by-chip export.
     """
-    members, out_s, year, cloud_cover_max, retries = task
+    members, out_s, year, cloud_cover_max, retries, screening = task
     out = Path(out_s)
     chips = [Chip(_CC, c, r) for c, r in members]
     bounds = (min(ch.bounds[0] for ch in chips), min(ch.bounds[1] for ch in chips),
@@ -142,7 +150,8 @@ def _export_group(task: tuple[list[tuple[int, int]], str, int, float, int]) -> l
     last = None
     for attempt in range(retries + 1):
         try:
-            arr, maps, report = composite_window(bounds, year, cloud_cover_max=cloud_cover_max)
+            arr, maps, report = composite_window(bounds, year, cloud_cover_max=cloud_cover_max,
+                                                 screening=SCREENINGS[screening])
             break
         except Exception as exc:  # network, STAC, or a scene that fails to read
             last = exc
@@ -304,6 +313,20 @@ def assemble(out: Path, cc: str, year: int, args_config: dict, stats_sample: int
         except ValueError:
             print(f"  skipping unreadable {f.name}", flush=True)
     entries.sort(key=lambda e: e["chip_id"])
+    # The screening is read from the chips, not from the command line, so a manifest rebuilt with
+    # --assemble-only states what the chips were made with.
+    names = sorted({screening_name(e["imagery"].get("screening")) for e in entries}) or ["revised"]
+    if len(names) > 1:
+        raise RuntimeError(f"{out} mixes chips of the screenings {names}")
+    composite = {
+        "export_2021": "per-pixel monthly median of SCL-clear acquisitions (SCL not 0, 1, 3, 8, 9, 10, "
+                       "11), every catalogue item one observation; gaps filled by linear interpolation "
+                       "across months",
+        "revised": "per-pixel monthly median of clear observations, one per overpass (tile copies and "
+                   "reprocessings merged, flagged if any copy is flagged); clear: SCL 4, 5 or 6, at least "
+                   "2 px from cloud, shadow, cirrus and snow, passing the Fmask snow test and the "
+                   "haze-optimised transform; gaps filled by linear interpolation across months",
+    }[names[0]]
 
     manifest = {
         "dataset": f"eurocrops_s2_seg_{cc}_{year}",
@@ -327,8 +350,9 @@ def assemble(out: Path, cc: str, year: int, args_config: dict, stats_sample: int
                     "layout": "(time channels): band index = month_index * 12 + band_index",
                     "units": "surface reflectance x 10000, BOA offset removed "
                              "(DN / 10000 convention)",
-                    "composite": "per-pixel monthly median of SCL-clear acquisitions, gaps filled "
-                                 "by linear interpolation across months",
+                    "composite": composite,
+                    "screening_name": names[0],
+                    "screening": screening_record(SCREENINGS[names[0]]),
                     "resampling": "bilinear for spectral bands, nearest for SCL"},
         **(extra or {}),
         "chips": entries,
@@ -357,6 +381,8 @@ def main() -> None:
                     help="keep cells at or above this in-scheme labelled area share; "
                          "0 keeps every cell holding an in-scheme parcel")
     ap.add_argument("--cloud-cover-max", type=float, default=80.0)
+    ap.add_argument("--screening", choices=sorted(SCREENINGS), default="revised",
+                    help="Sentinel-2 cloud and snow screening; revised is the main workflow's")
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--retries", type=int, default=3)
     ap.add_argument("--group-size", type=int, default=1,
@@ -390,6 +416,13 @@ def main() -> None:
         relabel(out, cc, args.year, id_col, args.workers, args.stats_sample)
         return
 
+    if (out / "manifest.json").exists():
+        have = json.loads((out / "manifest.json").read_text())["imagery"]
+        have = have.get("screening_name") or screening_name(have.get("screening"))
+        if have != args.screening:
+            raise SystemExit(f"{out} was exported with the {have} screening; a {args.screening} export "
+                             "would mix the two. Export into a new --out.")
+
     codes, names = load_classes(country)
     t0 = time.time()
     parcels = load_parcels(cc, args.year, id_col)
@@ -421,7 +454,8 @@ def main() -> None:
         assemble(out, cc, args.year, config, args.stats_sample)
         return
 
-    tasks = [(m, str(out), args.year, args.cloud_cover_max, args.retries) for m in group_list]
+    tasks = [(m, str(out), args.year, args.cloud_cover_max, args.retries, args.screening)
+             for m in group_list]
     done = 0
     failures = []
     t1 = time.time()
