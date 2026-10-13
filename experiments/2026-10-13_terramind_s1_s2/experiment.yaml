@@ -1,0 +1,12 @@
+# TerraMind v1 large fed Sentinel-2 alone, Sentinel-1 alone, and both, on all of Estonia (EE_2021_rev, REVISED
+# screening). terramind_v1_large is the core arm; terramind_v1_large_s2s1 is in arms/ (a core backbone, tokens of
+# the two modalities averaged); terramind_v1_large_s1 is in arms_run/ and registered by run.py. The three share the
+# token grid, the ChannelBottleneck and the decoder, and the draws and seeds, so they are compared fit by fit.
+#   poetry run python experiments/2026-10-13_terramind_s1_s2/run.py -e experiments/2026-10-13_terramind_s1_s2/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev
+#   bash scripts/cluster/submit.sh experiments/2026-10-13_terramind_s1_s2/experiment.yaml EE_2021_rev
+arms: [terramind_v1_large, terramind_v1_large_s2s1, terramind_v1_large_s1]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss

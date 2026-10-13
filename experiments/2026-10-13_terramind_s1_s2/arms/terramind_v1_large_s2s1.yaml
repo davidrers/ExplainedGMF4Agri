@@ -1,0 +1,20 @@
+# TerraMind v1 large, frozen, on the twelve monthly Sentinel-2 and Sentinel-1 RTC composites, tokens of the two
+# modalities averaged at every position; ChannelBottleneck and the 12.9 M parameter UNet decoder of the S2 arm,
+# fitted from cached features. Everything else as configs/arms/terramind_v1_large.yaml.
+route: cache                   # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: backbone      # TerraMind v1 S2L2A and S1RTC pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # D4; the cached fit draws one of the eight cached variants
+model:
+  backbone: terramind_v1_large_s2s1
+  lr: 1.0e-4
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2
+# Two modalities double the tokens TerraMind encodes per frame, so half the S2 arm's encoding batch.
+encode_batch_size: {hub: 2, cluster: 8}
