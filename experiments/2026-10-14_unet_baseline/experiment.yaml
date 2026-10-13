@@ -1,0 +1,12 @@
+# The baseline arm on trial: a plain 2D U-Net trained from scratch on the twelve monthly Sentinel-2 composites
+# (EE_2021_rev, revised screening), at the protocol's 15 epochs and at 45, beside TESSERA (core arm) as the
+# reference. Draw 0 and seeds 0 to 2, as in experiments/2026-10-13_terramind_s1_s2, whose terramind_v1_large fits
+# are the token-grid reference on the same draws and seeds. The U-Net arms are in arms_run/, registered by run.py.
+#   poetry run python experiments/2026-10-14_unet_baseline/run.py -e experiments/2026-10-14_unet_baseline/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev
+#   bash scripts/cluster/submit.sh experiments/2026-10-14_unet_baseline/experiment.yaml EE_2021_rev
+arms: [unet_r18_scratch, unet_r18_scratch_45ep, tessera_v1]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss

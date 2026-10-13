@@ -1,0 +1,17 @@
+# unet_r18_scratch trained for 45 epochs instead of the protocol's 15, everything else identical: does the
+# protocol's training length undertrain a model that learns its features from scratch?
+route: end_to_end              # the Sentinel-2 stack, fitted end to end (run.py)
+data:
+  normalisation: chips         # no pretraining statistics: the chip set's per-band statistics
+  batch_size: 4                # the effective batch of every arm
+  augment: true                # D4, drawn per sample, as the end-to-end arms do
+model:
+  backbone: unet_r18_scratch
+  lr: 1.0e-3                   # trained from scratch, as the per-pixel heads
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+epochs: 45                     # overrides the experiment's epochs for this arm (run.py)

@@ -1,0 +1,17 @@
+# A plain 2D U-Net (segmentation_models_pytorch Unet, ResNet-18 encoder, about 15 M parameters), trained from
+# scratch on the twelve monthly Sentinel-2 composites, all twelve bands, months stacked on channels (144). The
+# baseline arm on trial; registered by run.py. Nothing is frozen and nothing is cached.
+route: end_to_end              # the Sentinel-2 stack, fitted end to end (run.py)
+data:
+  normalisation: chips         # no pretraining statistics: the chip set's per-band statistics
+  batch_size: 4                # the effective batch of every arm
+  augment: true                # D4, drawn per sample, as the end-to-end arms do
+model:
+  backbone: unet_r18_scratch
+  lr: 1.0e-3                   # trained from scratch, as the per-pixel heads
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
