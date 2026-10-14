@@ -186,8 +186,8 @@ def fig_paired(df: pd.DataFrame, path: Path, metric: str = "macro_f1") -> None:
                 continue
             x = i + rng.uniform(-0.12, 0.12, len(v))
             ax.scatter(x, v, s=40, color=INK_2, alpha=0.75, lw=1.5, edgecolor=SURFACE, zorder=3)
-            ax.hlines(v.mean(), i - 0.28, i + 0.28, color=INK, lw=2, zorder=4)
-            ax.annotate(f"{v.mean():+.3f}", (i + 0.3, v.mean()), va="center", fontsize=9, color=INK)
+            ax.hlines(v.mean(), i - 0.22, i + 0.22, color=INK, lw=2, zorder=4)
+            ax.annotate(f"{v.mean():+.3f}", (i + 0.24, v.mean()), va="center", fontsize=8.5, color=INK)
         ax.axhline(0, color=BASELINE, lw=1.2, zorder=1)
         ax.set_xticks(range(len(budgets)), [f"K = {k:g} %" for k in budgets])
         ax.set_xlim(-0.6, len(budgets) - 0.2)

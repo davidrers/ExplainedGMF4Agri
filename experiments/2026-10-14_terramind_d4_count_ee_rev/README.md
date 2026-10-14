@@ -42,4 +42,13 @@ overrides applied, the cached fit receives `[k0]`, `[k0, k1, k2, k3]` and `None`
 **Results.** `results/2026-10-14_terramind_d4_count_ee_rev/EE_2021_rev/`. `report.py --chips EE_2021_rev` (the
 earlier study's, same `ARMS` and `PAIRS`) writes the figures and tables of `REPORT.md` into `figures/`.
 
-**Outcome.** Pending.
+**Run.** UT HPC, 14 October 2026, at commit `53f7783`: jobs 621979 (identity, node30, 3 h 36 min), 621980 (four
+rotations, node29, 3 h 23 min) and 621981 (all eight, node29, 3 h 23 min), each encoding its own 0.8 TB cache in
+26 min. No failure.
+
+**Outcome.** See [`REPORT.md`](REPORT.md). The augmentation adds at every budget on full Estonia: eight variants
+beat the identity by 0.047, 0.061 and 0.070 test Macro-F1 at K = 100, 20 and 5 %, in every seed. As on half of
+Estonia, most of it comes through the checkpoint of lowest validation loss, which tests the unaugmented decoder at
+epoch 2 to 7; at each fit's best validation epoch the gap is a quarter to a third as large. At 100 %, half of the
+gain is potatoes, learnt from epoch 5 to 8 on and so missed by most identity checkpoints. The main workflow keeps
+all eight variants.
