@@ -1,0 +1,8 @@
+# Stage 2: TESSERA v2 Medium on the 12 monthly S2 + S1 composites, encoder frozen or fine-tuned (DESIGN.md).
+# Run with this folder's run.py; its arms (route tessera_pixel) are in arms_run/, which the core's arm loader does not scan.
+arms: [tessera_v2m_frozen, tessera_v2m_full]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss

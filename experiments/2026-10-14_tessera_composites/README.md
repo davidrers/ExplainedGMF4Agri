@@ -1,8 +1,9 @@
 # TESSERA driven from our monthly composites, frozen and fine-tuned, 14 October 2026
 
 Nothing in the main workflow (`src/`, `configs/`, `scripts/`, `tests/`) is edited. The study runs in two stages.
-Stage 1, a feasibility spike, is done; it lives in `spike/` and is reported in [REPORT.md](REPORT.md). Stage 2, the
-fit with the encoder frozen or trained, is being designed.
+- **Stage 1**, a feasibility spike, is done. It lives in `spike/` and is reported in [REPORT.md](REPORT.md).
+- **Stage 2**, the fit with the encoder frozen or trained, is designed in [DESIGN.md](DESIGN.md) and built in this
+  folder. Its pilot on `EE_2021_rev_mini` is running.
 
 **Question.** Can the TESSERA encoder be run on the twelve monthly Sentinel-2 and Sentinel-1 composites that every
 other arm already reads, instead of on its native per-acquisition series, so that it can be fine-tuned without
@@ -23,10 +24,25 @@ Estonia, and the user ruled that download out on 14 October 2026.
 - **Measures:** per-pixel cosine to the native embedding, a ridge map onto it, and a per-pixel MLP probe (the
   arm's head) in leave-one-block-out cross-validation, 3 seeds.
 
-**Stage 2, the fit (to be designed).** The user's choices so far:
-- the v2 students rather than v1.1;
-- the composites as input, with no new download;
-- one switch keeping the backbone frozen or training it.
+**Stage 2, the fit.** [DESIGN.md](DESIGN.md) holds the decisions and their reasons. In short:
+- **Arms:** TESSERA v2 Medium on the composites, frozen (`tessera_v2m_frozen`) or fine-tuned (`tessera_v2m_full`).
+  The two differ in `model.trainable` alone, and live in `arms_run/`.
+- **Head and sampling:** a per-pixel MLP head; up to 64 pixels per support parcel per epoch, the same in both arms.
+- **Protocol:** K = 100, 20 and 5 %, draw 0, seeds 0 to 2, 15 epochs, checkpoint at the lowest validation loss.
+
+The code is in this folder:
+- `tessera_v2.py`: the encoder, copied from TESSERA under MIT, with a gradient-enabled batch encoder;
+- `pixels.py`: the pixel store and the frozen embedding cache;
+- `fit_pixel.py`: one cell;
+- `run.py`: the entry, with `scripts/run_kshot.py`'s command line;
+- `check.py`: the design's checks, all passed on 14 October 2026.
+
+**How to run stage 2.**
+
+    poetry run python experiments/2026-10-14_tessera_composites/check.py
+    poetry run python experiments/2026-10-14_tessera_composites/run.py -e experiments/2026-10-14_tessera_composites/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev_mini
+    bash scripts/cluster/submit.sh experiments/2026-10-14_tessera_composites/experiment.yaml EE_2021_rev    # cluster, one job per arm
+    poetry run python experiments/2026-10-14_tessera_composites/report.py --chips EE_2021_rev_mini
 
 **How to run stage 1.** From the repository root, after recreating the git-ignored inputs below:
 

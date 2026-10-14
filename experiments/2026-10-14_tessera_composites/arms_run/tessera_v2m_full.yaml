@@ -1,0 +1,19 @@
+# TESSERA v2 Medium (21.0 M parameters) on the 12 monthly S2 + S1 composites, encoder trained end to end with the head, at its own learning rate after a one-epoch warm-up.
+# Per-pixel MLP head (512, 256) as the TESSERA arm's. The two arms differ in model.trainable alone (DESIGN.md).
+route: tessera_pixel
+model:
+  backbone: tessera_v2_medium
+  student: medium
+  checkpoint_sha256: 3823be7db9d9cfc93f3c2a47c7699be82821ab4e1117d4d2befdb746941ee96e
+  trainable: true
+  head_hidden: [512, 256]
+  head_dropout: 0.2
+train:
+  pixels_per_parcel: 64        # drawn afresh each epoch, seeded by (seed, epoch); the same in both arms
+  val_pixels_per_parcel: 64    # a fixed subset, the same for every cell
+  batch_pixels: 4096
+  lr_head: 1.0e-3
+  lr_encoder: 1.0e-5           # used only when trainable
+  warmup_epochs: 1             # linear warm-up of the encoder learning rate
+  weight_decay: 0.05
+  precision: bf16-mixed        # encoder forward under bf16 autocast, in both arms
