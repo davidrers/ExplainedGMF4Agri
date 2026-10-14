@@ -1,0 +1,12 @@
+# TerraMind v1 large with its decoder trained on 1, 4 or 8 cached D4 variants (identity; the four quarter turns;
+# all eight, the core arm) on full Estonia under the revised Sentinel-2 screening (EE_2021_rev): the D4 count
+# study of ../2026-10-09_terramind_d4_count, which ran on half of EE_2021's training blocks, repeated on the main
+# workflow's chip set. Same arms, budgets, draw, seeds and epochs.
+#   poetry run python experiments/2026-10-14_terramind_d4_count_ee_rev/run.py -e experiments/2026-10-14_terramind_d4_count_ee_rev/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev
+#   bash scripts/cluster/submit.sh experiments/2026-10-14_terramind_d4_count_ee_rev/experiment.yaml EE_2021_rev
+arms: [terramind_v1_large_d4x1, terramind_v1_large_d4x4, terramind_v1_large]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss
