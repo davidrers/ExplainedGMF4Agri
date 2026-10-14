@@ -47,4 +47,4 @@ not reviewed the way the S2 composites were.
 
 **Report.** `report.py` compares the three arms, with the paired differences S2 + S1 minus S2 and S1 minus S2.
 
-**Outcome.** Pending: submitted to the cluster.
+**Outcome.** Adding Sentinel-1 helps at every budget: S2 + S1 beats S2 in all nine paired fits ([REPORT.md](REPORT.md)). Test Macro-F1, S2 / S2 + S1: 0.628 / 0.654 at K = 100 %, 0.511 / 0.565 at 20 % and 0.394 / 0.419 at 5 %; the paired gains are +0.026, +0.054 and +0.025. Sentinel-1 alone is weaker than Sentinel-2 alone (0.557, 0.482 and 0.370) but ahead of it on peas and spring rapeseed. The gains concentrate on crops that differ in canopy structure: peas, potatoes, spring rapeseed, rye, alfalfa and beans. Jobs 621197 to 621199, about 3 h each on `itc-gpu`.
