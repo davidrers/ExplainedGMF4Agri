@@ -1,7 +1,7 @@
 # TESSERA driven from our monthly composites: report, 14 October 2026
 
-This report covers **stage 1**, the feasibility spike. Stage 2, the fit with the encoder frozen or trained, will be
-added below once it has run.
+This report covers **stage 1**, the feasibility spike, and the **pilot of stage 2**. Stage 2 on all of Estonia will
+be added once it has run on the cluster.
 
 **Answer.** Yes, TESSERA can run on our composites. Frozen and fed the twelve monthly Sentinel-2 and Sentinel-1
 composites every arm already reads, it separates crops on the pilot about as well as from its native
@@ -143,6 +143,31 @@ the encoder in our own fit, can test that directly.
 - **For the main workflow.** The v1.1 store covers western Saaremaa, where v1.0 has no embedding (0.66 % of test
   pixels). This belongs in `pipeline.md` section 10 if the user agrees.
 
+## Stage 2 pilot: frozen against fine-tuned on `EE_2021_rev_mini`, 14 October 2026
+
+This pilot tests the stage 2 pipeline end to end ([DESIGN.md](DESIGN.md)); it is not the answer. It ran all
+18 cells on the hub (commit `d91dae9`, 0.2 GPU hours), with tables from `report.py` and figures in
+`results/2026-10-14_tessera_composites/EE_2021_rev_mini/figures/` (not committed).
+
+| Test Macro-F1, mean ± sd (3 seeds) | K = 100 % | K = 20 % | K = 5 % |
+|---|---|---|---|
+| v2 Medium, frozen | 0.168 ± 0.014 | 0.166 ± 0.016 | 0.150 ± 0.011 |
+| v2 Medium, fine-tuned | 0.191 ± 0.003 | 0.176 ± 0.020 | 0.153 ± 0.012 |
+| **Fine-tuned minus frozen, paired** | **+0.023 ± 0.016 (3/3)** | **+0.010 ± 0.006 (3/3)** | **+0.003 ± 0.002 (3/3)** |
+
+- **The pipeline works.** All 18 cells finished and the checks of DESIGN.md passed beforehand. The frozen
+  K = 100 % scores (0.15 to 0.18) sit where the main workflow's TESSERA v1 arm scored on its pilot's 9 test
+  chips (0.164).
+- **Fine-tuning helps in every paired fit, and the gain shrinks with the budget.** On the pilot that shrinking is
+  partly mechanical. At K = 5 % the sampler draws 2,387 pixels per epoch: one optimiser step per epoch, 15 steps
+  in all, against 10 per epoch at K = 100 %. On all of Estonia, K = 5 % gives about 50 steps per epoch.
+- **The encoder moves gently.** The checkpoint epochs are the same in both arms (3, 9 to 10, 14), so at learning
+  rate 1e-5 fine-tuning shifts the optimum's level, not its timing. DESIGN.md held a learning-rate trial in
+  reserve should full fine-tuning diverge or not move; neither happened, so it was not run.
+- **Speed.** A fine-tuned cell took 2.6 to 2.8 min at K = 100 % on the shared A4000 (40,000 pixels per epoch);
+  a frozen cell under 10 s. Scaled to all of Estonia, a fine-tuned K = 100 % cell should take a few hours on the
+  cluster GPU.
+
 ## Reproduce
 
     git clone https://github.com/ucam-eo/tessera data/external/tessera
@@ -152,3 +177,7 @@ the encoder in our own fit, can test that directly.
     poetry run python experiments/2026-10-14_tessera_composites/spike/embed_composites.py
     poetry run python experiments/2026-10-14_tessera_composites/spike/compare.py
     poetry run python experiments/2026-10-14_tessera_composites/spike/figures.py
+    # stage 2
+    poetry run python experiments/2026-10-14_tessera_composites/check.py
+    poetry run python experiments/2026-10-14_tessera_composites/run.py -e experiments/2026-10-14_tessera_composites/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev_mini
+    poetry run python experiments/2026-10-14_tessera_composites/report.py --chips EE_2021_rev_mini --out results/2026-10-14_tessera_composites/EE_2021_rev_mini/figures
