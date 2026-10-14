@@ -58,11 +58,25 @@ On the hub, `run.py` in place of `scripts/run_kshot.py`, with the same arguments
   2 by epoch 3 to 5; `report.py` draws the validation loss on a log axis.
 
 Submitted on 14 October 2026 as jobs 621675 (`unet_r18_scratch`), 621676 (`tessera_v1`) and 621677
-(`unet_r18_scratch_45ep`, with a 3-day limit) at commit `ac3abbc`.
+(`unet_r18_scratch_45ep`, with a 3-day limit) at commit `ac3abbc`. All three finished the same day on `hpc-node30`:
+2 h 56 min, 3 h 11 min and 9 h 1 min, no failure.
 
 **Results.** `results/2026-10-14_unet_baseline/EE_2021_rev/`; the pilot in `.../EE_2021_rev_mini/`.
 
 **Report.** `report.py` compares the three arms with TerraMind v1 large from the S1/S2 experiment, with the paired
-differences U-Net minus each GFM arm and 45 minus 15 epochs.
+differences 45 minus 15 epochs and each U-Net arm minus each GFM arm.
 
-**Outcome.** Pending: submitted to the cluster.
+**Outcome.** At the protocol's 15 epochs the U-Net is clearly below both GFM arms, but 15 epochs undertrain it
+([REPORT.md](REPORT.md)).
+- **Longer training.** 45 epochs add +0.046, +0.062 and +0.071 Macro-F1 at K = 100, 20 and 5 %, winning all nine
+  paired fits. At 15 epochs, every fit's checkpoint is at epoch 12 to 14.
+- **Test Macro-F1, U-Net at 45 epochs against TerraMind v1 large (S2) and TESSERA + MLP:**
+  - K = 100 %: 0.544 against 0.628 and 0.625;
+  - K = 20 %: 0.477 against 0.511 and 0.597;
+  - K = 5 %: 0.413 against 0.394 and 0.570.
+- **TerraMind's lead over the longer-trained U-Net shrinks as labels get scarce:** −0.084, −0.034, then +0.019 for the
+  U-Net at 5 %, which is within the noise.
+- **TESSERA's lead grows as labels get scarce:** −0.081, −0.120 and −0.157 for the U-Net. Its embeddings also carry
+  Sentinel-1.
+- **The shared training budget must be set before the K sweep.** At 15 epochs the comparison overstates the GFMs'
+  benefit by 0.05 to 0.07.

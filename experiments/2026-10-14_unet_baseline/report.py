@@ -45,8 +45,10 @@ ARMS: dict[str, tuple[str, int]] = {"unet_r18_scratch": ("U-Net, 15 epochs", 1),
                                     "tessera_v1": ("TESSERA + MLP", 3), "terramind_v1_large": ("TerraMind v1 large", 4)}
 #: Differences shown, as (label, arm a, arm b) for a minus b. The two arms must share draws and seeds.
 PAIRS: list[tuple[str, str, str]] = [("U-Net, 45 minus 15 epochs", "unet_r18_scratch_45ep", "unet_r18_scratch"),
-                                     ("U-Net minus TESSERA", "unet_r18_scratch", "tessera_v1"),
-                                     ("U-Net minus TerraMind", "unet_r18_scratch", "terramind_v1_large")]
+                                     ("U-Net 15 ep. minus TerraMind", "unet_r18_scratch", "terramind_v1_large"),
+                                     ("U-Net 45 ep. minus TerraMind", "unet_r18_scratch_45ep", "terramind_v1_large"),
+                                     ("U-Net 15 ep. minus TESSERA", "unet_r18_scratch", "tessera_v1"),
+                                     ("U-Net 45 ep. minus TESSERA", "unet_r18_scratch_45ep", "tessera_v1")]
 #: Arms of other experiments, ``arm -> (experiment name, arm folder)``, read from ``results/<name>/<chips>/<arm>/``.
 REFERENCES: dict[str, tuple[str, str]] = {"terramind_v1_large": ("2026-10-13_terramind_s1_s2", "terramind_v1_large")}
 
@@ -195,9 +197,15 @@ def fig_kshot(df: pd.DataFrame, styles: dict, path: Path) -> None:
 
 def fig_paired(df: pd.DataFrame, path: Path, metric: str = "macro_f1") -> None:
     budgets = sorted(df["pct"].unique(), reverse=True)
-    fig, axes = plt.subplots(1, len(PAIRS), figsize=(3.4 * len(PAIRS) + 0.8, 3.9), sharey=True, squeeze=False)
+    # At most three panels a row: five pairs on one row would be too wide to read.
+    ncols = min(3, len(PAIRS))
+    nrows = -(-len(PAIRS) // ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(3.4 * ncols + 0.8, 3.6 * nrows + 0.3), sharey=True,
+                             squeeze=False)
+    for ax in axes.flat[len(PAIRS):]:
+        ax.set_visible(False)
     rng = np.random.default_rng(0)
-    for ax, (label, a, b) in zip(axes[0], PAIRS, strict=True):
+    for ax, (label, a, b) in zip(axes.flat, PAIRS):
         d = paired(df, a, b, metric)
         for i, k in enumerate(budgets):
             v = d.xs(k, level="pct") if k in d.index.get_level_values("pct") else pd.Series(dtype=float)
@@ -205,14 +213,15 @@ def fig_paired(df: pd.DataFrame, path: Path, metric: str = "macro_f1") -> None:
                 continue
             x = i + rng.uniform(-0.12, 0.12, len(v))
             ax.scatter(x, v, s=40, color=INK_2, alpha=0.75, lw=1.5, edgecolor=SURFACE, zorder=3)
-            ax.hlines(v.mean(), i - 0.28, i + 0.28, color=INK, lw=2, zorder=4)
-            ax.annotate(f"{v.mean():+.3f}", (i + 0.3, v.mean()), va="center", fontsize=9, color=INK)
+            ax.hlines(v.mean(), i - 0.22, i + 0.22, color=INK, lw=2, zorder=4)
+            ax.annotate(f"{v.mean():+.3f}", (i + 0.24, v.mean()), va="center", fontsize=8.5, color=INK)
         ax.axhline(0, color=BASELINE, lw=1.2, zorder=1)
         ax.set_xticks(range(len(budgets)), [f"K = {k:g} %" for k in budgets])
         ax.set_xlim(-0.6, len(budgets) - 0.2)
         ax.grid(axis="x", visible=False)
         ax.set_title(label)
-    axes[0][0].set_ylabel(f"Difference in {dict(METRICS)[metric]}")
+    for row in axes:
+        row[0].set_ylabel(f"Difference in {dict(METRICS)[metric]}")
     fig.text(0.01, -0.03, "Dots: one draw and seed, both arms fit on the same parcels. Bar and value: the mean.",
              color=MUTED, fontsize=8.5)
     fig.tight_layout()
@@ -292,7 +301,8 @@ def fig_per_class(classes: pd.DataFrame, styles: dict, support: dict, path: Path
         p = p.reindex(index=order, columns=budgets)
         p.columns = [f"{k:g} %" for k in budgets]
         im = _heat(ax, p, cmap, vmin, vmax, fmt)
-        ax.set_title(label)
+        # Two lines, so the titles of five narrow panels do not run into each other.
+        ax.set_title(label.replace(" minus ", "\nminus ", 1), fontsize=10)
     axes[0][0].set_yticks(range(len(order)),
                           [f"{pretty(c)} ({support[c]:,})" if c in support else pretty(c) for c in order])
     fig.colorbar(im, ax=axes[0].tolist(), shrink=0.6, label=cbar)
