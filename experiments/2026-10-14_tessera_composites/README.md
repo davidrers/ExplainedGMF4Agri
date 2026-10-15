@@ -2,8 +2,8 @@
 
 Nothing in the main workflow (`src/`, `configs/`, `scripts/`, `tests/`) is edited. The study runs in two stages.
 - **Stage 1**, a feasibility spike, is done. It lives in `spike/` and is reported in [REPORT.md](REPORT.md).
-- **Stage 2**, the fit with the encoder frozen or trained, is designed in [DESIGN.md](DESIGN.md) and built in this
-  folder. Its pilot on `EE_2021_rev_mini` is running.
+- **Stage 2**, the fit with the encoder frozen or trained, is designed in [DESIGN.md](DESIGN.md), built in this
+  folder, and has run on all of Estonia. It is reported in the same file.
 
 **Question.** Can the TESSERA encoder be run on the twelve monthly Sentinel-2 and Sentinel-1 composites that every
 other arm already reads, instead of on its native per-acquisition series, so that it can be fine-tuned without
@@ -64,7 +64,18 @@ The code is in this folder:
 - `metrics.json`;
 - the logs.
 
-**Outcome.** Stage 1: yes ([REPORT.md](REPORT.md)).
+**Outcome.** Stage 2 ([REPORT.md](REPORT.md)): fine-tuning TESSERA v2 Medium on our composites beats keeping it
+frozen in all nine paired fits on `EE_2021_rev`.
+- **Fine-tuned against frozen, test Macro-F1:** 0.667 / 0.630 at K = 100 %, 0.641 / 0.594 at 20 %, 0.589 / 0.553 at
+  5 %. Paired gains +0.037, +0.047 and +0.037.
+- **Against the current TESSERA arm** (v1.0 store, same chips, draw and seeds): the frozen v2 arm is level, within
+  0.017; the fine-tuned one is ahead by 0.042, 0.044 and 0.019.
+- **Against every arm run on `EE_2021_rev`:** the fine-tuned arm is the best so far at every budget.
+- **Where the gain comes from:** within one or two epochs. The validation-loss checkpoint tests the fine-tuned
+  model that early.
+- **Run:** jobs 623163 (frozen, 50 min) and 623164 (fine-tuned, 3 h 46 min) on `itc-gpu`, commit `fb8654f`.
+
+Stage 1: yes.
 - **Probe:** frozen TESSERA on our composites separates crops on the pilot about as well as from its native series.
   Probe Macro-F1 is 0.371 ± 0.003 for v2 Medium on composites, against 0.370 (v1.1 native) and 0.373 (v1.0 native,
   the current arm). Every composite variant lands within 0.018.

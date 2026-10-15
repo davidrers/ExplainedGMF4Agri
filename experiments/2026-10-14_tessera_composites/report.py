@@ -41,6 +41,13 @@ ARMS: dict[str, tuple[str, int]] = {"tessera_v2m_frozen": ("v2 Medium, frozen", 
                                     "tessera_v2m_full": ("v2 Medium, fine-tuned", 2)}
 #: Differences shown, as (label, arm a, arm b) for a minus b. The two arms must share draws and seeds.
 PAIRS: list[tuple[str, str, str]] = [("fine-tuned minus frozen", "tessera_v2m_full", "tessera_v2m_frozen")]
+#: Arms of other experiments on the same chip set, budgets, draw and seeds, drawn beside ours in
+#: ``reference_curves.png``: (experiment, arm, label, categorical slot).
+REFERENCES: list[tuple[str, str, str, int]] = [
+    ("2026-10-14_unet_baseline", "tessera_v1", "TESSERA v1 store (current arm)", 3),
+    ("2026-10-13_terramind_s1_s2", "terramind_v1_large_s2s1", "TerraMind v1 large, S2 + S1", 4),
+    ("2026-10-14_unet_baseline", "unet_r18_scratch_45ep", "U-Net from scratch, 45 epochs", 7),
+]
 
 # The reference palette of the dataviz method: categorical slots in their validated order (the first three pass
 # every check all-pairs on the light surface), chart chrome, and a blue to red diverging ramp with a grey midpoint.
@@ -274,6 +281,29 @@ def fig_per_class(classes: pd.DataFrame, styles: dict, support: dict, path: Path
 
 # -------------------------------------------------------------------------------------------------------- tables
 
+def fig_references(df: pd.DataFrame, styles: dict, chips: str, path: Path) -> str:
+    """Our arms beside REFERENCES on the same chip set: the K curves, and their table in Markdown."""
+    frames, ref_styles = [df], dict(styles)
+    for exp, arm, label, slot in REFERENCES:
+        f = REPO / "results" / exp / chips / "summary.csv"
+        if f.exists():
+            r = pd.read_csv(f)
+            frames.append(r[r["arm"] == arm])
+            ref_styles[arm] = (label, SLOTS[slot - 1], MARKERS[slot - 1])
+    if len(frames) == 1:
+        return ""
+    allf = pd.concat(frames, ignore_index=True)
+    fig_kshot(allf, ref_styles, path)
+    budgets = sorted(allf["pct"].unique(), reverse=True)
+    lines = ["**Test Macro-F1 beside other arms on the same chip set, draw and seeds**, mean +- sd (fits)", "",
+             "| Arm | " + " | ".join(f"K = {k:g} %" for k in budgets) + " |", "|---|" + "---|" * len(budgets)]
+    for arm, (label, _, _) in ref_styles.items():
+        g = allf[allf["arm"] == arm].groupby("pct")["macro_f1"]
+        cells = [f"{g.mean()[k]:.3f} +- {g.std()[k]:.3f} ({g.count()[k]})" if k in g.mean() else "-" for k in budgets]
+        lines.append(f"| {label} | " + " | ".join(cells) + " |")
+    return "\n".join(lines) + "\n"
+
+
 def checkpoint_gap(df: pd.DataFrame, curves: pd.DataFrame) -> pd.DataFrame:
     """Per fit, validation Macro-F1 at the checkpoint kept (lowest validation loss), at its best epoch and at the
     last epoch: how much the checkpoint criterion leaves on the table."""
@@ -367,9 +397,10 @@ def main() -> None:
     if not classes.empty:
         fig_per_class(classes, styles, facts["support"], args.out / "per_class_f1.png")
     text = tables(df, styles, facts, curves)
+    text += "\n" + fig_references(df, styles, args.chips, args.out / "reference_curves.png")
     (args.out / "tables.md").write_text(text)
     print(text)
-    print(f"figures and tables in {args.out.relative_to(REPO)}")
+    print(f"figures and tables in {args.out}")
 
 
 if __name__ == "__main__":
