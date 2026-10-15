@@ -1,0 +1,21 @@
+# tessera_v2m_unet trained for 45 epochs instead of the protocol's 15, everything else identical: does the
+# protocol's training length undertrain a U-Net learned from scratch, on a quarter of the chips?
+# Frozen TESSERA v2 Medium rasters, as tessera_v2m_mlp, with a U-Net decoder: segmentation_models_pytorch's Unet with
+# a ResNet-18 down path on the 128 embedding channels, randomly initialised, about 14 M parameters, all trained.
+# The network and its settings are those of the from-scratch baseline (experiments/2026-10-14_unet_baseline), with
+# the embeddings in place of the 144 composite bands.
+route: raster
+data:
+  normalisation: chips
+  batch_size: 4
+  augment: true
+model:
+  backbone: tessera_v2m_unet
+  lr: 1.0e-3                   # trained from scratch, as the baseline U-Net and the per-pixel heads
+  weight_decay: 0.05
+  head_dropout: 0.1            # before the final 1 x 1 convolution, as the baseline U-Net
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+epochs: 45                     # overrides the experiment's epochs for this arm (run.py)

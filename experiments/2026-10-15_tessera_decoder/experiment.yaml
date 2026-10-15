@@ -1,0 +1,13 @@
+# Does a spatial U-Net decoder add value over the per-pixel MLP on frozen TESSERA embeddings? Frozen TESSERA v2
+# Medium rasters, encoded from the monthly S2 + S1 composites by run.py, with the core's per-pixel MLP or a U-Net
+# (ResNet-18 down path, about 14 M parameters, trained from scratch) as the decoder; the U-Net also at 45 epochs, to
+# see whether the protocol's 15 undertrain it. Quick answer on EE_2021_rev_quarter (a quarter of EE_2021_rev's blocks).
+# The arms are in arms_run/, registered by run.py.
+#   poetry run python experiments/2026-10-15_tessera_decoder/run.py -e experiments/2026-10-15_tessera_decoder/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev_mini
+#   bash scripts/cluster/submit.sh experiments/2026-10-15_tessera_decoder/experiment.yaml EE_2021_rev_quarter
+arms: [tessera_v2m_mlp, tessera_v2m_unet, tessera_v2m_unet_45ep]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss

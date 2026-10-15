@@ -1,0 +1,16 @@
+# Frozen TESSERA v2 Medium rasters (128 dims per 10 m pixel, encoded from the monthly S2 + S1 composites by run.py)
+# with the core's per-pixel MLP decoder (512, 256): the core arm tessera_v1, with v2 rasters in place of the v1 store.
+route: raster
+data:
+  normalisation: chips         # embeddings have no pretraining statistics; training-chip statistics (the sidecar's)
+  batch_size: 4
+  augment: true                # D4 is exact for a per-pixel embedding
+model:
+  backbone: tessera_v2m
+  lr: 1.0e-3                   # a small head trained from scratch
+  weight_decay: 0.05
+  head_dropout: 0.2
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
