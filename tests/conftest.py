@@ -237,3 +237,40 @@ def make_split_chipset(root: Path) -> Path:
 def split_chipset(tmp_path: Path) -> Path:
     """A fresh synthetic full-country chip set under ``tmp_path / "SYN_2021"``."""
     return make_split_chipset(tmp_path / "SYN_2021")
+
+
+class StubChipEncoder:
+    """Stands in for a per-pixel encoder: dimension k of a pixel is its parcel id + k, and the
+    top-left pixel of every chip is NaN, as a pixel without any input would be."""
+
+    def __init__(self, dims: int = 4) -> None:
+        self.dims, self.encoded = dims, []
+
+    def read(self, chip_dir: Path, chip_id: str):
+        import rasterio
+
+        with rasterio.open(Path(chip_dir) / f"{chip_id}.parcels.tif") as src:
+            return chip_id, src.read(1)
+
+    def encode(self, inputs) -> np.ndarray:
+        chip_id, ids = inputs
+        self.encoded.append(chip_id)
+        emb = np.stack([ids.astype(np.float32) + k for k in range(self.dims)])
+        emb[:, 0, 0] = np.nan
+        return emb
+
+
+@pytest.fixture()
+def stub_computed(monkeypatch) -> StubChipEncoder:
+    """A computed 10 m backbone, ``stub_v2``, whose encoder is a :class:`StubChipEncoder`."""
+    from gfm4agri.benchmark import backbones as bb
+    from gfm4agri.pipeline import raster_cache
+
+    encoder = StubChipEncoder()
+    monkeypatch.setitem(bb.BACKBONES, "stub_v2", bb.BackboneSpec(
+        name="stub_v2", resolution_group="pixel_raster", model_args=bb._precomputed(4), stats=None,
+        representation="stub_v2",
+        computed={"encoder": "stub", "student": None, "checkpoint_sha256": "ab" * 32,
+                  "precision": "32-true", "dims": 4, "inputs": [".parcels.tif"]}))
+    monkeypatch.setitem(raster_cache.ENCODERS, "stub", lambda spec, manifest, batch: encoder)
+    return encoder
