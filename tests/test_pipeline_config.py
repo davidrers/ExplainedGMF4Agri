@@ -33,7 +33,8 @@ def _without_run_specific(cfg: dict) -> dict:
 @pytest.mark.parametrize("pct", [100, 20, 5])
 @pytest.mark.parametrize("arm, legacy", GRID.items())
 def test_composed_cell_is_the_grid_configuration(arm, legacy, pct):
-    exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
+    # The grid ran for 15 epochs, kshot's budget until 15 October 2026; since then it is 45.
+    exp = {**load_experiment(CONFIGS / "experiments" / "kshot.yaml"), "epochs": 15}
     got = compose(arm, load_arm(arm), exp, load_machine("hub"), EE, SPLIT, Cell(arm, pct, 0, 0),
                   REPO / "results" / "kshot" / "EE_2021")
     # The grid passed the budget, the draw and 15 epochs on the command line.

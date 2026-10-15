@@ -81,6 +81,11 @@ def test_a_raster_arm_runs_end_to_end_and_resumes(split_chipset, configs, tmp_pa
     (cell / PREDICTIONS).unlink()
     run(exp, split_chipset, arms=["tiny_tessera"], configs=configs, results_root=tmp_path / "results")
     assert (cell / PREDICTIONS).exists() and (cell / "results.json").stat().st_mtime_ns == stamp
+    # Finished cells fitted for another number of epochs are not taken for this experiment's.
+    exp.write_text(yaml.safe_dump({**yaml.safe_load(exp.read_text()), "epochs": 2}))
+    with pytest.raises(SystemExit, match="fitted for 1 epochs, the experiment asks for 2"):
+        run(exp, split_chipset, arms=["tiny_tessera"], dry_run=True, configs=configs,
+            results_root=tmp_path / "results")
 
 
 def test_the_chip_set_check_asks_for_every_modality_an_arm_reads(split_chipset):

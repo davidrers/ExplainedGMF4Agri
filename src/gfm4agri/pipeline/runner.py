@@ -86,6 +86,14 @@ def _state(cell_dir: Path) -> str:
     return "fit"
 
 
+def _fitted_epochs(cell_dir: Path) -> int | None:
+    """The epoch budget a finished cell was fitted with, ``None`` for a cell not fitted."""
+    f = cell_dir / "results.json"
+    if not f.exists():
+        return None
+    return json.loads(f.read_text()).get("config", {}).get("trainer", {}).get("max_epochs")
+
+
 def _git(*args: str) -> str:
     return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True,
                           text=True).stdout.strip()
@@ -182,6 +190,18 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
                   "split": split_dir.name, "git_commit": _git("rev-parse", "HEAD"),
                   "git_dirty": bool(_git("status", "--porcelain")), "machine": machine,
                   "host": socket.gethostname()}
+    # A finished cell is skipped, so one fitted for another number of epochs would pass for this
+    # experiment's; such cells stop the run before anything is computed, and are never overwritten.
+    stale = []
+    for c in cells:
+        got = _fitted_epochs(out_root / c.arm / c.tag)
+        want = compose(c.arm, arm_cfgs[c.arm], exp, mach, chips, split_dir, c,
+                       out_root)["trainer"]["max_epochs"]
+        if got is not None and got != want:
+            stale.append(f"{c.arm}/{c.tag}: fitted for {got} epochs, the experiment asks for {want}")
+    if stale:
+        raise SystemExit(f"finished cells under {out_root} have another epoch budget; move them "
+                         "aside first:\n  " + "\n  ".join(stale))
     _say(f"{exp['name']} on {chips.name} ({split_dir.name}), {len(cells)} cells, "
          f"machine {machine}, commit {provenance['git_commit'][:8]}"
          + (" (dirty tree)" if provenance["git_dirty"] else ""))

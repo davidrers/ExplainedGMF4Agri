@@ -9,5 +9,5 @@ arms: [thor_v1_large_80m]
 budgets_pct: [100, 20, 5]
 draws: [0]
 seeds: [0]
-epochs: 15
+epochs: 45                     # kshot's since 15 October 2026; its 15-epoch cells are in results/kshot_15ep/
 checkpoint: val_loss
