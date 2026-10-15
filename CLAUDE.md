@@ -62,8 +62,9 @@ The 10 m group keeps the per-pixel MLP: a U-Net did not beat it under label scar
 (`experiments/2026-10-15_tessera_decoder`). TESSERA v1 from the store is retired from `kshot`: its rasters sit about
 0.7 px east and 0.4 px south of the chip grid (protocol D25). The earlier arms (`terramind_v1_large`, `thor_v1_large`,
 `tessera_v1`) keep their files for earlier results and experiments. All five current arms ran on `EE_2021_rev_mini`
-on the hub and the cluster on 15 October 2026; **their full-Estonia run on `EE_2021_rev` was submitted on 15 October
-(jobs 623991 to 623995)**. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
+on the hub and the cluster on 15 October 2026, and on all of `EE_2021_rev` at 15 epochs the same day
+(`results/kshot_15ep/EE_2021_rev/`, pipeline.md section 11). **Since then every arm trains for 45 epochs (protocol
+D27), and the six arms, the baseline among them, were resubmitted on `EE_2021_rev` (jobs 624583 to 624588)**. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
 workflow (`experiments/2026-10-08_thor_80m/`, with its own arm file): its full-Estonia cache, about 6.4 TB, fits
 no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
 archived studies in `experiments/`.
@@ -95,8 +96,8 @@ repeated draws, with models compared on the same draws; equal tuning trials and 
 K; no validation labels at low K; cross-country transfer only within one GAEZ v5 agro-ecological zone. AlphaEarth
 was confirmed on 7 October and is implemented, handled like TESSERA.
 
-**Open choices that move the numbers:** the baseline's fit budget (15 epochs undertrain it, protocol open item 10)
-and how `K*` is read against a baseline outside both resolution groups (open item 11); the checkpoint criterion (validation loss picks epoch 6 to 9 for the
+**Open choices that move the numbers:** how `K*` is read against a baseline outside both resolution groups
+(protocol open item 11); the checkpoint criterion (validation loss picks epoch 6 to 9 for the
 token-grid models while validation Macro-F1 peaks at 13), and the block size. THOR's group averaging is untested
 against the concatenation its authors use (pipeline.md section 10).
 

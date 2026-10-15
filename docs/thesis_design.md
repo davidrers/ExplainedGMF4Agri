@@ -162,7 +162,7 @@ nothing to do with the encoder. At K = 100 the draw is every parcel, which repro
 is the consistency check on the budget machinery.
 
 **Open, to be settled in the design sections still outstanding:** the values on the K grid beyond the
-working set of 5, 20 and 100 %, and the fit budget under per-cell GPU training; chip-to-block assignment
+working set of 5, 20 and 100 % (the fit budget is 45 epochs for every model since 15 October 2026); chip-to-block assignment
 and the buffer width; HCAT depth and the class eligibility filter under segmentation; the transfer
 protocol; and how pixel-level XAI is aggregated for Phase 3.
 

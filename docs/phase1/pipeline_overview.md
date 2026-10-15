@@ -111,8 +111,8 @@ that had no pretraining at all. That model is a plain U-Net, a standard segmenta
 about 15 M parameters, which starts from random weights and learns everything from the same
 labelled fields. It reads the same optical and radar pictures, all twelve months stacked
 together, so whatever separates it from a foundation model is the pretraining, not the input. It
-learns more slowly than a decoder on a frozen model: at the 15 rounds of training every model
-gets, it is still improving, and that is an open point.
+learns more slowly than a decoder on a frozen model: after 15 rounds of training it was still
+improving, so every model now gets 45 rounds.
 
 ---
 

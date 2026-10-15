@@ -767,8 +767,9 @@ throughput: the encoding batch, the data loader workers and the cache root. `con
 the three and the chip set into the configuration dictionary the fit functions already took, so
 `fit_cached`, `generate_embeddings`, `fit_end_to_end` and `FitPredictor` are unchanged; a test
 checks that every cell of the full-Estonia grid of 2 October composes to the configuration that
-grid ran with. The experiment `kshot` holds six arms at 100, 20 and 5 %, draw 0, seed 0 and 15
-epochs. Since 15 October 2026 they are `terramind_v1_large_s2s1` and `thor_v1_large_s2s1` (160 m
+grid ran with. The experiment `kshot` holds six arms at 100, 20 and 5 %, draw 0, seed 0 and 45
+epochs, every arm alike (protocol D27); until 15 October 2026 it was 15 epochs, and those results
+were moved to `results/kshot_15ep/`. Since 15 October 2026 they are `terramind_v1_large_s2s1` and `thor_v1_large_s2s1` (160 m
 tokens) on Sentinel-2 and Sentinel-1, `prithvi_eo_v2_600_tl` on Sentinel-2, `tessera_v2_medium`
 and `alphaearth_v1`, and the baseline `unet_r18_scratch_s2s1`. Until then they were TerraMind v1 large and THOR v1 large on Sentinel-2,
 Prithvi-EO-2.0 600M TL, TESSERA v1 from the store and AlphaEarth v1; those arm files stay in
@@ -804,7 +805,9 @@ test was the backbone's name.
 every raster the arms read, every modality included: an arm on Sentinel-1 requires `<chip>_s1rtc.tif`,
 and TESSERA v2 requires the two stacks its encoder reads. A cell is finished when its directory holds `results.json` and
 `predictions_test.npz`, the test-chip predictions in the format of the results notebook, and a
-finished cell is skipped, so a run resumes. `results.json` gains a `provenance` block with the
+finished cell is skipped, so a run resumes. Because a skipped cell is not refitted, the runner
+first compares every finished cell's recorded epochs with the experiment's and stops, naming the
+cells, when they differ; such cells are moved aside by hand and never overwritten. `results.json` gains a `provenance` block with the
 experiment, the chip set, the split, the git commit, whether the tree was dirty, the machine and
 the host. `summary.csv` collects every finished cell of an experiment and chip set. Results land
 in `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/`, logs in
@@ -860,8 +863,9 @@ the 20 % and 5 % fits of section 11 depart from it. The criterion also moves the
 full Estonian grid the token-grid models reach their lowest validation loss at epoch 6 to 9 while
 validation Macro-F1 keeps rising to epoch 13, so a checkpoint chosen on Macro-F1, or the last
 epoch of a fixed budget, would score higher. TESSERA is still improving on both at epoch 15, so
-it is undertrained rather than overfitted. The fit budget, fixed at 15 epochs for that grid
-against 40 in the configurations, is open with it.
+it is undertrained rather than overfitted. The fit budget was 15 epochs for that grid, against
+40 in the configurations, and for `kshot` until 15 October 2026; it is 45 epochs since (protocol
+D27).
 
 **Pixels never observed in the year enter as zeros.** A pixel with no clear observation in any
 month of the year is written as 0 in every band. Under `revised` that holds for 100,367 pixels of
@@ -901,14 +905,6 @@ token-grid arms see neighbouring pixels in the ViT and again in the UNet decoder
 sees none at all and its per-pixel MLP adds none. The U-Net experiment of section 11 bounds what
 that costs at the full budget, about 0.016 test Macro-F1 on a quarter of Estonia; at 5 % the
 U-Net lost 0.093 against the MLP.
-
-**The baseline trains for as long as the GFM arms, and is still improving then.** Every arm of
-`kshot` trains for 15 epochs. The frozen arms reach their lowest validation loss before that, but
-the U-Net learns its features from scratch: on Sentinel-2 alone over all of Estonia its checkpoint
-fell at epoch 12 to 14 in all nine fits, and 45 epochs added 0.05 to 0.07 test Macro-F1 at every
-budget (`experiments/2026-10-14_unet_baseline`). At 15 epochs the comparison therefore favours the
-GFMs by about that much. Whether the baseline, or every arm, gets a longer budget is open with the
-checkpoint criterion.
 
 **The baseline sits outside both resolution groups.** Protocol section 4.8 computes the matching
 budget `K*` within a group, and D21 compares within groups only. The U-Net outputs at 10 m and has
@@ -953,7 +949,7 @@ validation chips, so these runs wire and debug the chain and are not results.
 ### The K-shot workflow pilot, `EE_2021_mini`
 
 `EE_2021_mini` (section 6), 9 October 2026, the experiment `kshot` on the JupyterHub: the five arms at 100, 20 and
-5 %, draw 0, seed 0, 15 epochs, 15 cells in `results/kshot/EE_2021_mini/`. The three token-grid caches were computed
+5 %, draw 0, seed 0, 15 epochs, 15 cells in `results/kshot_15ep/EE_2021_mini/`. The three token-grid caches were computed
 on the fly, 5.1 GB for TerraMind, 8.3 GB for Prithvi and 11 GB for THOR, and the whole run took 68 minutes on the
 A4000. With 32 training and 9 test chips this checks the workflow, not the models. Test Macro-F1:
 
@@ -1062,7 +1058,7 @@ validation and 411 test chips, same split). Mean test Macro-F1 over the three se
 The experiment `kshot` with its new arms (section 9) on `EE_2021_rev_mini`, 15 October 2026, at
 commit `804dd16`: on the JupyterHub, and as five Slurm jobs on `itc-gpu` (623888 to 623892, 2.4 to
 4.6 minutes each), every cache computed on the fly. The cluster's results are in
-`results/_cluster/kshot/EE_2021_rev_mini/`. With 32 training and 9 test chips this checks the
+`results/_cluster/kshot_15ep/EE_2021_rev_mini/`. With 32 training and 9 test chips this checks the
 workflow, not the models. Test Macro-F1, JupyterHub / cluster:
 
 | Arm | 100 % | 20 % | 5 % |
@@ -1080,9 +1076,38 @@ workflow, not the models. Test Macro-F1, JupyterHub / cluster:
 * TESSERA v2's cache took 0.64 s per chip on the cluster. The caches came to 5.1 GB each for
   TerraMind and THOR, 8.3 GB for Prithvi and 1.4 GB for TESSERA v2.
 
-### Full Estonia, the arms of 15 October 2026
+### Full Estonia, the arms of 15 October 2026, 15 epochs
 
-`EE_2021_rev`, the experiment `kshot` at commit `27a51a8`, five Slurm jobs on `itc-gpu` (623991 to
-623995), submitted on 15 October 2026. Every cache is computed on the node's local NVMe; scaled
-from the pilot, the largest, Prithvi's, comes to about 1.1 TB of the 6.4 TB free. Results to
+`EE_2021_rev`, the experiment `kshot` at commit `27a51a8` with 15 epochs, five Slurm jobs on
+`itc-gpu` (623991 to 623995), 15 October 2026, every cache computed on the node's local NVMe.
+Prithvi's job failed during its 20 % fit, when a data-loader worker could not unlink a
+shared-memory file, a fault of the node; its two remaining cells ran as job 624290. The baseline
+did not run at this budget. The results are in `results/kshot_15ep/EE_2021_rev/`. Test Macro-F1,
+draw 0, seed 0:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large, S2 + S1 | 0.661 | 0.566 | 0.433 |
+| THOR v1 large, S2 + S1 | 0.594 | 0.547 | 0.393 |
+| Prithvi-EO-2.0 600M TL, S2 | 0.580 | 0.505 | 0.445 |
+| TESSERA v2 Medium + MLP | 0.605 | 0.562 | 0.504 |
+| AlphaEarth v1 + MLP | 0.521 | 0.465 | 0.427 |
+
+* TerraMind on Sentinel-2 and Sentinel-1 reproduces the seed-0 fits of
+  `experiments/2026-10-13_terramind_s1_s2` to every digit.
+* Frozen TESSERA v2 scores below TESSERA v1 from the store fitted the same way, on the same
+  parcels and seed (`experiments/2026-10-14_unet_baseline`: 0.623, 0.599 and 0.572), by 0.018,
+  0.037 and 0.068. Its validation Macro-F1 is lower at every budget, and at 5 % its checkpoint of
+  lowest validation loss fell at epoch 4 while validation Macro-F1 peaked at epoch 13. Its cache
+  was checked: its normalisation statistics match the rasters, and the rasters match those of
+  `experiments/2026-10-14_tessera_composites` at a cosine similarity of 0.9999.
+* AlphaEarth is the lowest arm. Its rasters pass through the export code of the TESSERA store and
+  have not been checked for the offset found there.
+* Checkpoints fell at epochs 4 to 14. The budget became 45 epochs the same day (protocol D27), so
+  these cells are not the main workflow's results.
+
+### Full Estonia, the arms of 15 October 2026, 45 epochs
+
+`EE_2021_rev`, the experiment `kshot` at commit `94f87ca`, the six arms with the baseline at 45
+epochs, six Slurm jobs on `itc-gpu` (624583 to 624588), submitted on 15 October 2026. Results to
 follow.
