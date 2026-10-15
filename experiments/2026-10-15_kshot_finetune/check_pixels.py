@@ -19,7 +19,7 @@ import numpy as np
 #: Labelled pixels and chips of EE_2021_rev (split blocks4_buf1600_seed0__6b0eb4cb, draw 0), from
 #: chip_parcels.parquet and draw_support: training pixels of the support per K, all validation and test pixels.
 EE_REV_PX = {"train": {100: 46_560_824, 20: 9_351_257, 5: 2_304_641}, "val": 9_966_900, "test": 19_379_279,
-             "test_chips": 1475, "epochs": 15}
+             "test_chips": 1475, "epochs": 45}
 
 
 def _say(msg: str) -> None:

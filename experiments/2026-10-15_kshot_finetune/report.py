@@ -86,10 +86,20 @@ plt.rcParams.update({
 
 # ---------------------------------------------------------------------------------------------------------- data
 
+#: The epochs of this folder's fits, read in ``main``; a frozen fit with another number is not paired with them.
+EPOCHS: list[int | None] = [None]
+
+
+def _epochs(path: Path) -> int | None:
+    return json.loads(path.read_text()).get("config", {}).get("trainer", {}).get("max_epochs")
+
+
 def result_files(sources: list[tuple[Path, list[str] | None]]) -> list[Path]:
-    """The ``results.json`` of every finished fit of the sources, each restricted to its arms (``None``: all)."""
-    return [p for out, arms in sources for p in sorted(out.glob("*/P*_draw*_seed*/results.json"))
-            if arms is None or p.parent.parent.name in arms]
+    """The ``results.json`` of every finished fit of the sources, each restricted to its arms (``None``: all); from
+    the other sources only fits trained for this folder's number of epochs."""
+    files = [(i, p) for i, (out, arms) in enumerate(sources) for p in sorted(out.glob("*/P*_draw*_seed*/results.json"))
+             if arms is None or p.parent.parent.name in arms]
+    return [p for i, p in files if i == 0 or EPOCHS[0] is None or _epochs(p) == EPOCHS[0]]
 
 
 def load(sources: list[tuple[Path, list[str] | None]]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict]:
@@ -496,7 +506,9 @@ def main() -> None:
 
     from gfm4agri.pipeline.config import load_experiment
 
-    name = load_experiment(HERE / "experiment.yaml")["name"]
+    exp = load_experiment(HERE / "experiment.yaml")
+    name = exp["name"]
+    EPOCHS[0] = exp["epochs"]
     results = REPO / "results" / name / args.chips
     sources = [(results, None)] + [(REPO / "results" / e / args.chips, arms) for e, arms in FROZEN.items()]
     df, classes, curves, facts = load(sources)

@@ -7,5 +7,5 @@ arms: [terramind_v1_large_s2s1_ft, prithvi_eo_v2_600_tl_ft, thor_v1_large_s2s1_f
 budgets_pct: [100, 20, 5]      # per cent of the trainable parcels of each class
 draws: [0]
 seeds: [0]
-epochs: 15
+epochs: 45                     # kshot's, from 15 October 2026 (15 before)
 checkpoint: val_loss           # the checkpoint of lowest validation loss

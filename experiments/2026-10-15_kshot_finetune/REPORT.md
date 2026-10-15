@@ -1,7 +1,9 @@
 # The K-shot workflow with every encoder fine-tuned: report, 15 October 2026
 
-Stage 1 of 2: the readiness checks and the pilot on `EE_2021_rev_mini`. The run on all of Estonia (`EE_2021_rev`) is
-submitted (jobs 624389 to 624393); its results will be added here as stage 2.
+Stage 1 of 2: the readiness checks and the pilot on `EE_2021_rev_mini`, at 15 epochs. The run on all of Estonia
+(`EE_2021_rev`) runs at 45 epochs, the main workflow's number since the user's change of 15 October 2026; its results
+will be added here as stage 2. A first, 15-epoch submission (jobs 624389 to 624393) was cancelled for that change after
+about 2 h; its outputs are kept in `results/2026-10-15_kshot_finetune/_cancelled_15_epochs/`.
 
 **Answer, so far.** The workflow is ready and running on all of Estonia.
 - **Checks:** every readiness check of DESIGN.md passes for the four fine-tuned arms on the cluster.
@@ -31,7 +33,7 @@ submitted (jobs 624389 to 624393); its results will be added here as stage 2.
 | 2. Encoder learning rate over the warm-up | 1.25e-6 to 1e-5 | same | same | same |
 | 3. Speed, fine-tuned | 0.064 s per chip | 0.108 s per chip | 0.113 s per chip | 36 us per labelled pixel; 0.62 s per test chip in full |
 | 3. Peak GPU memory, fine-tuned | 18.7 GB | 23.1 GB | 26.7 GB | 8.8 GB |
-| 3. Estimate for the three cells on `EE_2021_rev` | 3.5 h | 5.7 h | 6.1 h | 10.9 h, plus about 1.3 h for the raster cache |
+| 3. Estimate for the three cells on `EE_2021_rev`, 15 epochs (45 epochs: about three times) | 3.5 h | 5.7 h | 6.1 h | 10.9 h, plus about 1.3 h for the raster cache |
 
 THOR's 80 unmoved tensors are the ones `../2026-10-15_gfm_finetune/` explained, less the four of the Sentinel-1
 patch embeddings, which now train since S1 is fed: patch embeddings of bands not fed (Sentinel-3, B01, B09), the
@@ -73,8 +75,8 @@ control land within 0.01 of each other at every K.
 
 ## Next steps
 
-1. Stage 2: when jobs 624389 to 624393 finish, pull, run `check.py --predictions` and
-   `report.py --chips EE_2021_rev` (with the main workflow's `results/kshot/EE_2021_rev/` pulled beside it), and add
-   the results here.
+1. Stage 2: when the 45-epoch jobs finish, pull, run `check.py --predictions` and
+   `report.py --chips EE_2021_rev` (with the main workflow's 45-epoch `results/kshot/EE_2021_rev/` beside it; the report
+   pairs only fits of equal epochs), and add the results here.
 2. Seeds 1 and 2 would give the differences a spread; the runner resumes, so they are an `experiment.yaml` change.
 3. Whether fine-tuning enters the main workflow is a separate decision of the user.

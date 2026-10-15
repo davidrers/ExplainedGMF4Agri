@@ -48,15 +48,14 @@ def apply_overrides() -> None:
         dirs = search or [Path(configs) / "arms"]
         path = next((d / f"{name}.yaml" for d in dirs if (d / f"{name}.yaml").exists()), None)
         arm = yaml.safe_load(path.read_text()) if path is not None else None
-        if arm is None or arm.get("route") not in ROUTES:
+        # Without the switch an arm is the core's (the from-scratch U-Net is end to end there too).
+        if arm is None or arm.get("route") not in ROUTES or "trainable" not in arm.get("model", {}):
             return core_load_arm(name, configs, search)
         spec = get_backbone(arm["model"]["backbone"])
         if arm["route"] == "end_to_end" and spec.representation != "s2_monthly":
             raise ValueError(f"arm {name}: route end_to_end is for an encoder on the Sentinel-2 stack")
         if arm["route"] == "labelled_pixels" and not spec.computed:
             raise ValueError(f"arm {name}: route labelled_pixels is for a computed 10 m raster (TESSERA v2)")
-        if "trainable" not in arm["model"]:
-            raise ValueError(f"arm {name}: route {arm['route']!r} needs model.trainable")
         arm["_file"] = str(path)
         return arm
 

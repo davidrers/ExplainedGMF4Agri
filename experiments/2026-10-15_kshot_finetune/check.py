@@ -47,7 +47,7 @@ import numpy as np  # noqa: E402
 #: Training chips per K on EE_2021_rev (split blocks4_buf1600_seed0__6b0eb4cb, draw 0), as every fit on it
 #: records them (e.g. results/2026-10-13_terramind_s1_s2/EE_2021_rev/*/P*_draw0_seed0/results.json), and its
 #: validation and test chips.
-EE_REV = {"train": {100: 4898, 20: 4213, 5: 2706}, "val": 769, "test": 1475, "seeds": 1, "epochs": 15}
+EE_REV = {"train": {100: 4898, 20: 4213, 5: 2706}, "val": 769, "test": 1475, "seeds": 1, "epochs": 45}
 
 
 def _say(msg: str) -> None:

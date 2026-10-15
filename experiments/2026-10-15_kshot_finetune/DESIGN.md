@@ -18,7 +18,7 @@ longer has; its fine-tuning machinery and its checks carry over.
 Every fine-tuned arm is its core arm with `model.trainable: true` and nothing else changed but the route: the encoder
 is a second AdamW group at `encoder_lr` 1e-5, warmed up linearly over the first epoch, held in eval mode; the
 decoder keeps the core arm's learning rate, batch, precision and epochs. Budgets K = 100, 20 and 5 %, draw 0, seed 0,
-15 epochs, checkpoint of lowest validation loss: `kshot.yaml`'s protocol, so each fine-tuned cell pairs with the main
+45 epochs (15 until the user's change of 15 October 2026), checkpoint of lowest validation loss: `kshot.yaml`'s protocol, so each fine-tuned cell pairs with the main
 workflow's frozen cell on the same parcels.
 
 ## The TESSERA route

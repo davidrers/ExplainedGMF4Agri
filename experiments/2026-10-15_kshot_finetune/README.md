@@ -31,7 +31,8 @@ The code is in this folder:
 - `check.py` and `check_pixels.py`: the readiness checks of DESIGN.md, and the check of the predictions;
 - `report.py`: figures and tables, reading the frozen arms from `results/kshot/<chips>/` without writing there.
 
-**Protocol.** kshot's: K = 100, 20 and 5 %, draw 0, seed 0, 15 epochs, checkpoint of lowest validation loss
+**Protocol.** kshot's: K = 100, 20 and 5 %, draw 0, seed 0, 45 epochs (15 until 15 October 2026), checkpoint of lowest
+validation loss
 (`experiment.yaml`): 15 cells.
 
 **How to run.**
@@ -44,9 +45,14 @@ The code is in this folder:
 
 **Results.** `results/2026-10-15_kshot_finetune/<chip set>/`, with `checks/` for the readiness checks.
 
-**Status, 15 October 2026: ready; all of Estonia running. Stage 1 in [REPORT.md](REPORT.md).**
+**Status, 15 October 2026: ready; all of Estonia running at 45 epochs. Stage 1 in [REPORT.md](REPORT.md).**
 - **Checks.** Every readiness check passes on the cluster for the four fine-tuned arms: step-0 equivalence with the
   core's caches, the switch, eval mode and the warm-up.
 - **Pilot.** The 15 cells on `EE_2021_rev_mini` ran without a numeric fault and reproduce their logged test
   accuracy from their predictions; too small to say whether fine-tuning helps.
-- **Running.** `EE_2021_rev`, jobs 624389 to 624393, about 3.5 to 12 h each once started.
+- **Epochs.** The user moved this experiment and the main workflow from 15 to 45 epochs the same evening. The
+  15-epoch run on `EE_2021_rev` (jobs 624389 to 624393) was cancelled after about 2 h, one cell finished; its outputs
+  are kept in `results/2026-10-15_kshot_finetune/_cancelled_15_epochs/EE_2021_rev/`. The pilot stays at 15 epochs:
+  it tested the workflow, which the epoch count does not change.
+- **Running.** `EE_2021_rev` at 45 epochs, about 10, 17, 18 and 34 h for TerraMind, Prithvi, THOR and TESSERA once
+  started. Its frozen side is the main workflow's 45-epoch run, which the report pairs by epochs.
