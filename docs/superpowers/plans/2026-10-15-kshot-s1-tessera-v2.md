@@ -36,17 +36,22 @@ cd "/data/private/THESIS - ExplainedGMF4Agri"
 git worktree add -b kshot-s1-tessera-v2 /data/private/ExplainedGMF4Agri-kshot-s1 main
 ```
 
-- [ ] **Step 2: Link the data and results of the main checkout into the worktree, and keep the links out of git**
+- [ ] **Step 2: Link every entry of the main checkout's `data/` and `results/` into the worktree**
+
+`data/` and `results/` exist in the worktree already, because git tracks `data/README.md` and `results/eda/`; each
+other entry is linked, and `.gitignore`'s `/data/*` and `/results/*` keep the links out of git.
 
 ```bash
-WT=/data/private/ExplainedGMF4Agri-kshot-s1
-ln -s "/data/private/THESIS - ExplainedGMF4Agri/data" "$WT/data"
-ln -s "/data/private/THESIS - ExplainedGMF4Agri/results" "$WT/results"
-printf '/data\n/results\n' >> "/data/private/THESIS - ExplainedGMF4Agri/.git/info/exclude"
+WT=/data/private/ExplainedGMF4Agri-kshot-s1; MAIN="/data/private/THESIS - ExplainedGMF4Agri"
+for d in data results; do for e in "$MAIN/$d"/*; do n=$(basename "$e"); [ -e "$WT/$d/$n" ] || ln -s "$e" "$WT/$d/$n"; done; done
 cd "$WT" && git status --short
 ```
 
-Expected: `git status --short` prints nothing (`.gitignore` has `/data/*` and `/results/*`, which do not cover a symlink; `info/exclude` does).
+Expected: `git status --short` prints nothing.
+
+*As executed on 15 October 2026:* linking `data` and `results` themselves put the links inside the tracked
+directories, and `/data`, `/results` added to `.git/info/exclude` would have hidden new files under `results/eda/` in
+the main checkout too; both were undone and replaced by the per-entry links above.
 
 - [ ] **Step 3: Run the suite from the worktree as the baseline**
 
@@ -56,7 +61,10 @@ PY=/home/jovyan/.cache/pypoetry/virtualenvs/gfm4agri-7U2rqC_9-py3.11/bin/python
 $PY -m pytest -q 2>&1 | tail -3
 ```
 
-Expected: every test passes (`tests/conftest.py` puts the worktree's `src` first on the path). Record the count.
+Expected: every test passes (`tests/conftest.py` puts the worktree's `src` first on the path), except the twelve
+cases of `test_composed_cell_is_the_grid_configuration` in `tests/test_pipeline_config.py`: in the worktree the chip
+set's path resolves through a link into the main checkout, so `repo_relative` returns it absolute. They pass in the
+main checkout, where Task 8 runs the whole suite again after the merge.
 
 ---
 
@@ -1771,14 +1779,17 @@ $PY -m pytest -q 2>&1 | tail -2
 
 Expected: a clean rebase and a passing suite. If the rebase touched the files of this plan, rerun Task 7 Steps 2 to 4 before going on.
 
-- [ ] **Step 2: Fast-forward `main` and push**
+- [ ] **Step 2: Fast-forward `main`, run the whole suite in the main checkout, and push**
 
 ```bash
 cd "/data/private/THESIS - ExplainedGMF4Agri"
 git pull -q --ff-only origin main
 git merge --ff-only kshot-s1-tessera-v2
+$PY -m pytest -q -p no:cacheprovider; echo "exit $?"
 git push origin main
 ```
+
+Expected: exit 0, the twelve worktree-only failures of Task 0 included.
 
 - [ ] **Step 3: Update the cluster and prefetch the weights**
 
@@ -1808,14 +1819,14 @@ Expected: 15 cells; the new arms' scores close to the hub pilot's (the same draw
 - [ ] **Step 6: Remove the worktree and the branch**
 
 ```bash
-unlink /data/private/ExplainedGMF4Agri-kshot-s1/data
-unlink /data/private/ExplainedGMF4Agri-kshot-s1/results
+WT=/data/private/ExplainedGMF4Agri-kshot-s1
+find "$WT/data" "$WT/results" -maxdepth 1 -type l -delete
 cd "/data/private/THESIS - ExplainedGMF4Agri"
-git worktree remove /data/private/ExplainedGMF4Agri-kshot-s1
+git worktree remove "$WT"
 git branch -d kshot-s1-tessera-v2
 ```
 
-(`unlink` removes the link only, never what it points to.)
+(`find -type l -delete` removes the links only, never what they point to.)
 
 ---
 
