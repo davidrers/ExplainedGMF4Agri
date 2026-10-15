@@ -1,6 +1,7 @@
 # The K-shot arms on every sensor they read, and frozen TESSERA v2 in the main workflow
 
-Design agreed with the user on 15 October 2026, section by section. Status: written, awaiting the user's review.
+Design agreed with the user on 15 October 2026, section by section; reviewed and approved the same day, with the
+per-pixel MLP as the 10 m decoder (section 6).
 
 ## 1. Purpose
 
@@ -12,8 +13,8 @@ set-ups:
 2. **TESSERA runs as a model, not a product.** Frozen TESSERA v2 Medium, from its open weights, encodes our own monthly
    composites, and its output is cached by the runner exactly as the token-grid encoders' is. It replaces the v1.0
    store rasters, which are offset by about one pixel from the chip grid (section 3).
-3. **The 10 m group gets one decoder, chosen by evidence.** The group can take a U-Net or the per-pixel MLP; which
-   one is set from the decoder experiment's result.
+3. **The 10 m group keeps one decoder, chosen by evidence.** A U-Net was tested against the per-pixel MLP on frozen
+   TESSERA v2 and trailed it; the group keeps the MLP (section 6).
 
 ## 2. Decisions
 
@@ -22,15 +23,15 @@ set-ups:
 | S1 | Every GFM that accepts it reads it: TerraMind, THOR, TESSERA v2. Prithvi stays on S2 (pretrained on six HLS optical bands only) | User, 15 October 2026 |
 | TESSERA | v2 Medium, frozen, on the 12 monthly S2 + S1 composites, cached by the runner (approach 1: as the token-grid models, not a hub-built data product) | User, 15 October 2026 |
 | `tessera_v1` | Leaves `kshot.yaml`; its arm file, builder and rasters stay, so earlier results remain refittable | User, 15 October 2026 |
-| The 10 m decoder | One setting for the whole group (TESSERA v2 and AlphaEarth): U-Net or per-pixel MLP, chosen from `experiments/2026-10-15_tessera_decoder` | User, 15 October 2026 |
-| AlphaEarth | Takes the group's decoder, whichever it is | User, 15 October 2026 |
+| The 10 m decoder | The per-pixel MLP, for the whole group (TESSERA v2 and AlphaEarth), as now; the U-Net is not added to the core | User, 15 October 2026, on the first results of `experiments/2026-10-15_tessera_decoder` |
+| AlphaEarth | Takes the group's decoder; with the MLP kept, it is unchanged | User, 15 October 2026 |
 | THOR's band groups | Averaged at every token position, as TerraMind averages its modalities, so THOR's bottleneck and decoder match TerraMind's | User, 15 October 2026 |
 | Order of work | A branch in its own worktree; tests, hub pilot, merge, cluster pilot | This design |
 
 **Out of scope:** a full-Estonia grid (run on the user's word, after this change); comparing THOR's averaging with
-concatenation; THOR on S2 alone with averaging; the from-scratch baseline as a core arm; the 2 October protocol
-changes (K grid, nested repeated draws, equal training steps, low-K validation); TESSERA fine-tuning; the v1.1 store;
-half-month composites.
+concatenation; THOR on S2 alone with averaging; the from-scratch baseline as a core arm; the U-Net as a core
+decoder; the 2 October protocol changes (K grid, nested repeated draws, equal training steps, low-K validation);
+TESSERA fine-tuning; the v1.1 store; half-month composites.
 
 ## 3. Why the v1.0 store rasters go
 
@@ -48,8 +49,8 @@ across a pixel. The v2 rasters are encoded from the composites on the chip grid 
 | `terramind_v1_large_s2s1` | S2 + S1 RTC, modality tokens averaged | `token_grid`, 160 m | `ChannelBottleneck` (40.4 M) + 12.9 M UNet decoder | Replaces `terramind_v1_large`. In the registry since 13 October and run on all of Estonia (`experiments/2026-10-13_terramind_s1_s2`: +0.026, +0.054, +0.025 over S2); its arm file moves to `configs/arms/` |
 | `thor_v1_large_s2s1` | S2 (10 m and 20 m groups) + S1 (VV, VH), the three groups averaged | `token_grid`, 160 m | as TerraMind's, about 53 M | New; replaces `thor_v1_large` |
 | `prithvi_eo_v2_600_tl` | S2, six HLS bands | `token_grid`, 160 m | as TerraMind's | Unchanged |
-| `tessera_v2_medium` | S2 + S1, frozen, cached by the runner | `pixel_raster`, 10 m | the group's decoder (section 6) | New; replaces `tessera_v1` |
-| `alphaearth_v1` | the precomputed annual embedding | `pixel_raster`, 10 m | the group's decoder (section 6) | Decoder follows section 6 |
+| `tessera_v2_medium` | S2 + S1, frozen, cached by the runner | `pixel_raster`, 10 m | per-pixel MLP, about 0.2 M | New; replaces `tessera_v1` |
+| `alphaearth_v1` | the precomputed annual embedding | `pixel_raster`, 10 m | per-pixel MLP, about 0.2 M | Unchanged |
 
 The arm files of `tessera_v1`, `terramind_v1_large` and `thor_v1_large` stay in `configs/arms/` for refits and
 experiments. An arm that reads S1 makes the chip-set check require `_s1rtc.tif`; every chip set on the hub and the
@@ -104,19 +105,16 @@ it does a token-grid cache.
 
 ## 6. The decoder of the 10 m group
 
-- `DECODERS["pixel_raster"]` in `segmentation.py` takes one of two values: the per-pixel MLP (`PixelMLPDecoder`, 512
-  and 256, about 0.2 M parameters, as now) or a U-Net (`segmentation_models_pytorch` `Unet`, ResNet-18 down path,
-  random initialisation, all trained, 14.7 M parameters on 128 channels). The U-Net is the network of
-  `experiments/2026-10-14_unet_baseline` and `experiments/2026-10-15_tessera_decoder`.
-- The setting is per group, so TESSERA v2 and AlphaEarth share it; arms do not choose. The decoder's settings travel
-  with it: MLP lr 1e-3 and dropout 0.2; U-Net lr 1e-3 and head dropout 0.1.
-- **The value is set from `experiments/2026-10-15_tessera_decoder`**, once its three arms have finished on
-  `EE_2021_rev_quarter` and the user has seen the result: the U-Net if it matches or beats the MLP at the protocol's
-  15 epochs; the MLP if it loses; the user's decision if it wins only at 45 epochs, which would conflict with equal
-  training for every model. First paired cell, K = 100 %, seed 0: MLP 0.579, U-Net 0.519 test Macro-F1, with the
-  U-Net's validation Macro-F1 still flattening at epoch 10.
-- The from-scratch baseline decided on 2 October is the same U-Net on the composites; it is not added here, but the
-  two would differ only in their input.
+- **The per-pixel MLP stays** (`DECODERS["pixel_raster"]`, `PixelMLPDecoder`, 512 and 256, about 0.2 M parameters, lr
+  1e-3, dropout 0.2), for TESSERA v2 and AlphaEarth alike. Nothing in the decoder code changes.
+- **Why.** In `experiments/2026-10-15_tessera_decoder` on `EE_2021_rev_quarter`, a U-Net (`segmentation_models_pytorch`
+  `Unet`, ResNet-18 down path, 14.7 M parameters, trained from scratch) on the same frozen TESSERA v2 rasters trailed
+  the MLP at the protocol's 15 epochs: test Macro-F1 0.516 against 0.574 at K = 100 % (3 of 3 seeds), and 0.425
+  against 0.527 at K = 20 % (seed 0), the first results on 15 October 2026. The user chose the MLP on them.
+- **Still open.** The experiment's 45-epoch U-Net arm tells whether the U-Net was only undertrained. If it comes out
+  ahead, adding it to the core is a new decision, against the protocol's equal training for every model.
+- **Consequence for the comparison.** The 10 m arms keep a decoder without spatial context while the token-grid arms
+  have a UNet decoder; the protocol states this beside the decoder input resolution (D20, D21).
 
 ## 7. THOR on S2 + S1
 
@@ -142,10 +140,8 @@ it does a token-grid cache.
    their own.
 2. TESSERA cache decisions (reuse, compute, stop) from its record; a cache missing a chip is not reused.
 3. The datamodule pairs cached embeddings with masks and parcels by chip id, including under D4.
-4. The 10 m group's setting selects the decoder; the U-Net builds at 14.7 M parameters on 128 channels; the MLP is
-   unchanged.
-5. THOR S2 + S1: its groups, its S1 statistics, the averaging, a bottleneck as wide as TerraMind's.
-6. The five arms of `kshot.yaml` load and pass the chip-set check.
+4. THOR S2 + S1: its groups, its S1 statistics, the averaging, a bottleneck as wide as TerraMind's.
+5. The five arms of `kshot.yaml` load and pass the chip-set check.
 
 **Pilots.** `kshot` on `EE_2021_rev_mini`, all five arms, on the hub from the branch, then on the cluster from `main`;
 every new cache computed once there. A failure on the cluster is fixed forward on `main`.
@@ -155,7 +151,7 @@ every new cache computed once there. A failure on the cluster is fixed forward o
 Proposed as text with the implementation and written only once the user agrees:
 
 - **`docs/phase1/protocol.md`:** each arm's input (S1 for TerraMind, THOR and TESSERA; Prithvi on S2 by nature);
-  TESSERA v2 from open weights, frozen; THOR's averaging; the 10 m group's decoder in D21.
+  TESSERA v2 from open weights, frozen; THOR's averaging; the 10 m group's MLP, and the U-Net result behind it, in D21.
 - **`docs/thesis_design.md`:** the model table (TESSERA's access becomes open weights); Phase 2, where TESSERA with
   weights can join the backbone tier of explainability; the sentence on fine-tuning keeps its conclusion with a new
   reason.
