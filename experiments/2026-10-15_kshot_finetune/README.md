@@ -44,5 +44,9 @@ The code is in this folder:
 
 **Results.** `results/2026-10-15_kshot_finetune/<chip set>/`, with `checks/` for the readiness checks.
 
-**Status.** Built; TESSERA checks pass on the hub. Cluster checks and the pilot on `EE_2021_rev_mini` next, then
-all of Estonia (`EE_2021_rev`), which the user asked for once the workflow is ready.
+**Status, 15 October 2026: ready; all of Estonia running. Stage 1 in [REPORT.md](REPORT.md).**
+- **Checks.** Every readiness check passes on the cluster for the four fine-tuned arms: step-0 equivalence with the
+  core's caches, the switch, eval mode and the warm-up.
+- **Pilot.** The 15 cells on `EE_2021_rev_mini` ran without a numeric fault and reproduce their logged test
+  accuracy from their predictions; too small to say whether fine-tuning helps.
+- **Running.** `EE_2021_rev`, jobs 624389 to 624393, about 3.5 to 12 h each once started.

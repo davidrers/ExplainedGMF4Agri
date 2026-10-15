@@ -231,9 +231,14 @@ def fig_kshot(df: pd.DataFrame, styles: dict, path: Path) -> None:
 def fig_paired(df: pd.DataFrame, path: Path, metric: str = "macro_f1") -> None:
     budgets = sorted(df["pct"].unique(), reverse=True)
     pairs = [(label, a, b) for label, a, b in PAIRS if {a, b} <= set(df["arm"])]
-    fig, axes = plt.subplots(1, len(pairs), figsize=(3.4 * len(pairs) + 0.8, 3.9), sharey=True, squeeze=False)
+    # At most three panels a row, so the titles keep their room.
+    ncol = min(3, len(pairs))
+    nrow = -(-len(pairs) // ncol)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(3.9 * ncol + 0.8, 3.6 * nrow + 0.3), sharey=True, squeeze=False)
+    for ax in axes.ravel()[len(pairs):]:
+        ax.set_visible(False)
     rng = np.random.default_rng(0)
-    for ax, (label, a, b) in zip(axes[0], pairs, strict=True):
+    for ax, (label, a, b) in zip(axes.ravel(), pairs):
         d = paired(df, a, b, metric)
         for i, k in enumerate(budgets):
             v = d.xs(k, level="pct") if k in d.index.get_level_values("pct") else pd.Series(dtype=float)
@@ -248,7 +253,8 @@ def fig_paired(df: pd.DataFrame, path: Path, metric: str = "macro_f1") -> None:
         ax.set_xlim(-0.6, len(budgets) - 0.2)
         ax.grid(axis="x", visible=False)
         ax.set_title(label)
-    axes[0][0].set_ylabel(f"Difference in {dict(METRICS)[metric]}")
+    for row in axes:
+        row[0].set_ylabel(f"Difference in {dict(METRICS)[metric]}")
     fig.text(0.01, -0.03, "Dots: one draw and seed, both arms fit on the same parcels. Bar and value: the mean.",
              color=MUTED, fontsize=8.5)
     fig.tight_layout()
