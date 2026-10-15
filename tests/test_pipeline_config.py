@@ -159,3 +159,17 @@ def test_split_is_the_only_one_or_the_named_one(split_chipset):
 def test_paths_inside_the_repository_are_stored_relative(tmp_path):
     assert repo_relative(REPO / "data" / "x") == "data/x"
     assert repo_relative(tmp_path) == str(tmp_path.resolve())
+
+
+def test_a_computed_raster_reaches_the_fit_through_image_root(split_chipset, tmp_path):
+    arm = {"route": "raster", "data": {"normalisation": "chips", "batch_size": 4, "augment": True},
+           "model": {"backbone": "tessera_v2_medium"},
+           "trainer": {"precision": "16-mixed", "log_every_n_steps": 10}}
+    exp = {"epochs": 15}
+    split = resolve_split(split_chipset)
+    cell = Cell("a", 100, 0, 0)
+    plain = compose("a", arm, exp, {"num_workers": 0}, split_chipset, split, cell, tmp_path)
+    assert "image_root" not in plain["data"]
+    cfg = compose("a", arm, exp, {"num_workers": 0}, split_chipset, split, cell, tmp_path,
+                  image_root=tmp_path / "emb")
+    assert cfg["data"]["image_root"] == str((tmp_path / "emb").resolve())   # outside the repository

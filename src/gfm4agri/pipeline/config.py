@@ -138,19 +138,23 @@ def _number(x):
 
 
 def compose(arm_name: str, arm: dict, exp: dict, machine: dict, chips: Path, split_dir: Path,
-            cell: Cell, output_root: Path) -> dict:
+            cell: Cell, output_root: Path, image_root: Path | None = None) -> dict:
     """The configuration dictionary of one cell, in the layout the fit functions read."""
     d, t = arm["data"], arm["trainer"]
     trainer = {"max_epochs": exp["epochs"], "precision": t["precision"],
                "log_every_n_steps": t["log_every_n_steps"]}
     if "accumulate_grad_batches" in t:
         trainer["accumulate_grad_batches"] = t["accumulate_grad_batches"]
+    data = {"root": repo_relative(chips), "split": repo_relative(split_dir),
+            "normalisation": d["normalisation"], "batch_size": d["batch_size"],
+            "num_workers": machine["num_workers"], "augment": d["augment"]}
+    if image_root is not None:
+        # A computed raster (TESSERA v2) is read from its cache, the labels from the chip set.
+        data["image_root"] = repo_relative(image_root)
     return {
         "run_name": arm_name,
         "seed": cell.seed,
-        "data": {"root": repo_relative(chips), "split": repo_relative(split_dir),
-                 "normalisation": d["normalisation"], "batch_size": d["batch_size"],
-                 "num_workers": machine["num_workers"], "augment": d["augment"]},
+        "data": data,
         "label_budget": {"mode": "pct", "pct": _number(cell.pct), "draw_seed": cell.draw},
         "model": copy.deepcopy(arm["model"]),
         "trainer": trainer,

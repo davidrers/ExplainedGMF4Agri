@@ -13,6 +13,7 @@ rasterio = pytest.importorskip("rasterio")
 
 from gfm4agri.benchmark.backbones import BACKBONES, get_backbone  # noqa: E402
 from gfm4agri.benchmark.segmentation_data import EuroCropsSegDataModule, draw_support  # noqa: E402
+from conftest import SYN_SPLIT  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[1]
 PILOT = REPO / "data" / "eurocrops_chips" / "EE_2021_pilot"
@@ -384,3 +385,59 @@ def test_a_stacked_modality_reaches_the_encoder_as_one_image(root_s1, monkeypatc
     assert dm.modality_split is None
     x = img[None]
     assert dm.split_modalities(x) is x
+
+
+V2 = "tessera_v2_medium"
+
+
+def _fake_v2_cache(chips: Path, cache: Path, drop: str | None = None) -> None:
+    """A computed raster cache for ``chips``: dimension k of a pixel is its parcel id + k."""
+    (cache / "chips").mkdir(parents=True)
+    dims = get_backbone(V2).computed["dims"]
+    for f in sorted((chips / "chips").glob("*.parcels.tif")):
+        cid = f.name[: -len(".parcels.tif")]
+        if cid == drop:
+            continue
+        with rasterio.open(f) as src:
+            ids = src.read(1)
+        _write(cache / "chips" / f"{cid}_{V2}.tif",
+               np.stack([ids.astype(np.float32) + k for k in range(dims)]))
+    (cache / f"{V2}.json").write_text(json.dumps({
+        "file_suffix": f"_{V2}.tif", "band_names": [f"D{k:03d}" for k in range(dims)],
+        "normalisation": {"means": [0.0] * dims, "stds": [1.0] * dims}}))
+
+
+def test_a_computed_raster_is_read_from_its_cache_and_paired_with_the_chip_sets_masks(
+        split_chipset, tmp_path):
+    cache = tmp_path / "emb" / V2 / split_chipset.name
+    _fake_v2_cache(split_chipset, cache)
+    dm = EuroCropsSegDataModule(split_chipset, V2, normalisation="chips", batch_size=1, num_workers=0,
+                                augment=True, keep_parcel_ids=np.array([101]),
+                                split_dir=split_chipset / "splits" / SYN_SPLIT, image_root=cache)
+    dm.setup("fit")
+    assert {Path(f).parent for f in dm.train_dataset.image_files} == {cache / "chips"}
+    assert {Path(f).parent for f in dm.train_dataset.segmentation_mask_files} == {split_chipset / "chips"}
+    for _ in range(8):
+        s = dm.train_dataset[0]
+        lab = s["mask"] >= 0
+        # D4 moves image and mask together; only parcel 101 is labelled.
+        assert lab.sum() == 256 and (s["image"][0][lab] == 101).all()
+
+
+def test_a_cache_missing_a_chip_is_refused(split_chipset, tmp_path):
+    cache = tmp_path / "emb" / V2 / split_chipset.name
+    _fake_v2_cache(split_chipset, cache, drop="EE_00004_00000")
+    dm = EuroCropsSegDataModule(split_chipset, V2, normalisation="chips", batch_size=1, num_workers=0,
+                                split_dir=split_chipset / "splits" / SYN_SPLIT, image_root=cache)
+    with pytest.raises(ValueError, match="input rasters and masks differ"):
+        dm.setup("fit")
+
+
+def test_tessera_v2_is_a_10m_backbone_the_runner_computes():
+    spec = get_backbone(V2)
+    assert spec.resolution_group == "pixel_raster" and spec.representation == V2
+    assert spec.computed == {
+        "encoder": "tessera_v2", "student": "medium",
+        "checkpoint_sha256": "3823be7db9d9cfc93f3c2a47c7699be82821ab4e1117d4d2befdb746941ee96e",
+        "precision": "bf16-mixed", "dims": 128, "inputs": ["_merged.tif", "_s1rtc.tif"]}
+    assert not get_backbone("tessera_v1").computed

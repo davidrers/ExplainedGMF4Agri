@@ -21,7 +21,9 @@ Precomputed embeddings (TESSERA and AlphaEarth) enter the same registry with an
 identity backbone, the ``pixel_raster`` group, and a ``representation`` naming the embedding
 rasters to read instead of the Sentinel-2 stack. Their normalisation statistics come from the
 training chips, recorded next to the rasters, because the embedding has no pretraining
-input distribution to match.
+input distribution to match. TESSERA v2 is a third kind: the same identity backbone and group,
+but its raster is computed by the K-shot runner from the chip set's composites with the encoder
+named in ``computed``, and cached outside the chip set.
 """
 
 from __future__ import annotations
@@ -65,6 +67,11 @@ class BackboneSpec:
     #: datamodule hands over the interleaved stack without splitting it; TerraMind takes one
     #: tensor per modality.
     stack_modalities: bool = False
+    #: For a 10 m backbone whose raster the K-shot runner computes rather than reads from the chip
+    #: set (TESSERA v2): ``encoder`` (a key of ``raster_cache.ENCODERS``), ``student``,
+    #: ``checkpoint_sha256``, ``precision``, ``dims`` and the chip-set rasters it reads, ``inputs``.
+    #: Empty for every other backbone.
+    computed: dict = field(default_factory=dict)
 
 
 def _terramind_stats(bands: list[str]) -> tuple[list[float], list[float]]:
@@ -367,6 +374,18 @@ BACKBONES: dict[str, BackboneSpec] = {
         stats=None, representation="tessera_v1",
         notes="precomputed annual embedding, 128 dims per 10 m pixel, from the calendar-year "
               "Sentinel-1 and Sentinel-2 series; read from the public Zarr store"),
+    # TESSERA v2 from its open weights, frozen, run by the K-shot runner on the chip set's monthly
+    # S2 and S1 composites; its 10 m output is cached as an embedding raster
+    # (gfm4agri.pipeline.raster_cache) and read like a precomputed one. It replaces tessera_v1,
+    # whose store rasters sit about one pixel off the chip grid (decided 15 October 2026).
+    "tessera_v2_medium": BackboneSpec(
+        name="tessera_v2_medium", resolution_group="pixel_raster", model_args=_precomputed(128),
+        stats=None, representation="tessera_v2_medium",
+        computed={"encoder": "tessera_v2", "student": "medium",
+                  "checkpoint_sha256": "3823be7db9d9cfc93f3c2a47c7699be82821ab4e1117d4d2befdb746941ee96e",
+                  "precision": "bf16-mixed", "dims": 128, "inputs": ["_merged.tif", "_s1rtc.tif"]},
+        notes="TESSERA v2 Medium pixel student (21.0 M parameters), frozen, 128 dims per 10 m pixel "
+              "from the 12 monthly S2 and S1 composites; computed and cached by the runner"),
     "alphaearth_v1": BackboneSpec(
         name="alphaearth_v1", resolution_group="pixel_raster", model_args=_precomputed(64),
         stats=None, representation="alphaearth_v1",

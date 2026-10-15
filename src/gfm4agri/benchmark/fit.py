@@ -81,9 +81,11 @@ def fit_end_to_end(cfg: dict, *, fast_dev_run: bool = False) -> dict:
     elif budget["mode"] != "dense":
         raise ValueError(f"label_budget.mode must be dense or pct, not {budget['mode']!r}")
 
+    image_root = REPO / d["image_root"] if d.get("image_root") else None
     dm = EuroCropsSegDataModule(root, cfg["model"]["backbone"], normalisation=d["normalisation"],
                                 batch_size=d["batch_size"], num_workers=d["num_workers"],
-                                augment=d["augment"], keep_parcel_ids=keep, split_dir=split_dir)
+                                augment=d["augment"], keep_parcel_ids=keep, split_dir=split_dir,
+                                image_root=image_root)
     dm.setup("fit")
     labelled = labelled_fraction(dm.train_dataset)
     print(f"train chips {len(dm.train_dataset)}, val chips {len(dm.val_dataset)}, "

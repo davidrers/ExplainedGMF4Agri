@@ -382,11 +382,17 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
     def __init__(self, root: Path | str, backbone: str, *, normalisation: str = "backbone",
                  batch_size: int = 4, num_workers: int = 4, augment: bool = True,
                  keep_parcel_ids: np.ndarray | None = None,
-                 split_dir: Path | str | None = None, **kwargs) -> None:
+                 split_dir: Path | str | None = None, image_root: Path | str | None = None,
+                 **kwargs) -> None:
         root = Path(root)
         split_dir = None if split_dir is None else Path(split_dir)
+        # A computed raster (TESSERA v2) lives in its cache, not in the chip set: the inputs come
+        # from there, the masks, parcel rasters and split files from the chip set.
+        image_root = None if image_root is None else Path(image_root)
         manifest = load_manifest(root)
         spec = get_backbone(backbone)
+        if image_root is not None and (spec.representation == "s2_monthly" or split_dir is None):
+            raise ValueError("image_root holds a computed embedding raster under a spatial split")
         if normalisation not in ("backbone", "chips"):
             raise ValueError(f"normalisation must be 'backbone' or 'chips', not {normalisation!r}")
 
@@ -405,7 +411,7 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
                           for k in ("train", "val", "test")}
             no_data = None
         else:
-            sidecar = json.loads((root / f"{spec.representation}.json").read_text())
+            sidecar = json.loads(((image_root or root) / f"{spec.representation}.json").read_text())
             dataset_bands = sidecar["band_names"]
             bands = list(spec.input_bands or dataset_bands)
             idx = [dataset_bands.index(b) for b in bands]
@@ -452,19 +458,20 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
         for split_name in SPLIT_DIRS:
             listed = split_list(root, split_name, split_dir)
             if listed.exists():
-                roots[split_name] = (split_chip_dir(root, split_name, split_dir), listed)
+                labels = split_chip_dir(root, split_name, split_dir)
+                roots[split_name] = (image_root / "chips" if image_root else labels, labels, listed)
         if "test" not in roots:  # the pilot has no test split; evaluate on validation
             roots["test"] = roots["val"]
 
         super().__init__(
             batch_size=batch_size, num_workers=num_workers,
             num_classes=len(manifest["classes"]),
-            train_data_root=roots["train"][0], train_label_data_root=roots["train"][0],
-            train_split=roots["train"][1],
-            val_data_root=roots["val"][0], val_label_data_root=roots["val"][0],
-            val_split=roots["val"][1],
-            test_data_root=roots["test"][0], test_label_data_root=roots["test"][0],
-            test_split=roots["test"][1],
+            train_data_root=roots["train"][0], train_label_data_root=roots["train"][1],
+            train_split=roots["train"][2],
+            val_data_root=roots["val"][0], val_label_data_root=roots["val"][1],
+            val_split=roots["val"][2],
+            test_data_root=roots["test"][0], test_label_data_root=roots["test"][1],
+            test_split=roots["test"][2],
             img_grep=img_grep, label_grep=MASK_GREP,
             dataset_bands=ds_bands, output_bands=out_bands, means=means_all, stds=stds_all,
             expand_temporal_dimension=temporal, reduce_zero_label=False,
@@ -475,6 +482,7 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
         self.dataset_class = SparseParcelSegmentationDataset
         self.root = root
         self.split_dir = split_dir
+        self.image_root = image_root
         self.manifest = manifest
         self.representation = spec.representation
         #: What follows the chip id in an input raster's name.
@@ -494,6 +502,18 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
 
     def setup(self, stage: str) -> None:
         super().setup(stage)
+        # TerraTorch pairs input rasters and masks by sorted position. With the inputs in a cache
+        # apart from the masks, a chip missing on one side would shift every pair after it.
+        for name in ("train_dataset", "val_dataset", "test_dataset"):
+            ds = getattr(self, name, None)
+            if ds is None:
+                continue
+            imgs = [Path(f).name[: -len(self.img_suffix)] for f in ds.image_files]
+            masks = [Path(f).name[: -len(MASK_SUFFIX)] for f in ds.segmentation_mask_files]
+            if imgs != masks:
+                odd = sorted(set(imgs) ^ set(masks))[:3]
+                raise ValueError(f"{name}: input rasters and masks differ ({len(imgs)} against "
+                                 f"{len(masks)} chips, e.g. {odd})")
         if self.extra_rasters:
             for name in ("train_dataset", "val_dataset", "test_dataset", "predict_dataset"):
                 ds = getattr(self, name, None)

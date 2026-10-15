@@ -58,6 +58,7 @@ class FitPredictor:
         d = self.cfg["data"]
         self.root = REPO / d["root"]
         self.split_dir = REPO / d["split"] if d.get("split") else None
+        self.image_root = REPO / d["image_root"] if d.get("image_root") else None
         self.class_names = self.results["class_names"]
         self._build()
 
@@ -67,7 +68,7 @@ class FitPredictor:
         m, d = self.cfg["model"], self.cfg["data"]
         self.dm = EuroCropsSegDataModule(self.root, m["backbone"], normalisation=d["normalisation"],
                                          batch_size=1, num_workers=0, augment=False,
-                                         split_dir=self.split_dir)
+                                         split_dir=self.split_dir, image_root=self.image_root)
         ignore = self.dm.manifest["ignore_index"]
         if self.two_stage:
             from gfm4agri.benchmark.cached import build_cached_model
