@@ -38,12 +38,13 @@ The code is in this folder:
 
 **Results.** `results/2026-10-15_gfm_finetune/<chip set>/`, with `checks/` for the readiness checks.
 
-**Status, 15 October 2026: ready, stage 1 reported in [REPORT.md](REPORT.md).**
+**Superseded, 15 October 2026.** The main workflow moved to TerraMind and THOR on S2 + S1 and to frozen TESSERA v2 the same day, so its full-Estonia run was not made here. The user asked instead for the whole K-shot workflow with every encoder fine-tuned: [`../2026-10-15_kshot_finetune/`](../2026-10-15_kshot_finetune/README.md), which carries this folder's machinery and checks over. What stands from here is below.
+
+**Status, 15 October 2026: stage 1 reported in [REPORT.md](REPORT.md).**
 - **Checks.** All readiness checks pass for the three models on the cluster: identical step-0 features, the switch,
   eval mode and the warm-up.
 - **Pilot.** All 54 cells on `EE_2021_rev_mini` reproduce their logged test accuracy from their predictions, with
   no numeric fault.
 - **Too small to answer.** The pilot shows no effect of fine-tuning beyond seed noise: paired differences run from
   +0.045 (Prithvi, K = 100 %) to -0.021 (THOR, K = 20 %).
-- **Next.** The run on all of Estonia (`EE_2021_rev`) waits for the user's go: five jobs, the longest about 17 h,
-  reusing frozen TerraMind from `../2026-10-13_terramind_s1_s2/`.
+- **Next.** Not run here; see the superseding folder above.

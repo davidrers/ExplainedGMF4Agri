@@ -1,0 +1,24 @@
+# TESSERA v2 Medium, fine-tuned: configs/arms/tessera_v2_medium.yaml with the encoder trained (model.trainable). The
+# encoder runs on the twelve monthly S2 + S1 composites of the labelled pixels of each batch and its output, normalised
+# with the frozen raster cache's training-chip statistics, goes to the core's per-pixel MLP. Pixels without a label
+# give no loss, so this is the core's objective; the one departure is that the MLP's batch norm sees the labelled
+# pixels only (DESIGN.md). The encoder is a second AdamW group at encoder_lr, warmed up linearly over the first epoch
+# and held in eval mode. Read by this folder's run.py.
+route: labelled_pixels         # the encoder inside the training loop, on the labelled pixels of each batch
+data:
+  normalisation: chips         # the raster cache's training-chip statistics, fixed
+  batch_size: 4                # chips per step, as the core arm
+  augment: false               # D4 only permutes the pixels of a per-pixel model; it changes nothing here
+model:
+  backbone: tessera_v2_medium
+  lr: 1.0e-3                   # the MLP, constant, as the core arm
+  weight_decay: 0.05
+  head_dropout: 0.2
+  loss: ce
+  trainable: true              # the switch
+  encoder_lr: 1.0e-5
+  encoder_warmup_epochs: 1
+  encoder_chunk: 4096          # pixels per gradient-checkpointed encoder pass; memory only, not the result
+trainer:
+  precision: 16-mixed          # the MLP; the encoder runs under bf16 autocast, as the raster cache was made
+  log_every_n_steps: 10

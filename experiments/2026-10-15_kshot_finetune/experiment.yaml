@@ -1,0 +1,11 @@
+# The K-shot workflow (configs/experiments/kshot.yaml) with every encoder fine-tuned: the arms of kshot with
+# model.trainable, AlphaEarth left out (it has no encoder to train), and the frozen TESSERA control of the
+# labelled-pixel route (DESIGN.md). Budgets, draw, seed, epochs and checkpoint are kshot's; the frozen side is
+# kshot's own results on the same chip set. Run with this folder's run.py; its arms are in arms_run/.
+arms: [terramind_v1_large_s2s1_ft, prithvi_eo_v2_600_tl_ft, thor_v1_large_s2s1_ft, tessera_v2_medium_ft,
+       tessera_v2_medium_lab]
+budgets_pct: [100, 20, 5]      # per cent of the trainable parcels of each class
+draws: [0]
+seeds: [0]
+epochs: 15
+checkpoint: val_loss           # the checkpoint of lowest validation loss

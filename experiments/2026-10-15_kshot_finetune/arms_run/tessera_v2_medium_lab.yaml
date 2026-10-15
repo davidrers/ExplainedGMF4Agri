@@ -1,0 +1,22 @@
+# TESSERA v2 Medium, frozen, on the labelled-pixel route: the control of tessera_v2_medium_ft. The MLP trains on the
+# frozen raster cache's embeddings of the labelled pixels of each batch, so its batch norm sees what the fine-tuned
+# arm's sees. Against the core arm (whole chips) it measures the route alone; against tessera_v2_medium_ft, the
+# fine-tuning alone (DESIGN.md). Read by this folder's run.py.
+route: labelled_pixels         # the MLP on the labelled pixels of each batch
+data:
+  normalisation: chips         # the raster cache's training-chip statistics, fixed
+  batch_size: 4                # chips per step, as the core arm
+  augment: false               # D4 only permutes the pixels of a per-pixel model; it changes nothing here
+model:
+  backbone: tessera_v2_medium
+  lr: 1.0e-3                   # the MLP, constant, as the core arm
+  weight_decay: 0.05
+  head_dropout: 0.2
+  loss: ce
+  trainable: false             # the switch
+  encoder_lr: 1.0e-5           # unused when frozen
+  encoder_warmup_epochs: 1
+  encoder_chunk: 4096
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10

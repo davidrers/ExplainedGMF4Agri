@@ -1,0 +1,22 @@
+# TerraMind v1 large on S2 + S1, fine-tuned: configs/arms/terramind_v1_large_s2s1.yaml with the encoder trained
+# (model.trainable), on the end-to-end route. The encoder is a second AdamW group at encoder_lr, warmed up
+# linearly over the first epoch and held in eval mode; everything else is the core arm's. Read by this
+# folder's run.py (DESIGN.md).
+route: end_to_end              # the encoder inside the training loop; no feature cache
+data:
+  normalisation: backbone      # TerraMind v1 S2L2A and S1RTC pretraining statistics
+  batch_size: 2                # with accumulate_grad_batches 2, an effective batch of 4
+  augment: true                # D4, drawn live per sample
+model:
+  backbone: terramind_v1_large_s2s1
+  lr: 1.0e-4                   # bottleneck, decoder and head, constant, as the core arm
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+  trainable: true              # the switch: false would freeze the encoder on this route
+  encoder_lr: 1.0e-5
+  encoder_warmup_epochs: 1
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10
+  accumulate_grad_batches: 2
