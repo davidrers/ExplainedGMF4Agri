@@ -30,7 +30,7 @@ When an agreed update is made, `pipeline.md` is where it goes:
 - a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
 - a finished run or grid: section 11, Runs, and the Current state below.
 
-## Current state, 13 October 2026
+## Current state, 15 October 2026
 
 The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
 EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
@@ -41,15 +41,27 @@ per-class percentage label budget applied at load time, a frozen encoder with a 
 |---|---|
 | Chip set | **`data/eurocrops_chips/EE_2021_rev/`**, the main workflow's since 13 October 2026: 7,402 chips of 224 x 224 at 10 m, 20 classes, Sentinel-2 composites under the `revised` screening (pipeline.md section 5). Per chip: `_merged.tif` (S2, 144 bands), `.mask.tif`, `.parcels.tif`, and as links into `EE_2021`: `_s1rtc.tif` (S1 RTC, 24 bands), `_tessera.tif` (128-d), `_alphaearth.tif` (64-d). `EE_2021/` is the first export, under the `export_2021` screening; it stays as the parent of those links, and every result before 13 October 2026 was fitted on it |
 | Split | `splits/blocks4_buf1600_seed0__6b0eb4cb`: blocks of 4 x 4 chips, 1,600 m parcel buffer; 4,898 train, 769 validation, 1,475 test chips |
-| Feature caches | None for `EE_2021_rev` yet: every token-grid cache is recomputed for it, since its manifest differs. Of `EE_2021`: `data/embeddings/<backbone>/EE_2021/`, TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB), and `EE_2021_mini` for the three token-grid arms (about 25 GB) |
+| Feature caches | None persistent for `EE_2021_rev`: the cluster computes each job's caches on the node and deletes them after. On the hub, `data/embeddings/<backbone>/EE_2021_rev_mini/` for the four encoders of the current arms, TESSERA v2 included. Of `EE_2021`: `data/embeddings/<backbone>/EE_2021/`, TerraMind v1 large (about 0.8 TB) and Prithvi-EO-2.0 600M TL (about 1.3 TB), and `EE_2021_mini` for the three token-grid arms (about 25 GB) |
 | Pilot | **`data/eurocrops_chips/EE_2021_rev_mini/`**: whole blocks of `EE_2021_rev` as links, 32 training, 16 validation, 9 test chips, same split and the same blocks as `EE_2021_mini` (its counterpart on `EE_2021`); `subset.json` records the blocks. The old 12-chip `EE_2021_pilot/` is archived with `experiments/2026-09_pilot_12chips/` |
 | Cluster | The UT HPC clone holds `EE_2021`, `EE_2021_rev`, `EE_2021_rev_mini`, `EE_2021_mini`, the sample sets and `data/eurocrops/{parquet,vector}`, no caches |
 
-Arms implemented, one file each in `configs/arms/`: **TerraMind v1 large**, **Prithvi-EO-2.0 600M TL** and
-**THOR v1 large** on 160 m tokens (token grid; `ChannelBottleneck` plus a 12.9 M parameter UNet decoder; fitted from
-cached features), **TESSERA v1** and **AlphaEarth v1** (10 m pixel raster; per-pixel MLP; end to end on the
-embedding rasters). All five ran through the K-shot workflow on `EE_2021_mini` on 9 October 2026; THOR and AlphaEarth
-have not yet run on full Estonia. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
+The main workflow's arms since 15 October 2026 (`configs/experiments/kshot.yaml`, one file each in `configs/arms/`);
+each model consumes every sensor of the chip set it was pretrained on (protocol D24):
+
+| Arm | Input | Group and decoder |
+|---|---|---|
+| `terramind_v1_large_s2s1` | S2 + S1, modality tokens averaged | token grid, 160 m; `ChannelBottleneck` + 12.9 M UNet, 53.3 M trainable; from cached features |
+| `thor_v1_large_s2s1` | S2 + S1, its three band groups averaged | as TerraMind, exactly 53,281,492 trainable |
+| `prithvi_eo_v2_600_tl` | S2 only, all it was pretrained on | token grid; same decoder stack |
+| `tessera_v2_medium` | S2 + S1, frozen v2 Medium from open weights, run on the composites and cached by the runner (`pipeline/raster_cache.py`) | 10 m raster; per-pixel MLP, 0.2 M |
+| `alphaearth_v1` | its precomputed 64-d embedding | 10 m raster; per-pixel MLP |
+
+The 10 m group keeps the per-pixel MLP: a U-Net did not beat it under label scarcity
+(`experiments/2026-10-15_tessera_decoder`). TESSERA v1 from the store is retired from `kshot`: its rasters sit about
+0.7 px east and 0.4 px south of the chip grid (protocol D25). The earlier arms (`terramind_v1_large`, `thor_v1_large`,
+`tessera_v1`) keep their files for earlier results and experiments. All five current arms ran on `EE_2021_rev_mini`
+on the hub and the cluster on 15 October 2026; **their full-Estonia run on `EE_2021_rev` was submitted on 15 October
+(jobs 623991 to 623995)**. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
 workflow (`experiments/2026-10-08_thor_80m/`, with its own arm file): its full-Estonia cache, about 6.4 TB, fits
 no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
 archived studies in `experiments/`.
@@ -66,7 +78,7 @@ cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md se
 | 5 | 0.568 | 0.362 | 0.368 |
 
 This does not answer RQ1 yet: TESSERA sits in another resolution group, no cell has an interval, and no
-baseline has run.
+baseline has run. These are the arms before 15 October, on `EE_2021`.
 
 **Not built:** the baseline arm; repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
 and Portugal; Phases 2 and 3.
@@ -82,8 +94,8 @@ K; no validation labels at low K; cross-country transfer only within one GAEZ v5
 was confirmed on 7 October and is implemented, handled like TESSERA.
 
 **Open choices that move the numbers:** the checkpoint criterion (validation loss picks epoch 6 to 9 for the
-token-grid models while validation Macro-F1 peaks at 13), the treatment of the 0.66 % of test pixels without a
-TESSERA embedding (currently zeros), and the block size.
+token-grid models while validation Macro-F1 peaks at 13), and the block size. THOR's group averaging is untested
+against the concatenation its authors use (pipeline.md section 10).
 
 ## Running the pipeline
 
@@ -94,7 +106,7 @@ From the repository root. Every stage resumes from what is already on disk.
 ```bash
 poetry run python scripts/hub/build_country_chips.py --country LV --year 2021 --workers 8 --group-size 2   # S2 chips, masks, manifest; --screening revised by default
 poetry run python scripts/hub/build_s1_chips.py --country EE --year 2021 --workers 12        # S1 RTC beside them
-poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16
+poetry run python scripts/hub/build_tessera_chips.py --root data/eurocrops_chips/EE_2021 --workers 16   # the v1.0 store, retired from kshot
 poetry run python scripts/hub/build_chip_split.py --root data/eurocrops_chips/EE_2021       # block split, chip_parcels.parquet
 poetry run python scripts/hub/fetch_alphaearth_tiles.py --root data/eurocrops_chips/EE_2021 --workers 4
 poetry run python scripts/hub/build_alphaearth_chips.py --root data/eurocrops_chips/EE_2021 --workers 16 \
@@ -251,9 +263,9 @@ docs/superpowers/          design specs and implementation plans
 docs/proposal/, docs/research/, docs/internship/   proposal, research notes, the separate Terramind internship
 src/gfm4agri/data/         EuroCrops loading, class scheme, chip grid and label rasters, spatial blocks, chip split, pilot subset
 src/gfm4agri/chips/        Sentinel-2 and Sentinel-1 monthly compositing
-src/gfm4agri/embeddings/   TESSERA Zarr reader, AlphaEarth tile reader, shared raster export
+src/gfm4agri/embeddings/   TESSERA v2 encoder (vendored, MIT), TESSERA v1.0 Zarr reader, AlphaEarth tile reader, shared raster export
 src/gfm4agri/benchmark/    backbone registry, necks, decoders, datamodule and budget draw, end-to-end and two-stage fits, reload and predict
-src/gfm4agri/pipeline/     the K-shot workflow: config composition, cache lookup, runner
+src/gfm4agri/pipeline/     the K-shot workflow: config composition, cache lookup, TESSERA v2 raster cache, runner
 src/gfm4agri/{baselines,xai,uncertainty,reporting}/   empty placeholders for later work
 scripts/hub/               JupyterHub only: vector fetch; chip, S1, TESSERA, AlphaEarth, split and pilot builders
 scripts/run_kshot.py       the one entry point of the fit, on either machine

@@ -31,15 +31,18 @@ EuroCrops vectors ──┐
                     ├─→ chip grid ──→ label rasters ──┐
 EuroCropsML index ──┘                                 │
                                                       ├─→ chip set ──→ supervision ──→ fit
-Sentinel-2 L2A (Planetary Computer) ──→ monthly composites ──┤
-Sentinel-1 RTC (Planetary Computer) ──→ monthly composites ──┤
-TESSERA v1 (Source Cooperative Zarr) ──→ embedding rasters ──┤
-AlphaEarth v1 (annual COG tiles) ──────→ embedding rasters ──┘
+Sentinel-2 L2A (Planetary Computer) ──→ monthly composites ──┤                          ↑
+Sentinel-1 RTC (Planetary Computer) ──→ monthly composites ──┤              frozen encoders, run once
+AlphaEarth v1 (annual COG tiles) ──────→ embedding rasters ──┤              per chip set and cached:
+TESSERA v1.0 store, retired from K-shot → embedding rasters ─┘                ViT feature maps and
+                                                                               TESSERA v2's raster
 ```
 
 Every stage writes to disk and is resumable, because the network-bound stages, the Sentinel-2
 composites and the TESSERA and AlphaEarth reads, dominate the wall clock and must never be
-repeated by accident.
+repeated by accident. The frozen encoders are not stages of the chip set: the fit runs them over
+the chip set's composites once and caches their output (section 9), TESSERA v2 among them since
+15 October 2026 (section 7).
 
 | Stage | Code | Output |
 |---|---|---|
@@ -48,12 +51,12 @@ repeated by accident.
 | 3. Sentinel-2 composites | `src/gfm4agri/chips/s2_monthly.py` | `<chip>_merged.tif` |
 | 3b. Sentinel-1 composites | `src/gfm4agri/chips/s1_monthly.py`, `scripts/hub/build_s1_chips.py` | `<chip>_s1rtc.tif`, `s1_rtc.json` |
 | 4. Chip export | `scripts/hub/build_country_chips.py` (`--screening revised` by default); a pilot cut from it by `scripts/hub/build_pilot_chipset.py` | `manifest.json` and the chip set; for Estonia `EE_2021_rev` and its pilot `EE_2021_rev_mini` |
-| 5. TESSERA embeddings | `src/gfm4agri/embeddings/tessera.py`, `scripts/hub/build_tessera_chips.py` | `<chip>_tessera.tif`, `tessera_v1.json` |
+| 5. TESSERA v1.0 store embeddings, retired from K-shot | `src/gfm4agri/embeddings/tessera.py`, `scripts/hub/build_tessera_chips.py` | `<chip>_tessera.tif`, `tessera_v1.json` |
 | 5b. AlphaEarth embeddings | `src/gfm4agri/embeddings/alphaearth.py`, `scripts/hub/fetch_alphaearth_tiles.py`, `scripts/hub/build_alphaearth_chips.py` | tiles in `data/alphaearth/aef_v1_annual/<year>/`; `<chip>_alphaearth.tif`, `alphaearth_v1.json` |
 | 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/hub/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
 | 7. Supervision | `src/gfm4agri/benchmark/segmentation_data.py` | the training mask at a budget |
 | 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py` | a `SemanticSegmentationTask` |
-| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms, `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` and `predictions_test.npz`, `summary.csv`; the feature cache in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
+| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` and `predictions_test.npz`, `summary.csv`; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
 | 10. Inspection | `src/gfm4agri/benchmark/evaluation.py`, `notebooks/pipeline/eurocrops_ee_results.ipynb` | reloaded fits, test-chip predictions in `results/seg_cached/ee_predictions/` |
 
 ---
@@ -276,8 +279,10 @@ the report keeps.
 
 ### Sentinel-1 RTC composites
 
-The only consumer of Sentinel-1 among the models is TerraMind, through its `S1RTC` modality, so the
-format is TerraMind's: two bands, VV then VH, as backscatter in decibels. `s1_monthly.py` reads the
+Sentinel-1 is consumed by TerraMind through its `S1RTC` modality, by THOR as a third band group and
+by TESSERA v2 through its Sentinel-1 branch (protocol decision D24). The format is TerraMind's, the
+first consumer: two bands, VV then VH, as backscatter in decibels; THOR and TESSERA map it onto their
+own inputs. `s1_monthly.py` reads the
 Planetary Computer `sentinel-1-rtc` collection, radiometrically terrain-corrected gamma nought in
 linear power, and writes `<chip>_s1rtc.tif`, 24 bands of float32 on the chip's exact transform, in
 the same `(time channels)` layout as the Sentinel-2 chips: `band index = month_index * 2 + band_index`.
@@ -300,13 +305,18 @@ to `s1_reports/<chip>.json` and the provenance and normalisation statistics to `
 from the Sentinel-2 manifest so that neither picks up the other's chips and the manifest hash stamped
 in earlier results stays valid. All 7,402 Estonian chips have Sentinel-1.
 
-In the model, the backbone registry declares `S1RTC` as an extra modality of `terramind_v1_small_s2s1`
-and `terramind_v1_large_s2s1`. The datamodule interleaves the Sentinel-1 raster with the Sentinel-2 stack
-by month, so augmentation keeps the two aligned, normalises each with its own statistics (TerraMind's
-`S1RTC` pretraining statistics under `normalisation: backbone`, those of `s1_rtc.json` otherwise), and
-splits them back into one tensor per modality after normalisation. TerraMind averages the tokens of the two modalities at every position, so the token
-grid, the neck and the decoder are exactly those of the Sentinel-2 run and the two compare at matched
-capacity. So far only the pilot has been fitted with Sentinel-1 (section 11).
+In the model, the backbone registry declares `S1RTC` as an extra modality of `terramind_v1_small_s2s1`,
+`terramind_v1_large_s2s1` and `thor_v1_large_s2s1`. The datamodule interleaves the Sentinel-1 raster with
+the Sentinel-2 stack by month, so augmentation keeps the two aligned, and normalises each with its own
+statistics: the encoder's Sentinel-1 pretraining statistics under `normalisation: backbone` (TerraMind's
+`S1RTC`, THOR's VV and VH at 10 m, both in dB), those of `s1_rtc.json` otherwise. For TerraMind it splits
+them back into one tensor per modality after normalisation, and TerraMind averages the tokens of the two
+modalities at every position, so the token grid, the neck and the decoder are exactly those of the
+Sentinel-2 run and the two compare at matched capacity. THOR takes the two as one stacked image (section
+9). TESSERA v2 reads the raster directly when its cache is computed (section 7). TerraMind on Sentinel-2
+and Sentinel-1 ran on all of Estonia as an experiment before it joined the main workflow
+(`experiments/2026-10-13_terramind_s1_s2`): Sentinel-1 added 0.026, 0.054 and 0.025 test Macro-F1 at
+K = 100, 20 and 5 %, in all nine paired fits.
 
 ---
 
@@ -435,9 +445,66 @@ point to.
 
 ## 7. TESSERA embeddings
 
+TESSERA encodes each 10 m pixel's Sentinel-2 and Sentinel-1 series into one 128-dimensional
+vector, from that pixel alone: no part of the encoder sees a neighbouring pixel. Since 15 October
+2026 the main workflow runs **TESSERA v2 Medium from its open weights, frozen, on the chip set's
+own monthly composites** (protocol decision D25). The v1.0 store rasters it used before are
+described after it; they stay on disk and are no longer read by `kshot`.
+
+### TESSERA v2, computed by the runner
+
+**The encoder.** `src/gfm4agri/embeddings/tessera_v2_model.py` is TESSERA's v2 pixel student and
+its input bucketing, copied verbatim from `ucam-eo/tessera` at commit `e368539` under its MIT
+licence. The Medium student, 21.0 M parameters, is loaded from
+`data/weights/tessera/v2/student_medium.pt`, fetched from Hugging Face
+(`geotessera/TESSERA-V-2.0-2B-M`) when absent and checked against the SHA-256 the registry
+records; it runs in evaluation mode under bf16 with no gradients.
+
+**The inputs are the composites every other arm reads** (`src/gfm4agri/embeddings/tessera_v2.py`):
+
+* Sentinel-2: TESSERA's ten bands in its own order, B04 B02 B03 B08 B8A B05 B06 B07 B11 B12,
+  taken from `<chip>_merged.tif` by band name, as reflectance x 10,000, TESSERA's convention.
+* Sentinel-1: our VV and VH in dB become TESSERA's int16 encoding, (2 dB + 50) x 200, clipped to
+  0 to 32,767, with 0 for a month never observed, TESSERA's missing value. Our composites merge the
+  two orbit directions, so the twelve frames enter as its ascending stream.
+* Dates: the fifteenth of each month, as the day of year.
+
+Both sensors are standardised with v2's own statistics, and each pixel's valid frames are bucketed
+and padded as v2's `encode_pixels` does. A pixel whose Sentinel-2 is zero in every month, the
+never-observed pixels of section 10, is encoded from Sentinel-1 alone; a pixel with neither comes
+out NaN, which the datamodule replaces with 0 as it did for the store's gaps.
+`experiments/2026-10-14_tessera_composites` established that frozen v2 on these monthly composites
+separates crops about as well as from its native per-acquisition series, and scored the frozen
+arm within 0.017 test Macro-F1 of the v1.0 store arm on all of Estonia.
+
+**The cache** (`src/gfm4agri/pipeline/raster_cache.py`). The encoder's output for a chip never
+changes, so the runner computes it once per chip set, as it does a ViT's feature cache, into
+`<cache root>/tessera_v2_medium/<chip set>/`: `chips/<chip>_tessera_v2_medium.tif`, float32 on the
+chip's own grid; `tessera_v2_medium.json`, the sidecar the datamodule reads, with per-dimension
+statistics of the training chips; and `cache.json`, written last, recording the backbone, the
+student, the checkpoint's SHA-256, the precision, the chip manifest's SHA-256 and the split hash.
+The lookup decides as for the token-grid caches (section 9): a complete cache whose record matches
+is reused, a missing one is computed into the scratch root and resumes the chips already there,
+and a cache made under another record is never written into. It holds one copy per chip, not
+eight D4 variants, because a per-pixel encoder commutes with rotation and flipping. Chips are read
+on a thread eight ahead of the encoder. On the cluster's RTX PRO 6000 a chip takes 0.64 s, so all
+7,402 Estonian chips take about 80 minutes and about 180 GB.
+
+**The fit** is the `raster` route of section 9, unchanged except that the datamodule reads the
+embeddings from the cache and the masks and parcel rasters from the chip set, paired by chip id.
+
+### The v1.0 store, retired from the K-shot workflow
+
 TESSERA v1 encodes each 10 m pixel's full-year Sentinel-1 and Sentinel-2 series into one
 128-dimensional vector. The embeddings are precomputed and served from Source Cooperative as a
 Zarr v3 store, one group per UTM zone, quantised to int8 with one float32 scale per pixel.
+
+**Its rasters are offset from the chip grid**, by about 0.7 pixel east and 0.4 pixel south, 5 to
+8 m, measured on `EE_2021_rev_mini` on 15 October 2026: ridge maps from the v1.0 raster, shifted
+by up to two pixels, onto three grid-aligned references (v2 Medium and v1.1 on our composites, and
+the v1.1 store read afresh) all fit best at one pixel east. Every TESSERA v1 result, the
+full-Estonia grid of section 11 included, was trained with that offset. Its cause is not
+established; section 10 records it.
 
 The store is read directly with `zarr` over HTTPS rather than through the `geotessera` client,
 for two reasons: the client that knows the new location requires Python 3.12 and this
@@ -552,9 +619,11 @@ twelve-band stack has 144.
 
 ## 9. Model assembly and the fit
 
-A fit is a **frozen encoder with a trainable decoder**. Full encoder fine-tuning is out of
-scope because it is unavailable for the precomputed-embedding models, so allowing it for the
-open-weight models would make the comparison incoherent.
+A fit is a **frozen encoder with a trainable decoder**. Full encoder fine-tuning is outside the
+main comparison: AlphaEarth ships only embeddings, so a frozen encoder is the one setting every
+model shares, and allowing fine-tuning for the open-weight models alone would make the comparison
+incoherent. What fine-tuning adds is studied in experiments (`experiments/2026-10-14_tessera_composites`,
+`experiments/2026-10-15_gfm_finetune`).
 
 `backbones.py` is the registry. Each entry declares the model arguments, the pretraining
 statistics, the band subset the encoder consumes, the resolution group, and whether the encoder
@@ -562,9 +631,12 @@ takes coordinates. The registry is what keeps per-model differences declarative:
 reads the band subset and the statistics from it rather than having them copied into a config
 by hand.
 
-**Inputs differ by model, and the differences are declared rather than incidental.** Prithvi
+**Inputs differ by model, and the differences are declared rather than incidental.** Each model
+consumes every sensor of the chip set it was pretrained on (protocol decision D24): TerraMind, THOR
+and TESSERA v2 the Sentinel-2 and Sentinel-1 stacks, Prithvi the Sentinel-2 stack alone. Prithvi
 consumes only its six pretrained HLS bands, so on Sentinel-2 `NIR_NARROW` is B8A. TerraMind is
-single-date, so a temporal wrapper runs it per month and concatenates the monthly features.
+single-date, so a temporal wrapper runs it per month and concatenates the monthly features; its
+Sentinel-1 is the `S1RTC` modality of section 5.
 Prithvi is natively multi-temporal, so the twelve months enter one ViT as twelve token planes
 with a 3D positional embedding. THOR v1 large, like TerraMind, is single-date and runs per month
 through the same temporal wrapper. It tokenises its two Sentinel-2 groups apart, the four 10 m
@@ -575,9 +647,18 @@ which gives the 14 x 14 grid TerraMind has on the same chip; the user fixed this
 2026 for parity with TerraMind. The 80 m variant, 8 and 4 px patches on a 28 x 28 grid, was studied on the
 12-chip pilot and run again under the K-shot protocol as an experiment (`experiments/2026-10-08_thor_80m/`),
 `thor_v1_large_80m` in its own resolution group `token_grid_80m`. It is not an arm of the main workflow: its
-full-Estonia cache, 154 MB per chip encoding, comes to about 6.4 TB. The two groups' token maps are concatenated on the channel
-axis, as THOR's authors do for dense tasks, and THOR's pretraining statistics, given in
-reflectance, are scaled to the chips' reflectance x 10,000. THOR is not part of TerraTorch: its
+full-Estonia cache, 154 MB per chip encoding, comes to about 6.4 TB. THOR's pretraining statistics, given in
+reflectance, are scaled to the chips' reflectance x 10,000.
+
+**THOR on Sentinel-2 and Sentinel-1**, `thor_v1_large_s2s1`, is the main workflow's THOR since 15
+October 2026. VV and VH, read from `<chip>_s1rtc.tif`, enter as one stacked image with the
+Sentinel-2 bands and form a third band group, THOR's 10 m IW group, at 16 px and so on the same
+14 x 14 grid, normalised with THOR's Sentinel-1 statistics at 10 m in dB; a month never observed
+enters at the band mean. The three groups are **averaged** at every token position
+(`backbone_merge_method: mean`), as TerraMind averages its modalities, so each month contributes
+1,024 channels per selected layer and the bottleneck and decoder are exactly TerraMind's: 53,281,492
+trainable parameters for both. THOR's authors concatenate the groups on the channel axis for dense
+tasks, as the Sentinel-2 arm `thor_v1_large` does, and the two have not been compared (section 10). THOR is not part of TerraTorch: its
 backbones register through `thor_terratorch_ext`, which `scripts/env/install_thor.sh` installs
 outside the Poetry lock at fixed commits on both machines. Encoders with date and location encodings additionally receive
 `temporal_coords`, the year and zero-based day of year of the fifteenth of each month, and
@@ -595,14 +676,18 @@ score difference is attributable to the encoder.
   `LearnedInterpolateToPyramidal` and a 12.9 M parameter `UNetDecoder`. The bottleneck is not
   cosmetic. TerraMind concatenates twelve monthly feature maps, so without it the large variant
   carries 815 M trainable parameters against Prithvi's 63 M, which is neither comparable nor
-  trainable on a 16 GB card. THOR's two concatenated groups double that width to 24,576
-  channels per selected layer, so its bottleneck carries more weights than TerraMind's. The projection also mixes the months of each token position, so it
+  trainable on a 16 GB card. THOR on Sentinel-2 alone concatenates its two groups, which doubles
+  that width to 24,576 channels per selected layer, so its bottleneck carries more weights than
+  TerraMind's; THOR on Sentinel-2 and Sentinel-1 averages its three groups and matches TerraMind
+  exactly. The projection also mixes the months of each token position, so it
   is where the decoder first learns which dates matter.
 * `pixel_raster`: `PixelMLPDecoder`, a per-pixel MLP written as 1 x 1 convolutions, two hidden
   layers of 512 and 256. Every output pixel depends only on that pixel's embedding, so the
   score measures the embedding itself. This follows the head the TESSERA authors use for crop
-  classification. AlphaEarth uses the same head with the same hyperparameters, so the two
-  precomputed embeddings differ only in the embedding.
+  classification. TESSERA v2 and AlphaEarth use the same head with the same hyperparameters, so
+  the two embeddings differ only in the embedding. A spatial U-Net in its place was tested on
+  frozen TESSERA v2 and kept out (`experiments/2026-10-15_tessera_decoder`, section 11): the 10 m
+  group therefore sees no spatial context beyond its encoder's, which for TESSERA is none.
 
 The task is a TerraTorch `SemanticSegmentationTask` built through `EncoderDecoderFactory`, with
 `freeze_backbone=True`, AdamW, and cross-entropy that ignores the unlabelled pixels.
@@ -665,9 +750,12 @@ throughput: the encoding batch, the data loader workers and the cache root. `con
 the three and the chip set into the configuration dictionary the fit functions already took, so
 `fit_cached`, `generate_embeddings`, `fit_end_to_end` and `FitPredictor` are unchanged; a test
 checks that every cell of the full-Estonia grid of 2 October composes to the configuration that
-grid ran with. The experiment `kshot` holds the five arms, TerraMind v1 large, Prithvi-EO-2.0
-600M TL, THOR v1 large on 160 m tokens, TESSERA v1 and AlphaEarth v1, at 100, 20 and 5 %, draw 0,
-seed 0 and 15 epochs.
+grid ran with. The experiment `kshot` holds five arms at 100, 20 and 5 %, draw 0, seed 0 and 15
+epochs. Since 15 October 2026 they are `terramind_v1_large_s2s1` and `thor_v1_large_s2s1` (160 m
+tokens) on Sentinel-2 and Sentinel-1, `prithvi_eo_v2_600_tl` on Sentinel-2, `tessera_v2_medium`
+and `alphaearth_v1`. Until then they were TerraMind v1 large and THOR v1 large on Sentinel-2,
+Prithvi-EO-2.0 600M TL, TESSERA v1 from the store and AlphaEarth v1; those arm files stay in
+`configs/arms/` for the earlier results and for experiments.
 
 **Experiments run on the same runner without touching it.** An experiment lives in its own folder,
 `experiments/<date>_<name>/`, with an `experiment.yaml` the runner takes by path, arm files in `arms/` that are
@@ -679,7 +767,10 @@ workflow's.
 
 **Two routes.** The token-grid arms are always fitted from cached features with `fit_cached`;
 training them with the encoder inside the loop is no longer part of the workflow. The raster
-arms train end to end on their embedding rasters with `fit_end_to_end`.
+arms train end to end on their embedding rasters with `fit_end_to_end`. A raster is either a
+product of the chip set, as AlphaEarth's is, or computed by a frozen encoder the registry entry
+names under `computed`, as TESSERA v2's is: the runner then resolves its cache (section 7) before
+the arm's first fit, and passes the cache as the image root while the masks come from the chip set.
 
 **A cache is looked up before it is computed.** For a token-grid arm the runner looks for
 `<cache root>/<backbone>/<chip set>/`. It reuses that cache as it is only when its `cache.json`
@@ -692,7 +783,8 @@ root, as on the hub, the run stops and names the fields that differ. Before this
 test was the backbone's name.
 
 **What a run writes.** Before any compute the runner checks that the chip set holds the split and
-every raster the arms read. A cell is finished when its directory holds `results.json` and
+every raster the arms read, every modality included: an arm on Sentinel-1 requires `<chip>_s1rtc.tif`,
+and TESSERA v2 requires the two stacks its encoder reads. A cell is finished when its directory holds `results.json` and
 `predictions_test.npz`, the test-chip predictions in the format of the results notebook, and a
 finished cell is skipped, so a run resumes. `results.json` gains a `provenance` block with the
 experiment, the chip set, the split, the git commit, whether the tree was dirty, the machine and
@@ -763,10 +855,38 @@ flags on every date. The datamodule does not treat them as nodata.
 experiment before that date used the `export_2021` composites. They are not paired with fits on
 `EE_2021_rev`, so a difference between the two includes the screening.
 
-**TESSERA pixels without an embedding enter as zeros.** Section 7 gives their share. The
+**TESSERA v1 pixels without an embedding enter as zeros.** Section 7 gives their share. The
 datamodule replaces the missing vector with 0 when the chip is loaded, before normalisation, and
-those pixels are still scored, so TESSERA is tested on pixels it has no input for. The comment beside that replacement in `segmentation_data.py`
-says the share is zero over Estonian farmland, which predates the coverage check.
+those pixels are still scored, so TESSERA v1 is tested on pixels it has no input for. The comment beside that replacement in `segmentation_data.py`
+says the share is zero over Estonian farmland, which predates the coverage check. TESSERA v2 is
+computed from the chip set's own composites, so only a pixel with neither Sentinel-2 nor
+Sentinel-1 in any month lacks an embedding.
+
+**The v1.0 store rasters are offset, for a cause not established.** Section 7 gives the
+measurement, about 0.7 pixel east and 0.4 pixel south. A nearest-neighbour warp between two 10 m
+grids displaces a pixel by at most half a pixel, so the warp alone does not explain it; a
+georeferencing convention of the store or of the reader may. AlphaEarth's rasters are cut from
+UTM tiles by the same export code, `src/gfm4agri/embeddings/export.py`, and have not been checked
+for an offset.
+
+**THOR's band groups are averaged, which its authors do not do.** THOR's authors concatenate the
+groups' token maps for dense tasks. `thor_v1_large_s2s1` averages them so that it matches
+TerraMind's decoder exactly; averaging and concatenation have not been compared on these chips.
+
+**THOR meets terrain-corrected Sentinel-1 it was not pretrained on.** The chip set's Sentinel-1
+is RTC gamma nought; THOR was pretrained on ordinary backscatter. Over flat Estonia the two
+differ little, but the mismatch would grow on relief. TerraMind (`S1RTC`) and TESSERA (Planetary
+Computer `sentinel-1-rtc`) were pretrained on RTC.
+
+**The 10 m group has no spatial context in its decoder.** Protocol decision D21 records it: the
+token-grid arms see neighbouring pixels in the ViT and again in the UNet decoder, while TESSERA
+sees none at all and its per-pixel MLP adds none. The U-Net experiment of section 11 bounds what
+that costs at the full budget, about 0.016 test Macro-F1 on a quarter of Estonia; at 5 % the
+U-Net lost 0.093 against the MLP.
+
+**Earlier `kshot` results are on other arms.** Results of `kshot` before 15 October 2026 used
+TerraMind and THOR on Sentinel-2 alone and TESSERA v1 from the store; they are not paired with the
+current arms.
 
 **Feature caches on the cluster are job-scoped.** The cluster home holds 1 TB, which the Estonian
 chip set (284 GB) and one token-grid cache (744 GB to 1.3 TB) do not fit together, and no project
@@ -857,6 +977,58 @@ The fit hours of the two-stage models exclude stage 1, which took 11.5 h for Ter
 * The 100 % fits' test-chip predictions are stored in `results/seg_cached/ee_predictions/`.
 * None of this answers RQ1 yet. No baseline has run, every cell is a single draw and seed, and
   the checkpoint criterion of section 10 is unsettled.
-* THOR v1 large and AlphaEarth v1 were implemented after this grid, on 7 and 8 October, and have
-  not run on full Estonia yet; THOR ran only on the 12-chip pilot. Both are arms of the K-shot
-  experiment, so its full-Estonia run adds their cells to this table.
+* THOR v1 large and AlphaEarth v1 were implemented after this grid, on 7 and 8 October, and did
+  not run in it. The arms of the K-shot experiment changed on 15 October; their full-Estonia run
+  on `EE_2021_rev` is listed below.
+
+### The decoder of the 10 m group, `EE_2021_rev_quarter`
+
+`experiments/2026-10-15_tessera_decoder`, 15 October 2026, jobs 623444 to 623446 on `itc-gpu` at
+commit `0ab085d`. On frozen TESSERA v2 Medium rasters, the per-pixel MLP at 15 epochs against a
+U-Net with a ResNet-18 down path, 14.7 M parameters trained from scratch, at 15 and at 45 epochs; K = 100, 20
+and 5 %, draw 0, seeds 0 to 2, on a quarter of `EE_2021_rev`'s blocks (1,190 training, 169
+validation and 411 test chips, same split). Mean test Macro-F1 over the three seeds:
+
+| Decoder | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| Per-pixel MLP, 15 epochs | 0.573 | 0.532 | 0.451 |
+| U-Net, 15 epochs | 0.516 | 0.444 | 0.259 |
+| U-Net, 45 epochs | 0.589 | 0.530 | 0.358 |
+
+* At the protocol's 15 epochs the U-Net lost all nine paired fits.
+* At 45 epochs it gained 0.016 at K = 100 % (3 of 3 fits), mostly at parcel edges, was level at
+  20 % and lost 0.093 at 5 % (0 of 3).
+* It makes parcels more coherent, but loses whole small parcels, concentrated in the rare
+  classes, which Macro-F1 weighs as much as grassland.
+* The main workflow kept the MLP (the user, 15 October 2026; protocol decision D21). The full
+  report is the experiment's `REPORT.md`.
+
+### The arms of 15 October 2026, pilots on `EE_2021_rev_mini`
+
+The experiment `kshot` with its new arms (section 9) on `EE_2021_rev_mini`, 15 October 2026, at
+commit `804dd16`: on the JupyterHub, and as five Slurm jobs on `itc-gpu` (623888 to 623892, 2.4 to
+4.6 minutes each), every cache computed on the fly. The cluster's results are in
+`results/_cluster/kshot/EE_2021_rev_mini/`. With 32 training and 9 test chips this checks the
+workflow, not the models. Test Macro-F1, JupyterHub / cluster:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large, S2 + S1 | 0.117 / 0.135 | 0.075 / 0.082 | 0.056 / 0.040 |
+| Prithvi-EO-2.0 600M TL | 0.092 / 0.091 | 0.111 / 0.084 | 0.106 / 0.079 |
+| THOR v1 large, S2 + S1 | 0.118 / 0.156 | 0.067 / 0.054 | 0.065 / 0.089 |
+| TESSERA v2 Medium + MLP | 0.209 / 0.209 | 0.192 / 0.191 | 0.157 / 0.157 |
+| AlphaEarth v1 + MLP | 0.161 / 0.161 | 0.126 / 0.126 | 0.132 / 0.133 |
+
+* The 10 m arms agree across the two machines to within 0.001. The token-grid arms differ by up
+  to 0.038, Prithvi, whose code did not change, by up to 0.027: the run-to-run variation of GPU
+  fits seen on `EE_2021_mini` on 9 October, not an effect of the change.
+* THOR on Sentinel-2 and Sentinel-1 has exactly TerraMind's 53,281,492 trainable parameters.
+* TESSERA v2's cache took 0.64 s per chip on the cluster. The caches came to 5.1 GB each for
+  TerraMind and THOR, 8.3 GB for Prithvi and 1.4 GB for TESSERA v2.
+
+### Full Estonia, the arms of 15 October 2026
+
+`EE_2021_rev`, the experiment `kshot` at commit `27a51a8`, five Slurm jobs on `itc-gpu` (623991 to
+623995), submitted on 15 October 2026. Every cache is computed on the node's local NVMe; scaled
+from the pilot, the largest, Prithvi's, comes to about 1.1 TB of the 6.4 TB free. Results to
+follow.

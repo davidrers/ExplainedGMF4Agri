@@ -62,7 +62,8 @@ must be reported as such.
 **Primary, self-built: EuroCrops polygons rasterised onto Sentinel-2 chips.**
 Parcel polygons come from the EuroCrops vector release, joined to the EuroCropsML parcel index by
 `parcel_id`. Imagery is Sentinel-2 at 10 m, composited onto a **fixed monthly grid, T = 12**, over the
-2021 growing season. Chips are 224 x 224 pixels, that is 2.24 km on a side. Estonia and Latvia are
+2021 growing season, with Sentinel-1 RTC backscatter (VV, VH) composited onto the same grid for the models
+pretrained on it. Chips are 224 x 224 pixels, that is 2.24 km on a side. Estonia and Latvia are
 built first; Portugal is staged and added if the schedule allows. Estimated export is roughly 100 GB
 for the two Baltic countries.
 
@@ -88,24 +89,33 @@ thesis needs a smallholder or tropical extension.
 ## Selection of GFMs
 
 Four pretrained GFMs, all evaluated with **frozen encoders and trainable decoders**. Full encoder
-fine-tuning is out of scope, since it is unavailable for the precomputed-embedding models.
+fine-tuning is outside the main comparison: AlphaEarth ships only embeddings, so a frozen encoder is the one
+setting every model shares, and it keeps a difference in Macro-F1 a difference between representations.
+What fine-tuning adds is studied separately, as experiments; for TESSERA v2 it added about 0.04 test
+Macro-F1 on Estonia at every budget (15 October 2026).
 
-| Model | Distribution | Access | Decoder input | Backbone-tier XAI |
-|---|---|---|---|---|
-| TerraMind (Jakubik et al., 2025) | open weights | TerraTorch | ViT token grid, ~160 m | yes |
-| THOR (Forgaard et al., 2026) | open weights | TerraTorch | ViT token grid, ~160 m | yes |
-| AlphaEarth Foundations (Brown et al., 2025) | precomputed annual embeddings | Earth Engine `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL` | per-pixel raster, 10 m | no |
-| TESSERA (Feng et al., 2025) | precomputed pixel-time-series embeddings | Python sampling library | per-pixel raster, 10 m | no |
+Each model consumes **every sensor of the chip set it was pretrained on**, since withholding a pretrained
+modality would evaluate the model below its design.
+
+| Model | Distribution | Access | Input | Decoder input | Backbone-tier XAI |
+|---|---|---|---|---|---|
+| TerraMind (Jakubik et al., 2025) | open weights | TerraTorch | monthly S2 + S1 | ViT token grid, ~160 m | yes |
+| THOR (Forgaard et al., 2026) | open weights | TerraTorch | monthly S2 + S1 | ViT token grid, ~160 m | yes |
+| AlphaEarth Foundations (Brown et al., 2025) | precomputed annual embeddings | Earth Engine `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL` | its own sources, S1 among them | per-pixel raster, 10 m | no |
+| TESSERA (Feng et al., 2025) | open weights, v2 Medium | vendored encoder, run frozen on the chip set's composites | monthly S2 + S1 | per-pixel raster, 10 m | yes |
 
 The weights-versus-embeddings split is not merely logistical: it sets the ceiling on explainability,
 because attribution back to bands, dates or patches requires gradients or perturbations through the
 encoder. This is why Phase 2 is organised into an embedding tier and a backbone tier.
 
-**Decoder input resolution is a declared experimental factor.** A UNet over a 10 m embedding raster
-begins with 256 times more spatial detail than a UperNet over a 14 x 14 token grid, so a Macro-F1
+**Decoder input resolution is a declared experimental factor.** A decoder over a 10 m embedding raster
+begins with 256 times more spatial detail than one over a 14 x 14 token grid, so a Macro-F1
 difference across that boundary is not attributable to the encoder. Headline comparisons are made
 within a resolution group, one decoder family is fixed per group, and decoder parameter counts are
-reported alongside every result so that a reader can confirm capacity was matched.
+reported alongside every result so that a reader can confirm capacity was matched. The token-grid group
+carries a UNet decoder; the 10 m group carries a per-pixel MLP, because a spatial UNet over frozen TESSERA
+v2 did not beat it under label scarcity (15 October 2026). The 10 m group therefore sees no spatial
+context beyond what its encoder supplies, which for TESSERA, a per-pixel encoder, is none.
 
 **AlphaEarth caveat.** AlphaEarth ships annual embeddings while the labels target a single growing
 season, so its per-pixel vector carries no intra-season phenology at all. This is expected to look
@@ -161,7 +171,8 @@ which is neither comparable nor trainable on a 16 GB card.
 
 Not active. Pixel-level segmentation makes Integrated Gradients, Occlusion and AttnLRP natively
 per-pixel, per-band and per-date, which is a stronger basis for RQ2.1 than attributing a pooled vector.
-The **embedding tier** applies to all four models and the **backbone tier** to TerraMind and THOR only.
+The **embedding tier** applies to all four models and the **backbone tier** to the models with open
+weights: TerraMind, THOR and TESSERA v2.
 Uncertainty uses Monte Carlo Dropout as primary and Deep Ensembles as the heavier comparison, both at
 decoder level, reporting per-pixel predictive entropy with reliability diagrams and Expected
 Calibration Error. RQ2.3 is answered by placing the GFM importances, after binding to agronomic

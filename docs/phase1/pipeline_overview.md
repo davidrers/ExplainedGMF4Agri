@@ -29,13 +29,14 @@ flowchart TD
     A["EuroCrops<br/>field boundaries + crop type"] --> C
     B["EuroCropsML<br/>parcel index, no geometry"] -.cross-check.-> C
     C["Chip grid<br/>2.24 km squares"] --> D["Two label pictures per chip:<br/>which crop, and which field"]
-    E["Sentinel-2<br/>a year of satellite passes"] --> F["12 monthly pictures,<br/>clouds removed"]
-    G["TESSERA<br/>ready-made pixel summaries"] --> H["128 numbers per pixel"]
+    E["Sentinel-2 optical + Sentinel-1 radar<br/>a year of satellite passes"] --> F["12 monthly pictures of each"]
+    G["AlphaEarth<br/>ready-made pixel summaries"] --> H["64 numbers per pixel"]
     D --> I["A chip set on disk"]
     F --> I
     H --> I
-    I --> J["Hide all but K% of the fields"]
-    J --> K["Frozen foundation model<br/>+ small trainable decoder"]
+    I --> M["Frozen foundation models read the pictures once:<br/>TerraMind, THOR, Prithvi, TESSERA"]
+    M --> J["Hide all but K% of the fields"]
+    J --> K["Small trainable decoder"]
     K --> L["Crop map + scores"]
 ```
 
@@ -66,9 +67,16 @@ Baltic December is mostly guesswork and the reader should be able to see that.
 Twelve months matter because crops are told apart by *when* they green up and die back, not by
 what they look like on any single day. Winter wheat and spring barley can look identical in July.
 
-**5. A second, ready-made view.** TESSERA has already digested a full year of Sentinel-1 and
-Sentinel-2 for every 10 m pixel on Earth into 128 numbers. We download those numbers for the same
-tiles. This gives two very different inputs over identical labels, which is what makes the
+The same is done for Sentinel-1, a radar that sees through cloud: twelve monthly pictures of how
+strongly each pixel scatters the radar back, which responds to the crop's structure and wetness
+rather than its colour. Every model that was trained to read radar gets it.
+
+**5. Pixel summaries.** Two of the models summarise each 10 m pixel's year in a short list of
+numbers. AlphaEarth's summaries are ready-made: Google publishes 64 numbers for every pixel on
+Earth, and we download them for the same tiles. TESSERA's model is published itself, so we run
+it on our own twelve monthly optical and radar pictures and get 128 numbers per pixel, lined up
+exactly with our tiles. (TESSERA's ready-made summaries, which we used first, turned out to sit
+about one pixel off our grid.) Either way the labels are identical, which is what makes the
 comparison fair.
 
 **6. Hiding most of the labels.** This is the experiment. To ask "what if we had only annotated
@@ -87,9 +95,13 @@ Two details that matter:
 **7. Training.** The foundation model itself is **frozen**: its weights never change. We train
 only a small decoder on top, which reads the frozen model's output and produces the crop map.
 
-This is deliberate. Two of the four models we compare only exist as precomputed numbers, so they
-*cannot* be fine-tuned. Allowing the others to fine-tune would compare a model that got to adapt
-against models that did not.
+This is deliberate. AlphaEarth only exists as precomputed numbers, so it *cannot* be fine-tuned.
+Allowing the others to fine-tune would compare a model that got to adapt against a model that
+did not. How much fine-tuning would add is measured separately.
+
+The five models of the main comparison: TerraMind and THOR, which read the optical and radar
+pictures; Prithvi, which was trained on optical pictures only and reads those; TESSERA, run on
+both; and AlphaEarth's ready-made summaries.
 
 ---
 
@@ -102,19 +114,25 @@ gets 63 M, the winner may just be whoever got the bigger decoder. TerraMind stac
 outputs, which silently inflated its decoder until we added a projection to squash it back down.
 All the tile-grid models now carry an identical 12.9 M decoder.
 
-**The models do not see the same detail.** TESSERA produces one vector per 10 m pixel. The
-transformer models produce one vector per ~160 m patch, which then has to be upscaled back to
-10 m. That is a 256-fold difference in starting spatial detail, before the encoder is even
-considered. So a TESSERA-versus-transformer gap is *not* evidence about encoder quality, and the
-two are compared within their own group first.
+**The models do not see the same detail.** TESSERA and AlphaEarth produce one vector per 10 m
+pixel. The transformer models produce one vector per ~160 m patch, which then has to be upscaled
+back to 10 m. That is a 256-fold difference in starting spatial detail, before the encoder is
+even considered. So a TESSERA-versus-transformer gap is *not* evidence about encoder quality, and
+the two are compared within their own group first.
+
+The groups also differ in what they know about the neighbours. A transformer looks at the whole
+tile, and its decoder looks around again. TESSERA looks at one pixel's year and nothing else, and
+its decoder judges each pixel on its own. We tried giving it a decoder that looks around: it drew
+cleaner field edges when every label was available, but lost small fields of rare crops, and
+with few labels it did worse. So the per-pixel decoder stays.
 
 ```mermaid
 flowchart LR
     subgraph P["Per-pixel group, 10 m"]
-      T["TESSERA<br/>128 numbers per pixel"] --> TM["Small per-pixel MLP"]
+      T["TESSERA / AlphaEarth<br/>128 or 64 numbers per pixel"] --> TM["Small per-pixel MLP"]
     end
     subgraph G["Token-grid group, ~160 m"]
-      V["TerraMind / Prithvi<br/>patch tokens"] --> VN["Squash to 768 channels"] --> VU["UNet decoder, upscale to 10 m"]
+      V["TerraMind / THOR / Prithvi<br/>patch tokens"] --> VN["Squash to 768 channels"] --> VU["UNet decoder, upscale to 10 m"]
     end
 ```
 

@@ -129,7 +129,8 @@ it does a token-grid cache.
   The cache is half as wide per month as the concatenated set-up's.
 - **Caveats the protocol states.** Averaging is untested for THOR, whose authors concatenate groups for dense tasks;
   the pilot shows the arm runs, not how the two compare. Our S1 is terrain-corrected (RTC), THOR was pretrained on
-  ordinary backscatter; in flat Estonia the two differ little, and TerraMind meets the converse mismatch.
+  ordinary backscatter; in flat Estonia the two differ little. TerraMind (its S1RTC modality) and TESSERA
+  (Planetary Computer `sentinel-1-rtc`) were pretrained on RTC and meet no mismatch.
 
 ## 8. Verification
 
