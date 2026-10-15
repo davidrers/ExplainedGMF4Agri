@@ -72,4 +72,11 @@ checked by SHA-256 (see its README).
 
 **Results.** `results/2026-10-15_tessera_decoder/<set>/`.
 
-**Outcome.** Pending.
+**Outcome.** ([REPORT.md](REPORT.md)) No: on frozen TESSERA v2 Medium the U-Net does not beat the per-pixel MLP under
+label scarcity.
+- **At 15 epochs it loses every paired fit:** test Macro-F1 0.516 / 0.444 / 0.259 against 0.573 / 0.532 / 0.451 at
+  K = 100 / 20 / 5 %.
+- **At 45 epochs it catches up only with every label:** +0.016 at K = 100 %, level at 20 %, -0.093 at 5 %.
+- **It gains spatial coherence and parcel edges, and loses whole small parcels,** concentrated in the rare classes.
+- **The main workflow keeps the MLP** for its 10 m group (the user, 15 October 2026).
+- **Runs:** jobs 623444 to 623446 on `itc-gpu`, commit `0ab085d`, `EE_2021_rev_quarter`.
