@@ -1,0 +1,12 @@
+# TerraMind v1 large, Prithvi-EO-2.0 600M TL and THOR v1 large, each frozen (the core arm, cache route) and
+# fine-tuned (arms_run/<arm>_ft.yaml, end-to-end route with the encoder trained). The pairs share draw and
+# seeds, so they are compared fit by fit. Run through this folder's run.py (DESIGN.md):
+#   poetry run python experiments/2026-10-15_gfm_finetune/run.py -e experiments/2026-10-15_gfm_finetune/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev_mini
+#   bash scripts/cluster/submit.sh experiments/2026-10-15_gfm_finetune/experiment.yaml EE_2021_rev_mini
+arms: [terramind_v1_large, terramind_v1_large_ft, prithvi_eo_v2_600_tl, prithvi_eo_v2_600_tl_ft,
+       thor_v1_large, thor_v1_large_ft]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0, 1, 2]
+epochs: 15
+checkpoint: val_loss
