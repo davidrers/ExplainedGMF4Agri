@@ -60,6 +60,11 @@ class BackboneSpec:
     #: "stats"}``: the raster ``<chip><suffix>`` in the same ``(time channels)`` layout, its
     #: band names in the encoder's order, and ``(bands) -> (means, stds)`` as pretrained.
     extra_modalities: dict = field(default_factory=dict)
+    #: Whether the encoder takes its further modalities as more bands of one image rather than as
+    #: a dictionary of modalities. THOR reads Sentinel-1 as a band group of the same image, so its
+    #: datamodule hands over the interleaved stack without splitting it; TerraMind takes one
+    #: tensor per modality.
+    stack_modalities: bool = False
 
 
 def _terramind_stats(bands: list[str]) -> tuple[list[float], list[float]]:
@@ -206,9 +211,34 @@ def _thor_stats(bands: list[str]) -> tuple[list[float], list[float]]:
     return [p["mean"] * 1e4 for p in params], [p["std"] * 1e4 for p in params]
 
 
-def _thor(variant: str, indices: list[int], bottleneck: int,
-          token_m: int = THOR_TOKEN_M) -> Callable[[list[str], int], dict]:
-    gsd = {**dict.fromkeys(THOR_BANDS_10M, 10), **dict.fromkeys(THOR_BANDS_20M, 20)}
+#: Sentinel-1 as THOR reads it: VV and VH, which THOR maps to its 10 m IW group.
+THOR_S1_BANDS = ("VV", "VH")
+
+
+def _thor_s1_stats(bands: list[str]) -> tuple[list[float], list[float]]:
+    """THOR's pretraining statistics of its S1 bands at 10 m, in dB, the unit of ``_s1rtc.tif``."""
+    _register_thor()
+    from thor_terratorch_ext.models.backbones import thor_vit as tv
+
+    # THOR keys its SAR statistics by ground sampling distance: "S1:IW-VV_10" for 10 m.
+    keys = [f"{tv.lookup_band.get(b)}_10" for b in bands]
+    missing = [b for b, k in zip(bands, keys) if k not in tv.THOR_NORMALIZATION_PARAMS]
+    if missing:
+        raise KeyError(f"THOR was not pretrained on {missing}")
+    params = [tv.THOR_NORMALIZATION_PARAMS[k] for k in keys]
+    return [p["mean"] for p in params], [p["std"] for p in params]
+
+
+#: Sentinel-1 RTC as THOR's third band group: the ``_s1rtc.tif`` TerraMind reads, normalised with
+#: THOR's statistics, and stacked behind the Sentinel-2 bands (``stack_modalities``).
+THOR_S1RTC = {"S1RTC": {"suffix": "_s1rtc.tif", "bands": THOR_S1_BANDS,
+                        "stats": _thor_s1_stats, "sidecar": "s1_rtc.json"}}
+
+
+def _thor(variant: str, indices: list[int], bottleneck: int, token_m: int = THOR_TOKEN_M,
+          merge: str = "concat", s1: bool = False) -> Callable[[list[str], int], dict]:
+    gsd = {**dict.fromkeys(THOR_BANDS_10M, 10), **dict.fromkeys(THOR_BANDS_20M, 20),
+           **dict.fromkeys(THOR_S1_BANDS, 10)}
     if THOR_GROUND_COVER_M % token_m or token_m % max(gsd.values()):
         raise ValueError(f"{token_m} m tokens do not tile the chip in every band group")
 
@@ -216,21 +246,25 @@ def _thor(variant: str, indices: list[int], bottleneck: int,
         # Every path that builds a model asks for these arguments first, so THOR is in
         # TerraTorch's registry by the time the factory looks it up.
         _register_thor()
+        # ``bands`` are the Sentinel-2 bands; S1, when read, follows them in every month, as the
+        # datamodule interleaves it.
+        model_bands = list(bands) + (list(THOR_S1_BANDS) if s1 else [])
         return {
             "backbone": variant,
             "backbone_pretrained": True,
-            "backbone_model_bands": list(bands),
+            "backbone_model_bands": model_bands,
             "backbone_ground_cover": THOR_GROUND_COVER_M,
-            # THOR tokenises each spectral group on its own, at a patch size chosen at
-            # inference. Both groups get tokens of the same ground size: at 160 m, 16 px on the
-            # 10 m bands and 8 px on the 20 m bands, the 14 x 14 grid TerraMind has on the
-            # same chip; at 80 m, 8 and 4 px and a 28 x 28 grid, 4 px being the smallest patch
-            # THOR was pretrained with.
-            "backbone_patch_sizes": {b: token_m // gsd[b] for b in bands},
-            # The two groups' token maps are concatenated on the channel axis, as the THOR
-            # authors do for dense tasks, so THOR hands over maps rather than tokens and needs
-            # no reshaping neck: 2 x embed_dim channels per month.
-            "backbone_merge_method": "concat",
+            # THOR tokenises each band group on its own, at a patch size chosen at inference.
+            # Every group gets tokens of the same ground size: at 160 m, 16 px on the 10 m bands
+            # (S2 and S1) and 8 px on the 20 m bands, the 14 x 14 grid TerraMind has on the same
+            # chip; at 80 m, 8 and 4 px and a 28 x 28 grid, 4 px being the smallest patch THOR
+            # was pretrained with.
+            "backbone_patch_sizes": {b: token_m // gsd[b] for b in model_bands},
+            # THOR hands over maps rather than tokens and needs no reshaping neck. "concat"
+            # stacks the groups' maps on the channel axis, as the THOR authors do for dense
+            # tasks: groups x embed_dim channels per month. "mean" averages them at every token
+            # position, as TerraMind averages its modalities: embed_dim channels per month.
+            "backbone_merge_method": merge,
             # THOR is single-date; the wrapper runs it per month and concatenates the
             # monthly features, as for TerraMind.
             "backbone_use_temporal": True,
@@ -238,7 +272,8 @@ def _thor(variant: str, indices: list[int], bottleneck: int,
             "backbone_temporal_n_timestamps": n_timesteps,
             "necks": [
                 {"name": "SelectIndices", "indices": indices},
-                # 12 months x 2 groups x 1024 = 24,576 channels per layer for the large variant.
+                # Concatenated: 12 months x 2 groups x 1024 = 24,576 channels per layer for the
+                # large variant. Averaged: 12 x 1024 = 12,288, TerraMind's width.
                 {"name": "ChannelBottleneck", "out_channels": bottleneck},
                 {"name": "LearnedInterpolateToPyramidal"},
             ],
@@ -318,6 +353,15 @@ BACKBONES: dict[str, BackboneSpec] = {
         model_args=_thor("thor_v1_large", [5, 11, 17, 23], bottleneck=768, token_m=80),
         stats=_thor_stats, input_bands=THOR_BANDS,
         notes="thor_v1_large on 80 m tokens, 8 and 4 px patches, a 28 x 28 grid"),
+    # THOR on Sentinel-2 and Sentinel-1: S1 is a third band group on the same 160 m grid, and the
+    # three groups are averaged at every token position, as TerraMind averages its two
+    # modalities, so the bottleneck and decoder are TerraMind's (decided 15 October 2026).
+    "thor_v1_large_s2s1": BackboneSpec(
+        name="thor_v1_large_s2s1", resolution_group="token_grid",
+        model_args=_thor("thor_v1_large", [5, 11, 17, 23], bottleneck=768, merge="mean", s1=True),
+        stats=_thor_stats, input_bands=THOR_BANDS, extra_modalities=THOR_S1RTC,
+        stack_modalities=True,
+        notes="thor_v1_large on S2 and S1 RTC (VV, VH), the three band groups averaged per token"),
     "tessera_v1": BackboneSpec(
         name="tessera_v1", resolution_group="pixel_raster", model_args=_precomputed(128),
         stats=None, representation="tessera_v1",

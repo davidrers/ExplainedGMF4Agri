@@ -425,11 +425,13 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
         # treat the two as one image and keep them aligned with each other and with the mask.
         # It is split back into one tensor per modality after normalisation, in
         # ``on_after_batch_transfer``. ``bands`` stays the Sentinel-2 list the encoder's S2L2A
-        # input is built from; the modality brings its own.
+        # input is built from; the modality brings its own. An encoder that reads the modality as
+        # more bands of the same image (``stack_modalities``, THOR) gets the stack unsplit.
         extra = spec.extra_modalities if spec.representation == "s2_monthly" else {}
         ds_bands, out_bands = list(dataset_bands), list(bands)
         means_all, stds_all = list(means), list(stds)
-        extra_rasters, split = [], ([("S2L2A", len(bands))] if extra else None)
+        stacked = spec.stack_modalities
+        extra_rasters, split = [], ([("S2L2A", len(bands))] if extra and not stacked else None)
         for name, m in extra.items():
             mb = list(m["bands"])
             if normalisation == "backbone":
@@ -443,7 +445,8 @@ class EuroCropsSegDataModule(GenericNonGeoSegmentationDataModule):
             means_all += list(mm)
             stds_all += list(ss)
             extra_rasters.append((m["suffix"], len(mb), list(mm)))
-            split.append((name, len(mb)))
+            if split is not None:
+                split.append((name, len(mb)))
 
         roots = {}
         for split_name in SPLIT_DIRS:

@@ -61,7 +61,7 @@ def check_chipset(chips: Path, split_dir: Path, arms: dict[str, dict]) -> list[s
     for name, arm in arms.items():
         spec = get_backbone(arm["model"]["backbone"])
         if spec.representation == "s2_monthly":
-            suffixes = ["_merged.tif"]
+            suffixes = ["_merged.tif", *(m["suffix"] for m in spec.extra_modalities.values())]
         else:
             sidecar = chips / f"{spec.representation}.json"
             if not sidecar.exists():

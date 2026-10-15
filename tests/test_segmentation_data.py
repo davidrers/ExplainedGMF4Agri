@@ -137,7 +137,12 @@ def test_registry_fragments_are_well_formed():
         assert args["backbone"] == name or (
             (spec.extra_modalities or spec.resolution_group != "token_grid")
             and name.startswith(args["backbone"] + "_"))
-        if spec.extra_modalities:
+        if spec.extra_modalities and spec.stack_modalities:
+            # Stacked behind the S2 bands (THOR): the modality's bands end the encoder's band list.
+            assert args["backbone_merge_method"] == "mean"
+            for v in spec.extra_modalities.values():
+                assert args["backbone_model_bands"][-len(v["bands"]):] == list(v["bands"])
+        elif spec.extra_modalities:
             assert args["backbone_modalities"] == ["S2L2A", *spec.extra_modalities]
             assert args["backbone_merge_method"] == "mean"
             for m, v in spec.extra_modalities.items():
@@ -363,3 +368,19 @@ def test_support_draw_ignores_int_or_float_budget(tmp_path):
     a = derived_rng("seg_support", "EE", "3302000000", f"{5:g}", 0).permutation(50)
     b = derived_rng("seg_support", "EE", "3302000000", f"{5.0:g}", 0).permutation(50)
     assert (a == b).all()
+
+
+def test_a_stacked_modality_reaches_the_encoder_as_one_image(root_s1, monkeypatch):
+    import dataclasses
+
+    spec = dataclasses.replace(get_backbone("terramind_v1_small_s2s1"), name="stacked_s2s1",
+                               stack_modalities=True)
+    monkeypatch.setitem(BACKBONES, "stacked_s2s1", spec)
+    dm = EuroCropsSegDataModule(root_s1, "stacked_s2s1", normalisation="backbone", batch_size=1,
+                                num_workers=0, augment=False)
+    dm.setup("fit")
+    img = dm.train_dataset[0]["image"]
+    assert tuple(img.shape) == (len(BANDS) + 2, T, H, H)
+    assert dm.modality_split is None
+    x = img[None]
+    assert dm.split_modalities(x) is x

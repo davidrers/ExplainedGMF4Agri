@@ -19,6 +19,7 @@ from gfm4agri.benchmark.backbones import (  # noqa: E402
     THOR_BANDS,
     THOR_BANDS_10M,
     THOR_GROUND_COVER_M,
+    THOR_S1_BANDS,
     THOR_TOKEN_M,
     get_backbone,
 )
@@ -106,4 +107,44 @@ def test_the_decoder_receives_the_monthly_maps_of_both_groups(token_m):
     grid = THOR_GROUND_COVER_M // token_m
     assert len(feats) == 12
     assert tuple(feats[0].shape) == (1, n_t * 2 * 768, grid, grid)
+    assert tuple(out.shape) == (1, 3, 224, 224)
+
+
+def test_s1_joins_as_a_third_group_on_the_same_grid_and_the_groups_are_averaged():
+    args = get_backbone("thor_v1_large_s2s1").model_args(list(THOR_BANDS), 12)
+    assert args["backbone_model_bands"] == list(THOR_BANDS) + list(THOR_S1_BANDS)
+    assert {args["backbone_patch_sizes"][b] for b in THOR_S1_BANDS} == {THOR_TOKEN_M // 10}
+    assert args["backbone_merge_method"] == "mean"
+    s2 = get_backbone("thor_v1_large").model_args(list(THOR_BANDS), 12)
+    assert {k for k in s2 if s2[k] != args[k]} == {
+        "backbone_model_bands", "backbone_patch_sizes", "backbone_merge_method"}
+
+
+def test_s1_statistics_are_thors_own_at_10m_in_db():
+    spec = get_backbone("thor_v1_large_s2s1")
+    means, stds = spec.extra_modalities["S1RTC"]["stats"](list(THOR_S1_BANDS))
+    assert means == pytest.approx([-12.9850, -20.6958])
+    assert stds == pytest.approx([5.0062, 5.8688])
+    assert spec.stack_modalities and spec.input_bands == THOR_BANDS
+    assert spec.stats(["RED"]) == get_backbone("thor_v1_large").stats(["RED"])
+
+
+def test_averaged_groups_hand_the_decoder_one_group_width_per_month():
+    from terratorch.models import EncoderDecoderFactory
+
+    import gfm4agri.benchmark.necks  # noqa: F401  registers ChannelBottleneck
+    from gfm4agri.benchmark.backbones import _thor
+
+    n_t = 2
+    args = _thor("thor_v1_base", [2, 5, 8, 11], bottleneck=768, merge="mean", s1=True)(list(THOR_BANDS), n_t)
+    args["backbone_pretrained"] = False
+    model = EncoderDecoderFactory().build_model(
+        task="segmentation", **args, decoder="UNetDecoder",
+        decoder_channels=[512, 256, 128, 64], num_classes=3).eval()
+    x = torch.randn(1, len(THOR_BANDS) + len(THOR_S1_BANDS), n_t, 224, 224)
+    with torch.no_grad():
+        feats = model.encoder(x)
+        out = model(x).output
+    # One group's 768 channels per month, as TerraMind hands over one modality's width.
+    assert tuple(feats[0].shape) == (1, n_t * 768, 14, 14)
     assert tuple(out.shape) == (1, 3, 224, 224)

@@ -13,7 +13,8 @@ import yaml
 pytest.importorskip("terratorch")
 pytest.importorskip("rasterio")
 
-from gfm4agri.pipeline.runner import PREDICTIONS, run  # noqa: E402
+from conftest import SYN_SPLIT  # noqa: E402
+from gfm4agri.pipeline.runner import PREDICTIONS, check_chipset, run  # noqa: E402
 
 TINY_RASTER = {"route": "raster",
                "data": {"normalisation": "chips", "batch_size": 2, "augment": True},
@@ -80,3 +81,10 @@ def test_a_raster_arm_runs_end_to_end_and_resumes(split_chipset, configs, tmp_pa
     (cell / PREDICTIONS).unlink()
     run(exp, split_chipset, arms=["tiny_tessera"], configs=configs, results_root=tmp_path / "results")
     assert (cell / PREDICTIONS).exists() and (cell / "results.json").stat().st_mtime_ns == stamp
+
+
+def test_the_chip_set_check_asks_for_every_modality_an_arm_reads(split_chipset):
+    split = split_chipset / "splits" / SYN_SPLIT
+    problems = check_chipset(split_chipset, split, {"s2s1": {"model": {"backbone": "terramind_v1_large_s2s1"}}})
+    assert problems == ["s2s1: 6 chips lack _s1rtc.tif, e.g. "
+                        "['EE_00000_00000', 'EE_00001_00000', 'EE_00004_00000']"]
