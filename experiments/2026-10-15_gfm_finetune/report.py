@@ -153,18 +153,24 @@ def fig_kshot(df: pd.DataFrame, styles: dict, path: Path) -> None:
     models = [(t, f, ft) for t, f, ft in MODELS if df["arm"].isin([f, ft]).any()]
     fig, axes = plt.subplots(1, len(models), figsize=(3.9 * len(models) + 0.6, 4.2), sharey=True, squeeze=False)
     for ax, (title, frozen, tuned) in zip(axes[0], models, strict=True):
+        means = {}
         for i, (arm, mode) in enumerate(((frozen, "frozen"), (tuned, "fine-tuned"))):
             g = df[df["arm"] == arm]
             if g.empty:
                 continue
             _, colour, marker = styles[arm]
-            mean = g.groupby("pct")["macro_f1"].mean()
+            means[arm] = mean = g.groupby("pct")["macro_f1"].mean()
             jitter = np.exp((i - 0.5) * 0.04)
             ax.scatter(g["pct"] * jitter, g["macro_f1"], s=16, color=colour, alpha=0.45, lw=0, zorder=2)
             ax.plot(mean.index, mean.values, color=colour, lw=2, marker=marker, ms=7, mec=SURFACE, mew=1.5,
                     zorder=3, label=mode)
+        # At each K the higher of the two means is labelled above its point and the lower below, so the two
+        # labels never meet however close the means are.
+        for arm, mean in means.items():
+            other = next((m for a, m in means.items() if a != arm), None)
             for k, v in mean.items():
-                ax.annotate(f"{v:.3f}", (k, v), textcoords="offset points", xytext=(0, 8 if i else -14),
+                above = other is None or k not in other or v >= other[k]
+                ax.annotate(f"{v:.3f}", (k, v), textcoords="offset points", xytext=(0, 8 if above else -14),
                             ha="center", fontsize=8, color=INK_2)
         _budget_axis(ax, budgets)
         ax.set_xlim(min(budgets) / 1.4, max(budgets) * 1.4)
