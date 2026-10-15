@@ -1,0 +1,18 @@
+# TESSERA v2 Medium, frozen, from its open weights, on the twelve monthly Sentinel-2 and Sentinel-1 composites; its
+# 128-dimension 10 m output is computed and cached by the runner (gfm4agri.pipeline.raster_cache), and the per-pixel
+# MLP decoder of the pixel_raster group (512, 256) is trained on it, with tessera_v1's settings. The MLP was kept
+# over a U-Net on 15 October 2026 (experiments/2026-10-15_tessera_decoder).
+route: raster                  # cache: fitted from cached encoder features; raster: from embedding rasters
+data:
+  normalisation: chips         # an embedding has no pretraining statistics; the cache's training-chip statistics
+  batch_size: 4
+  augment: true                # D4 is exact for a per-pixel embedding
+model:
+  backbone: tessera_v2_medium
+  lr: 1.0e-3                   # a small head trained from scratch
+  weight_decay: 0.05
+  head_dropout: 0.2
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10

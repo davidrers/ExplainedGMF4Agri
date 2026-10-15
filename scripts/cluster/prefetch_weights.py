@@ -1,7 +1,8 @@
-"""Download the pretrained weights of the cache-route arms into the local Hugging Face cache.
+"""Download the pretrained weights of the arms that run an encoder.
 
 Run on the cluster's login node by setup_env.sh, so jobs never download. Building each arm's
-end-to-end model once triggers the download; nothing is trained.
+end-to-end model once triggers the download into the Hugging Face cache; TESSERA v2's student
+is fetched into data/weights/tessera/v2/ and checked against its SHA-256. Nothing is trained.
 
     poetry run python scripts/cluster/prefetch_weights.py
 """
@@ -24,9 +25,16 @@ def main() -> None:
     exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
     for name in exp["arms"]:
         arm = load_arm(name)
+        backbone = arm["model"]["backbone"]
+        spec = get_backbone(backbone)
+        if spec.computed:
+            from gfm4agri.embeddings.tessera_v2 import WEIGHTS, load_student
+
+            print(f"{backbone}: fetching and checking its weights", flush=True)
+            load_student(spec.computed["student"], WEIGHTS, spec.computed["checkpoint_sha256"])
+            continue
         if arm["route"] != "cache":
             continue
-        backbone = arm["model"]["backbone"]
         # The bands a fit hands the encoder: its declared subset, else every exported band.
         bands = list(get_backbone(backbone).input_bands or BAND_NAMES)
         print(f"{backbone}: building once to fetch its weights", flush=True)

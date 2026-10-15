@@ -59,8 +59,9 @@ def test_thor_arm_keeps_the_160m_settings_of_its_pilot():
 def test_every_arm_route_matches_its_backbone():
     exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
     routes = {a: load_arm(a)["route"] for a in exp["arms"]}
-    assert routes == {"terramind_v1_large": "cache", "prithvi_eo_v2_600_tl": "cache",
-                      "thor_v1_large": "cache", "tessera_v1": "raster", "alphaearth_v1": "raster"}
+    assert routes == {"terramind_v1_large_s2s1": "cache", "prithvi_eo_v2_600_tl": "cache",
+                      "thor_v1_large_s2s1": "cache", "tessera_v2_medium": "raster",
+                      "alphaearth_v1": "raster"}
 
 
 def test_the_thor_80m_experiment_follows_the_kshot_protocol():
@@ -88,8 +89,11 @@ def test_every_cache_arm_has_an_encode_batch_on_both_machines():
     core = [load_arm(p.stem) for p in sorted((CONFIGS / "arms").glob("*.yaml"))]
     for machine in ("hub", "cluster"):
         profile = load_machine(machine)
-        assert {a["model"]["backbone"] for a in core if a["route"] == "cache"} <= \
-               set(profile["encode_batch_size"]), machine
+        from gfm4agri.benchmark.backbones import get_backbone
+
+        encoding = {a["model"]["backbone"] for a in core
+                    if a["route"] == "cache" or get_backbone(a["model"]["backbone"]).computed}
+        assert encoding <= set(profile["encode_batch_size"]), machine
         for f in sorted((REPO / "experiments").glob("*/arms/*.yaml")):
             arm = load_arm(f.stem, search=[f.parent])
             if arm["route"] == "cache":
@@ -97,10 +101,27 @@ def test_every_cache_arm_has_an_encode_batch_on_both_machines():
                     arm["model"]["backbone"] in profile["encode_batch_size"], (f, machine)
 
 
+#: Arms that left kshot.yaml on 15 October 2026 for their S2 + S1 or v2 successors, kept so that
+#: earlier results can be refitted and experiments can vary them.
+RETIRED = {"tessera_v1", "terramind_v1_large", "thor_v1_large"}
+
+
 def test_the_main_workflow_holds_only_its_own_experiment_and_arms():
     assert sorted(p.name for p in (CONFIGS / "experiments").glob("*.yaml")) == ["kshot.yaml"]
     exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
-    assert sorted(p.stem for p in (CONFIGS / "arms").glob("*.yaml")) == sorted(exp["arms"])
+    assert not RETIRED & set(exp["arms"])
+    assert sorted(p.stem for p in (CONFIGS / "arms").glob("*.yaml")) == sorted([*exp["arms"], *RETIRED])
+
+
+def test_every_kshot_encoder_that_reads_s1_is_given_it():
+    from gfm4agri.benchmark.backbones import get_backbone
+
+    exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
+    specs = {a: get_backbone(load_arm(a)["model"]["backbone"]) for a in exp["arms"]}
+    reads_s1 = {a for a, s in specs.items()
+                if "S1RTC" in s.extra_modalities or "_s1rtc.tif" in s.computed.get("inputs", [])}
+    # Prithvi-EO-2.0 was pretrained on six HLS optical bands; AlphaEarth carries S1 inside its embedding.
+    assert reads_s1 == {"terramind_v1_large_s2s1", "thor_v1_large_s2s1", "tessera_v2_medium"}
 
 
 def test_an_experiment_folder_arm_shadows_the_core_arm(tmp_path):
