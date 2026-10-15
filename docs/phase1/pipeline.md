@@ -487,8 +487,8 @@ The lookup decides as for the token-grid caches (section 9): a complete cache wh
 is reused, a missing one is computed into the scratch root and resumes the chips already there,
 and a cache made under another record is never written into. It holds one copy per chip, not
 eight D4 variants, because a per-pixel encoder commutes with rotation and flipping. Chips are read
-on a thread eight ahead of the encoder. On the cluster's RTX PRO 6000 a chip takes 0.64 s, so all
-7,402 Estonian chips take about 80 minutes and about 180 GB.
+on a thread eight ahead of the encoder. On the cluster's RTX PRO 6000 a chip takes 0.63 s, so the
+7,142 chips of the Estonian split take about 75 minutes and about 175 GB.
 
 **The fit** is the `raster` route of section 9, unchanged except that the datamodule reads the
 embeddings from the cache and the masks and parcel rasters from the chip set, paired by chip id.
