@@ -137,9 +137,14 @@ reads from cache. This is an implementation optimisation and not a change of met
 augmentation is not free under caching, because ViTs are not exactly equivariant, so the eight D4
 variants are cached rather than approximated in feature space.
 
-Raw-feature baseline in two per-pixel variants: TIMESAT phenometrics (NDVI and EVI peak value and
-day-of-year, length of season, sowing and harvest day-of-year, per-band mean and standard deviation)
-and the flattened monthly stack, which is the T = 12 chip itself.
+Baseline: a 2D U-Net trained from scratch on the same chips, a ResNet-18 encoder randomly
+initialised, about 15 M parameters, all trained, on the twelve monthly Sentinel-2 and Sentinel-1
+composites stacked on 168 input channels. It sees every sensor a foundation model sees and learns its
+spatial and temporal features from the labels alone, so the gap between it and a foundation model is
+what pretraining contributes. It replaces the two per-pixel raw-feature variants first planned, TIMESAT
+phenometrics (NDVI and EVI peak value and day-of-year, length of season, sowing and harvest
+day-of-year, per-band mean and standard deviation) and the flattened monthly stack; whether the
+phenometrics keep a role is open (protocol decision D26).
 
 Protocol: the 15 to 20 most frequent crops per country; a label-budget grid K expressed as a
 **percentage of the independent parcel polygons available for training, applied per class**, so a class

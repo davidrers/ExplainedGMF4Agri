@@ -1,8 +1,9 @@
 """One end-to-end fit: the frozen encoder inside the training loop, the neck and decoder trained.
 
 Moved unchanged from ``scripts/seg/train.py``. The K-shot workflow uses it for the raster arms,
-whose features are the embedding rasters themselves; token-grid arms are fitted from cached
-features by :func:`gfm4agri.benchmark.cached.fit_cached`.
+whose features are the embedding rasters themselves, and for the U-Net baseline, which is
+trained whole from scratch; token-grid arms are fitted from cached features by
+:func:`gfm4agri.benchmark.cached.fit_cached`.
 
 Writes ``<output_root>/<run_name>/<budget>_seed<seed>/``: the Lightning logs and checkpoint,
 ``config.yaml`` as resolved, and ``results.json`` carrying the configuration, the label budget,
@@ -54,6 +55,7 @@ def fit_end_to_end(cfg: dict, *, fast_dev_run: bool = False) -> dict:
     import lightning.pytorch as pl
     import torch
 
+    from gfm4agri.benchmark.backbones import get_backbone
     from gfm4agri.benchmark.segmentation import build_task, count_params
     from gfm4agri.benchmark.segmentation_data import (
         EuroCropsSegDataModule, draw_support, manifest_sha256, split_protocol)
@@ -100,6 +102,7 @@ def fit_end_to_end(cfg: dict, *, fast_dev_run: bool = False) -> dict:
     print("normalised per-band std: ", np.round(x.std(other).numpy(), 2).tolist()[:16])
 
     m = cfg["model"]
+    spec = get_backbone(m["backbone"])
     task = build_task(m["backbone"], num_classes=len(dm.class_names), class_names=dm.class_names,
                       bands=dm.bands, n_timesteps=dm.n_timesteps,
                       ignore_index=dm.manifest["ignore_index"], lr=m["lr"],
@@ -141,7 +144,8 @@ def fit_end_to_end(cfg: dict, *, fast_dev_run: bool = False) -> dict:
         "effective_batch": d["batch_size"] * t.get("accumulate_grad_batches", 1),
         "chips": {"train": len(dm.train_dataset), "val": len(dm.val_dataset),
                   "test": len(dm.test_dataset) if getattr(dm, "test_dataset", None) else None},
-        "backbone": m["backbone"], "frozen_encoder": True,
+        "backbone": m["backbone"], "frozen_encoder": not spec.scratch,
+        **({"scratch_model": spec.scratch} if spec.scratch else {}),
         "representation": dm.representation,
         "normalisation": {"mode": dm.normalisation, "means": dm.norm_means, "stds": dm.norm_stds},
         "params": params,

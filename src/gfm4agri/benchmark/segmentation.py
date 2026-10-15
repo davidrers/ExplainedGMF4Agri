@@ -22,7 +22,8 @@ def build_task(backbone: str, *, num_classes: int, class_names: list[str], bands
                n_timesteps: int, ignore_index: int = -1, lr: float = 1e-4,
                weight_decay: float = 0.05, head_dropout: float = 0.1, loss: str = "ce",
                decoder: dict | None = None, plot_on_val: bool = False):
-    """A ``SemanticSegmentationTask`` with the encoder frozen and the decoder trainable."""
+    """A ``SemanticSegmentationTask`` with the encoder frozen and the decoder trainable; for a
+    model trained from scratch (the baseline), everything trainable."""
     import terratorch  # noqa: F401  registers backbones, necks and decoders
 
     import gfm4agri.benchmark.decoders  # noqa: F401  registers the thesis decoders
@@ -30,6 +31,18 @@ def build_task(backbone: str, *, num_classes: int, class_names: list[str], bands
     from terratorch.tasks import SemanticSegmentationTask
 
     spec = get_backbone(backbone)
+    if spec.scratch:
+        import gfm4agri.benchmark.scratch_unet  # noqa: F401  registers ScratchUNetFactory
+
+        # ``bands`` are the Sentinel-2 bands; a stacked modality adds its own in every month.
+        n_bands = len(bands) + sum(len(m["bands"]) for m in spec.extra_modalities.values())
+        return SemanticSegmentationTask(
+            model_factory="ScratchUNetFactory",
+            model_args={"in_channels": n_bands * n_timesteps, "num_classes": num_classes,
+                        "encoder": spec.scratch["encoder"], "head_dropout": head_dropout},
+            loss=loss, lr=lr, optimizer="AdamW", optimizer_hparams={"weight_decay": weight_decay},
+            ignore_index=ignore_index, freeze_backbone=False, freeze_decoder=False,
+            plot_on_val=plot_on_val, class_names=class_names)
     model_args = {
         **spec.model_args(bands, n_timesteps),
         **(decoder or DECODERS[spec.resolution_group]),

@@ -24,6 +24,11 @@ training chips, recorded next to the rasters, because the embedding has no pretr
 input distribution to match. TESSERA v2 is a third kind: the same identity backbone and group,
 but its raster is computed by the K-shot runner from the chip set's composites with the encoder
 named in ``computed``, and cached outside the chip set.
+
+The baseline of RQ1 is in the registry too, though it is no foundation model: a 2D U-Net
+trained from scratch on the composites (``scratch``), in a ``scratch`` group of its own. It
+reads the stack as an encoder does, but nothing of it is pretrained or frozen, so it has no
+pretraining statistics and takes the training chips' ones.
 """
 
 from __future__ import annotations
@@ -72,6 +77,10 @@ class BackboneSpec:
     #: ``checkpoint_sha256``, ``precision``, ``dims`` and the chip-set rasters it reads, ``inputs``.
     #: Empty for every other backbone.
     computed: dict = field(default_factory=dict)
+    #: For a model trained from scratch rather than a frozen encoder (the U-Net baseline): what
+    #: :mod:`gfm4agri.benchmark.scratch_unet` builds, ``model``, ``encoder``, ``encoder_weights``
+    #: and ``temporal_fusion``. Empty for every foundation model.
+    scratch: dict = field(default_factory=dict)
 
 
 def _terramind_stats(bands: list[str]) -> tuple[list[float], list[float]]:
@@ -241,6 +250,11 @@ def _thor_s1_stats(bands: list[str]) -> tuple[list[float], list[float]]:
 THOR_S1RTC = {"S1RTC": {"suffix": "_s1rtc.tif", "bands": THOR_S1_BANDS,
                         "stats": _thor_s1_stats, "sidecar": "s1_rtc.json"}}
 
+#: Sentinel-1 RTC for a model without pretraining statistics: always normalised with the chip
+#: set's, from the ``s1_rtc.json`` sidecar.
+S1RTC_CHIPS = {"S1RTC": {"suffix": "_s1rtc.tif", "bands": ("VV", "VH"),
+                         "stats": None, "sidecar": "s1_rtc.json"}}
+
 
 def _thor(variant: str, indices: list[int], bottleneck: int, token_m: int = THOR_TOKEN_M,
           merge: str = "concat", s1: bool = False) -> Callable[[list[str], int], dict]:
@@ -391,6 +405,17 @@ BACKBONES: dict[str, BackboneSpec] = {
         stats=None, representation="alphaearth_v1",
         notes="precomputed annual embedding, 64 dims per 10 m pixel (unit vectors), Google's "
               "Satellite Embedding V1; cut from the published COG tiles"),
+    # The baseline of RQ1 on every sensor the GFMs see: S1 stacked behind S2 in every month, as
+    # for THOR, under the chip set's statistics (S1 from its sidecar). From
+    # experiments/2026-10-14_unet_baseline, on S2 there; in the main workflow since 15 October 2026.
+    "unet_r18_scratch_s2s1": BackboneSpec(
+        name="unet_r18_scratch_s2s1", resolution_group="scratch",
+        model_args=lambda bands, n_timesteps: {}, stats=None,
+        extra_modalities=S1RTC_CHIPS, stack_modalities=True,
+        scratch={"model": "smp.Unet", "encoder": "resnet18", "encoder_weights": None,
+                 "temporal_fusion": "early: 12 months x (12 S2 + 2 S1 bands) as 168 channels"},
+        notes="2D U-Net (ResNet-18 encoder, about 15 M parameters) trained from scratch on the 12 "
+              "monthly S2 and S1 RTC composites, months stacked on channels"),
 }
 
 

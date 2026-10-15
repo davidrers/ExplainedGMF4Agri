@@ -129,6 +129,8 @@ def test_draw_support_is_per_class_and_deterministic(root):
 
 def test_registry_fragments_are_well_formed():
     for name, spec in BACKBONES.items():
+        if spec.scratch:  # the baseline: no encoder to describe, built by scratch_unet
+            continue
         args = spec.model_args(BANDS, 12)
         if spec.representation != "s2_monthly":  # precomputed embedding: identity backbone
             assert args["backbone"] == "IdentityBackbone" and spec.stats is None

@@ -1,0 +1,18 @@
+# The baseline of RQ1: a 2D U-Net with a ResNet-18 encoder, randomly initialised, about 15 M parameters, all trained,
+# on the twelve monthly Sentinel-2 composites and the Sentinel-1 RTC beside them, months and bands stacked on channels
+# (12 x 14 = 168). From experiments/2026-10-14_unet_baseline, where it ran on S2 alone; in the main workflow since
+# 15 October 2026, on S2 + S1 because the GFM arms that were pretrained on S1 see it.
+route: end_to_end              # nothing frozen, nothing cached: the stack is fitted end to end
+data:
+  normalisation: chips         # no pretraining statistics: the chip set's per-band statistics, S1 from s1_rtc.json
+  batch_size: 4                # the effective batch of every arm
+  augment: true                # D4, drawn per sample, as the end-to-end arms do
+model:
+  backbone: unet_r18_scratch_s2s1
+  lr: 1.0e-3                   # trained from scratch, as the per-pixel heads
+  weight_decay: 0.05
+  head_dropout: 0.1
+  loss: ce
+trainer:
+  precision: 16-mixed
+  log_every_n_steps: 10

@@ -55,8 +55,8 @@ the chip set's composites once and caches their output (section 9), TESSERA v2 a
 | 5b. AlphaEarth embeddings | `src/gfm4agri/embeddings/alphaearth.py`, `scripts/hub/fetch_alphaearth_tiles.py`, `scripts/hub/build_alphaearth_chips.py` | tiles in `data/alphaearth/aef_v1_annual/<year>/`; `<chip>_alphaearth.tif`, `alphaearth_v1.json` |
 | 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/hub/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
 | 7. Supervision | `src/gfm4agri/benchmark/segmentation_data.py` | the training mask at a budget |
-| 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py` | a `SemanticSegmentationTask` |
-| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` and `predictions_test.npz`, `summary.csv`; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
+| 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py`; the baseline's U-Net in `benchmark/scratch_unet.py` | a `SemanticSegmentationTask` |
+| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms and the baseline, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` and `predictions_test.npz`, `summary.csv`; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
 | 10. Inspection | `src/gfm4agri/benchmark/evaluation.py`, `notebooks/pipeline/eurocrops_ee_results.ipynb` | reloaded fits, test-chip predictions in `results/seg_cached/ee_predictions/` |
 
 ---
@@ -689,8 +689,25 @@ score difference is attributable to the encoder.
   frozen TESSERA v2 and kept out (`experiments/2026-10-15_tessera_decoder`, section 11): the 10 m
   group therefore sees no spatial context beyond its encoder's, which for TESSERA is none.
 
+**The baseline**, `unet_r18_scratch_s2s1`, is the model RQ1 measures the GFMs against: a 2D U-Net
+with a ResNet-18 encoder (`segmentation_models_pytorch`), randomly initialised, 14.8 M
+parameters, all trained. It reads the Sentinel-2 and Sentinel-1 stacks, Sentinel-1 interleaved
+behind Sentinel-2 in every month as for THOR, and flattens the months onto the channels, 12 x 14
+= 168, so the first convolution holds a weight for every band in every month and everything after
+it is spatial (early fusion). It sees every sensor a GFM arm sees, so a gap between a GFM and the
+baseline is not the second sensor. Having no pretraining statistics, it is normalised with the
+chip set's: the manifest's for Sentinel-2 and `s1_rtc.json`'s for Sentinel-1, both computed on 200
+chips sampled across the country rather than on the training chips alone. It sits in a `scratch`
+group of its own: its output is at 10 m, as the 10 m group's, and it has spatial context
+throughout, as the token-grid group has. It was tested on Sentinel-2 alone in
+`experiments/2026-10-14_unet_baseline` (section 11), where it replaced the two per-pixel
+raw-feature baselines the protocol first named, and entered the main workflow on 15 October 2026
+on Sentinel-2 and Sentinel-1.
+
 The task is a TerraTorch `SemanticSegmentationTask` built through `EncoderDecoderFactory`, with
-`freeze_backbone=True`, AdamW, and cross-entropy that ignores the unlabelled pixels.
+`freeze_backbone=True`, AdamW, and cross-entropy that ignores the unlabelled pixels. The
+baseline's task builds its U-Net through `ScratchUNetFactory` instead, with nothing frozen, and its
+`results.json` records `frozen_encoder: false` and the model it built.
 
 `fit_end_to_end` (`src/gfm4agri/benchmark/fit.py`, formerly `scripts/seg/train.py`) resolves the
 configuration, draws the support set, builds the datamodule and the task, fits, tests from the
@@ -750,10 +767,10 @@ throughput: the encoding batch, the data loader workers and the cache root. `con
 the three and the chip set into the configuration dictionary the fit functions already took, so
 `fit_cached`, `generate_embeddings`, `fit_end_to_end` and `FitPredictor` are unchanged; a test
 checks that every cell of the full-Estonia grid of 2 October composes to the configuration that
-grid ran with. The experiment `kshot` holds five arms at 100, 20 and 5 %, draw 0, seed 0 and 15
+grid ran with. The experiment `kshot` holds six arms at 100, 20 and 5 %, draw 0, seed 0 and 15
 epochs. Since 15 October 2026 they are `terramind_v1_large_s2s1` and `thor_v1_large_s2s1` (160 m
 tokens) on Sentinel-2 and Sentinel-1, `prithvi_eo_v2_600_tl` on Sentinel-2, `tessera_v2_medium`
-and `alphaearth_v1`. Until then they were TerraMind v1 large and THOR v1 large on Sentinel-2,
+and `alphaearth_v1`, and the baseline `unet_r18_scratch_s2s1`. Until then they were TerraMind v1 large and THOR v1 large on Sentinel-2,
 Prithvi-EO-2.0 600M TL, TESSERA v1 from the store and AlphaEarth v1; those arm files stay in
 `configs/arms/` for the earlier results and for experiments.
 
@@ -765,9 +782,10 @@ spec's path and uses that `run.py` when present. Each `results.json` records the
 arm files. THOR on 80 m tokens runs this way, with the name `kshot` so its cells land beside the main
 workflow's.
 
-**Two routes.** The token-grid arms are always fitted from cached features with `fit_cached`;
+**Three routes.** The token-grid arms are always fitted from cached features with `fit_cached`;
 training them with the encoder inside the loop is no longer part of the workflow. The raster
-arms train end to end on their embedding rasters with `fit_end_to_end`. A raster is either a
+arms train end to end on their embedding rasters with `fit_end_to_end`, and so does the baseline
+on the composites (`route: end_to_end`), with nothing frozen and so nothing to cache. A raster is either a
 product of the chip set, as AlphaEarth's is, or computed by a frozen encoder the registry entry
 names under `computed`, as TESSERA v2's is: the runner then resolves its cache (section 7) before
 the arm's first fit, and passes the cache as the image root while the masks come from the chip set.
@@ -884,6 +902,20 @@ sees none at all and its per-pixel MLP adds none. The U-Net experiment of sectio
 that costs at the full budget, about 0.016 test Macro-F1 on a quarter of Estonia; at 5 % the
 U-Net lost 0.093 against the MLP.
 
+**The baseline trains for as long as the GFM arms, and is still improving then.** Every arm of
+`kshot` trains for 15 epochs. The frozen arms reach their lowest validation loss before that, but
+the U-Net learns its features from scratch: on Sentinel-2 alone over all of Estonia its checkpoint
+fell at epoch 12 to 14 in all nine fits, and 45 epochs added 0.05 to 0.07 test Macro-F1 at every
+budget (`experiments/2026-10-14_unet_baseline`). At 15 epochs the comparison therefore favours the
+GFMs by about that much. Whether the baseline, or every arm, gets a longer budget is open with the
+checkpoint criterion.
+
+**The baseline sits outside both resolution groups.** Protocol section 4.8 computes the matching
+budget `K*` within a group, and D21 compares within groups only. The U-Net outputs at 10 m and has
+spatial context throughout, so it belongs to neither group, and any `K*` against it crosses the
+boundary the protocol otherwise forbids. How `K*` is read against it is not yet written into the
+protocol.
+
 **Earlier `kshot` results are on other arms.** Results of `kshot` before 15 October 2026 used
 TerraMind and THOR on Sentinel-2 alone and TESSERA v1 from the store; they are not paired with the
 current arms.
@@ -980,6 +1012,28 @@ The fit hours of the two-stage models exclude stage 1, which took 11.5 h for Ter
 * THOR v1 large and AlphaEarth v1 were implemented after this grid, on 7 and 8 October, and did
   not run in it. The arms of the K-shot experiment changed on 15 October; their full-Estonia run
   on `EE_2021_rev` is listed below.
+
+### The U-Net baseline on Sentinel-2, `EE_2021_rev`
+
+`experiments/2026-10-14_unet_baseline`, 14 October 2026, jobs 621675 to 621677 on `itc-gpu` at
+commits `ac3abbc` and `53f7783` (same code). The from-scratch U-Net of section 9 on the 144
+Sentinel-2 channels alone, at 15 and at 45 epochs, against TESSERA v1 from the store with the MLP
+and TerraMind v1 large on Sentinel-2 (from `experiments/2026-10-13_terramind_s1_s2`); K = 100, 20
+and 5 %, draw 0, seeds 0 to 2, every arm on the same parcels. Mean test Macro-F1 over the three seeds:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| U-Net, 15 epochs | 0.498 | 0.415 | 0.342 |
+| U-Net, 45 epochs | 0.544 | 0.477 | 0.413 |
+| TerraMind v1 large, S2 | 0.628 | 0.511 | 0.394 |
+| TESSERA v1 + MLP | 0.625 | 0.597 | 0.570 |
+
+* At 15 epochs the U-Net was still improving: its checkpoint fell at epoch 12 to 14 in all nine
+  fits. 45 epochs won all nine paired fits, by 0.05 to 0.07, most in the small classes.
+* At 45 epochs it trailed TerraMind by 0.084 at 100 % and 0.034 at 20 % and drew level at 5 %;
+  TESSERA stayed ahead at every budget, by most at 5 %.
+* The U-Net entered the main workflow on 15 October 2026 as the baseline, on Sentinel-2 and
+  Sentinel-1 (section 9). The full report is the experiment's `REPORT.md`.
 
 ### The decoder of the 10 m group, `EE_2021_rev_quarter`
 

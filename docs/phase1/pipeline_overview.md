@@ -38,6 +38,9 @@ flowchart TD
     M --> J["Hide all but K% of the fields"]
     J --> K["Small trainable decoder"]
     K --> L["Crop map + scores"]
+    I --> N["Baseline: a U-Net that learns<br/>from the labels alone"]
+    J --> N
+    N --> L
 ```
 
 ---
@@ -102,6 +105,14 @@ did not. How much fine-tuning would add is measured separately.
 The five models of the main comparison: TerraMind and THOR, which read the optical and radar
 pictures; Prithvi, which was trained on optical pictures only and reads those; TESSERA, run on
 both; and AlphaEarth's ready-made summaries.
+
+**8. The baseline.** The question is how few labels a foundation model needs to match a model
+that had no pretraining at all. That model is a plain U-Net, a standard segmentation network of
+about 15 M parameters, which starts from random weights and learns everything from the same
+labelled fields. It reads the same optical and radar pictures, all twelve months stacked
+together, so whatever separates it from a foundation model is the pretraining, not the input. It
+learns more slowly than a decoder on a frozen model: at the 15 rounds of training every model
+gets, it is still improving, and that is an open point.
 
 ---
 

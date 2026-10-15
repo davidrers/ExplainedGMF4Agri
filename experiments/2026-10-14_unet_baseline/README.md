@@ -11,6 +11,10 @@ composites the GFMs consume, run through the same K-shot experiments, replacing 
 monthly-stack baselines in the K sweep. The user chose a plain U-Net, not U-TAE, and on 14 October a 2D one with
 the months stacked on channels. If it holds up, it becomes an arm of the main workflow (a separate decision).
 
+**In the main workflow since 15 October 2026** as `unet_r18_scratch_s2s1`, on Sentinel-2 and Sentinel-1 (168
+channels), 15 epochs like every arm; `scratch_unet.py` moved to `src/gfm4agri/benchmark/`. This folder's `run.py`
+still reproduces the Sentinel-2 runs.
+
 **What it varies.**
 
 | Arm | Input | Model | Trained |

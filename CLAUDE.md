@@ -46,7 +46,8 @@ per-class percentage label budget applied at load time, a frozen encoder with a 
 | Cluster | The UT HPC clone holds `EE_2021`, `EE_2021_rev`, `EE_2021_rev_mini`, `EE_2021_mini`, the sample sets and `data/eurocrops/{parquet,vector}`, no caches |
 
 The main workflow's arms since 15 October 2026 (`configs/experiments/kshot.yaml`, one file each in `configs/arms/`);
-each model consumes every sensor of the chip set it was pretrained on (protocol D24):
+each model consumes every sensor of the chip set it was pretrained on (protocol D24), and the baseline every sensor
+any of them sees:
 
 | Arm | Input | Group and decoder |
 |---|---|---|
@@ -55,6 +56,7 @@ each model consumes every sensor of the chip set it was pretrained on (protocol 
 | `prithvi_eo_v2_600_tl` | S2 only, all it was pretrained on | token grid; same decoder stack |
 | `tessera_v2_medium` | S2 + S1, frozen v2 Medium from open weights, run on the composites and cached by the runner (`pipeline/raster_cache.py`) | 10 m raster; per-pixel MLP, 0.2 M |
 | `alphaearth_v1` | its precomputed 64-d embedding | 10 m raster; per-pixel MLP |
+| `unet_r18_scratch_s2s1` | S2 + S1, months stacked on 168 channels | **the baseline** (protocol D26): a ResNet-18 U-Net trained from scratch, everything trainable, end to end; group `scratch` |
 
 The 10 m group keeps the per-pixel MLP: a U-Net did not beat it under label scarcity
 (`experiments/2026-10-15_tessera_decoder`). TESSERA v1 from the store is retired from `kshot`: its rasters sit about
@@ -80,20 +82,21 @@ cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md se
 This does not answer RQ1 yet: TESSERA sits in another resolution group, no cell has an interval, and no
 baseline has run. These are the arms before 15 October, on `EE_2021`.
 
-**Not built:** the baseline arm; repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
+**Not built:** repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
 and Portugal; Phases 2 and 3.
 
 **Decided on 2 October 2026, not yet in `protocol.md` or the code.** These live only in
 [`figures/phase1_experimental_setup_prompt.md`](figures/phase1_experimental_setup_prompt.md) and session memory, so
 confirm them with the user and write them into the protocol before building on them: THOR joins the arms, handled
 like TerraMind (now implemented, on 160 m tokens as confirmed on 9 October); the baseline becomes a plain U-Net
-trained from scratch on the same monthly Sentinel-2 chips, replacing the per-pixel TIMESAT and monthly-stack
-baselines in the K sweep, with the role of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %; nested
+trained from scratch, replacing the per-pixel TIMESAT and monthly-stack baselines in the K sweep (now protocol
+D26 and the arm `unet_r18_scratch_s2s1`, on S2 + S1), with the role of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %; nested
 repeated draws, with models compared on the same draws; equal tuning trials and training steps for every model and
 K; no validation labels at low K; cross-country transfer only within one GAEZ v5 agro-ecological zone. AlphaEarth
 was confirmed on 7 October and is implemented, handled like TESSERA.
 
-**Open choices that move the numbers:** the checkpoint criterion (validation loss picks epoch 6 to 9 for the
+**Open choices that move the numbers:** the baseline's fit budget (15 epochs undertrain it, protocol open item 10)
+and how `K*` is read against a baseline outside both resolution groups (open item 11); the checkpoint criterion (validation loss picks epoch 6 to 9 for the
 token-grid models while validation Macro-F1 peaks at 13), and the block size. THOR's group averaging is untested
 against the concatenation its authors use (pipeline.md section 10).
 

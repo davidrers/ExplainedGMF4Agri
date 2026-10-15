@@ -1,8 +1,10 @@
 # The K-shot workflow's arms since 15 October 2026: every GFM on every sensor it was pretrained on (TerraMind, THOR
-# and TESSERA v2 on S2 + S1; Prithvi-EO-2.0 on S2, the only input it takes; AlphaEarth's embedding carries S1).
+# and TESSERA v2 on S2 + S1; Prithvi-EO-2.0 on S2, the only input it takes; AlphaEarth's embedding carries S1), and
+# the baseline they are measured against, a U-Net trained from scratch on S2 + S1.
 # Run on any chip set:  poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips <dir>
 name: kshot
-arms: [terramind_v1_large_s2s1, prithvi_eo_v2_600_tl, thor_v1_large_s2s1, tessera_v2_medium, alphaearth_v1]
+arms: [terramind_v1_large_s2s1, prithvi_eo_v2_600_tl, thor_v1_large_s2s1, tessera_v2_medium, alphaearth_v1,
+       unet_r18_scratch_s2s1]
 budgets_pct: [100, 20, 5]      # per cent of the trainable parcels of each class
 draws: [0]
 seeds: [0]

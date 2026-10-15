@@ -68,9 +68,15 @@ def load_arm(name: str, configs: Path = CONFIGS, search: list[Path] | None = Non
     arm = _yaml(path)
     arm["_file"] = str(path)
     spec = get_backbone(arm["model"]["backbone"])
-    want = "cache" if spec.representation == "s2_monthly" else "raster"
+    # A model trained from scratch has nothing frozen to cache: the stack is fitted end to end.
+    if spec.scratch:
+        want = "end_to_end"
+    else:
+        want = "cache" if spec.representation == "s2_monthly" else "raster"
     if arm["route"] != want:
         raise ValueError(f"arm {name}: route {arm['route']!r}, but {spec.name} needs {want!r}")
+    if spec.scratch and arm["data"]["normalisation"] != "chips":
+        raise ValueError(f"arm {name}: {spec.name} has no pretraining statistics; use 'chips'")
     return arm
 
 

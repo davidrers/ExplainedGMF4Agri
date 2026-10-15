@@ -61,7 +61,7 @@ def test_every_arm_route_matches_its_backbone():
     routes = {a: load_arm(a)["route"] for a in exp["arms"]}
     assert routes == {"terramind_v1_large_s2s1": "cache", "prithvi_eo_v2_600_tl": "cache",
                       "thor_v1_large_s2s1": "cache", "tessera_v2_medium": "raster",
-                      "alphaearth_v1": "raster"}
+                      "alphaearth_v1": "raster", "unet_r18_scratch_s2s1": "end_to_end"}
 
 
 def test_the_thor_80m_experiment_follows_the_kshot_protocol():
@@ -121,7 +121,22 @@ def test_every_kshot_encoder_that_reads_s1_is_given_it():
     reads_s1 = {a for a, s in specs.items()
                 if "S1RTC" in s.extra_modalities or "_s1rtc.tif" in s.computed.get("inputs", [])}
     # Prithvi-EO-2.0 was pretrained on six HLS optical bands; AlphaEarth carries S1 inside its embedding.
-    assert reads_s1 == {"terramind_v1_large_s2s1", "thor_v1_large_s2s1", "tessera_v2_medium"}
+    # The baseline sees every sensor the GFMs see.
+    assert reads_s1 == {"terramind_v1_large_s2s1", "thor_v1_large_s2s1", "tessera_v2_medium",
+                        "unet_r18_scratch_s2s1"}
+
+
+def test_the_baseline_trains_everything_on_the_168_channel_stack():
+    import torch
+
+    from gfm4agri.benchmark.segmentation import build_task
+
+    arm = load_arm("unet_r18_scratch_s2s1")
+    task = build_task(arm["model"]["backbone"], num_classes=5, class_names=list("abcde"),
+                      bands=[f"B{i}" for i in range(12)], n_timesteps=12)
+    assert all(p.requires_grad for p in task.model.parameters())
+    # (B, 12 S2 + 2 S1 bands, 12 months, H, W), as the datamodule stacks it
+    assert task.model(torch.zeros(1, 14, 12, 64, 64)).output.shape == (1, 5, 64, 64)
 
 
 def test_an_experiment_folder_arm_shadows_the_core_arm(tmp_path):

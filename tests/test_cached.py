@@ -48,7 +48,7 @@ def test_training_variants_are_exactly_what_the_end_to_end_augmentation_draws():
 
 
 @pytest.mark.parametrize("name", [n for n, s in BACKBONES.items()
-                                  if s.representation == "s2_monthly"])
+                                  if s.representation == "s2_monthly" and not s.scratch])
 def test_cache_point_is_before_the_first_trainable_neck(name):
     if name.startswith("thor"):
         pytest.importorskip("thor_terratorch_ext")
