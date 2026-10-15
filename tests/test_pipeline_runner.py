@@ -88,3 +88,42 @@ def test_the_chip_set_check_asks_for_every_modality_an_arm_reads(split_chipset):
     problems = check_chipset(split_chipset, split, {"s2s1": {"model": {"backbone": "terramind_v1_large_s2s1"}}})
     assert problems == ["s2s1: 6 chips lack _s1rtc.tif, e.g. "
                         "['EE_00000_00000', 'EE_00001_00000', 'EE_00004_00000']"]
+
+
+TINY_COMPUTED = {"route": "raster",
+                 "data": {"normalisation": "chips", "batch_size": 2, "augment": True},
+                 "model": {"backbone": "stub_v2", "lr": 1.0e-3, "weight_decay": 0.05,
+                           "head_dropout": 0.2, "loss": "ce"},
+                 "trainer": {"precision": "32-true", "log_every_n_steps": 1}}
+
+
+def test_a_computed_arm_encodes_once_fits_from_its_cache_and_records_it(
+        split_chipset, configs, tmp_path, stub_computed):
+    (configs / "arms" / "tiny_stub.yaml").write_text(yaml.safe_dump(TINY_COMPUTED))
+    exp = configs / "experiments" / "stub.yaml"
+    exp.write_text(yaml.safe_dump({"name": "stub", "arms": ["tiny_stub"], "budgets_pct": [100],
+                                   "draws": [0], "seeds": [0], "epochs": 1, "checkpoint": "val_loss"}))
+    results = tmp_path / "results"
+    rows = run(exp, split_chipset, dry_run=True, configs=configs, results_root=results)
+    assert rows[0]["cache"] == "compute" and not stub_computed.encoded
+    run(exp, split_chipset, configs=configs, results_root=results)
+    cache = tmp_path / "emb" / "stub_v2" / "SYN_2021"
+    assert (cache / "cache.json").exists() and len(stub_computed.encoded) == 6
+    cell = results / "stub" / "SYN_2021" / "tiny_stub" / "P100_draw0_seed0"
+    r = json.loads((cell / "results.json").read_text())
+    assert Path(r["config"]["data"]["image_root"]).resolve() == cache.resolve()
+    assert r["provenance"]["raster_cache"]["backbone"] == "stub_v2"
+    assert r["provenance"]["raster_cache"]["encoded_now"] == 6
+    z = np.load(cell / PREDICTIONS)
+    assert sorted(z["ids"]) == ["EE_00008_00000", "EE_00009_00000"] and z["pred"].shape == (2, 32, 32)
+    # A rerun reuses the cache: predictions are redone without encoding again.
+    (cell / PREDICTIONS).unlink()
+    rows = run(exp, split_chipset, configs=configs, results_root=results)
+    assert rows[0]["cache"] == "reuse" and len(stub_computed.encoded) == 6 and (cell / PREDICTIONS).exists()
+
+
+def test_a_computed_arm_needs_the_rasters_its_encoder_reads(split_chipset):
+    problems = check_chipset(split_chipset, split_chipset / "splits" / SYN_SPLIT,
+                             {"v2": {"model": {"backbone": "tessera_v2_medium"}}})
+    assert problems == ["v2: 6 chips lack _s1rtc.tif, e.g. "
+                        "['EE_00000_00000', 'EE_00001_00000', 'EE_00004_00000']"]

@@ -1,11 +1,13 @@
 """Run a K-shot experiment on one chip set: every arm x budget x draw x seed.
 
 Per arm: check that the chip set has what the arm reads; for a cache-route arm, reuse its
-feature cache or compute it (:mod:`gfm4agri.pipeline.cache`); then fit every cell that is not
-finished, write its test predictions and stamp its provenance. A cell is finished when it
-holds ``results.json`` and ``predictions_test.npz``; a cell with only the first gets its
-predictions without a refit, which a job-scoped cache needs because two-stage prediction reads
-the cache. Results land in ``<results_root>/<experiment>/<chip set>/<arm>/<cell>/``.
+feature cache or compute it (:mod:`gfm4agri.pipeline.cache`), and for a computed 10 m arm
+(TESSERA v2) its raster cache the same way (:mod:`gfm4agri.pipeline.raster_cache`); then fit
+every cell that is not finished, write its test predictions and stamp its provenance. A cell is
+finished when it holds ``results.json`` and ``predictions_test.npz``; a cell with only the
+first gets its predictions without a refit, which a job-scoped cache needs because two-stage
+prediction reads the cache. Results land in
+``<results_root>/<experiment>/<chip set>/<arm>/<cell>/``.
 """
 
 from __future__ import annotations
@@ -60,7 +62,10 @@ def check_chipset(chips: Path, split_dir: Path, arms: dict[str, dict]) -> list[s
     present = set(os.listdir(chips / "chips")) if (chips / "chips").is_dir() else set()
     for name, arm in arms.items():
         spec = get_backbone(arm["model"]["backbone"])
-        if spec.representation == "s2_monthly":
+        if spec.computed:
+            # A raster the runner computes: what its encoder reads must be there, not the raster.
+            suffixes = list(spec.computed["inputs"])
+        elif spec.representation == "s2_monthly":
             suffixes = ["_merged.tif", *(m["suffix"] for m in spec.extra_modalities.values())]
         else:
             sidecar = chips / f"{spec.representation}.json"
@@ -152,6 +157,8 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
         arms: list[str] | None = None, machine: str = "hub", cache_root: Path | None = None,
         scratch: Path | None = None, dry_run: bool = False, configs: Path = CONFIGS,
         results_root: Path = REPO / "results") -> list[dict]:
+    from gfm4agri.benchmark.backbones import get_backbone
+
     exp = load_experiment(experiment)
     mach = load_machine(machine, configs)
     chips = Path(chips) if Path(chips).is_absolute() else Path.cwd() / chips
@@ -184,12 +191,18 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
         mine = [c for c in cells if c.arm == arm_name]
         todo = [c for c in mine if _state(out_root / arm_name / c.tag) != "done"]
         backbone = arm["model"]["backbone"]
+        computed = bool(get_backbone(backbone).computed)
         decision = None
-        if arm["route"] == "cache":
-            from gfm4agri.pipeline.cache import resolve_cache
+        if arm["route"] == "cache" or computed:
+            if computed:
+                from gfm4agri.pipeline.raster_cache import resolve_raster_cache
 
-            decision = resolve_cache(root, scratch, backbone, chips, split_dir,
-                                     arm["data"]["normalisation"], arm["trainer"]["precision"])
+                decision = resolve_raster_cache(root, scratch, backbone, chips, split_dir)
+            else:
+                from gfm4agri.pipeline.cache import resolve_cache
+
+                decision = resolve_cache(root, scratch, backbone, chips, split_dir,
+                                         arm["data"]["normalisation"], arm["trainer"]["precision"])
             _say(f"{arm_name}: cache {decision.action} {decision.cache_dir} ({decision.reason})"
                  + "".join(f"\n    {m}" for m in decision.mismatches))
             if decision.action == "stop" and todo:
@@ -201,19 +214,34 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
                       "cache": decision.action if decision else None} for c in mine]
             continue
         if todo and decision is not None and decision.action == "compute":
-            from gfm4agri.benchmark.cached import generate_embeddings
-
             _say(f"{arm_name}: encoding into {decision.cache_dir}")
-            generate_embeddings(backbone, chips, decision.cache_dir,
-                                normalisation=arm["data"]["normalisation"],
-                                batch_size=encode_batch_size(arm, mach, machine),
-                                num_workers=mach["encode_num_workers"],
-                                precision=arm["trainer"]["precision"], split_dir=split_dir)
+            if computed:
+                from gfm4agri.pipeline.raster_cache import build_raster_cache
+
+                build_raster_cache(backbone, chips, split_dir, decision.cache_dir,
+                                   batch=encode_batch_size(arm, mach, machine))
+            else:
+                from gfm4agri.benchmark.cached import generate_embeddings
+
+                generate_embeddings(backbone, chips, decision.cache_dir,
+                                    normalisation=arm["data"]["normalisation"],
+                                    batch_size=encode_batch_size(arm, mach, machine),
+                                    num_workers=mach["encode_num_workers"],
+                                    precision=arm["trainer"]["precision"], split_dir=split_dir)
             gc.collect()
+        # A computed raster is read from its cache, and its record goes into every cell's provenance.
+        # ``extra`` stays empty for every other arm, so an experiment that wraps ``compose`` with the
+        # eight-argument signature keeps working.
+        arm_provenance, extra = provenance, {}
+        if computed and todo:
+            record = json.loads((decision.cache_dir / "cache.json").read_text())
+            arm_provenance = {**provenance,
+                              "raster_cache": {"dir": repo_relative(decision.cache_dir), **record}}
+            extra = {"image_root": decision.cache_dir}
         for c in todo:
             cell_dir = out_root / arm_name / c.tag
             if _state(cell_dir) == "fit":
-                cfg = compose(arm_name, arm, exp, mach, chips, split_dir, c, out_root)
+                cfg = compose(arm_name, arm, exp, mach, chips, split_dir, c, out_root, **extra)
                 _say(f"{arm_name} {c.tag}: fit")
                 if arm["route"] == "cache":
                     from gfm4agri.benchmark.cached import fit_cached
@@ -224,7 +252,7 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
                     from gfm4agri.benchmark.fit import fit_end_to_end
 
                     fit_end_to_end(cfg)
-                _stamp(cell_dir / "results.json", provenance)
+                _stamp(cell_dir / "results.json", arm_provenance)
                 gc.collect()
             _say(f"{arm_name} {c.tag}: test predictions")
             _predict(cell_dir, test_ids, mach["num_workers"])
