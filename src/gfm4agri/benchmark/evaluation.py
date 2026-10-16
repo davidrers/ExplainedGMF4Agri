@@ -17,9 +17,20 @@ import numpy as np
 import torch
 import yaml
 
-__all__ = ["FitPredictor", "confusion", "f1_from_iou", "per_class_scores"]
+__all__ = ["FitPredictor", "confusion", "f1_from_iou", "fit_checkpoint", "per_class_scores"]
 
 REPO = Path(__file__).resolve().parents[3]
+
+
+def fit_checkpoint(fit_dir: Path, results: dict) -> Path:
+    """The checkpoint a fit was tested with, in ``fit_dir/checkpoints/``.
+
+    ``results.json`` records it as ``best_checkpoint``, by the path of the machine that fitted. A cell fitted
+    again after an interrupted fit keeps the old ``best-loss.ckpt`` beside the new ``best-loss-v1.ckpt``, so the
+    name must be read from the record, not assumed.
+    """
+    name = Path(results.get("best_checkpoint") or "best-loss.ckpt").name
+    return Path(fit_dir) / "checkpoints" / name
 
 
 def f1_from_iou(iou: float) -> float:
@@ -86,7 +97,7 @@ class FitPredictor:
                                class_names=self.class_names, bands=self.dm.bands,
                                n_timesteps=self.dm.n_timesteps, ignore_index=ignore,
                                head_dropout=m["head_dropout"]).model
-        ckpt = self.fit_dir / "checkpoints" / "best-loss.ckpt"
+        ckpt = fit_checkpoint(self.fit_dir, self.results)
         state = torch.load(ckpt, map_location="cpu", weights_only=False)["state_dict"]
         state = {k[len("model."):]: v for k, v in state.items() if k.startswith("model.")}
         missing, unexpected = model.load_state_dict(state, strict=False)

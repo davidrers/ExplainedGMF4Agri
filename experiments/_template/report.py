@@ -3,7 +3,8 @@
 Reads ``results/<name>/<chip set>/`` as the K-shot runner writes it, on the hub or pulled back from the cluster,
 refreshes its ``summary.csv``, and writes into ``figures/`` beside this file:
 
-* ``kshot_curves.png``: test Macro-F1 and mIoU against K per arm, the mean over draws and seeds and every fit;
+* ``kshot_curves.png``: test Macro-F1, mIoU and Macro-F1 per parcel against K per arm, the mean over draws and
+  seeds and every fit;
 * ``paired_differences.png``: the difference in test Macro-F1 between two arms fit by fit, on the same draw and
   seed, for every pair of ``PAIRS``;
 * ``validation_curves.png``: validation loss and Macro-F1 per epoch, per arm and K, with the epochs the checkpoint
@@ -48,7 +49,9 @@ MARKERS = ["o", "s", "D", "^", "v", "h", "P", "X"]
 SURFACE, INK, INK_2, MUTED, GRID, BASELINE = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
 DIVERGING = LinearSegmentedColormap.from_list("gain", ["#e34948", "#f0efec", "#2a78d6"])
 SEQUENTIAL = LinearSegmentedColormap.from_list("level", ["#cde2fb", "#2a78d6", "#0d366b"])
-METRICS = [("macro_f1", "Test Macro-F1"), ("miou", "Test mIoU")]
+#: Every fit is also scored per parcel, by a majority vote of its pixels (protocol D28), and reported beside the
+#: pixel metrics.
+METRICS = [("macro_f1", "Test Macro-F1"), ("miou", "Test mIoU"), ("parcel_macro_f1", "Test Macro-F1 per parcel")]
 
 plt.rcParams.update({
     "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
@@ -142,7 +145,7 @@ def _end_labels(ax, items: list[tuple[float, float, str, str]], gap: float) -> N
 
 def fig_kshot(df: pd.DataFrame, styles: dict, path: Path) -> None:
     budgets = sorted(df["pct"].unique())
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+    fig, axes = plt.subplots(1, len(METRICS), figsize=(5.5 * len(METRICS), 4.4))
     n = len(styles)
     for ax, (metric, title) in zip(axes, METRICS, strict=True):
         ends = []

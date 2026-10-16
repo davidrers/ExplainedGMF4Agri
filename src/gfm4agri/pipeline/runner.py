@@ -6,8 +6,9 @@ feature cache or compute it (:mod:`gfm4agri.pipeline.cache`), and for a computed
 every cell that is not finished, write its test predictions and stamp its provenance. A cell is
 finished when it holds ``results.json`` and ``predictions_test.npz``; a cell with only the
 first gets its predictions without a refit, which a job-scoped cache needs because two-stage
-prediction reads the cache. Results land in
-``<results_root>/<experiment>/<chip set>/<arm>/<cell>/``.
+prediction reads the cache. Every finished cell is then scored per parcel from its predictions
+(:mod:`gfm4agri.benchmark.parcel_metrics`), once: a cell finished before that gets its scores on
+a rerun, without a refit. Results land in ``<results_root>/<experiment>/<chip set>/<arm>/<cell>/``.
 """
 
 from __future__ import annotations
@@ -28,11 +29,16 @@ from gfm4agri.pipeline.config import (CONFIGS, REPO, arm_dirs, compose, encode_b
                                       load_arm, load_experiment, load_machine, plan_cells,
                                       repo_relative, resolve_split)
 
-__all__ = ["PREDICTIONS", "check_chipset", "run", "summarise"]
+__all__ = ["PREDICTIONS", "add_parcel_metrics", "check_chipset", "run", "summarise"]
 
 PREDICTIONS = "predictions_test.npz"
 METRICS = {"test/F1_Score": "macro_f1", "test/mIoU": "miou",
            "test/Pixel_Accuracy": "pixel_accuracy", "test/loss": "test_loss"}
+PARCEL_METRICS = {"macro_f1": "parcel_macro_f1", "accuracy": "parcel_accuracy", "kappa": "parcel_kappa",
+                  "n_parcels": "test_parcels"}
+#: Largest difference between the logged pixel Macro-F1 and the one of the stored predictions before the
+#: predictions are taken to come from another model than the one tested.
+CHECK_TOLERANCE = 0.002
 
 
 def _say(msg: str) -> None:
@@ -123,6 +129,45 @@ def _predict(cell_dir: Path, test_ids: list[str], num_workers: int) -> None:
     torch.cuda.empty_cache()
 
 
+def _score_parcels(cell_dir: Path, chips: Path) -> None:
+    """Write the cell's parcel scores into its ``results.json``."""
+    from gfm4agri.benchmark.parcel_metrics import score_predictions
+
+    f = cell_dir / "results.json"
+    r = json.loads(f.read_text())
+    s = score_predictions(cell_dir / PREDICTIONS, chips / "chips", r["class_names"])
+    logged = r.get("test_metrics", {}).get("test/F1_Score")
+    if logged is not None and abs(s["pixel_macro_f1"] - logged) > CHECK_TOLERANCE:
+        _say(f"WARNING {cell_dir}: the stored predictions give pixel Macro-F1 {s['pixel_macro_f1']:.4f}, "
+             f"the fit logged {logged:.4f}; they may come from another checkpoint than the one tested")
+    r["parcel_metrics"] = s
+    tmp = f.with_name(f"results.json.{os.getpid()}")
+    tmp.write_text(json.dumps(r, indent=2))
+    tmp.replace(f)
+
+
+def add_parcel_metrics(out_root: Path, chips: Path | None = None, arms: list[str] | None = None,
+                       force: bool = False) -> list[Path]:
+    """Score per parcel every finished cell under ``out_root`` that has no parcel scores yet.
+
+    ``chips`` is the chip set the cells were tested on; without it, each cell's own record names it.
+    ``arms`` limits the scoring to those arms' cells, as a cluster job must: the jobs of the other arms
+    write into the same folder. Returns the cells scored.
+    """
+    done = []
+    for f in sorted(Path(out_root).glob("*/P*_draw*_seed*/results.json")):
+        cell = f.parent
+        if _state(cell) != "done" or (arms is not None and cell.parent.name not in arms):
+            continue
+        r = json.loads(f.read_text())
+        if "parcel_metrics" in r and not force:
+            continue
+        root = Path(chips) if chips else REPO / r["config"]["data"]["root"]
+        _score_parcels(cell, root)
+        done.append(cell)
+    return done
+
+
 def _epochs(cell_dir: Path) -> tuple[int | None, int | None]:
     """Epoch of the lowest validation loss and of the highest validation Macro-F1."""
     logs = sorted(cell_dir.glob("logs/version_*/metrics.csv"))
@@ -139,9 +184,15 @@ def _epochs(cell_dir: Path) -> tuple[int | None, int | None]:
 def _row(results_path: Path) -> dict:
     r = json.loads(results_path.read_text())
     lb, m, prov = r["label_budget"], r["test_metrics"], r.get("provenance", {})
+    pm = r.get("parcel_metrics", {})
+    redone, logged = pm.get("pixel_macro_f1"), m.get("test/F1_Score")
     ckpt, best_f1 = _epochs(results_path.parent)
     return {"arm": r["run"], "pct": lb["pct"], "draw": lb["draw_seed"], "seed": r["seed"],
             **{v: m.get(k) for k, v in METRICS.items()},
+            **{v: pm.get(k) for k, v in PARCEL_METRICS.items()},
+            # Whether the stored predictions, which the parcel scores come from, reproduce the logged score.
+            "predictions_match": (None if redone is None or logged is None
+                                  else abs(redone - logged) <= CHECK_TOLERANCE),
             "train_chips": r["chips"]["train"],
             "parcels": sum(v["drawn"] for v in (lb.get("support") or {}).values()),
             "ckpt_epoch": ckpt, "best_val_f1_epoch": best_f1,
@@ -279,6 +330,9 @@ def run(experiment: Path, chips: Path, *, split: str | None = None,
         rows += [{"arm": arm_name, "cell": c.tag, "state": _state(out_root / arm_name / c.tag),
                   "cache": decision.action if decision else None} for c in mine]
     if not dry_run:
+        scored = add_parcel_metrics(out_root, chips, arms=list(arm_cfgs))
+        if scored:
+            _say(f"parcel scores of {len(scored)} cells")
         df = summarise(out_root)
         _say(f"summary of {len(df)} cells -> {out_root / 'summary.csv'}")
     return rows

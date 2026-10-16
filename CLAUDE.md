@@ -30,12 +30,12 @@ When an agreed update is made, `pipeline.md` is where it goes:
 - a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
 - a finished run or grid: section 11, Runs, and the Current state below.
 
-## Current state, 15 October 2026
+## Current state, 16 October 2026
 
 The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
 EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
 per-class percentage label budget applied at load time, a frozen encoder with a trainable decoder, and a
-`results.json` per fit.
+`results.json` per fit, scored per pixel and per parcel.
 
 | Item | Value |
 |---|---|
@@ -68,6 +68,14 @@ D27), and the six arms, the baseline among them, were resubmitted on `EE_2021_re
 workflow (`experiments/2026-10-08_thor_80m/`, with its own arm file): its full-Estonia cache, about 6.4 TB, fits
 no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
 archived studies in `experiments/`.
+
+**Since 16 October 2026 every fit is also scored per parcel** (protocol D28): each test parcel takes the class most
+of its pixels were predicted as, and parcel Macro-F1, accuracy and kappa sit beside the pixel metrics in
+`results.json` (`parcel_metrics`) and `summary.csv`; the pixel Macro-F1 stays the primary metric. On the 15-epoch
+grid the parcel Macro-F1 is 0.002 to 0.078 below the pixel one, most for the token-grid models, and TESSERA leads
+per parcel at every budget (`experiments/2026-10-16_parcel_metric`). `FitPredictor` loaded `best-loss.ckpt` by
+name, so a cell refitted after an interrupted fit was predicted with the stale checkpoint; it now loads the one
+`results.json` names, and `summary.csv`'s `predictions_match` flags stored predictions that miss the logged score.
 
 Full-Estonia grid, finished 2 October 2026. Test Macro-F1 over the 1,475 test chips, one draw and one seed per
 cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md section 11,
@@ -134,8 +142,10 @@ poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips
 Configs: `configs/arms/<arm>.yaml` (what is trained), `configs/experiments/<name>.yaml` (arms, budgets, draws, seeds,
 epochs), `configs/machines/{hub,cluster}.yaml` (throughput only). A token-grid arm reuses its cache in
 `data/embeddings/<backbone>/<chip set>/` when `cache.json` matches the run, and computes it otherwise. Results go to
-`results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/` (`results.json`, `predictions_test.npz`) and
-`summary.csv`; runs before 9 October stay in `results/seg/` and `results/seg_cached/`.
+`results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/` (`results.json` with the pixel metrics and
+`parcel_metrics`, `predictions_test.npz`) and `summary.csv`; runs before 9 October stay in `results/seg/` and
+`results/seg_cached/`. `run_kshot.py ... --summarise` scores per parcel any finished cell that has no parcel scores
+yet, without a refit, and refreshes `summary.csv`.
 
 ### Two instructions: run an experiment, or add to the main workflow
 
@@ -181,12 +191,15 @@ if it cannot be done that way, ask.
 7. **Bring the results back.** `bash scripts/cluster/pull_results.sh <name> <set>`, with the experiment's `name`
    (by default its folder's name). Results already on the hub under the same `<name>/<set>` are kept apart with
    `DEST=results/_cluster`. Every `results.json` records the spec, the entry script, the arm files, the machine
-   and the commit.
+   and the commit. Cells fitted by a job that started before the parcel scores existed (16 October 2026; the
+   45-epoch jobs 624583, 624584, 624587 and 624588 among them) have none: add them with
+   `poetry run python scripts/run_kshot.py -e <spec> --chips data/eurocrops_chips/<set> --summarise`.
 8. **Figures.** Set `ARMS` (short labels, colour slots) and `PAIRS` (arms compared fit by fit on shared draws
    and seeds) in the folder's `report.py`, adapt it if the question needs another figure, and run
-   `poetry run python experiments/<folder>/report.py --chips <set>`. It writes `figures/` (K curves, paired
-   differences, validation curves with the checkpoint epochs, per-class F1) and `figures/tables.md`. For a quick
-   look, `notebooks/pipeline/kshot_results.ipynb` with `EXPERIMENT` and `CHIPS` set still works.
+   `poetry run python experiments/<folder>/report.py --chips <set>`. It writes `figures/` (K curves per pixel and
+   per parcel, paired differences, validation curves with the checkpoint epochs, per-class F1) and
+   `figures/tables.md`. For a quick look, `notebooks/pipeline/kshot_results.ipynb` with `EXPERIMENT` and `CHIPS`
+   set still works.
 9. **Report and record.** Write `REPORT.md` from the template's sections: the answer first, the setup and the
    runs, every figure with what it shows, the tables, the analysis, the caveats and the next steps. Put a
    few-line outcome with a link to it in the README, commit the folder with `figures/`, push, and give the user

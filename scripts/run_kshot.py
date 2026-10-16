@@ -6,7 +6,9 @@
     poetry run python scripts/run_kshot.py -e ... --chips ... --summarise
 
 Results land in results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/, and a finished cell
-is skipped, so a run resumes. On the hub, run it detached with its log beside the results:
+is skipped, so a run resumes. Every finished cell is also scored per parcel; ``--summarise`` scores
+the cells that have no parcel scores yet, such as those pulled back from the cluster, and collects
+them all. On the hub, run it detached with its log beside the results:
 
     mkdir -p results/kshot/EE_2021_mini/logs
     setsid nohup poetry run python -u scripts/run_kshot.py -e configs/experiments/kshot.yaml \
@@ -37,14 +39,17 @@ def main() -> None:
     ap.add_argument("--scratch", type=Path, default=None,
                     help="where missing caches are computed; default the cache root")
     ap.add_argument("--dry-run", action="store_true", help="plan and check, compute nothing")
-    ap.add_argument("--summarise", action="store_true", help="only collect finished cells")
+    ap.add_argument("--summarise", action="store_true",
+                    help="only score per parcel the finished cells not yet scored, and collect them")
     args = ap.parse_args()
 
     from gfm4agri.pipeline.config import load_experiment
-    from gfm4agri.pipeline.runner import run, summarise
+    from gfm4agri.pipeline.runner import add_parcel_metrics, run, summarise
 
     if args.summarise:
         out = REPO / "results" / load_experiment(args.experiment)["name"] / args.chips.name
+        scored = add_parcel_metrics(out, args.chips, arms=args.arms)
+        print(f"parcel scores added to {len(scored)} cells")
         print(summarise(out).to_string(index=False))
         return
     rows = run(args.experiment, args.chips, split=args.split, arms=args.arms,

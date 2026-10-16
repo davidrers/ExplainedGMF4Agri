@@ -46,6 +46,13 @@ The distinction that makes the label budget meaningful:
 One polygon is one human annotation action and yields a few thousand labelled pixels, so K counts
 polygons per class. K counted in pixels would not measure annotation effort and would not answer RQ1.
 
+Every map is **scored both per pixel and per parcel**. The pixel Macro-F1 is the primary metric. Beside
+it, each test parcel takes the class most of its pixels were predicted as, and Macro-F1, overall accuracy
+and kappa are reported over the parcels, because the EuroCrops labels are parcel declarations and the
+published EuroCrops benchmarks score parcels (protocol decision D28). The pixel score weighs every
+hectare and the parcel score every declaration; in Estonia they differ by up to 0.08, most for the
+token-grid models, because small parcels are classified far worse.
+
 Supervision is **sparse**. Chips are exported in full, only the K selected polygons per class are
 burned into the training mask, and every other pixel carries `ignore_index`. Loss is computed on
 labelled pixels only. Test blocks are labelled **densely** from the full EuroCrops layer, because the
@@ -150,7 +157,7 @@ Protocol: the 15 to 20 most frequent crops per country; a label-budget grid K ex
 **percentage of the independent parcel polygons available for training, applied per class**, so a class
 holding n parcels contributes ceil(K / 100 x n) of them and a class present at all keeps at least one;
 multiple random draws per K; the same fixed held-out test blocks at every K; Macro-F1 with 95 %
-bootstrap confidence intervals; spatial block cross-validation (Roberts et al., 2017). Run in-country
+bootstrap confidence intervals, per pixel and per parcel; spatial block cross-validation (Roberts et al., 2017). Run in-country
 within each country, then repeated as cross-country transfer on the intersection of each pair of
 countries' top classes.
 

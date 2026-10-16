@@ -114,6 +114,15 @@ together, so whatever separates it from a foundation model is the pretraining, n
 learns more slowly than a decoder on a frozen model: after 15 rounds of training it was still
 improving, so every model now gets 45 rounds.
 
+**9. Scoring, per pixel and per field.** Every crop map is scored twice on the same test area.
+Per pixel asks how much of the area is mapped right, so the large fields dominate it. Per field,
+each field takes the crop most of its pixels were mapped as, and is then right or wrong as a
+whole: that is how a paying agency checks a farmer's declaration, and how the published EuroCrops
+results are scored. The two disagree. A fifth of the Estonian test fields are under 0.64 ha and
+every model gets the smallest of them mostly wrong, so the per-field score is lower, and it falls
+most for the transformer models, whose 160 m patches are larger than those fields. Both scores are
+reported for every run.
+
 ---
 
 ## Why the comparison needs care

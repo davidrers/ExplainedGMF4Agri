@@ -56,7 +56,7 @@ the chip set's composites once and caches their output (section 9), TESSERA v2 a
 | 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/hub/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
 | 7. Supervision | `src/gfm4agri/benchmark/segmentation_data.py` | the training mask at a budget |
 | 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py`; the baseline's U-Net in `benchmark/scratch_unet.py` | a `SemanticSegmentationTask` |
-| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms and the baseline, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` and `predictions_test.npz`, `summary.csv`; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
+| 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms and the baseline, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms; every finished cell scored per parcel by `benchmark/parcel_metrics.py` | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json`, with the pixel test metrics and `parcel_metrics`, and `predictions_test.npz`; `summary.csv` with both; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
 | 10. Inspection | `src/gfm4agri/benchmark/evaluation.py`, `notebooks/pipeline/eurocrops_ee_results.ipynb` | reloaded fits, test-chip predictions in `results/seg_cached/ee_predictions/` |
 
 ---
@@ -813,6 +813,35 @@ the host. `summary.csv` collects every finished cell of an experiment and chip s
 in `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/`, logs in
 `results/<experiment>/<chip set>/logs/`.
 
+**Every cell is also scored per parcel** (protocol D28, since 16 October 2026). Once a cell holds
+its predictions, `add_parcel_metrics` scores them with `benchmark/parcel_metrics.py` and writes a
+`parcel_metrics` block into `results.json`: Macro-F1, overall accuracy, kappa, weighted F1, per-class
+F1 and support over the test parcels, their number and the rule. Every parcel, pooled over the test
+chips it touches through the global identifier of `<chip>.parcels.tif`, takes the class most of its
+labelled pixels were predicted as, ties going to the lowest class index; pixels of classes outside
+the scheme do not vote. The scoring is NumPy on the stored predictions, a few seconds a cell on all
+of Estonia, and a cell is scored once: a cell finished before the parcel scores existed, or pulled
+from the cluster without them, gets them on the next run or from `run_kshot.py --summarise`, without
+a refit. A cluster job scores only its own arms' cells, because the jobs of the other arms write into
+the same folder. The block also holds the pixel Macro-F1 recomputed from the same predictions, and
+`summary.csv` gains `parcel_macro_f1`, `parcel_accuracy`, `parcel_kappa`, `test_parcels` and
+`predictions_match`, which is false when that recomputed score misses the logged one by more than
+0.002, that is when the stored predictions are not those of the model that was tested. The rule and
+its robustness were established in `experiments/2026-10-16_parcel_metric`.
+
+**Two cells were predicted with a stale checkpoint** (found and fixed on 16 October 2026). When a
+cell is fitted again into a directory that still holds the `best-loss.ckpt` of an interrupted fit,
+Lightning names the new best checkpoint `best-loss-v1.ckpt`. The fit is tested with it and
+`results.json` records it, but `FitPredictor` loaded `best-loss.ckpt` by name, so the stored
+predictions came from the interrupted fit. It showed when the parcel scoring recomputed the pixel
+Macro-F1 from the stored predictions: in 2 of the 33 full-Estonia cells scored it missed the logged
+value, Prithvi at 20 % in `results/kshot_15ep/EE_2021_rev/` (0.5014 against 0.5054, the cell whose
+job failed, section 11) and the 45-epoch U-Net at 100 %, seed 0, of
+`experiments/2026-10-14_unet_baseline` (0.5574 against 0.5449). The other 31 reproduce it exactly,
+and the logged pixel metrics are unaffected. `FitPredictor` now loads the checkpoint `results.json`
+names (`fit_checkpoint`). The two cells' predictions were not redone, Prithvi's because it needs its
+feature cache, which is not kept for `EE_2021_rev`; `predictions_match` flags them.
+
 **On the cluster** each arm runs as one Slurm job (`scripts/cluster/submit.sh`,
 `scripts/cluster/kshot.sbatch`). The cluster profile looks for caches under `data/embeddings/` in
 its clone; a missing cache is computed onto the node's local NVMe, used for that arm's whole sweep
@@ -915,6 +944,11 @@ protocol.
 **Earlier `kshot` results are on other arms.** Results of `kshot` before 15 October 2026 used
 TerraMind and THOR on Sentinel-2 alone and TESSERA v1 from the store; they are not paired with the
 current arms.
+
+**The parcel score is a hard vote.** Protocol section 4.6 asks for predicted probabilities to be
+persisted, but the fits store only each test pixel's predicted class. A parcel is therefore scored by
+the majority of its predicted classes rather than by its mean probability, and Phase 2 cannot reuse
+probabilities yet. Like the pixel metrics, the parcel metrics have no interval (single draws, above).
 
 **Feature caches on the cluster are job-scoped.** The cluster home holds 1 TB, which the Estonian
 chip set (284 GB) and one token-grid cache (744 GB to 1.3 TB) do not fit together, and no project
@@ -1105,6 +1139,22 @@ draw 0, seed 0:
   have not been checked for the offset found there.
 * Checkpoints fell at epochs 4 to 14. The budget became 45 epochs the same day (protocol D27), so
   these cells are not the main workflow's results.
+
+Per parcel (protocol D28), scored on 16 October 2026 from the stored predictions over the 34,610
+test parcels, Macro-F1 / overall accuracy:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large, S2 + S1 | 0.583 / 0.787 | 0.515 / 0.742 | 0.381 / 0.689 |
+| THOR v1 large, S2 + S1 | 0.516 / 0.753 | 0.491 / 0.727 | 0.349 / 0.673 |
+| Prithvi-EO-2.0 600M TL, S2 | 0.535 / 0.763 | stale predictions (section 9) | 0.409 / 0.677 |
+| TESSERA v2 Medium + MLP | 0.589 / 0.793 | 0.547 / 0.779 | 0.502 / 0.755 |
+| AlphaEarth v1 + MLP | 0.474 / 0.745 | 0.432 / 0.723 | 0.408 / 0.715 |
+
+* Per parcel every arm is lower than per pixel: the token-grid models by 0.04 to 0.08 Macro-F1,
+  AlphaEarth by 0.02 to 0.05, TESSERA by 0.002 to 0.016, so TESSERA leads per parcel at every
+  budget. Parcels under 0.16 ha, 5 % of the test parcels, are voted their class 24 to 38 % of the
+  time, and the pixel score hardly sees them (`experiments/2026-10-16_parcel_metric`).
 
 ### Full Estonia, the arms of 15 October 2026, 45 epochs
 
