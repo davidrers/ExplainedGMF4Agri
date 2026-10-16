@@ -9,7 +9,9 @@
 * :class:`FtFitPredictor` is the core's ``FitPredictor``. For a token-grid cell of this experiment it passes the
   batch's ``temporal_coords`` and ``location_coords`` to the model, as the task does in training and test, and it
   loads the checkpoint strictly. For a TESSERA cell (``pixelft``) it rebuilds the cell's task, loads it strictly and
-  predicts every pixel of each test chip. Any other cell it predicts exactly as the core does.
+  predicts every pixel of each test chip. Any other cell it predicts exactly as the core does. The checkpoint is the
+  one ``results.json`` records (``fit_checkpoint``): a cell fitted again after an interrupted fit keeps the old
+  ``best-loss.ckpt`` beside the new ``best-loss-v1.ckpt``.
 """
 
 from __future__ import annotations
@@ -20,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from gfm4agri.benchmark.evaluation import FitPredictor
+from gfm4agri.benchmark.evaluation import FitPredictor, fit_checkpoint
 
 __all__ = ["COORDS", "WORKFLOW", "FtFitPredictor", "build_ft_task"]
 
@@ -111,13 +113,13 @@ def build_ft_task(backbone: str, *, num_classes: int, class_names: list[str], ba
 class FtFitPredictor(FitPredictor):
     """The core's predictor, which for a cell of this experiment passes the coordinates and loads strictly."""
 
-    def __init__(self, fit_dir, device: str | None = None, checkpoint: str = "best-loss.ckpt") -> None:
+    def __init__(self, fit_dir, device: str | None = None) -> None:
         from pixelft import PIXEL_WORKFLOW
 
         r = json.loads((Path(fit_dir) / "results.json").read_text())
         self.ours = r.get("workflow") in WORKFLOW.values()
         self.pixels = r.get("workflow") in PIXEL_WORKFLOW.values()
-        self.checkpoint = checkpoint
+        self.checkpoint = fit_checkpoint(Path(fit_dir), r)
         super().__init__(fit_dir, device)
 
     def _build(self) -> None:
@@ -135,8 +137,7 @@ class FtFitPredictor(FitPredictor):
                               bands=self.dm.bands, n_timesteps=self.dm.n_timesteps,
                               ignore_index=self.dm.manifest["ignore_index"], head_dropout=m["head_dropout"],
                               trainable=bool(m["trainable"])).model
-        state = torch.load(self.fit_dir / "checkpoints" / self.checkpoint, map_location="cpu",
-                           weights_only=False)["state_dict"]
+        state = torch.load(self.checkpoint, map_location="cpu", weights_only=False)["state_dict"]
         state = {k[len("model."):]: v for k, v in state.items() if k.startswith("model.")}
         # Every weight, the encoder's included, comes from the checkpoint: a fine-tuned encoder that did not load
         # would otherwise be replaced, without a word, by the pretrained one.
@@ -148,8 +149,7 @@ class FtFitPredictor(FitPredictor):
 
         cfg = {**self.cfg, "data": {**self.cfg["data"], "num_workers": 0}}
         self.dm, task, self.source = build_pixel_cell(cfg, None, stages=("test",))
-        state = torch.load(self.fit_dir / "checkpoints" / self.checkpoint, map_location="cpu",
-                           weights_only=False)["state_dict"]
+        state = torch.load(self.checkpoint, map_location="cpu", weights_only=False)["state_dict"]
         # The MLP, the cache's statistics and, when it was trained, the student: all from the checkpoint.
         task.load_state_dict(state, strict=True)
         self.task = task.to(self.device).eval()
