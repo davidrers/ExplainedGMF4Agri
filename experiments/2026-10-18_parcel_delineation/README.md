@@ -49,4 +49,11 @@ every `results.json` carries `panoptic_metrics` and the rules under `delineation
 **Report.** `poetry run python experiments/2026-10-18_parcel_delineation/report.py --chips <set>` writes
 `figures/`, and [REPORT.md](REPORT.md) is written from them.
 
-**Outcome.** Pending.
+**Outcome** (19 October 2026, all of Estonia, [REPORT.md](REPORT.md)). At the agreed threshold of 0.5 the boundary
+head adds no parcel geometry beyond the true parcel extent for the five GFM arms: class-agnostic PQ 0.462 to 0.512
+against 0.486 for the extent's connected regions with nothing predicted. Only the U-Net baseline clears that floor
+at every K (0.524 to 0.561). Between parcels of the same class, the boundaries the head exists for, the heads mark
+at most 17 % of the boundary pixels, and the splits they make cost as many false parcels as they gain. Predicted
+geometry costs 0.12 to 0.22 parcel F1 at IoU > 0.5 against the declared parcels. Joint training leaves the pixel
+Macro-F1 of RQ1 unchanged (mean +0.003 over 18 paired fits). Not proposed for the main workflow; `diagnose.py`
+holds the split by parcel contact behind these numbers.

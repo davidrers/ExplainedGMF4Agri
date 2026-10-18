@@ -16,6 +16,10 @@ the main workflow's ``results/kshot/<chip set>/``, whose ``oracle`` and ``semant
 * ``validation_curves.png``: validation crop-type and boundary loss per epoch, with the checkpoint epochs;
 * ``examples.png``: test chips: a July composite, the true parcels, and the boundary parcels of every arm at the
   largest K;
+* when ``diagnose.py`` has run: ``where_found.png``, the share of the true parcels found by the extent, the
+  crop-type map and the boundary head, split by whether a parcel touches none, only other classes, or its own
+  class; ``boundary_pixels.png``, the share of the target's boundary pixels the head marks, by what lies across
+  them;
 * ``tables.md``: the tables of REPORT.md in Markdown, also printed.
 
     poetry run python experiments/2026-10-18_parcel_delineation/report.py --chips EE_2021_rev
@@ -326,6 +330,133 @@ def fig_joint(df: pd.DataFrame, ref: pd.DataFrame, styles: dict, path: Path) -> 
     plt.close(fig)
 
 
+def load_diagnostics(results: Path) -> pd.DataFrame:
+    """``diagnostics.json`` of ``diagnose.py`` as one row per arm, K and quantity; empty when it was not run."""
+    f = results / "diagnostics.json"
+    if not f.exists():
+        return pd.DataFrame()
+    rows = []
+    for key, d in json.loads(f.read_text()).items():
+        arm, cell = key.split("/")
+        pct = float(cell.split("_")[0][1:])
+        for variant, cats in d["pieces"].items():
+            for cat, v in cats.items():
+                rows.append({"arm": arm, "pct": pct, "kind": "pieces", "variant": variant, "cat": cat,
+                             "n": v["n"], "value": v["found"]})
+        for cat, v in d["pixels"].items():
+            for t in ("0.3", "0.5"):
+                rows.append({"arm": arm, "pct": pct, "kind": "pixels", "variant": f"marked@{t}", "cat": cat,
+                             "n": v["n"], "value": v[f"marked@{t}"]})
+        for variant, v in d["unmatched"].items():
+            slivers = next(x for k, x in v.items() if k.startswith("slivers"))
+            rows += [{"arm": arm, "pct": pct, "kind": "unmatched", "variant": variant, "cat": c, "n": v["predicted"],
+                      "value": x} for c, x in (("predicted", v["predicted"]), ("unmatched", v["unmatched"]),
+                                               ("slivers", slivers))]
+    return pd.DataFrame(rows)
+
+
+PIECE_CATS = ["isolated", "touching other class", "touching same class"]
+PIXEL_CATS = ["same class", "between classes", "outer", "interior"]
+
+
+def fig_where(diag: pd.DataFrame, styles: dict, path: Path) -> None:
+    """Share of the true parcels found, by what they touch: extent, crop-type map and boundary head, largest K."""
+    k = diag["pct"].max()
+    d = diag[(diag["kind"] == "pieces") & (diag["pct"] == k)]
+    arms = [a for a in styles if a in set(d["arm"])]
+    total = d[(d["variant"] == "extent")].groupby("cat")["n"].first()
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 0.42 * len(arms) + 1.9), sharey=True)
+    marks = [("extent", MUTED, "|", 140), ("semantic", SLOTS[6], "P", 60), ("boundary@0.3", None, None, 60),
+             ("boundary@0.5", None, None, 60)]
+    for ax, cat in zip(axes, PIECE_CATS, strict=True):
+        g = d[d["cat"] == cat].set_index(["arm", "variant"])["value"]
+        for i, arm in enumerate(arms):
+            vals = [g.get((arm, v), np.nan) for v, *_ in marks]
+            ax.plot([np.nanmin(vals), np.nanmax(vals)], [i, i], color=GRID, lw=2.5, zorder=1)
+            for (v, colour, marker, size), x in zip(marks, vals, strict=True):
+                c, m = (colour, marker) if colour else (styles[arm][1], styles[arm][2])
+                face = SURFACE if v == "boundary@0.3" else c
+                ax.scatter([x], [i], s=size, marker=m, color=face, edgecolor=c if v == "boundary@0.3" else SURFACE,
+                           lw=1.6 if v == "boundary@0.3" else 1.2, zorder=3 if v != "extent" else 2)
+        ax.set_yticks(range(len(arms)), [styles[a][0] for a in arms])
+        ax.invert_yaxis()
+        ax.grid(axis="y", visible=False)
+        ax.grid(axis="x", visible=True)
+        ax.set_xlim(-0.02, 1.02)
+        share = total.get(cat, 0) / max(total.sum(), 1)
+        ax.set_title(f"{cat}: {int(total.get(cat, 0)):,} parcels, {share:.0%}")
+        ax.set_xlabel("share found, class-agnostic IoU > 0.5")
+    from matplotlib.lines import Line2D
+
+    handles = [Line2D([], [], ls="", marker="|", ms=12, mew=2, color=MUTED, label="extent alone"),
+               Line2D([], [], ls="", marker="P", ms=8, color=SLOTS[6], mec=SURFACE, label="crop-type map alone"),
+               Line2D([], [], ls="", marker="o", ms=8, color=INK_2, mec=SURFACE, label="boundary head, 0.5"),
+               Line2D([], [], ls="", marker="o", ms=8, mfc=SURFACE, mec=INK_2, mew=1.6, label="boundary head, 0.3")]
+    fig.legend(handles=handles, loc="upper center", ncol=4, bbox_to_anchor=(0.5, 1.04))
+    fig.text(0.01, -0.04, f"K = {k:g} %. True parcel pieces of the test chips by what they touch inside the extent. "
+             "Boundary head marks in the arm's colour: filled at threshold 0.5, hollow at 0.3.",
+             color=MUTED, fontsize=8.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
+def fig_pixels(diag: pd.DataFrame, styles: dict, path: Path) -> None:
+    """Share of the boundary pixels of the target the head marks at 0.5, by what lies across them, per arm and K."""
+    d = diag[(diag["kind"] == "pixels") & (diag["variant"] == "marked@0.5")]
+    budgets = sorted(d["pct"].unique(), reverse=True)
+    arms = [a for a in styles if a in set(d["arm"])]
+    n = d.groupby("cat")["n"].first()
+    fig, axes = plt.subplots(1, 4, figsize=(2.3 * 4 + 3.0, 0.4 * len(arms) + 1.7), sharey=True)
+    for ax, cat in zip(axes, PIXEL_CATS, strict=True):
+        t = d[d["cat"] == cat].pivot(index="arm", columns="pct", values="value").reindex(index=arms, columns=budgets)
+        t.columns = [f"{k:g} %" for k in budgets]
+        im = _heat(ax, t, SEQUENTIAL, 0, 1, ".2f")
+        ax.set_title(f"{cat}\n{int(n.get(cat, 0)) / 1e6:.2f} M pixels" if cat == "interior"
+                     else f"{cat}\n{int(n.get(cat, 0)):,} pixels")
+    axes[0].set_yticks(range(len(arms)), [styles[a][0] for a in arms])
+    fig.colorbar(im, ax=axes.tolist(), shrink=0.7, label="share marked boundary, probability >= 0.5")
+    fig.text(0.01, -0.03, "Boundary pixels of the test target by what lies across them: a parcel of the same class, a "
+             "parcel of another class, or non-parcel land (outer); interior: the false-alarm rate. Columns are K.",
+             color=MUTED, fontsize=8.5)
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
+def diagnostic_tables(diag: pd.DataFrame, styles: dict) -> str:
+    budgets = sorted(diag["pct"].unique(), reverse=True)
+    arms = [a for a in styles if a in set(diag["arm"])]
+
+    def table(rows: list[tuple[str, dict]], cols: list[str], fmt: str) -> str:
+        head = "| Arm | " + " | ".join(f"{c}, K = {k:g} %" for k in budgets for c in cols) + " |\n|---|" \
+            + "---|" * (len(budgets) * len(cols)) + "\n"
+        return head + "\n".join(f"| {label} | " + " | ".join(
+            "" if pd.isna(v := vals.get((k, c), np.nan)) else format(v, fmt) for k in budgets for c in cols) + " |"
+            for label, vals in rows)
+
+    out = []
+    p = diag[diag["kind"] == "pieces"].set_index(["arm", "pct", "variant", "cat"])["value"]
+    short = {"isolated": "isolated", "touching other class": "other cl.", "touching same class": "same cl."}
+    for v, title in (("extent", "the extent alone"), ("semantic", "the crop-type map alone"),
+                     ("boundary@0.5", "the boundary head at 0.5"), ("boundary@0.3", "the boundary head at 0.3")):
+        rows = [(styles[a][0], {(k, short[c]): p.get((a, k, v, c), np.nan) for k in budgets for c in PIECE_CATS})
+                for a in arms]
+        out.append(f"**True parcels found by {title}**, class-agnostic IoU > 0.5, by what they touch\n\n"
+                   + table(rows, list(short.values()), ".3f"))
+    x = diag[(diag["kind"] == "pixels") & (diag["variant"] == "marked@0.5")].set_index(["arm", "pct", "cat"])["value"]
+    rows = [(styles[a][0], {(k, c): x.get((a, k, c), np.nan) for k in budgets for c in PIXEL_CATS}) for a in arms]
+    out.append("**Boundary pixels marked at 0.5**, by what lies across them (interior: false alarms)\n\n"
+               + table(rows, PIXEL_CATS, ".3f"))
+    u = diag[diag["kind"] == "unmatched"].set_index(["arm", "pct", "variant", "cat"])["value"]
+    ext = diag[(diag["kind"] == "unmatched") & (diag["variant"] == "extent")].groupby("cat")["value"].first()
+    rows = [(styles[a][0], {(k, c): u.get((a, k, "boundary@0.5", c), np.nan) for k in budgets
+                            for c in ("predicted", "unmatched", "slivers")}) for a in arms]
+    out.append("**Predicted parcels of the boundary head at 0.5**: all, unmatched, unmatched slivers under 20 pixels "
+               f"(the extent alone: {int(ext.get('predicted', 0)):,} predicted, {int(ext.get('unmatched', 0)):,} "
+               "unmatched)\n\n" + table(rows, ["predicted", "unmatched", "slivers"], ",.0f"))
+    return "\n\n".join(out) + "\n"
+
+
 def fig_tau(df: pd.DataFrame, styles: dict, path: Path) -> None:
     budgets = sorted(df["pct"].unique(), reverse=True)
     fig, axes = plt.subplots(1, len(budgets), figsize=(4.0 * len(budgets), 3.6), sharey=True, squeeze=False)
@@ -555,6 +686,11 @@ def main() -> None:
         fig_validation(df, curves, styles, args.out / "validation_curves.png")
     fig_examples(results, args.chips, styles, args.out / "examples.png")
     text = tables(df, ref, styles, facts)
+    diag = load_diagnostics(results)
+    if not diag.empty:
+        fig_where(diag, styles, args.out / "where_found.png")
+        fig_pixels(diag, styles, args.out / "boundary_pixels.png")
+        text += "\n" + diagnostic_tables(diag, styles)
     (args.out / "tables.md").write_text(text)
     print(text)
     print(f"figures and tables in {args.out}")
