@@ -7,10 +7,14 @@ Reads this folder's ``results/2026-10-15_kshot_finetune/<chip set>/`` as ``run.p
 * ``kshot_curves.png``: test Macro-F1 against K, one panel per model: frozen, fine-tuned, and for TESSERA the frozen
   control of the labelled-pixel route;
 * ``paired_differences.png``: the differences of ``PAIRS``, fit by fit on the same draw and seed;
+* ``readouts.png``: the difference of each pair of ``PAIRS`` under three readouts: test Macro-F1 per pixel and per
+  parcel at the checkpoint the protocol keeps, and the best validation Macro-F1 over the epochs, which keeps none;
 * ``validation_curves.png``: validation Macro-F1 and loss per epoch, per model and K, with the checkpoint epochs;
 * ``per_class_f1.png``: per-class test F1 of each pair;
 * ``tables.md``: the tables of REPORT.md, among them the second checkpoint (highest validation Macro-F1) of this
   folder's arms, the cost per cell, and the readiness checks of ``check.py``.
+
+The figures of a chip set go to ``figures/<chip set>/``:
 
     poetry run python experiments/2026-10-15_kshot_finetune/report.py --chips EE_2021_rev_mini
 """
@@ -72,7 +76,10 @@ MARKERS = ["o", "s", "D", "^", "v", "h", "P", "X"]
 SURFACE, INK, INK_2, MUTED, GRID, BASELINE = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
 DIVERGING = LinearSegmentedColormap.from_list("gain", ["#e34948", "#f0efec", "#2a78d6"])
 SEQUENTIAL = LinearSegmentedColormap.from_list("level", ["#cde2fb", "#2a78d6", "#0d366b"])
-METRICS = [("macro_f1", "Test Macro-F1"), ("miou", "Test mIoU")]
+METRICS = [("macro_f1", "Test Macro-F1"), ("parcel_macro_f1", "Test parcel Macro-F1"), ("miou", "Test mIoU")]
+#: The readouts of a pair's difference: a column of the summary, or ``best_val_f1``, taken from the curves.
+READOUTS = [("macro_f1", "Test Macro-F1, per pixel"), ("parcel_macro_f1", "Test Macro-F1, per parcel"),
+            ("best_val_f1", "Best validation Macro-F1 over the epochs")]
 
 plt.rcParams.update({
     "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
@@ -139,6 +146,15 @@ def load(sources: list[tuple[Path, list[str] | None]]) -> tuple[pd.DataFrame, pd
         facts["machines"].add(prov.get("machine"))
     facts["support"] = support
     return df, pd.DataFrame(classes), pd.DataFrame(curves), facts
+
+
+def add_best_val(df: pd.DataFrame, curves: pd.DataFrame) -> pd.DataFrame:
+    """``df`` with each fit's highest validation Macro-F1 over the epochs (``best_val_f1``)."""
+    if curves.empty:
+        return df
+    best = (curves[curves["metric"] == "val_f1"].groupby(["arm", "pct", "draw", "seed"])["value"].max()
+            .rename("best_val_f1").reset_index())
+    return df.merge(best, on=["arm", "pct", "draw", "seed"], how="left")
 
 
 def arm_styles(arms: list[str]) -> dict[str, tuple[str, str, str]]:
@@ -272,6 +288,46 @@ def fig_paired(df: pd.DataFrame, path: Path, metric: str = "macro_f1") -> None:
     plt.close(fig)
 
 
+def fig_readouts(df: pd.DataFrame, path: Path) -> None:
+    """Each pair's difference per K under the three ``READOUTS``, mean over draws and seeds."""
+    budgets = sorted(df["pct"].unique(), reverse=True)
+    pairs = [(label, a, b) for label, a, b in PAIRS if {a, b} <= set(df["arm"])]
+    readouts = [(m, name) for m, name in READOUTS if m in df]
+    ncol = min(3, len(pairs))
+    nrow = -(-len(pairs) // ncol)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(3.9 * ncol + 0.8, 3.4 * nrow + 0.6), sharey=True, squeeze=False)
+    for ax in axes.ravel()[len(pairs):]:
+        ax.set_visible(False)
+    width = 0.8 / len(readouts)
+    for ax, (label, a, b) in zip(axes.ravel(), pairs, strict=False):
+        for j, (metric, name) in enumerate(readouts):
+            d = paired(df, a, b, metric)
+            d = d.groupby(level="pct").mean() if not d.empty else d
+            x = np.arange(len(budgets)) + (j - (len(readouts) - 1) / 2) * width
+            v = np.array([d.get(k, np.nan) for k in budgets])
+            ax.bar(x, v, width, color=SLOTS[j], edgecolor=SURFACE, lw=1.5, label=name, zorder=2)
+            for xi, vi in zip(x, v, strict=True):
+                if np.isfinite(vi):
+                    ax.annotate(f"{vi:+.2f}".replace("+0.00", "0.00").replace("-0.00", "0.00"), (xi, vi),
+                                textcoords="offset points", xytext=(0, 3 if vi >= 0 else -3), ha="center",
+                                va="bottom" if vi >= 0 else "top", fontsize=7, color=INK_2)
+        ax.axhline(0, color=BASELINE, lw=1.2, zorder=1)
+        ax.set_xticks(range(len(budgets)), [f"K = {k:g} %" for k in budgets])
+        ax.set_xlim(-0.6, len(budgets) - 0.4)
+        ax.grid(axis="x", visible=False)
+        ax.set_title(label)
+    lo, hi = axes[0][0].get_ylim()
+    axes[0][0].set_ylim(lo - 0.01, hi + 0.01)
+    for row in axes:
+        row[0].set_ylabel("Difference")
+    _legend(fig, axes, 1.02)
+    fig.text(0.01, -0.02, "Test readouts: the checkpoint of lowest validation loss of each fit. Validation readout: "
+             "the best epoch of each fit, no checkpoint. Mean over draws and seeds.", color=MUTED, fontsize=8.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
 def fig_validation(df: pd.DataFrame, curves: pd.DataFrame, styles: dict, path: Path) -> None:
     """Validation Macro-F1 (top block) and loss (bottom block) per epoch: rows K, columns the models."""
     budgets = sorted(df["pct"].unique(), reverse=True)
@@ -334,10 +390,10 @@ def fig_per_class(classes: pd.DataFrame, styles: dict, support: dict, path: Path
     if any({a, b} <= set(mean.index.get_level_values(0)) for _, a, b in PAIRS):
         # A class with F1 zero in both arms has no difference to show: it is left blank.
         have = set(mean.index.get_level_values(0))
-        panels = [(label.split(":")[0], (mean[a] - mean[b]).where((mean[a] >= 0.005) | (mean[b] >= 0.005))
+        panels = [(label.replace(": ", "\n").replace(" minus ", " minus\n"), (mean[a] - mean[b]).where((mean[a] >= 0.005) | (mean[b] >= 0.005))
                    .unstack("pct")) for label, a, b in PAIRS if {a, b} <= have]
         lim = max(np.nanmax(np.abs(p.values)) for _, p in panels)
-        cmap, vmin, vmax, fmt, cbar = DIVERGING, -lim, lim, "+.2f", "Test F1, fine-tuned minus frozen"
+        cmap, vmin, vmax, fmt, cbar = DIVERGING, -lim, lim, "+.2f", "Difference in test F1, as titled"
     else:
         panels = [(styles[a][0], mean[a].unstack("pct")) for a in styles if a in mean.index.get_level_values(0)]
         cmap, vmin, vmax, fmt, cbar = SEQUENTIAL, 0.0, 1.0, ".2f", "Test F1"
@@ -347,7 +403,7 @@ def fig_per_class(classes: pd.DataFrame, styles: dict, support: dict, path: Path
         p = p.reindex(index=order, columns=budgets)
         p.columns = [f"{k:g} %" for k in budgets]
         im = _heat(ax, p, cmap, vmin, vmax, fmt)
-        ax.set_title(label)
+        ax.set_title(label, fontsize=9.5)
     axes[0][0].set_yticks(range(len(order)),
                           [f"{pretty(c)} ({support[c]:,})" if c in support else pretty(c) for c in order])
     fig.colorbar(im, ax=axes[0].tolist(), shrink=0.6, label=cbar)
@@ -386,10 +442,10 @@ def tables(df: pd.DataFrame, styles: dict, facts: dict, curves: pd.DataFrame | N
                 (f"{m[k]:.3f}" if k in m else "") for k in budgets) + " |")
         out.append(f"**{title}**, mean +- standard deviation (fits)\n\n{head}" + "\n".join(rows))
     present = [(label, a, b) for label, a, b in PAIRS if {a, b} <= set(df["arm"])]
-    if present:
+    for metric, name in [r for r in READOUTS if r[0] in df] if present else []:
         rows = []
         for label, a, b in present:
-            d = paired(df, a, b, "macro_f1")
+            d = paired(df, a, b, metric)
             cells = []
             for k in budgets:
                 v = d.xs(k, level="pct") if k in d.index.get_level_values("pct") else pd.Series(dtype=float)
@@ -397,8 +453,8 @@ def tables(df: pd.DataFrame, styles: dict, facts: dict, curves: pd.DataFrame | N
                 cells.append(f"{v.mean():+.3f} +- {v.std():.3f} ({(v > 0).sum()}/{len(v)})" if len(v) > 1
                              else f"{v.iloc[0]:+.3f}" if len(v) else "")
             rows.append(f"| {label} | " + " | ".join(cells) + " |")
-        out.append("**Paired difference in test Macro-F1**, mean +- standard deviation (fits won by the first)\n\n"
-                   + head.replace("| Arm |", "| Pair |") + "\n".join(rows))
+        out.append(f"**Paired difference in {name[0].lower() + name[1:]}**, mean +- standard deviation (fits won "
+                   "by the first)\n\n" + head.replace("| Arm |", "| Pair |") + "\n".join(rows))
     rows = []
     for arm, (label, _, _) in styles.items():
         cells = []
@@ -501,7 +557,7 @@ def extra_tables(sources: list[tuple[Path, list[str] | None]], df: pd.DataFrame,
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--chips", required=True, help="the chip set's name, e.g. EE_2021_mini")
-    ap.add_argument("--out", type=Path, default=HERE / "figures")
+    ap.add_argument("--out", type=Path, default=None, help="default: figures/<chip set>/")
     args = ap.parse_args()
 
     from gfm4agri.pipeline.config import load_experiment
@@ -514,11 +570,14 @@ def main() -> None:
     df, classes, curves, facts = load(sources)
     if df.empty:
         raise SystemExit(f"no finished fits in {[str(s) for s, _ in sources]}")
+    df = add_best_val(df, curves)
+    args.out = args.out or HERE / "figures" / args.chips
     styles = arm_styles(sorted(df["arm"].unique()))
     args.out.mkdir(parents=True, exist_ok=True)
     fig_kshot(df, styles, args.out / "kshot_curves.png")
     if any({a, b} <= set(df["arm"]) for _, a, b in PAIRS):
         fig_paired(df, args.out / "paired_differences.png")
+        fig_readouts(df, args.out / "readouts.png")
     if not curves.empty:
         fig_validation(df, curves, styles, args.out / "validation_curves.png")
     if not classes.empty:

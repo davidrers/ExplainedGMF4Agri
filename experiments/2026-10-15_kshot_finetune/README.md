@@ -42,17 +42,23 @@ validation loss
     bash scripts/cluster/submit.sh experiments/2026-10-15_kshot_finetune/experiment.yaml EE_2021_rev_mini    # one job per arm
     poetry run python experiments/2026-10-15_kshot_finetune/check.py -e experiments/2026-10-15_kshot_finetune/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev_mini --predictions
     poetry run python experiments/2026-10-15_kshot_finetune/report.py --chips EE_2021_rev_mini
+    poetry run python experiments/2026-10-15_kshot_finetune/report.py --chips EE_2021_rev    # figures/<chip set>/
 
 **Results.** `results/2026-10-15_kshot_finetune/<chip set>/`, with `checks/` for the readiness checks.
 
-**Status, 15 October 2026: ready; all of Estonia running at 45 epochs. Stage 1 in [REPORT.md](REPORT.md).**
-- **Checks.** Every readiness check passes on the cluster for the four fine-tuned arms: step-0 equivalence with the
-  core's caches, the switch, eval mode and the warm-up.
-- **Pilot.** The 15 cells on `EE_2021_rev_mini` ran without a numeric fault and reproduce their logged test
-  accuracy from their predictions; too small to say whether fine-tuning helps.
-- **Epochs.** The user moved this experiment and the main workflow from 15 to 45 epochs the same evening. The
-  15-epoch run on `EE_2021_rev` (jobs 624389 to 624393) was cancelled after about 2 h, one cell finished; its outputs
-  are kept in `results/2026-10-15_kshot_finetune/_cancelled_15_epochs/EE_2021_rev/`. The pilot stays at 15 epochs:
-  it tested the workflow, which the epoch count does not change.
-- **Running.** `EE_2021_rev` at 45 epochs, about 10, 17, 18 and 34 h for TerraMind, Prithvi, THOR and TESSERA once
-  started. Its frozen side is the main workflow's 45-epoch run, which the report pairs by epochs.
+**Outcome, 18 October 2026: all of Estonia done at 45 epochs. Details in [REPORT.md](REPORT.md).**
+- **TESSERA v2:** fine-tuning pays off. Test Macro-F1 rises from 0.618, 0.582 and 0.504 to 0.660, 0.630 and 0.581
+  at K = 100, 20 and 5 %, and the gain holds per parcel and in validation. The frozen control of the same route
+  moves less than 0.005 in validation, so the gain is the encoder's. The fine-tuned arm is the best of the main grid
+  at K = 20 and 5 %.
+- **TerraMind, Prithvi and THOR:** fine-tuning gains about +0.01 in best validation Macro-F1 (THOR -0.033 at
+  K = 5 %), within the seed spread. At the protocol's checkpoint of lowest validation loss, test differences swing
+  from -0.082 to +0.034. Fine-tuned validation loss turns at epochs 5 to 9, so the checkpoint lands before the
+  rarer classes are learnt.
+- **Cost:** 4 to 9 times the frozen fitting time for the token-grid models, 15 times for TESSERA (34.6 h for three
+  cells).
+- **Run:** one draw and one seed per cell. Node failures on 16 October forced three cells to be refitted, and two of
+  them were first predicted with the interrupted fit's checkpoint. Commit 02a10f1 fixed the predictor and the two
+  were predicted again. All 15 cells' predictions now reproduce their logged scores.
+- **Stage 1** (readiness checks and the 15-epoch pilot on `EE_2021_rev_mini`): every check passed. The pilot was too
+  small to answer the question.
