@@ -1,0 +1,10 @@
+# Parcel delineation by a boundary head trained jointly with the crop-type head (README.md). The six arms of the
+# main workflow, as they are in configs/arms/; run.py adds the boundary head, the joint loss and the panoptic
+# scores. The crop-type-only fits these are compared with are results/kshot/<chip set>/ (configs/experiments/kshot.yaml).
+arms: [terramind_v1_large_s2s1, prithvi_eo_v2_600_tl, thor_v1_large_s2s1, tessera_v2_medium, alphaearth_v1,
+       unet_r18_scratch_s2s1]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0]
+epochs: 45
+checkpoint: val_loss           # the lowest validation loss, here crop-type plus boundary loss
