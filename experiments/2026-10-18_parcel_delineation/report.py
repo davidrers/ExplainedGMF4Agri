@@ -14,8 +14,8 @@ the main workflow's ``results/kshot/<chip set>/``, whose ``oracle`` and ``semant
   in pixel Macro-F1, in RQ with the true parcels and in class-agnostic PQ of the crop-type map's parcels;
 * ``tau.png``: class-agnostic PQ of the boundary parcels against the threshold on the boundary probability;
 * ``validation_curves.png``: validation crop-type and boundary loss per epoch, with the checkpoint epochs;
-* ``examples.png``: test chips: a July composite, the true parcels, and the boundary parcels of every arm at the
-  largest K;
+* ``examples.png``: test chips: a July composite, the true parcels and crop types, and every arm's boundary parcels
+  and predicted crop types at the largest K;
 * when ``diagnose.py`` has run: ``where_found.png``, the share of the true parcels found by the extent, the
   crop-type map and the boundary head, split by whether a parcel touches none, only other classes, or its own
   class; ``boundary_pixels.png``, the share of the target's boundary pixels the head marks, by what lies across
@@ -39,6 +39,7 @@ sys.path[:0] = [str(HERE), str(REPO / "src")]
 import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
+import matplotlib.patches  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
@@ -544,6 +545,26 @@ def pick_chips(chips_dir: Path, ids: list[str], n: int = 3) -> list[str]:
     return [c for _, c in sorted(scores, reverse=True)[:n]]
 
 
+#: Short labels of the scheme's classes in the example figure; any other class shows its name without underscores.
+SHORT = {"pasture_meadow_grassland_grass": "grassland", "winter_common_soft_wheat": "winter wheat",
+         "spring_common_soft_wheat": "spring wheat", "legumes_harvested_green": "legumes, green harvest",
+         "winter_rapeseed_rape": "winter rapeseed", "spring_rapeseed_rape": "spring rapeseed",
+         "grain_maize_corn_popcorn": "grain maize", "legumes_dried_pulses_protein_crops": "dried pulses",
+         "alfalfa_lucerne": "alfalfa", "orchards_fruits": "orchards", "fresh_vegetables": "vegetables"}
+OTHER_CLASS = "#a3a29b"
+
+
+def _show_classes(ax, cls: np.ndarray, extent: np.ndarray, outline: np.ndarray, colours: dict, title: str) -> None:
+    """A crop-type map inside the extent, one colour per class, with the true parcel outlines in white."""
+    img = np.ones(cls.shape + (3,))
+    for k in np.unique(cls[extent]):
+        img[extent & (cls == k)] = matplotlib.colors.to_rgb(colours.get(int(k), OTHER_CLASS))
+    img[outline & extent] = 1.0
+    ax.imshow(img, interpolation="nearest")
+    ax.set_title(title, fontsize=9)
+    ax.axis("off")
+
+
 def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
     import rasterio
 
@@ -556,38 +577,71 @@ def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
                        key=lambda p: -float(p.parent.name[1:].split("_")[0]))
         if found:
             cells[arm] = np.load(found[0])
+            names = json.loads((found[0].parent / "results.json").read_text())["class_names"]
     if not cells:
         return
     ids = [str(c) for c in next(iter(cells.values()))["ids"]]
     chosen = pick_chips(chips_dir, ids)
     manifest = json.loads((REPO / "data/eurocrops_chips" / chips / "manifest.json").read_text())
     bands = manifest["imagery"]["band_names"]
-    fig, axes = plt.subplots(len(chosen), 2 + len(cells), figsize=(2.3 * (2 + len(cells)), 2.5 * len(chosen)),
-                             squeeze=False)
-    for row, cid in zip(axes, chosen, strict=True):
+
+    # Per chip: the extent, the true pieces, the true classes and every arm's predicted classes and parcels.
+    shown = []
+    for cid in chosen:
         parcels = read_parcels(chips_dir, cid)
+        first = next(iter(cells.values()))
+        mask = first["mask"][ids.index(cid)]
+        extent = (mask >= 0) & (parcels > 0)
+        arms = {}
+        for arm, d in cells.items():
+            j = [str(c) for c in d["ids"]].index(cid)
+            arms[arm] = (d["pred"][j], panoptic.from_boundary(extent, d["boundary"][j].astype(np.float32) / 255.0,
+                                                              panoptic.TAU))
+        shown.append((cid, extent, panoptic.pieces(np.where(extent, parcels, 0)), mask, arms))
+    # One colour per class across the figure, in slot order by the pixels a class covers in all its crop-type maps;
+    # the classes past the eight slots share one grey.
+    area = np.zeros(len(names), np.int64)
+    for _, extent, _, mask, arms in shown:
+        for cls in [mask] + [pred for pred, _ in arms.values()]:
+            area += np.bincount(cls[extent].astype(np.int64), minlength=len(names))
+    ranked = [int(k) for k in np.argsort(-area, kind="stable") if area[k] > 0]
+    colours = dict(zip(ranked, SLOTS))
+
+    ncol = 2 + len(cells)
+    fig, axes = plt.subplots(2 * len(chosen), ncol, figsize=(2.3 * ncol, 2.5 * 2 * len(chosen)), squeeze=False)
+    for r, (cid, extent, true, mask, arms) in enumerate(shown):
+        top, bottom = axes[2 * r], axes[2 * r + 1]
         with rasterio.open(chips_dir / f"{cid}_merged.tif") as s:
             # Band index = month index x bands per month + band index (the manifest's layout).
             july = 6 * len(bands)
             rgb = np.stack([s.read(july + bands.index(b) + 1) for b in ("RED", "GREEN", "BLUE")], -1)
             rgb = rgb.astype(np.float32)
         rgb = np.clip(rgb / np.nanpercentile(rgb, 98), 0, 1)
-        row[0].imshow(np.nan_to_num(rgb), interpolation="nearest")
-        row[0].set_title(f"{cid}, July", fontsize=9)
-        row[0].axis("off")
-        first = next(iter(cells.values()))
-        i = ids.index(cid)
-        mask = first["mask"][i]
-        extent = (mask >= 0) & (parcels > 0)
-        true = panoptic.pieces(np.where(extent, parcels, 0))
-        _show_parcels(row[1], true, extent, "true parcels")
-        for ax, (arm, d) in zip(row[2:], cells.items()):
-            j = [str(c) for c in d["ids"]].index(cid)
-            seg = panoptic.from_boundary(extent, d["boundary"][j].astype(np.float32) / 255.0, panoptic.TAU)
-            _show_parcels(ax, seg, extent, styles[arm][0])
-    fig.text(0.01, 0.0, "Inside the true parcel extent (light); dark lines are parcel outlines. Boundary parcels at "
-             "threshold 0.5, the largest K fitted. Chips with the most contacts between parcels of one class.",
-             color=MUTED, fontsize=8.5)
+        top[0].imshow(np.nan_to_num(rgb), interpolation="nearest")
+        top[0].set_title(f"{cid}, July", fontsize=9)
+        top[0].axis("off")
+        outline = _outline(true)
+        _show_parcels(top[1], true, extent, "true parcels")
+        _show_classes(bottom[1], mask, extent, outline, colours, "true crop types")
+        for t_ax, b_ax, (arm, (pred, seg)) in zip(top[2:], bottom[2:], arms.items()):
+            _show_parcels(t_ax, seg, extent, f"{styles[arm][0]}: parcels")
+            correct = float((pred[extent] == mask[extent]).mean())
+            _show_classes(b_ax, pred, extent, outline, colours, f"crop types, {correct:.0%} correct")
+        # The chip's classes, in the figure's colour order, as the legend of its crop-type row.
+        present = set()
+        for cls in [mask] + [pred for pred, _ in arms.values()]:
+            present |= {int(k) for k in np.unique(cls[extent])}
+        handles = [matplotlib.patches.Patch(color=colours[k], label=SHORT.get(names[k], names[k].replace("_", " ")))
+                   for k in ranked if k in present and k in colours]
+        if present - set(colours):
+            handles.append(matplotlib.patches.Patch(color=OTHER_CLASS, label="other classes"))
+        bottom[0].axis("off")
+        bottom[0].legend(handles=handles, loc="center left", fontsize=8, handlelength=1.2, borderaxespad=0,
+                         title="crop type", title_fontsize=8.5, alignment="left")
+    fig.text(0.01, 0.0, "Per chip, top: parcels inside the true parcel extent (light), dark lines their outlines, "
+             "the boundary parcels at threshold 0.5. Bottom: the crop type per pixel inside the extent, white lines the "
+             "true parcel outlines; share of pixels correct. Largest K fitted. Chips with the most contacts between "
+             "parcels of one class.", color=MUTED, fontsize=8.5, wrap=True)
     fig.tight_layout()
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)

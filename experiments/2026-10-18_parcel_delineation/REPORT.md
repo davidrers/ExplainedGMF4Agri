@@ -203,12 +203,24 @@ holds. THOR's boundary loss stays the highest of all (0.35 to 0.42).
 
 ### Examples
 
-![Test chips: July composite, true parcels, boundary parcels of every arm at K = 100 %](figures/examples.png)
+![Test chips: July composite, true parcels and crop types, and every arm's boundary parcels and predicted crop types at K = 100 %](figures/examples.png)
 
-The three test chips with the most contacts between parcels of one class. The true parcels (second column) are
-strips and blocks separated by thin internal lines. Every arm's boundary parcels keep the outer outline of the
-extent, which the extent gives, and draw few of the internal lines; what they add are small holes and slivers
-inside the fields.
+The three test chips with the most contacts between parcels of one class; for each, the parcels in the upper row
+and the crop types in the lower row. The true parcels (second column) are strips and blocks separated by thin
+internal lines. Every arm's boundary parcels keep the outer outline of the extent, which the extent gives, and draw
+few of the internal lines; what they add are small holes and slivers inside the fields.
+
+The crop-type rows show why the map alone cannot stand in for the head. Neighbouring parcels of one class form one
+block of colour, as the grassland strips of the first two chips do, and in the figure only the white lines of the
+true outlines keep them apart; the parcels drawn from the map merge them. The errors take a different form in each
+group. The token-grid models confuse classes in rounded patches a few tokens wide that ignore the parcel outlines,
+as TerraMind and Prithvi do on the first chip, where grassland becomes legumes harvested green. TESSERA's errors
+are scattered pixels inside a parcel, such as the spring wheat (13 %) and oats (9 %) in the spring barley block of
+the third chip; when parcels are drawn from the map, each such class change cuts a sliver. Elsewhere a whole parcel
+takes one wrong class: the three legumes parcels at the top left of the third chip are oats for THOR (88 to 99 %),
+peas for AlphaEarth (100 %) and oats or spring wheat for the U-Net, while TerraMind alone gets part of each right (28 to
+76 %). These chips were chosen for their same-class contacts and are mostly grassland, so their pixel
+accuracy (63 to 98 %) does not estimate that of the test set.
 
 ## Analysis
 
