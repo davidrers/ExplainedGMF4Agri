@@ -203,7 +203,7 @@ holds. THOR's boundary loss stays the highest of all (0.35 to 0.42).
 
 ### Examples
 
-![Test chips: July composite, true parcels and crop types, and every arm's boundary parcels and predicted crop types at K = 100 %](figures/examples.png)
+![Test chips: July composite, true parcels and crop types, and every arm's boundary parcels and predicted crop types over the whole chip at K = 100 %](figures/examples.png)
 
 The three test chips with the most contacts between parcels of one class; for each, the parcels in the upper row
 and the crop types in the lower row. The true parcels (second column) are strips and blocks separated by thin
@@ -221,6 +221,13 @@ takes one wrong class: the three legumes parcels at the top left of the third ch
 peas for AlphaEarth (100 %) and oats or spring wheat for the U-Net, while TerraMind alone gets part of each right (28 to
 76 %). These chips were chosen for their same-class contacts and are mostly grassland, so their pixel
 accuracy (63 to 98 %) does not estimate that of the test set.
+
+The predicted crop types cover the whole chip, the true ones only the extent. Outside the extent, which holds 74 % of
+the test pixels, every arm still names a crop, since the scheme has no background class. TESSERA and AlphaEarth call
+86 % of those pixels grassland and the U-Net 65 %, while the token-grid models call only 39 to 45 % grassland and
+spread other crops over forest and settlements, as TerraMind's winter wheat, rapeseed and rye over the forest of the
+first chip show. None of this enters a score, since every metric is computed inside the extent; it matters for a map
+of a whole region, which would need the cropland mask of stage 1 first.
 
 ## Analysis
 
