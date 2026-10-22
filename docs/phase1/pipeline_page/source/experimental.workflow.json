@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Experimental workflow",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "experimental-workflow.html",
+    "legend": {
+      "entries": {
+        "frontend": {
+          "label": "data"
+        },
+        "database": {
+          "label": "frozen, or saved to disk"
+        },
+        "backend": {
+          "label": "trained for every K, draw and seed"
+        },
+        "external": {
+          "label": "evaluation"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "lane-1",
+      "label": "Imagery"
+    },
+    {
+      "id": "lane-2",
+      "label": "Main path"
+    },
+    {
+      "id": "lane-3",
+      "label": "Side outputs"
+    }
+  ],
+  "mainPath": [
+    "parcels",
+    "chips",
+    "split",
+    "budget",
+    "train",
+    "test"
+  ],
+  "nodes": [
+    {
+      "id": "imagery",
+      "lane": "lane-1",
+      "col": 1,
+      "type": "frontend",
+      "icon": "none",
+      "label": "Satellite inputs",
+      "sublabel": "S2, S1 monthly · AlphaEarth"
+    },
+    {
+      "id": "parcels",
+      "lane": "lane-2",
+      "col": 0,
+      "type": "frontend",
+      "icon": "none",
+      "label": "EuroCrops parcels",
+      "sublabel": "v11 · 20 classes"
+    },
+    {
+      "id": "chips",
+      "lane": "lane-2",
+      "col": 1,
+      "type": "frontend",
+      "icon": "none",
+      "label": "Chip set",
+      "sublabel": "7,402 chips · 10 m"
+    },
+    {
+      "id": "split",
+      "lane": "lane-2",
+      "col": 2,
+      "type": "frontend",
+      "icon": "none",
+      "label": "Spatial split",
+      "sublabel": "4 × 4-chip blocks"
+    },
+    {
+      "id": "budget",
+      "lane": "lane-2",
+      "col": 3,
+      "type": "frontend",
+      "icon": "none",
+      "label": "Label budget",
+      "sublabel": "K % of parcels per class"
+    },
+    {
+      "id": "train",
+      "lane": "lane-2",
+      "col": 4,
+      "type": "backend",
+      "icon": "none",
+      "label": "Train decoder",
+      "sublabel": "45 epochs per K, draw, seed"
+    },
+    {
+      "id": "test",
+      "lane": "lane-2",
+      "col": 5,
+      "type": "external",
+      "icon": "none",
+      "label": "Score test blocks",
+      "sublabel": "1,475 test chips"
+    },
+    {
+      "id": "encode",
+      "lane": "lane-3",
+      "col": 3,
+      "type": "database",
+      "icon": "none",
+      "label": "Encode once",
+      "sublabel": "frozen · cached per chip set"
+    },
+    {
+      "id": "report",
+      "lane": "lane-3",
+      "col": 5,
+      "type": "external",
+      "icon": "none",
+      "label": "results.json",
+      "sublabel": "pixel + parcel scores"
+    }
+  ],
+  "edges": [
+    {
+      "id": "rasterise",
+      "from": "parcels",
+      "to": "chips",
+      "label": "rasterised"
+    },
+    {
+      "id": "composite",
+      "from": "imagery",
+      "to": "chips"
+    },
+    {
+      "id": "chips-split",
+      "from": "chips",
+      "to": "split"
+    },
+    {
+      "id": "split-budget",
+      "from": "split",
+      "to": "budget",
+      "label": "train parcels"
+    },
+    {
+      "id": "split-encode",
+      "from": "split",
+      "to": "encode",
+      "label": "8 D4 copies",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "budget-train",
+      "from": "budget",
+      "to": "train",
+      "label": "K % labels",
+      "variant": "emphasis"
+    },
+    {
+      "id": "encode-train",
+      "from": "encode",
+      "to": "train",
+      "label": "cached features",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "train-test",
+      "from": "train",
+      "to": "test",
+      "label": "best val loss"
+    },
+    {
+      "id": "test-report",
+      "from": "test",
+      "to": "report"
+    }
+  ]
+}
