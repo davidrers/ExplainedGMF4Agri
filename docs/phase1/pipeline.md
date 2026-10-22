@@ -16,6 +16,14 @@ Everything below describes code that runs today. Where the implementation depart
 [protocol.md](protocol.md), the departure is stated in [section 10](#10-known-gaps) rather
 than hidden. The runs made with it so far are listed in [section 11](#11-runs).
 
+**The main workflow and the experiments.** The main workflow is what
+`configs/experiments/kshot.yaml` runs: the six arms of section 9, every foundation-model encoder
+frozen, at the budgets, draws, seeds and fit budget that file states. Everything else is an
+experiment in its own folder of `experiments/`, fine-tuning among them (protocol D29). This
+document cites an experiment where its result justifies a decision of the main workflow, and
+section 11 keeps the runs of the two apart and lists the six experiments the thesis analysis
+reports.
+
 **This document changes only by agreement with the author**, never as a side effect of an
 experiment or an exploration. An agreed update goes where it belongs: a changed stage, data
 product, script or configuration to its section and the stage table below; a fault found and
@@ -57,7 +65,7 @@ the chip set's composites once and caches their output (section 9), TESSERA v2 a
 | 7. Supervision | `src/gfm4agri/benchmark/segmentation_data.py` | the training mask at a budget |
 | 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py`; the baseline's U-Net in `benchmark/scratch_unet.py` | a `SemanticSegmentationTask` |
 | 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms and the baseline, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms; every finished cell scored per parcel by `benchmark/parcel_metrics.py` | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json`, with the pixel test metrics and `parcel_metrics`, and `predictions_test.npz`; `summary.csv` with both; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
-| 10. Inspection | `src/gfm4agri/benchmark/evaluation.py`, `notebooks/pipeline/eurocrops_ee_results.ipynb` | reloaded fits, test-chip predictions in `results/seg_cached/ee_predictions/` |
+| 10. Inspection | `notebooks/pipeline/kshot_results.ipynb` (`EXPERIMENT`, `CHIPS`); an experiment's `report.py`; `docs/phase1/results_estonia/report.py` for the main workflow on Estonia; `src/gfm4agri/benchmark/evaluation.py` to reload a fit | K curves per pixel and per parcel, validation curves with the checkpoint epochs, per-class F1, maps of test chips; [results_estonia/REPORT.md](results_estonia/REPORT.md). The grid of 2 October 2026 keeps `notebooks/pipeline/eurocrops_ee_results.ipynb` and `results/seg_cached/ee_predictions/` |
 
 ---
 
@@ -449,7 +457,9 @@ TESSERA encodes each 10 m pixel's Sentinel-2 and Sentinel-1 series into one 128-
 vector, from that pixel alone: no part of the encoder sees a neighbouring pixel. Since 15 October
 2026 the main workflow runs **TESSERA v2 Medium from its open weights, frozen, on the chip set's
 own monthly composites** (protocol decision D25). The v1.0 store rasters it used before are
-described after it; they stay on disk and are no longer read by `kshot`.
+described after it; they stay on disk and are no longer read by `kshot`. TESSERA v2 fine-tuned,
+and the frozen encoder against the store, are compared in experiments, not in the main workflow
+(protocol D29).
 
 ### TESSERA v2, computed by the runner
 
@@ -474,8 +484,17 @@ and padded as v2's `encode_pixels` does. A pixel whose Sentinel-2 is zero in eve
 never-observed pixels of section 10, is encoded from Sentinel-1 alone; a pixel with neither comes
 out NaN, which the datamodule replaces with 0 as it did for the store's gaps.
 `experiments/2026-10-14_tessera_composites` established that frozen v2 on these monthly composites
-separates crops about as well as from its native per-acquisition series, and scored the frozen
-arm within 0.017 test Macro-F1 of the v1.0 store arm on all of Estonia.
+separates crops about as well as from its native per-acquisition series. With that experiment's
+own head, trained on a sample of pixels per parcel rather than on chips, frozen v2 scored within
+0.017 test Macro-F1 of the v1.0 store arm at every budget on all of Estonia. **In the main
+workflow the gap is larger at the low budgets.** Against the store arm at 15 epochs on the same
+parcels and seed (`experiments/2026-10-14_unet_baseline`: 0.623, 0.599 and 0.572 at K = 100, 20
+and 5 %), the frozen v2 arm scored 0.018, 0.037 and 0.068 lower at 15 epochs and 0.005, 0.017 and
+0.068 lower at 45 (section 11). At 5 % its checkpoint of lowest validation loss falls at epoch 4
+under both fit budgets (section 10). The switch is kept for the whole pipeline (the author,
+16 and 22 October 2026): the store's offset pairs a label with the embedding of the pixel beside
+it, and v2 on the composites gives TESSERA the imagery and the frozen treatment of every other
+arm.
 
 **The cache** (`src/gfm4agri/pipeline/raster_cache.py`). The encoder's output for a chip never
 changes, so the runner computes it once per chip set, as it does a ViT's feature cache, into
@@ -503,7 +522,7 @@ Zarr v3 store, one group per UTM zone, quantised to int8 with one float32 scale 
 8 m, measured on `EE_2021_rev_mini` on 15 October 2026: ridge maps from the v1.0 raster, shifted
 by up to two pixels, onto three grid-aligned references (v2 Medium and v1.1 on our composites, and
 the v1.1 store read afresh) all fit best at one pixel east. Every TESSERA v1 result, the
-full-Estonia grid of section 11 included, was trained with that offset. Its cause is not
+full-Estonia grid of 2 October 2026 in section 11 included, was trained with that offset. Its cause is not
 established; section 10 records it.
 
 The store is read directly with `zarr` over HTTPS rather than through the `geotessera` client,
@@ -620,10 +639,12 @@ twelve-band stack has 144.
 ## 9. Model assembly and the fit
 
 A fit is a **frozen encoder with a trainable decoder**. Full encoder fine-tuning is outside the
-main comparison: AlphaEarth ships only embeddings, so a frozen encoder is the one setting every
-model shares, and allowing fine-tuning for the open-weight models alone would make the comparison
-incoherent. What fine-tuning adds is studied in experiments (`experiments/2026-10-14_tessera_composites`,
-`experiments/2026-10-15_gfm_finetune`).
+main comparison (protocol D29, confirmed by the author on 22 October 2026): AlphaEarth ships only
+embeddings, so a frozen encoder is the one setting every model shares, and allowing fine-tuning
+for the open-weight models alone would make the comparison incoherent. What fine-tuning adds is
+studied in experiments (`experiments/2026-10-14_tessera_composites`,
+`experiments/2026-10-15_gfm_finetune`, `experiments/2026-10-15_kshot_finetune`), whose runs
+section 11 lists apart from the main workflow's.
 
 `backbones.py` is the registry. Each entry declares the model arguments, the pretraining
 statistics, the band subset the encoder consumes, the resolution group, and whether the encoder
@@ -755,7 +776,7 @@ the fit. It takes an experiment and the path of a chip set, and runs every arm, 
 seed of the experiment on that chip set, the same way on the JupyterHub and on the cluster:
 
 ```
-poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021 [--dry-run]
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot.yaml --chips data/eurocrops_chips/EE_2021_rev [--dry-run]
 ```
 
 **Three configuration files replace the per-run YAML.** `configs/arms/<arm>.yaml` describes what
@@ -888,13 +909,14 @@ WorldCover.
 **Checkpoint selection consults validation labels at every budget.** `fit_end_to_end` and
 `fit_cached` test the checkpoint of lowest validation loss. [protocol.md](protocol.md) allows the validation
 partition only for early stopping within the full-budget fits and never at a finite budget, so
-the 20 % and 5 % fits of section 11 depart from it. The criterion also moves the scores: on the
-full Estonian grid the token-grid models reach their lowest validation loss at epoch 6 to 9 while
-validation Macro-F1 keeps rising to epoch 13, so a checkpoint chosen on Macro-F1, or the last
-epoch of a fixed budget, would score higher. TESSERA is still improving on both at epoch 15, so
-it is undertrained rather than overfitted. The fit budget was 15 epochs for that grid, against
-40 in the configurations, and for `kshot` until 15 October 2026; it is 45 epochs since (protocol
-D27).
+the 20 % and 5 % fits of section 11 depart from it. The criterion also moves the scores. At 45
+epochs (protocol D27) the frozen token-grid arms reach their lowest validation loss at epoch 7 to
+14, so they reproduce their 15-epoch cells to every digit, while their validation Macro-F1 peaks
+at epochs 23 to 44; frozen TESSERA v2 at 5 % stops at epoch 4, and the baseline at epoch 32 to 41.
+A checkpoint chosen on Macro-F1, or the last epoch of the fixed budget, would score the token-grid
+arms higher and use the 30 epochs the loss criterion leaves idle. With the encoder trained, in
+`experiments/2026-10-15_kshot_finetune`, the loss turns earlier still, at epoch 5 to 9. The fit
+budget was 15 epochs for the grid of 2 October and for `kshot` until 15 October 2026.
 
 **Pixels never observed in the year enter as zeros.** A pixel with no clear observation in any
 month of the year is written as 0 in every band. Under `revised` that holds for 100,367 pixels of
@@ -902,11 +924,12 @@ month of the year is written as 0 in every band. Under `revised` that holds for 
 are bright, unvegetated surfaces, probably quarries, sand or built-up land, that the haze test
 flags on every date. The datamodule does not treat them as nodata.
 
-**Results before 13 October 2026 are on `EE_2021`.** The full-Estonia grid of section 11 and every
+**Results before 13 October 2026 are on `EE_2021`.** The full-Estonia grid of 2 October 2026 and every
 experiment before that date used the `export_2021` composites. They are not paired with fits on
 `EE_2021_rev`, so a difference between the two includes the screening.
 
-**TESSERA v1 pixels without an embedding enter as zeros.** Section 7 gives their share. The
+**TESSERA v1 pixels without an embedding entered as zeros.** This concerns the retired store arm
+and the results made with it. Section 7 gives their share. The
 datamodule replaces the missing vector with 0 when the chip is loaded, before normalisation, and
 those pixels are still scored, so TESSERA v1 is tested on pixels it has no input for. The comment beside that replacement in `segmentation_data.py`
 says the share is zero over Estonian farmland, which predates the coverage check. TESSERA v2 is
@@ -966,151 +989,55 @@ logs and `results.json`. The runs up to 8 October were made before the K-shot wo
 scripts of the snapshot commit `a81bd9e`, and stay in `results/seg/` and `results/seg_cached/`;
 runs of the workflow are in `results/<experiment>/<chip set>/`.
 
-### Pilot, 12 chips
+The runs fall in three groups. **The main workflow** is the experiment `kshot` with the arms of
+section 9. **The experiments of the analysis** are the six experiments the thesis reports, each
+backing a decision of the main workflow, followed by two more experiment runs that a decision rests
+on; an experiment not listed is documented in its own `REPORT.md` only. **Earlier runs** were made
+with the arms before 15 October 2026, or before the K-shot workflow, and are not paired with the
+current arms (section 10).
 
-`EE_2021_pilot`, manifest `f114f0a4`, 25 to 28 September 2026. Test metrics are computed on the
-validation chips, so these runs wire and debug the chain and are not results.
+### The main workflow
 
-* End to end, at 5, 20 and 100 %, in `results/seg/*_ee_pilot/`: Prithvi-EO-2.0 300M TL and 600M TL,
-  TerraMind v1 small and large, TESSERA v1 with the per-pixel MLP, and TerraMind v1 small and
-  large on Sentinel-2 plus Sentinel-1.
-* Two stages, at the same budgets with seeds 0 to 2, in `results/seg_cached/*_ee_pilot/`:
-  TerraMind v1 small and Prithvi-EO-2.0 300M TL. They agree with the end-to-end fits within the
-  seed spread (section 9).
-* Adding Sentinel-1 moved TerraMind's pilot Macro-F1 by at most 0.05 in either direction, within
-  what repeated fits move on the pilot, so no conclusion is drawn from it.
+The experiment `kshot` with its current arms, newest first. The 45-epoch grid on all of Estonia is
+the current result; the 15-epoch grid and the pilots are kept for the record.
 
-### The K-shot workflow pilot, `EE_2021_mini`
+#### Full Estonia, 45 epochs: the current result
 
-`EE_2021_mini` (section 6), 9 October 2026, the experiment `kshot` on the JupyterHub: the five arms at 100, 20 and
-5 %, draw 0, seed 0, 15 epochs, 15 cells in `results/kshot_15ep/EE_2021_mini/`. The three token-grid caches were computed
-on the fly, 5.1 GB for TerraMind, 8.3 GB for Prithvi and 11 GB for THOR, and the whole run took 68 minutes on the
-A4000. With 32 training and 9 test chips this checks the workflow, not the models. Test Macro-F1:
-
-| Arm | 100 % | 20 % | 5 % |
-|---|---|---|---|
-| TerraMind v1 large | 0.132 | 0.150 | 0.083 |
-| Prithvi-EO-2.0 600M TL | 0.101 | 0.077 | 0.088 |
-| THOR v1 large, 160 m | 0.129 | 0.071 | 0.096 |
-| THOR v1 large, 80 m (add-on, run after the others) | 0.146 | 0.110 | 0.109 |
-| TESSERA v1 + MLP | 0.164 | 0.155 | 0.147 |
-| AlphaEarth v1 + MLP | 0.161 | 0.126 | 0.132 |
-
-The same 15 cells then ran on the UT HPC cluster the same day, as five Slurm jobs on `itc-gpu` at commit
-`0250e4c`, 2.5 to 6.5 minutes each on an RTX PRO 6000 Blackwell, with every token-grid cache computed on the node's
-local NVMe and gone after the job. Every cell drew the same parcels as on the JupyterHub. The raster arms
-reproduced the hub's Macro-F1 to within 0.001; the token-grid arms differed by up to 0.034 (TerraMind at 20 %),
-which is the run-to-run variation of GPU fits on another GPU type and encoding batch, and on nine test chips is as
-large as the gaps between arms. The cluster's results are in `results/_cluster_check/kshot/EE_2021_mini/`.
-
-### Full Estonia
-
-`EE_2021`, manifest `4fb7b380`, split `blocks4_buf1600_seed0__6b0eb4cb`, 1 to 2 October 2026, run
-by `scripts/seg/run_ee_grid.sh` (snapshot commit `a81bd9e`) with 15 epochs and the checkpoint of
-lowest validation loss. Every model is scored on the same 1,475 test chips. TerraMind v1 large and
-Prithvi-EO-2.0 600M TL train in two stages from the caches of section 9; TESSERA trains end to end
-on its embedding rasters. The summary is `results/seg_cached/ee_grid_summary.csv`, and
-`notebooks/pipeline/eurocrops_ee_results.ipynb` holds the curves, the validation histories, the
-per-class scores and maps of segmented test chips.
-
-| Model | K, % | Training chips | Parcels drawn | Test Macro-F1 | Test mIoU | Fit, h |
-|---|---|---|---|---|---|---|
-| TESSERA v1 + MLP | 100 | 4,898 | 86,909 | 0.631 | 0.523 | 1.17 |
-| TESSERA v1 + MLP | 20 | 4,213 | 17,390 | 0.611 | 0.504 | 0.93 |
-| TESSERA v1 + MLP | 5 | 2,706 | 4,354 | 0.568 | 0.460 | 0.67 |
-| TerraMind v1 large | 100 | 4,898 | 86,909 | 0.586 | 0.484 | 1.75 |
-| TerraMind v1 large | 20 | 4,213 | 17,390 | 0.479 | 0.378 | 1.45 |
-| TerraMind v1 large | 5 | 2,706 | 4,354 | 0.362 | 0.269 | 0.91 |
-| Prithvi-EO-2.0 600M TL | 100 | 4,898 | 86,909 | 0.573 | 0.470 | 2.42 |
-| Prithvi-EO-2.0 600M TL | 20 | 4,213 | 17,390 | 0.496 | 0.386 | 1.95 |
-| Prithvi-EO-2.0 600M TL | 5 | 2,706 | 4,354 | 0.368 | 0.278 | 1.17 |
-
-The fit hours of the two-stage models exclude stage 1, which took 11.5 h for TerraMind v1 large.
-
-* TESSERA loses about 0.06 Macro-F1 from 100 to 5 %, against about 0.21 for both token-grid
-  models. Part of that gap is the decoder input, since a per-pixel head on 10 m embeddings keeps
-  the parcel edges that a 14 x 14 or 16 x 16 token grid must recover by upsampling, so it is
-  not attributable to the encoder alone.
-* TerraMind v1 large and Prithvi-EO-2.0 600M TL differ by at most 0.02 at every budget, inside
-  what a second seed would move.
-* The hard classes are the same for every model: green legumes, clover and alfalfa go to
-  grassland, spring wheat to spring barley and oats, and vegetables and orchards are almost
-  never predicted.
-* The 100 % fits' test-chip predictions are stored in `results/seg_cached/ee_predictions/`.
-* None of this answers RQ1 yet. No baseline has run, every cell is a single draw and seed, and
-  the checkpoint criterion of section 10 is unsettled.
-* THOR v1 large and AlphaEarth v1 were implemented after this grid, on 7 and 8 October, and did
-  not run in it. The arms of the K-shot experiment changed on 15 October; their full-Estonia run
-  on `EE_2021_rev` is listed below.
-
-### The U-Net baseline on Sentinel-2, `EE_2021_rev`
-
-`experiments/2026-10-14_unet_baseline`, 14 October 2026, jobs 621675 to 621677 on `itc-gpu` at
-commits `ac3abbc` and `53f7783` (same code). The from-scratch U-Net of section 9 on the 144
-Sentinel-2 channels alone, at 15 and at 45 epochs, against TESSERA v1 from the store with the MLP
-and TerraMind v1 large on Sentinel-2 (from `experiments/2026-10-13_terramind_s1_s2`); K = 100, 20
-and 5 %, draw 0, seeds 0 to 2, every arm on the same parcels. Mean test Macro-F1 over the three seeds:
+`EE_2021_rev`, the experiment `kshot` with 45 epochs (protocol D27), the six arms with the
+baseline, six Slurm jobs on `itc-gpu` (624583 to 624588), submitted on 15 October 2026 and run on
+16 October. A job runs the clone as it stands when it starts, so TerraMind, AlphaEarth and the
+baseline ran at commit `94f87ca` and THOR and TESSERA at `b2b159c`, which added the parcel scores.
+Prithvi's job failed during its 20 % fit with the shared-memory fault of the 15-epoch run; its two
+remaining cells ran as job 626364 at `02a10f1`. The cells fitted before `b2b159c` were scored per
+parcel afterwards from their stored predictions (`--summarise`), and every stored prediction
+matches its logged score. The results are in `results/kshot/EE_2021_rev/`. Test Macro-F1 over the
+1,475 test chips, draw 0, seed 0, per pixel / per parcel:
 
 | Arm | 100 % | 20 % | 5 % |
 |---|---|---|---|
-| U-Net, 15 epochs | 0.498 | 0.415 | 0.342 |
-| U-Net, 45 epochs | 0.544 | 0.477 | 0.413 |
-| TerraMind v1 large, S2 | 0.628 | 0.511 | 0.394 |
-| TESSERA v1 + MLP | 0.625 | 0.597 | 0.570 |
+| TerraMind v1 large, S2 + S1 | 0.661 / 0.583 | 0.566 / 0.515 | 0.433 / 0.381 |
+| THOR v1 large, S2 + S1 | 0.594 / 0.516 | 0.547 / 0.491 | 0.393 / 0.349 |
+| Prithvi-EO-2.0 600M TL, S2 | 0.580 / 0.535 | 0.505 / 0.472 | 0.445 / 0.409 |
+| TESSERA v2 Medium + MLP | 0.618 / 0.602 | 0.582 / 0.574 | 0.504 / 0.502 |
+| AlphaEarth v1 + MLP | 0.523 / 0.484 | 0.497 / 0.455 | 0.449 / 0.425 |
+| U-Net from scratch, S2 + S1 (baseline) | 0.616 / 0.553 | 0.564 / 0.520 | 0.467 / 0.446 |
 
-* At 15 epochs the U-Net was still improving: its checkpoint fell at epoch 12 to 14 in all nine
-  fits. 45 epochs won all nine paired fits, by 0.05 to 0.07, most in the small classes.
-* At 45 epochs it trailed TerraMind by 0.084 at 100 % and 0.034 at 20 % and drew level at 5 %;
-  TESSERA stayed ahead at every budget, by most at 5 %.
-* The U-Net entered the main workflow on 15 October 2026 as the baseline, on Sentinel-2 and
-  Sentinel-1 (section 9). The full report is the experiment's `REPORT.md`.
+* The three token-grid arms reproduce their 15-epoch cells to every digit. Their checkpoint of
+  lowest validation loss falls at epoch 7 to 14, inside the first 15, and the fit is deterministic,
+  while their validation Macro-F1 peaks at epochs 23 to 44. Under this checkpoint criterion the
+  extra 30 epochs go unused (section 10).
+* The 10 m arms gained: TESSERA by 0.013 and 0.020 at 100 and 20 % (at 5 % its checkpoint fell at
+  epoch 4 again, giving the same cell), AlphaEarth by 0.002, 0.032 and 0.022.
+* The baseline's checkpoint falls at epoch 32 to 41. Per pixel, only TerraMind at 100 % and
+  TESSERA at 20 and 5 % score above it by more than 0.005; TerraMind is level with it at 20 %,
+  TESSERA at 100 %, and every token-grid arm and AlphaEarth fall below it at 5 %. Per parcel only TESSERA, at
+  every budget, and TerraMind at 100 % are above it.
+* The parcel Macro-F1 is again 0.002 to 0.078 below the pixel one, least for TESSERA.
+* RQ1 is not answered yet: every cell is one draw and one seed, and the checkpoint criterion
+  decides the token-grid arms. These cells, the fine-tuned arms below and the published Estonian
+  results are brought together in [results_estonia/REPORT.md](results_estonia/REPORT.md).
 
-### The decoder of the 10 m group, `EE_2021_rev_quarter`
-
-`experiments/2026-10-15_tessera_decoder`, 15 October 2026, jobs 623444 to 623446 on `itc-gpu` at
-commit `0ab085d`. On frozen TESSERA v2 Medium rasters, the per-pixel MLP at 15 epochs against a
-U-Net with a ResNet-18 down path, 14.7 M parameters trained from scratch, at 15 and at 45 epochs; K = 100, 20
-and 5 %, draw 0, seeds 0 to 2, on a quarter of `EE_2021_rev`'s blocks (1,190 training, 169
-validation and 411 test chips, same split). Mean test Macro-F1 over the three seeds:
-
-| Decoder | 100 % | 20 % | 5 % |
-|---|---|---|---|
-| Per-pixel MLP, 15 epochs | 0.573 | 0.532 | 0.451 |
-| U-Net, 15 epochs | 0.516 | 0.444 | 0.259 |
-| U-Net, 45 epochs | 0.589 | 0.530 | 0.358 |
-
-* At the protocol's 15 epochs the U-Net lost all nine paired fits.
-* At 45 epochs it gained 0.016 at K = 100 % (3 of 3 fits), mostly at parcel edges, was level at
-  20 % and lost 0.093 at 5 % (0 of 3).
-* It makes parcels more coherent, but loses whole small parcels, concentrated in the rare
-  classes, which Macro-F1 weighs as much as grassland.
-* The main workflow kept the MLP (the user, 15 October 2026; protocol decision D21). The full
-  report is the experiment's `REPORT.md`.
-
-### The arms of 15 October 2026, pilots on `EE_2021_rev_mini`
-
-The experiment `kshot` with its new arms (section 9) on `EE_2021_rev_mini`, 15 October 2026, at
-commit `804dd16`: on the JupyterHub, and as five Slurm jobs on `itc-gpu` (623888 to 623892, 2.4 to
-4.6 minutes each), every cache computed on the fly. The cluster's results are in
-`results/_cluster/kshot_15ep/EE_2021_rev_mini/`. With 32 training and 9 test chips this checks the
-workflow, not the models. Test Macro-F1, JupyterHub / cluster:
-
-| Arm | 100 % | 20 % | 5 % |
-|---|---|---|---|
-| TerraMind v1 large, S2 + S1 | 0.117 / 0.135 | 0.075 / 0.082 | 0.056 / 0.040 |
-| Prithvi-EO-2.0 600M TL | 0.092 / 0.091 | 0.111 / 0.084 | 0.106 / 0.079 |
-| THOR v1 large, S2 + S1 | 0.118 / 0.156 | 0.067 / 0.054 | 0.065 / 0.089 |
-| TESSERA v2 Medium + MLP | 0.209 / 0.209 | 0.192 / 0.191 | 0.157 / 0.157 |
-| AlphaEarth v1 + MLP | 0.161 / 0.161 | 0.126 / 0.126 | 0.132 / 0.133 |
-
-* The 10 m arms agree across the two machines to within 0.001. The token-grid arms differ by up
-  to 0.038, Prithvi, whose code did not change, by up to 0.027: the run-to-run variation of GPU
-  fits seen on `EE_2021_mini` on 9 October, not an effect of the change.
-* THOR on Sentinel-2 and Sentinel-1 has exactly TerraMind's 53,281,492 trainable parameters.
-* TESSERA v2's cache took 0.64 s per chip on the cluster. The caches came to 5.1 GB each for
-  TerraMind and THOR, 8.3 GB for Prithvi and 1.4 GB for TESSERA v2.
-
-### Full Estonia, the arms of 15 October 2026, 15 epochs
+#### Full Estonia, 15 epochs
 
 `EE_2021_rev`, the experiment `kshot` at commit `27a51a8` with 15 epochs, five Slurm jobs on
 `itc-gpu` (623991 to 623995), 15 October 2026, every cache computed on the node's local NVMe.
@@ -1156,43 +1083,150 @@ test parcels, Macro-F1 / overall accuracy:
   budget. Parcels under 0.16 ha, 5 % of the test parcels, are voted their class 24 to 38 % of the
   time, and the pixel score hardly sees them (`experiments/2026-10-16_parcel_metric`).
 
-### Full Estonia, the arms of 15 October 2026, 45 epochs
+#### Pilots on `EE_2021_rev_mini`
 
-`EE_2021_rev`, the experiment `kshot` with 45 epochs (protocol D27), the six arms with the
-baseline, six Slurm jobs on `itc-gpu` (624583 to 624588), submitted on 15 October 2026 and run on
-16 October. A job runs the clone as it stands when it starts, so TerraMind, AlphaEarth and the
-baseline ran at commit `94f87ca` and THOR and TESSERA at `b2b159c`, which added the parcel scores.
-Prithvi's job failed during its 20 % fit with the shared-memory fault of the 15-epoch run; its two
-remaining cells ran as job 626364 at `02a10f1`. The cells fitted before `b2b159c` were scored per
-parcel afterwards from their stored predictions (`--summarise`), and every stored prediction
-matches its logged score. The results are in `results/kshot/EE_2021_rev/`. Test Macro-F1 over the
-1,475 test chips, draw 0, seed 0, per pixel / per parcel:
+The experiment `kshot` with its new arms (section 9) on `EE_2021_rev_mini`, 15 October 2026, at
+commit `804dd16`: on the JupyterHub, and as five Slurm jobs on `itc-gpu` (623888 to 623892, 2.4 to
+4.6 minutes each), every cache computed on the fly. The cluster's results are in
+`results/_cluster/kshot_15ep/EE_2021_rev_mini/`. With 32 training and 9 test chips this checks the
+workflow, not the models. Test Macro-F1, JupyterHub / cluster:
 
 | Arm | 100 % | 20 % | 5 % |
 |---|---|---|---|
-| TerraMind v1 large, S2 + S1 | 0.661 / 0.583 | 0.566 / 0.515 | 0.433 / 0.381 |
-| THOR v1 large, S2 + S1 | 0.594 / 0.516 | 0.547 / 0.491 | 0.393 / 0.349 |
-| Prithvi-EO-2.0 600M TL, S2 | 0.580 / 0.535 | 0.505 / 0.472 | 0.445 / 0.409 |
-| TESSERA v2 Medium + MLP | 0.618 / 0.602 | 0.582 / 0.574 | 0.504 / 0.502 |
-| AlphaEarth v1 + MLP | 0.523 / 0.484 | 0.497 / 0.455 | 0.449 / 0.425 |
-| U-Net from scratch, S2 + S1 (baseline) | 0.616 / 0.553 | 0.564 / 0.520 | 0.467 / 0.446 |
+| TerraMind v1 large, S2 + S1 | 0.117 / 0.135 | 0.075 / 0.082 | 0.056 / 0.040 |
+| Prithvi-EO-2.0 600M TL | 0.092 / 0.091 | 0.111 / 0.084 | 0.106 / 0.079 |
+| THOR v1 large, S2 + S1 | 0.118 / 0.156 | 0.067 / 0.054 | 0.065 / 0.089 |
+| TESSERA v2 Medium + MLP | 0.209 / 0.209 | 0.192 / 0.191 | 0.157 / 0.157 |
+| AlphaEarth v1 + MLP | 0.161 / 0.161 | 0.126 / 0.126 | 0.132 / 0.133 |
 
-* The three token-grid arms reproduce their 15-epoch cells to every digit. Their checkpoint of
-  lowest validation loss falls at epoch 7 to 14, inside the first 15, and the fit is deterministic,
-  while their validation Macro-F1 peaks at epochs 23 to 44. Under this checkpoint criterion the
-  extra 30 epochs go unused (section 10).
-* The 10 m arms gained: TESSERA by 0.013 and 0.020 at 100 and 20 % (at 5 % its checkpoint fell at
-  epoch 4 again, giving the same cell), AlphaEarth by 0.002, 0.032 and 0.022.
-* The baseline's checkpoint falls at epoch 32 to 41. Per pixel, only TerraMind at 100 % and
-  TESSERA at 20 and 5 % score above it by more than 0.005; TerraMind is level with it at 20 %,
-  TESSERA at 100 %, and every token-grid arm and AlphaEarth fall below it at 5 %. Per parcel only TESSERA, at
-  every budget, and TerraMind at 100 % are above it.
-* The parcel Macro-F1 is again 0.002 to 0.078 below the pixel one, least for TESSERA.
-* RQ1 is not answered yet: every cell is one draw and one seed, and the checkpoint criterion
-  decides the token-grid arms. These cells, the fine-tuned arms below and the published Estonian
-  results are brought together in [results_estonia/REPORT.md](results_estonia/REPORT.md).
+* The 10 m arms agree across the two machines to within 0.001. The token-grid arms differ by up
+  to 0.038, Prithvi, whose code did not change, by up to 0.027: the run-to-run variation of GPU
+  fits seen on `EE_2021_mini` on 9 October, not an effect of the change.
+* THOR on Sentinel-2 and Sentinel-1 has exactly TerraMind's 53,281,492 trainable parameters.
+* TESSERA v2's cache took 0.64 s per chip on the cluster. The caches came to 5.1 GB each for
+  TerraMind and THOR, 8.3 GB for Prithvi and 1.4 GB for TESSERA v2.
 
-### Every encoder fine-tuned, `EE_2021_rev`
+### The experiments of the analysis
+
+The six experiments the thesis analysis reports, agreed with the author on 22 October 2026. Each
+varies one factor of the pipeline on one encoder and compares the variants fit by fit, on shared
+draws and seeds. The relative result is what backs the decision, so none is rerun on the main
+workflow's current arms. Experiments 1 to 3 used TerraMind or THOR on Sentinel-2 alone, the arms
+before 15 October 2026, at 15 epochs; the frozen token-grid arms of the main workflow gave the same
+cells at 15 and at 45 epochs. Each folder's `REPORT.md` holds the figures and the full analysis.
+
+#### 1. THOR token size: 160, 80 and 40 m
+
+`experiments/2026-10-09_thor_token_size`, 9 to 11 October 2026. THOR v1 large on Sentinel-2 alone,
+frozen, on tokens of 160 m (16 px patches on the 10 m bands and 8 px on the 20 m bands, a 14 x 14
+grid), 80 m (8 and 4 px, 28 x 28) and 40 m (4 and 2 px, 56 x 56), with the same bottleneck and
+decoder. `EE_2021_sample`: 36 training, 8 validation and 18 test blocks of `EE_2021` (413, 88 and
+207 chips, all 20 classes); K = 100, 20 and 5 %, draw 0, seeds 0 to 2, 15 epochs. Mean test
+Macro-F1 over the three seeds:
+
+| Tokens | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| 160 m | 0.365 | 0.210 | 0.170 |
+| 80 m | 0.376 | 0.249 | 0.175 |
+| 40 m | 0.411 | 0.262 | 0.221 |
+
+* 40 m beats 160 m by 0.046, 0.051 and 0.050 and wins all nine paired fits, although its 20 m bands
+  run on 2 px patches, below anything THOR saw in pretraining. 80 m is clearly ahead of 160 m only
+  at 20 %.
+* The cache grows with the grid: 40 m needs 16 times the cache of 160 m, about 25.5 TB for all of
+  Estonia, and 80 m about 6.4 TB.
+* The main workflow keeps 160 m tokens, for parity with TerraMind's 14 x 14 grid (the author,
+  9 October 2026) and because the finer caches fit no cluster node. Its THOR is therefore not THOR
+  at its best resolution. `experiments/2026-10-08_thor_80m`, 80 m on the 12-chip pilot and on
+  `EE_2021_mini`, came before it.
+
+#### 2. Rotations: 1, 4 or 8 D4 variants per training chip
+
+`experiments/2026-10-14_terramind_d4_count_ee_rev`, 14 October 2026. The two-stage fit encodes each
+training chip once per D4 variant and draws one per sample (section 9). TerraMind v1 large on
+Sentinel-2 alone, frozen, trained from 1 variant (the identity, no augmentation), 4 (the quarter
+turns) or 8 (all of D4); validation and test read the identity. All of `EE_2021_rev`, K = 100, 20
+and 5 %, draw 0, seeds 0 to 2, 15 epochs. Mean test Macro-F1:
+
+| Variants | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| 1, the identity | 0.581 | 0.449 | 0.324 |
+| 4, the quarter turns | 0.602 | 0.500 | 0.376 |
+| 8, all of D4 | 0.628 | 0.511 | 0.394 |
+
+* Eight variants beat the identity by 0.047, 0.061 and 0.070, in every seed; at 20 and 5 % the gain
+  varies from 0.002 to 0.133 between seeds. Four variants sit between.
+* Most of the gain comes through the checkpoint criterion. Without augmentation the validation loss
+  turns upward after epoch 2 to 7, so the checkpoint of lowest validation loss keeps an early
+  decoder; at each fit's best epoch the validation gap shrinks to 0.015 to 0.017.
+* The main workflow keeps all eight variants. Half of Estonia
+  (`experiments/2026-10-09_terramind_d4_count`) and an earlier run at 5 %
+  (`experiments/2026-10-08_d4_ablation`) agree.
+
+#### 3. Temporal grid: 12 monthly or 24 half-month composites
+
+`experiments/2026-10-12_terramind_12v24`, on the chip sets built by
+`experiments/2026-10-12_s2_semimonthly`, 12 and 13 October 2026. TerraMind v1 large on Sentinel-2
+alone, frozen, on the 733 chips of `EE_2021_sample` composited two ways under the `revised`
+screening: 12 monthly frames (`EE_2021_sample_rev`) and 24 half-month frames, days 1 to 15 and 16 to
+the month's end (`EE_2021_sample_24`). Same labels and parcels; 413 training, 88 validation and 207
+test chips; K = 100, 20 and 5 %, draw 0, seeds 0 to 2, 15 epochs. Test Macro-F1, 24 frames minus 12:
+
+| | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| Mean difference | +0.015 | +0.035 | +0.001 |
+| Fits won by 24 frames | 2 of 3 | 2 of 3 | 1 of 3 |
+
+* Every difference lies within the spread between seeds; at 20 % the mean rests on one fit of
+  +0.090.
+* Half months halve the clear observations per frame and open gaps a month hides: from 16 to 31
+  October, 73 % of the chips have no acquisition at all.
+* 24 frames double the encoding time and the cache, and the bottleneck grows from 40.4 M to 78.2 M
+  parameters. The main workflow keeps 12 monthly composites.
+
+#### 4. TESSERA: its encoder on our composites, or the store's embeddings
+
+`experiments/2026-10-14_tessera_composites`, 14 and 15 October 2026, in two stages, beside the main
+workflow's own cells (section 7).
+
+* **Stage 1, on `EE_2021_rev_mini`.** Frozen TESSERA checkpoints run on our monthly composites,
+  against the store's embeddings of the native per-acquisition series, scored by a per-pixel MLP
+  probe, leaving one block out, over three seeds. Probe Macro-F1: v2 Medium on composites
+  0.371 ± 0.003, the v1.1 store 0.370 ± 0.004, the v1.0 store 0.373 ± 0.002; every composite
+  variant lies within 0.018 of native. The vectors differ, a median cosine of 0.76 for the same
+  checkpoint, but carry about the same information.
+* **Stage 2, on `EE_2021_rev`,** with the experiment's own head, trained on up to 64 pixels per
+  support parcel and epoch, 15 epochs, seeds 0 to 2: frozen v2 Medium scores 0.630, 0.594 and
+  0.553 test Macro-F1 at K = 100, 20 and 5 %, the v1.0 store arm 0.625, 0.597 and 0.570, within
+  0.017 at every budget.
+* **In the main workflow**, fitted on chips, frozen v2 scored 0.018, 0.037 and 0.068 below the
+  store arm at 15 epochs (section 7).
+* Three things change together between the two arms: the encoder version, the input (native series
+  or monthly composites) and the alignment, since the store's rasters sit about 0.7 px east and
+  0.4 px south of the chip grid. Stage 1 isolates the input; the version and the offset are not
+  separated. Protocol D25 keeps v2 on the composites for the whole pipeline.
+
+#### 5. TerraMind: Sentinel-2, Sentinel-1 or both
+
+`experiments/2026-10-13_terramind_s1_s2`, 13 and 14 October 2026. TerraMind v1 large, frozen, on
+Sentinel-2 (12 bands), on Sentinel-1 RTC (VV and VH in dB, through its pretrained S1RTC patch
+embedding), or on both with the two modalities' tokens averaged at every position; the same
+bottleneck and decoder. All of `EE_2021_rev`, K = 100, 20 and 5 %, draw 0, seeds 0 to 2, 15
+epochs. Mean test Macro-F1:
+
+| Input | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| Sentinel-2 | 0.628 | 0.511 | 0.394 |
+| Sentinel-1 | 0.557 | 0.482 | 0.370 |
+| Sentinel-2 + Sentinel-1 | 0.654 | 0.565 | 0.419 |
+
+* Both sensors beat Sentinel-2 alone by 0.026, 0.054 and 0.025 and win every fit.
+* Sentinel-1 alone falls 0.072, 0.029 and 0.024 below Sentinel-2 and loses every fit; the gap
+  narrows as labels get scarce.
+* Radar helps most on crops that differ in canopy structure: peas, potatoes, spring rapeseed, rye,
+  alfalfa and beans. This backs protocol D24: every model reads every sensor it was pretrained on.
+
+#### 6. Fine-tuned against frozen, `EE_2021_rev`
 
 `experiments/2026-10-15_kshot_finetune`, 15 to 18 October 2026, jobs 624576 to 624580 on
 `itc-gpu`, with jobs 626736 and 626737 refitting cells lost to node failures. The arms of `kshot`
@@ -1216,3 +1250,140 @@ same route. AlphaEarth has no encoder to train. Fine-tuned minus frozen Macro-F1
   checkpoint rather than the encoder.
 * Fine-tuning costs 4 to 9 times the frozen fit for the token-grid models and 15 times for
   TESSERA, 26 h for its K = 100 % cell. The full report is the experiment's `REPORT.md`.
+* It repeats stage 2 of experiment 4, where fine-tuning TESSERA v2 won nine of nine paired fits over
+  three seeds. Fine-tuning stays out of the main workflow (protocol D29).
+
+### Other experiment runs cited by a decision
+
+Kept for the record because a decision rests on them, and not reported as experiments: the U-Net
+on Sentinel-2, since the baseline is now part of the main workflow (D26, D27), and the decoder of
+the 10 m group (D21). The other folders of `experiments/` are documented in their own `REPORT.md`
+only: the Sentinel-2 screening and the revised export behind `EE_2021_rev` (section 5), the parcel
+metric behind D28, the parcel delineation study, and the pilots that the experiments above
+superseded.
+
+#### The U-Net baseline on Sentinel-2, `EE_2021_rev`
+
+`experiments/2026-10-14_unet_baseline`, 14 October 2026, jobs 621675 to 621677 on `itc-gpu` at
+commits `ac3abbc` and `53f7783` (same code). The from-scratch U-Net of section 9 on the 144
+Sentinel-2 channels alone, at 15 and at 45 epochs, against TESSERA v1 from the store with the MLP
+and TerraMind v1 large on Sentinel-2 (from `experiments/2026-10-13_terramind_s1_s2`); K = 100, 20
+and 5 %, draw 0, seeds 0 to 2, every arm on the same parcels. Mean test Macro-F1 over the three seeds:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| U-Net, 15 epochs | 0.498 | 0.415 | 0.342 |
+| U-Net, 45 epochs | 0.544 | 0.477 | 0.413 |
+| TerraMind v1 large, S2 | 0.628 | 0.511 | 0.394 |
+| TESSERA v1 + MLP | 0.625 | 0.597 | 0.570 |
+
+* At 15 epochs the U-Net was still improving: its checkpoint fell at epoch 12 to 14 in all nine
+  fits. 45 epochs won all nine paired fits, by 0.05 to 0.07, most in the small classes.
+* At 45 epochs it trailed TerraMind by 0.084 at 100 % and 0.034 at 20 % and drew level at 5 %;
+  TESSERA stayed ahead at every budget, by most at 5 %.
+* The U-Net entered the main workflow on 15 October 2026 as the baseline, on Sentinel-2 and
+  Sentinel-1 (section 9). The full report is the experiment's `REPORT.md`.
+
+#### The decoder of the 10 m group, `EE_2021_rev_quarter`
+
+`experiments/2026-10-15_tessera_decoder`, 15 October 2026, jobs 623444 to 623446 on `itc-gpu` at
+commit `0ab085d`. On frozen TESSERA v2 Medium rasters, the per-pixel MLP at 15 epochs against a
+U-Net with a ResNet-18 down path, 14.7 M parameters trained from scratch, at 15 and at 45 epochs; K = 100, 20
+and 5 %, draw 0, seeds 0 to 2, on a quarter of `EE_2021_rev`'s blocks (1,190 training, 169
+validation and 411 test chips, same split). Mean test Macro-F1 over the three seeds:
+
+| Decoder | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| Per-pixel MLP, 15 epochs | 0.573 | 0.532 | 0.451 |
+| U-Net, 15 epochs | 0.516 | 0.444 | 0.259 |
+| U-Net, 45 epochs | 0.589 | 0.530 | 0.358 |
+
+* At the protocol's 15 epochs the U-Net lost all nine paired fits.
+* At 45 epochs it gained 0.016 at K = 100 % (3 of 3 fits), mostly at parcel edges, was level at
+  20 % and lost 0.093 at 5 % (0 of 3).
+* It makes parcels more coherent, but loses whole small parcels, concentrated in the rare
+  classes, which Macro-F1 weighs as much as grassland.
+* The main workflow kept the MLP (the user, 15 October 2026; protocol decision D21). The full
+  report is the experiment's `REPORT.md`.
+
+### Earlier runs, before the arms of 15 October 2026
+
+TerraMind and THOR on Sentinel-2 alone, TESSERA v1 from the store, and before 9 October the
+scripts of the snapshot commit `a81bd9e`.
+
+#### Pilot, 12 chips
+
+`EE_2021_pilot`, manifest `f114f0a4`, 25 to 28 September 2026. Test metrics are computed on the
+validation chips, so these runs wire and debug the chain and are not results.
+
+* End to end, at 5, 20 and 100 %, in `results/seg/*_ee_pilot/`: Prithvi-EO-2.0 300M TL and 600M TL,
+  TerraMind v1 small and large, TESSERA v1 with the per-pixel MLP, and TerraMind v1 small and
+  large on Sentinel-2 plus Sentinel-1.
+* Two stages, at the same budgets with seeds 0 to 2, in `results/seg_cached/*_ee_pilot/`:
+  TerraMind v1 small and Prithvi-EO-2.0 300M TL. They agree with the end-to-end fits within the
+  seed spread (section 9).
+* Adding Sentinel-1 moved TerraMind's pilot Macro-F1 by at most 0.05 in either direction, within
+  what repeated fits move on the pilot, so no conclusion is drawn from it.
+
+#### The K-shot workflow pilot, `EE_2021_mini`
+
+`EE_2021_mini` (section 6), 9 October 2026, the experiment `kshot` on the JupyterHub: the five arms at 100, 20 and
+5 %, draw 0, seed 0, 15 epochs, 15 cells in `results/kshot_15ep/EE_2021_mini/`. The three token-grid caches were computed
+on the fly, 5.1 GB for TerraMind, 8.3 GB for Prithvi and 11 GB for THOR, and the whole run took 68 minutes on the
+A4000. With 32 training and 9 test chips this checks the workflow, not the models. Test Macro-F1:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large | 0.132 | 0.150 | 0.083 |
+| Prithvi-EO-2.0 600M TL | 0.101 | 0.077 | 0.088 |
+| THOR v1 large, 160 m | 0.129 | 0.071 | 0.096 |
+| THOR v1 large, 80 m (add-on, run after the others) | 0.146 | 0.110 | 0.109 |
+| TESSERA v1 + MLP | 0.164 | 0.155 | 0.147 |
+| AlphaEarth v1 + MLP | 0.161 | 0.126 | 0.132 |
+
+The same 15 cells then ran on the UT HPC cluster the same day, as five Slurm jobs on `itc-gpu` at commit
+`0250e4c`, 2.5 to 6.5 minutes each on an RTX PRO 6000 Blackwell, with every token-grid cache computed on the node's
+local NVMe and gone after the job. Every cell drew the same parcels as on the JupyterHub. The raster arms
+reproduced the hub's Macro-F1 to within 0.001; the token-grid arms differed by up to 0.034 (TerraMind at 20 %),
+which is the run-to-run variation of GPU fits on another GPU type and encoding batch, and on nine test chips is as
+large as the gaps between arms. The cluster's results are in `results/_cluster_check/kshot/EE_2021_mini/`.
+
+#### Full Estonia, `EE_2021`, the grid of 2 October 2026
+
+`EE_2021`, manifest `4fb7b380`, split `blocks4_buf1600_seed0__6b0eb4cb`, 1 to 2 October 2026, run
+by `scripts/seg/run_ee_grid.sh` (snapshot commit `a81bd9e`) with 15 epochs and the checkpoint of
+lowest validation loss. Every model is scored on the same 1,475 test chips. TerraMind v1 large and
+Prithvi-EO-2.0 600M TL train in two stages from the caches of section 9; TESSERA trains end to end
+on its embedding rasters. The summary is `results/seg_cached/ee_grid_summary.csv`, and
+`notebooks/pipeline/eurocrops_ee_results.ipynb` holds the curves, the validation histories, the
+per-class scores and maps of segmented test chips.
+
+| Model | K, % | Training chips | Parcels drawn | Test Macro-F1 | Test mIoU | Fit, h |
+|---|---|---|---|---|---|---|
+| TESSERA v1 + MLP | 100 | 4,898 | 86,909 | 0.631 | 0.523 | 1.17 |
+| TESSERA v1 + MLP | 20 | 4,213 | 17,390 | 0.611 | 0.504 | 0.93 |
+| TESSERA v1 + MLP | 5 | 2,706 | 4,354 | 0.568 | 0.460 | 0.67 |
+| TerraMind v1 large | 100 | 4,898 | 86,909 | 0.586 | 0.484 | 1.75 |
+| TerraMind v1 large | 20 | 4,213 | 17,390 | 0.479 | 0.378 | 1.45 |
+| TerraMind v1 large | 5 | 2,706 | 4,354 | 0.362 | 0.269 | 0.91 |
+| Prithvi-EO-2.0 600M TL | 100 | 4,898 | 86,909 | 0.573 | 0.470 | 2.42 |
+| Prithvi-EO-2.0 600M TL | 20 | 4,213 | 17,390 | 0.496 | 0.386 | 1.95 |
+| Prithvi-EO-2.0 600M TL | 5 | 2,706 | 4,354 | 0.368 | 0.278 | 1.17 |
+
+The fit hours of the two-stage models exclude stage 1, which took 11.5 h for TerraMind v1 large.
+
+* TESSERA loses about 0.06 Macro-F1 from 100 to 5 %, against about 0.21 for both token-grid
+  models. Part of that gap is the decoder input, since a per-pixel head on 10 m embeddings keeps
+  the parcel edges that a 14 x 14 or 16 x 16 token grid must recover by upsampling, so it is
+  not attributable to the encoder alone.
+* TerraMind v1 large and Prithvi-EO-2.0 600M TL differ by at most 0.02 at every budget, inside
+  what a second seed would move.
+* The hard classes are the same for every model: green legumes, clover and alfalfa go to
+  grassland, spring wheat to spring barley and oats, and vegetables and orchards are almost
+  never predicted.
+* The 100 % fits' test-chip predictions are stored in `results/seg_cached/ee_predictions/`.
+* None of this answers RQ1 yet. No baseline has run, every cell is a single draw and seed, and
+  the checkpoint criterion of section 10 is unsettled.
+* THOR v1 large and AlphaEarth v1 were implemented after this grid, on 7 and 8 October, and did
+  not run in it. The arms of the K-shot experiment changed on 15 October; their full-Estonia run
+  on `EE_2021_rev` is under the main workflow's runs above.

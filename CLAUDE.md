@@ -31,7 +31,7 @@ When an agreed update is made, `pipeline.md` is where it goes:
 - a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
 - a finished run or grid: section 11, Runs, and the Current state below.
 
-## Current state, 18 October 2026
+## Current state, 22 October 2026
 
 The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
 EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
@@ -66,8 +66,9 @@ The 10 m group keeps the per-pixel MLP: a U-Net did not beat it under label scar
 on the hub and the cluster on 15 October 2026, and on all of `EE_2021_rev` at 15 epochs the same day
 (`results/kshot_15ep/EE_2021_rev/`, pipeline.md section 11). **Since then every arm trains for 45 epochs (protocol
 D27); the six arms, the baseline among them, ran on all of `EE_2021_rev` at 45 epochs on 16 October 2026
-(`results/kshot/EE_2021_rev/`), and the four encoders with weights ran fine-tuned in
-`experiments/2026-10-15_kshot_finetune`** (results below). **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
+(`results/kshot/EE_2021_rev/`)**. **Every foundation-model encoder stays frozen in the main workflow; fine-tuning
+is an experiment** (protocol D29, user 22 October 2026): the four encoders with weights ran fine-tuned in
+`experiments/2026-10-15_kshot_finetune`. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
 workflow (`experiments/2026-10-08_thor_80m/`, with its own arm file): its full-Estonia cache, about 6.4 TB, fits
 no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
 archived studies in `experiments/`.
@@ -80,10 +81,9 @@ per parcel at every budget (`experiments/2026-10-16_parcel_metric`). `FitPredict
 name, so a cell refitted after an interrupted fit was predicted with the stale checkpoint; it now loads the one
 `results.json` names, and `summary.csv`'s `predictions_match` flags stored predictions that miss the logged score.
 
-Full-Estonia grid at 45 epochs, finished 16 October 2026, with the fine-tuned TESSERA of
-`experiments/2026-10-15_kshot_finetune` (18 October). Test Macro-F1 over the 1,475 test chips, per pixel / per
-parcel, one draw and one seed per cell, checkpoint of lowest validation loss. Details in pipeline.md section 11
-and [docs/phase1/results_estonia/REPORT.md](docs/phase1/results_estonia/REPORT.md).
+The main workflow's full-Estonia grid at 45 epochs, finished 16 October 2026. Test Macro-F1 over the 1,475 test
+chips, per pixel / per parcel, one draw and one seed per cell, checkpoint of lowest validation loss. Details in
+pipeline.md section 11 and [docs/phase1/results_estonia/REPORT.md](docs/phase1/results_estonia/REPORT.md).
 
 | Arm | K = 100 % | 20 % | 5 % |
 |---|---|---|---|
@@ -91,15 +91,17 @@ and [docs/phase1/results_estonia/REPORT.md](docs/phase1/results_estonia/REPORT.m
 | THOR v1 large, S2 + S1 | 0.594 / 0.516 | 0.547 / 0.491 | 0.393 / 0.349 |
 | Prithvi-EO-2.0 600M TL | 0.580 / 0.535 | 0.505 / 0.472 | 0.445 / 0.409 |
 | TESSERA v2 Medium + MLP | 0.618 / 0.602 | 0.582 / 0.574 | 0.504 / 0.502 |
-| TESSERA v2 Medium, fine-tuned | 0.660 / 0.639 | 0.630 / 0.603 | 0.581 / 0.566 |
 | AlphaEarth v1 + MLP | 0.523 / 0.484 | 0.497 / 0.455 | 0.449 / 0.425 |
 | U-Net from scratch (baseline) | 0.616 / 0.553 | 0.564 / 0.520 | 0.467 / 0.446 |
 
-The token-grid arms equal their 15-epoch cells to every digit, their checkpoint falling at epoch 7 to 14. Fine-tuning
-raises TESSERA by 0.04 to 0.08 and TerraMind, THOR and Prithvi by about 0.01 in validation, their test score
-swinging either way with the checkpoint. This does not answer RQ1 yet: no cell has an interval, and the checkpoint
-criterion decides the token-grid arms. The grid of 2 October 2026 on `EE_2021`, with the arms before 15 October, is
-in pipeline.md section 11.
+The token-grid arms equal their 15-epoch cells to every digit, their checkpoint falling at epoch 7 to 14. Frozen
+TESSERA v2 scores 0.005, 0.017 and 0.068 below the retired v1.0 store arm per pixel; the switch holds for the whole
+pipeline (protocol D25, user 22 October 2026). In the fine-tuning experiment TESSERA v2 reaches 0.660 / 0.639,
+0.630 / 0.603 and 0.581 / 0.566, 0.04 to 0.08 above frozen, while TerraMind, THOR and Prithvi gain about 0.01 in
+validation, their test score swinging either way with the checkpoint. This does not answer RQ1 yet: no cell has an
+interval, and the checkpoint criterion decides the token-grid arms. pipeline.md section 11 keeps the runs of the
+main workflow, the experiment runs its decisions rest on, and the earlier runs (the grid of 2 October 2026 on
+`EE_2021` among them) apart.
 
 **Not built:** repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
 and Portugal; Phases 2 and 3.
@@ -109,8 +111,9 @@ and Portugal; Phases 2 and 3.
 confirm them with the user and write them into the protocol before building on them: THOR joins the arms, handled
 like TerraMind (now implemented, on 160 m tokens as confirmed on 9 October); the baseline becomes a plain U-Net
 trained from scratch, replacing the per-pixel TIMESAT and monthly-stack baselines in the K sweep (now protocol
-D26 and the arm `unet_r18_scratch_s2s1`, on S2 + S1), with the role of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %; nested
-repeated draws, with models compared on the same draws; equal tuning trials and training steps for every model and
+D26 and the arm `unet_r18_scratch_s2s1`, on S2 + S1), with the role of the phenometrics still open; K grid of 1, 5, 10, 20, 50 and 100 %
+(protocol D2; `kshot` runs the working subset 5, 20 and 100); nested repeated draws (protocol D8, not implemented),
+with models compared on the same draws; equal tuning trials and training steps for every model and
 K; no validation labels at low K; cross-country transfer only within one GAEZ v5 agro-ecological zone. AlphaEarth
 was confirmed on 7 October and is implemented, handled like TESSERA.
 

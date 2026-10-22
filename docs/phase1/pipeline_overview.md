@@ -54,7 +54,7 @@ ships no boundaries, so it is used as a cross-check rather than as training data
 **2. Cutting the country into tiles.** The country is divided into a fixed grid of 2.24 km
 squares, each 224 by 224 pixels at 10 m. The grid is anchored to the map projection rather than
 to the data, so tile "EE_02354_01821" always means the same patch of ground, whatever else
-changes. Estonia comes to 7,398 tiles.
+changes. Estonia comes to 7,402 tiles.
 
 **3. Two label pictures per tile.** One says *which crop* is in each pixel. The other says
 *which field* each pixel belongs to. The second one looks redundant and is the key to the whole
@@ -100,7 +100,8 @@ only a small decoder on top, which reads the frozen model's output and produces 
 
 This is deliberate. AlphaEarth only exists as precomputed numbers, so it *cannot* be fine-tuned.
 Allowing the others to fine-tune would compare a model that got to adapt against a model that
-did not. How much fine-tuning would add is measured separately.
+did not. How much fine-tuning would add is measured in separate experiments, and is not part of
+the main comparison.
 
 The five models of the main comparison: TerraMind and THOR, which read the optical and radar
 pictures; Prithvi, which was trained on optical pictures only and reads those; TESSERA, run on
@@ -158,17 +159,18 @@ flowchart LR
 
 ---
 
-## What the pilot can and cannot tell you
+## What the Estonian results can and cannot tell you
 
-The current numbers come from **twelve tiles**, eight for training and four for validation, with
-no separate test set. They exist to prove the machinery runs end to end, and the manifest says so
-in as many words.
+The main comparison has run on all of Estonia: 7,402 tiles, split by area into 4,898 for
+training, 769 for validation and 1,475 for testing; six models, each with 100 %, 20 % and 5 % of
+the fields labelled, each trained for 45 rounds. The numbers and figures are in
+[results_estonia/REPORT.md](results_estonia/REPORT.md).
 
-What they can support: that the pipeline works, that the budget mechanism is sound, and that the
-gap between the per-pixel and token-grid groups is large.
+What they can support: that the whole chain works at the scale of a country; that the baseline
+is a serious opponent, ahead of all three transformer models when only 5 % of the fields are
+labelled; and that the two per-pixel models lose the least as labels are taken away.
 
-What they cannot support: any fine distinction between the transformer models. Repeating an
-identical run moves the score by about as much as the gaps between those models, so on this pilot
-they are indistinguishable. Fixing that needs the full Estonian export, a proper spatial split,
-and several random draws per budget, which is exactly what the protocol asks for and what the
-running export is being built for.
+What they cannot support yet: any difference of a few hundredths. Each setting was trained once,
+on one random choice of fields, so no number has an error bar. The rule that decides which round
+of training to keep also moves the transformer models' scores, and is not settled. Repeated
+random choices of the fields, with intervals, are the next thing the protocol requires.
