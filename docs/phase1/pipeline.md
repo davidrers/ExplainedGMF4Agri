@@ -1158,6 +1158,61 @@ test parcels, Macro-F1 / overall accuracy:
 
 ### Full Estonia, the arms of 15 October 2026, 45 epochs
 
-`EE_2021_rev`, the experiment `kshot` at commit `94f87ca`, the six arms with the baseline at 45
-epochs, six Slurm jobs on `itc-gpu` (624583 to 624588), submitted on 15 October 2026. Results to
-follow.
+`EE_2021_rev`, the experiment `kshot` with 45 epochs (protocol D27), the six arms with the
+baseline, six Slurm jobs on `itc-gpu` (624583 to 624588), submitted on 15 October 2026 and run on
+16 October. A job runs the clone as it stands when it starts, so TerraMind, AlphaEarth and the
+baseline ran at commit `94f87ca` and THOR and TESSERA at `b2b159c`, which added the parcel scores.
+Prithvi's job failed during its 20 % fit with the shared-memory fault of the 15-epoch run; its two
+remaining cells ran as job 626364 at `02a10f1`. The cells fitted before `b2b159c` were scored per
+parcel afterwards from their stored predictions (`--summarise`), and every stored prediction
+matches its logged score. The results are in `results/kshot/EE_2021_rev/`. Test Macro-F1 over the
+1,475 test chips, draw 0, seed 0, per pixel / per parcel:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large, S2 + S1 | 0.661 / 0.583 | 0.566 / 0.515 | 0.433 / 0.381 |
+| THOR v1 large, S2 + S1 | 0.594 / 0.516 | 0.547 / 0.491 | 0.393 / 0.349 |
+| Prithvi-EO-2.0 600M TL, S2 | 0.580 / 0.535 | 0.505 / 0.472 | 0.445 / 0.409 |
+| TESSERA v2 Medium + MLP | 0.618 / 0.602 | 0.582 / 0.574 | 0.504 / 0.502 |
+| AlphaEarth v1 + MLP | 0.523 / 0.484 | 0.497 / 0.455 | 0.449 / 0.425 |
+| U-Net from scratch, S2 + S1 (baseline) | 0.616 / 0.553 | 0.564 / 0.520 | 0.467 / 0.446 |
+
+* The three token-grid arms reproduce their 15-epoch cells to every digit. Their checkpoint of
+  lowest validation loss falls at epoch 7 to 14, inside the first 15, and the fit is deterministic,
+  while their validation Macro-F1 peaks at epochs 23 to 44. Under this checkpoint criterion the
+  extra 30 epochs go unused (section 10).
+* The 10 m arms gained: TESSERA by 0.013 and 0.020 at 100 and 20 % (at 5 % its checkpoint fell at
+  epoch 4 again, giving the same cell), AlphaEarth by 0.002, 0.032 and 0.022.
+* The baseline's checkpoint falls at epoch 32 to 41. Per pixel, only TerraMind at 100 % and
+  TESSERA at 20 and 5 % score above it by more than 0.005; TerraMind is level with it at 20 %,
+  TESSERA at 100 %, and every token-grid arm and AlphaEarth fall below it at 5 %. Per parcel only TESSERA, at
+  every budget, and TerraMind at 100 % are above it.
+* The parcel Macro-F1 is again 0.002 to 0.078 below the pixel one, least for TESSERA.
+* RQ1 is not answered yet: every cell is one draw and one seed, and the checkpoint criterion
+  decides the token-grid arms. These cells, the fine-tuned arms below and the published Estonian
+  results are brought together in [results_estonia/REPORT.md](results_estonia/REPORT.md).
+
+### Every encoder fine-tuned, `EE_2021_rev`
+
+`experiments/2026-10-15_kshot_finetune`, 15 to 18 October 2026, jobs 624576 to 624580 on
+`itc-gpu`, with jobs 626736 and 626737 refitting cells lost to node failures. The arms of `kshot`
+with the encoder trainable at a learning rate of 1e-5 after a one-epoch warm-up, the encoder in
+eval mode, and everything else as in the core arm; 45 epochs, draw 0, seed 0, paired with the
+frozen cells above. TESSERA v2 trains on the labelled pixels only, beside a frozen control on the
+same route. AlphaEarth has no encoder to train. Fine-tuned minus frozen Macro-F1 at 100 / 20 / 5 %:
+
+| Model | Test, per pixel | Test, per parcel | Best validation |
+|---|---|---|---|
+| TerraMind v1 large | -0.063 / -0.004 / -0.082 | -0.038 / -0.004 / -0.065 | +0.012 / +0.008 / +0.010 |
+| THOR v1 large | +0.033 / -0.012 / +0.011 | +0.029 / -0.016 / +0.020 | +0.010 / 0.000 / -0.033 |
+| Prithvi-EO-2.0 600M TL | +0.033 / +0.034 / -0.051 | +0.009 / +0.020 / -0.038 | +0.016 / +0.004 / +0.008 |
+| TESSERA v2 Medium | +0.042 / +0.047 / +0.077 | +0.037 / +0.028 / +0.063 | +0.053 / +0.051 / +0.056 |
+
+* Fine-tuned TESSERA scores 0.660, 0.630 and 0.581 per pixel and 0.639, 0.603 and 0.566 per
+  parcel: the highest of every arm at 20 and 5 %, and level with frozen TerraMind per pixel at
+  100 %. Its frozen control moves the validation score by under 0.005, so the gain is the encoder's.
+* For TerraMind, THOR and Prithvi the validation loss turns at epoch 5 to 9 once the encoder
+  trains, before the rarer classes are learnt, so the sign of the test difference follows the
+  checkpoint rather than the encoder.
+* Fine-tuning costs 4 to 9 times the frozen fit for the token-grid models and 15 times for
+  TESSERA, 26 h for its K = 100 % cell. The full report is the experiment's `REPORT.md`.

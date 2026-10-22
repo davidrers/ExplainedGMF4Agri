@@ -13,6 +13,7 @@ uncertainty and LLM reporting. **Phase 1, the label-budget curves of RQ1, is the
 | [docs/phase1/pipeline.md](docs/phase1/pipeline.md) | **The implemented pipeline**, stage by stage, with the reason for each decision, the faults found and fixed, and the known gaps (section 10). Read before touching the code |
 | [docs/phase1/pipeline_overview.md](docs/phase1/pipeline_overview.md) | The same pipeline in plain language, with diagrams |
 | [docs/phase1/proposal_deltas.md](docs/phase1/proposal_deltas.md) | Where the protocol departs from the proposal and from the research design |
+| [docs/phase1/results_estonia/REPORT.md](docs/phase1/results_estonia/REPORT.md) | First results for Estonia 2021: every arm frozen and fine-tuned at 45 epochs, per pixel and per parcel, each model's configuration in plain language, and the published Estonian results beside ours |
 
 Precedence: `thesis_design.md` states the intent and `protocol.md` the mechanism; when they disagree the protocol
 is corrected to match.
@@ -30,7 +31,7 @@ When an agreed update is made, `pipeline.md` is where it goes:
 - a departure from `protocol.md` or a deferred decision: section 10, Known gaps;
 - a finished run or grid: section 11, Runs, and the Current state below.
 
-## Current state, 16 October 2026
+## Current state, 18 October 2026
 
 The chain runs end to end on **all of Estonia 2021**: EuroCrops v11 polygons, a fixed 2,240 m chip grid in
 EPSG:3035, dense mask and parcel-id rasters, twelve monthly Sentinel-2 L2A composites, a spatial block split, a
@@ -64,7 +65,9 @@ The 10 m group keeps the per-pixel MLP: a U-Net did not beat it under label scar
 `tessera_v1`) keep their files for earlier results and experiments. All five current arms ran on `EE_2021_rev_mini`
 on the hub and the cluster on 15 October 2026, and on all of `EE_2021_rev` at 15 epochs the same day
 (`results/kshot_15ep/EE_2021_rev/`, pipeline.md section 11). **Since then every arm trains for 45 epochs (protocol
-D27), and the six arms, the baseline among them, were resubmitted on `EE_2021_rev` (jobs 624583 to 624588)**. **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
+D27); the six arms, the baseline among them, ran on all of `EE_2021_rev` at 45 epochs on 16 October 2026
+(`results/kshot/EE_2021_rev/`), and the four encoders with weights ran fine-tuned in
+`experiments/2026-10-15_kshot_finetune`** (results below). **THOR v1 large on 80 m tokens** is an experiment, not an arm of the main
 workflow (`experiments/2026-10-08_thor_80m/`, with its own arm file): its full-Estonia cache, about 6.4 TB, fits
 no cluster node; it has run on `EE_2021_mini` only. The small variants and TerraMind on S2 plus S1 are
 archived studies in `experiments/`.
@@ -77,19 +80,26 @@ per parcel at every budget (`experiments/2026-10-16_parcel_metric`). `FitPredict
 name, so a cell refitted after an interrupted fit was predicted with the stale checkpoint; it now loads the one
 `results.json` names, and `summary.csv`'s `predictions_match` flags stored predictions that miss the logged score.
 
-Full-Estonia grid, finished 2 October 2026. Test Macro-F1 over the 1,475 test chips, one draw and one seed per
-cell, 15 epochs, checkpoint of lowest validation loss. Details in pipeline.md section 11,
-[`results/seg_cached/ee_grid_summary.csv`](results/seg_cached/ee_grid_summary.csv) and
-[`notebooks/pipeline/eurocrops_ee_results.ipynb`](notebooks/pipeline/eurocrops_ee_results.ipynb).
+Full-Estonia grid at 45 epochs, finished 16 October 2026, with the fine-tuned TESSERA of
+`experiments/2026-10-15_kshot_finetune` (18 October). Test Macro-F1 over the 1,475 test chips, per pixel / per
+parcel, one draw and one seed per cell, checkpoint of lowest validation loss. Details in pipeline.md section 11
+and [docs/phase1/results_estonia/REPORT.md](docs/phase1/results_estonia/REPORT.md).
 
-| K, % of parcels per class | TESSERA + MLP | TerraMind v1 large | Prithvi-EO-2.0 600M TL |
+| Arm | K = 100 % | 20 % | 5 % |
 |---|---|---|---|
-| 100 | 0.631 | 0.586 | 0.573 |
-| 20 | 0.611 | 0.479 | 0.496 |
-| 5 | 0.568 | 0.362 | 0.368 |
+| TerraMind v1 large, S2 + S1 | 0.661 / 0.583 | 0.566 / 0.515 | 0.433 / 0.381 |
+| THOR v1 large, S2 + S1 | 0.594 / 0.516 | 0.547 / 0.491 | 0.393 / 0.349 |
+| Prithvi-EO-2.0 600M TL | 0.580 / 0.535 | 0.505 / 0.472 | 0.445 / 0.409 |
+| TESSERA v2 Medium + MLP | 0.618 / 0.602 | 0.582 / 0.574 | 0.504 / 0.502 |
+| TESSERA v2 Medium, fine-tuned | 0.660 / 0.639 | 0.630 / 0.603 | 0.581 / 0.566 |
+| AlphaEarth v1 + MLP | 0.523 / 0.484 | 0.497 / 0.455 | 0.449 / 0.425 |
+| U-Net from scratch (baseline) | 0.616 / 0.553 | 0.564 / 0.520 | 0.467 / 0.446 |
 
-This does not answer RQ1 yet: TESSERA sits in another resolution group, no cell has an interval, and no
-baseline has run. These are the arms before 15 October, on `EE_2021`.
+The token-grid arms equal their 15-epoch cells to every digit, their checkpoint falling at epoch 7 to 14. Fine-tuning
+raises TESSERA by 0.04 to 0.08 and TerraMind, THOR and Prithvi by about 0.01 in validation, their test score
+swinging either way with the checkpoint. This does not answer RQ1 yet: no cell has an interval, and the checkpoint
+criterion decides the token-grid arms. The grid of 2 October 2026 on `EE_2021`, with the arms before 15 October, is
+in pipeline.md section 11.
 
 **Not built:** repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia
 and Portugal; Phases 2 and 3.
@@ -105,8 +115,9 @@ K; no validation labels at low K; cross-country transfer only within one GAEZ v5
 was confirmed on 7 October and is implemented, handled like TESSERA.
 
 **Open choices that move the numbers:** how `K*` is read against a baseline outside both resolution groups
-(protocol open item 11); the checkpoint criterion (validation loss picks epoch 6 to 9 for the
-token-grid models while validation Macro-F1 peaks at 13), and the block size. THOR's group averaging is untested
+(protocol open item 11); the checkpoint criterion (at 45 epochs validation loss picks epoch 7 to 14
+for the frozen token-grid models and 5 to 9 for the fine-tuned ones, while their validation Macro-F1 peaks at
+epochs 13 to 44), and the block size. THOR's group averaging is untested
 against the concatenation its authors use (pipeline.md section 10).
 
 ## Running the pipeline
@@ -191,8 +202,8 @@ if it cannot be done that way, ask.
 7. **Bring the results back.** `bash scripts/cluster/pull_results.sh <name> <set>`, with the experiment's `name`
    (by default its folder's name). Results already on the hub under the same `<name>/<set>` are kept apart with
    `DEST=results/_cluster`. Every `results.json` records the spec, the entry script, the arm files, the machine
-   and the commit. Cells fitted by a job that started before the parcel scores existed (16 October 2026; the
-   45-epoch jobs 624583, 624584, 624587 and 624588 among them) have none: add them with
+   and the commit. Cells fitted by a job that started before the parcel scores existed (commit `b2b159c`, 16 October
+   2026) have none: add them with
    `poetry run python scripts/run_kshot.py -e <spec> --chips data/eurocrops_chips/<set> --summarise`.
 8. **Figures.** Set `ARMS` (short labels, colour slots) and `PAIRS` (arms compared fit by fit on shared draws
    and seeds) in the folder's `report.py`, adapt it if the question needs another figure, and run
