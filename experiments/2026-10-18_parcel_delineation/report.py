@@ -15,7 +15,8 @@ the main workflow's ``results/kshot/<chip set>/``, whose ``oracle`` and ``semant
 * ``tau.png``: class-agnostic PQ of the boundary parcels against the threshold on the boundary probability;
 * ``validation_curves.png``: validation crop-type and boundary loss per epoch, with the checkpoint epochs;
 * ``examples.png``: test chips: a July composite, the true parcels and crop types, and every arm's boundary parcels
-  and predicted crop types (over the whole chip) at the largest K;
+  and predicted crop types at the largest K, the latter where the July SCL calls vegetation when ``fetch_scl.py`` has
+  run (over the whole chip otherwise);
 * when ``diagnose.py`` has run: ``where_found.png``, the share of the true parcels found by the extent, the
   crop-type map and the boundary head, split by whether a parcel touches none, only other classes, or its own
   class; ``boundary_pixels.png``, the share of the target's boundary pixels the head marks, by what lies across
@@ -552,14 +553,18 @@ SHORT = {"pasture_meadow_grassland_grass": "grassland", "winter_common_soft_whea
          "grain_maize_corn_popcorn": "grain maize", "legumes_dried_pulses_protein_crops": "dried pulses",
          "alfalfa_lucerne": "alfalfa", "orchards_fruits": "orchards", "fresh_vegetables": "vegetables"}
 OTHER_CLASS = "#a3a29b"
+#: The class of the Sentinel-2 scene classification (SCL) the predicted crop types are shown on.
+SCL_VEGETATION = 4
 
 
-def _show_classes(ax, cls: np.ndarray, where: np.ndarray, outline: np.ndarray, colours: dict, title: str) -> None:
-    """A crop-type map over ``where``, one colour per class, with the true parcel outlines in white."""
+def _show_classes(ax, cls: np.ndarray, where: np.ndarray, colours: dict, title: str,
+                  outline: np.ndarray | None = None) -> None:
+    """A crop-type map over ``where``, one colour per class, with ``outline`` in white when given."""
     img = np.ones(cls.shape + (3,))
     for k in np.unique(cls[where]):
         img[where & (cls == k)] = matplotlib.colors.to_rgb(colours.get(int(k), OTHER_CLASS))
-    img[outline] = 1.0
+    if outline is not None:
+        img[outline] = 1.0
     ax.imshow(img, interpolation="nearest")
     ax.set_title(title, fontsize=9)
     ax.axis("off")
@@ -585,33 +590,36 @@ def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
     manifest = json.loads((REPO / "data/eurocrops_chips" / chips / "manifest.json").read_text())
     bands = manifest["imagery"]["band_names"]
 
-    # Per chip: the extent, the true pieces, the true classes and every arm's predicted classes and parcels.
+    # Per chip: the extent, the pixels the July SCL calls vegetation (``fetch_scl.py``; the whole chip without it),
+    # the true pieces, the true classes and every arm's predicted classes and parcels.
+    scl = dict(np.load(out / "scl_july.npz")) if (out / "scl_july.npz").exists() else {}
     shown = []
     for cid in chosen:
         parcels = read_parcels(chips_dir, cid)
         first = next(iter(cells.values()))
         mask = first["mask"][ids.index(cid)]
         extent = (mask >= 0) & (parcels > 0)
+        veg = scl[cid] == SCL_VEGETATION if cid in scl else np.ones(extent.shape, bool)
         arms = {}
         for arm, d in cells.items():
             j = [str(c) for c in d["ids"]].index(cid)
             arms[arm] = (d["pred"][j], panoptic.from_boundary(extent, d["boundary"][j].astype(np.float32) / 255.0,
                                                               panoptic.TAU))
-        shown.append((cid, extent, panoptic.pieces(np.where(extent, parcels, 0)), mask, arms))
+        shown.append((cid, extent, veg, panoptic.pieces(np.where(extent, parcels, 0)), mask, arms))
     # One colour per class across the figure, in slot order by the pixels a class covers in all its crop-type maps
-    # (the true classes inside the extent, the predicted ones over the whole chip); the classes past the eight slots
+    # (the true classes inside the extent, the predicted ones where they are shown); the classes past the eight slots
     # share one grey.
     area = np.zeros(len(names), np.int64)
-    for _, extent, _, mask, arms in shown:
+    for _, extent, veg, _, mask, arms in shown:
         area += np.bincount(mask[extent].astype(np.int64), minlength=len(names))
         for pred, _ in arms.values():
-            area += np.bincount(pred.ravel().astype(np.int64), minlength=len(names))
+            area += np.bincount(pred[veg].astype(np.int64), minlength=len(names))
     ranked = [int(k) for k in np.argsort(-area, kind="stable") if area[k] > 0]
     colours = dict(zip(ranked, SLOTS))
 
     ncol = 2 + len(cells)
     fig, axes = plt.subplots(2 * len(chosen), ncol, figsize=(2.3 * ncol, 2.5 * 2 * len(chosen)), squeeze=False)
-    for r, (cid, extent, true, mask, arms) in enumerate(shown):
+    for r, (cid, extent, veg, true, mask, arms) in enumerate(shown):
         top, bottom = axes[2 * r], axes[2 * r + 1]
         with rasterio.open(chips_dir / f"{cid}_merged.tif") as s:
             # Band index = month index x bands per month + band index (the manifest's layout).
@@ -620,20 +628,19 @@ def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
             rgb = rgb.astype(np.float32)
         rgb = np.clip(rgb / np.nanpercentile(rgb, 98), 0, 1)
         top[0].imshow(np.nan_to_num(rgb), interpolation="nearest")
-        top[0].set_title(f"{cid}, July", fontsize=9)
+        top[0].set_title(f"{cid}\nJuly" + (f", {veg.mean():.0%} SCL vegetation" if cid in scl else ""), fontsize=9)
         top[0].axis("off")
         outline = _outline(true)
-        chip = np.ones(extent.shape, bool)
         _show_parcels(top[1], true, extent, "true parcels")
-        _show_classes(bottom[1], mask, extent, outline, colours, "true crop types")
+        _show_classes(bottom[1], mask, extent, colours, "true crop types", outline)
         for t_ax, b_ax, (arm, (pred, seg)) in zip(top[2:], bottom[2:], arms.items()):
             _show_parcels(t_ax, seg, extent, f"{styles[arm][0]}: parcels")
             correct = float((pred[extent] == mask[extent]).mean())
-            _show_classes(b_ax, pred, chip, outline, colours, f"crop types, {correct:.0%} correct")
+            _show_classes(b_ax, pred, veg, colours, f"crop types, {correct:.0%} correct")
         # The chip's classes, in the figure's colour order, as the legend of its crop-type row.
         present = {int(k) for k in np.unique(mask[extent])}
         for pred, _ in arms.values():
-            present |= {int(k) for k in np.unique(pred)}
+            present |= {int(k) for k in np.unique(pred[veg])}
         handles = [matplotlib.patches.Patch(color=colours[k], label=SHORT.get(names[k], names[k].replace("_", " ")))
                    for k in ranked if k in present and k in colours]
         if present - set(colours):
@@ -642,10 +649,10 @@ def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
         bottom[0].legend(handles=handles, loc="center left", fontsize=8, handlelength=1.2, borderaxespad=0,
                          title="crop type", title_fontsize=8.5, alignment="left")
     fig.text(0.01, 0.0, "Per chip, top: parcels inside the true parcel extent (light), dark lines their outlines, "
-             "the boundary parcels at threshold 0.5. Bottom: the predicted crop type of every pixel of the chip, the true "
-             "one only inside the extent; white lines the true parcel outlines, which also bound the extent; share of "
-             "the extent's pixels correct. Largest K fitted. Chips with the most contacts between parcels of one "
-             "class.", color=MUTED, fontsize=8.5, wrap=True)
+             "the boundary parcels at threshold 0.5. Bottom: the predicted crop type of every pixel the July "
+             "scene classification of Sentinel-2 calls vegetation (SCL 4; blank elsewhere), the true one inside the "
+             "extent, with the true parcel outlines in white; share of the extent's pixels correct, vegetation or not. Largest K fitted. Chips with the most contacts between parcels of one "
+             "class.", color=MUTED, fontsize=8.5, wrap=True, va="top")
     fig.tight_layout()
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
