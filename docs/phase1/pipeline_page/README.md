@@ -1,22 +1,21 @@
 # Phase 1 pipeline page
 
-`index.html` is a standalone, interactive page of the main workflow: the experimental workflow, the
-pipeline architecture of the six arms, and the six experiments of the analysis, each linked to its
-`REPORT.md`. It was built on 22 October 2026 with the archify skill from `source/`.
+`index.html` is a standalone, interactive page of the main workflow in the style of the Claude Design file
+"Architecture Diagram v2": (1) the experimental workflow with the fairness rules, (2) the model architecture of
+the six arms, and (3) the six experiments of the analysis, each linked to its `REPORT.md`, with the Estonia
+results report.
 
 Online, once GitHub Pages serves `docs/` from `main`:
 https://davidrers.github.io/ExplainedGMF4Agri/phase1/pipeline_page/
 
-## Rebuilding it
+Interactions: **Step through** walks each diagram step by step; **Live** animates the flow along the arrows;
+**Fit / 100 %** switches between the whole diagram and its design size; **Status** marks what is built in the
+workflow; hovering a fairness rule lights the steps that carry it; clicking a model name follows its lane and
+shows its settings; **Show in the architecture** points from an experiment to the part of the pipeline it
+decided.
 
-`source/candidate.archify.md` is the page; it reads the two diagram specs and `backbones.png` beside it.
-`backbones.png` is `backbones.html` rendered by headless Chrome at a scale of 2 and a window of 1092 x 499 px.
-
-archify refuses to write its receipts on the NFS project drive, so build on local disk and copy back:
+`index.html` is generated, so edit `build_page.py` and rebuild:
 
 ```bash
-export PATH=$HOME/.local/opt/node/bin:$PATH
-cp -r docs/phase1/pipeline_page/source /tmp/pipeline_page && cd /tmp/pipeline_page
-node ~/.claude/skills/archify/bin/archify.mjs finalize explainer candidate.archify.md index.html --json
-cp index.html "<repository>/docs/phase1/pipeline_page/index.html"
+python docs/phase1/pipeline_page/build_page.py
 ```
