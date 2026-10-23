@@ -3,8 +3,9 @@
 
     python docs/phase1/pipeline_page/build_page.py
 
-Section 1 recreates the design's experimental workflow, section 2 its model architecture with the
-current arms, section 3 lists the six experiments of the analysis with links to their reports.
+Section 1 recreates the design's experimental workflow under the research questions, section 2 its
+model architecture with the current arms, section 3 lists the six experiments of the analysis with
+links to their reports.
 Coordinates of section 2 are in design pixels; the page scales each diagram to the window.
 """
 from __future__ import annotations
@@ -82,8 +83,9 @@ WF_STEPS = [
          now="E1 has run on Estonia, one draw and one seed per cell. E2 has not started."),
     dict(n=7, c=GREEN, title="Evaluation", tags=["F3", "F7", "F8"], status="partly",
          body="Fixed test blocks only. Macro-F1 (primary) per pixel and per parcel, mIoU and per-class F1, also per AEZ "
-              "class.<br>Paired comparisons between models, with 95 % intervals.",
-         now="Pixel and parcel Macro-F1 on the 1,475 test chips. No intervals yet: one draw, one seed."),
+              "class.<br>Paired comparisons between models, with 95 % intervals. K*, the matching budget against the "
+              "baseline, answers RQ1.",
+         now="Pixel and parcel Macro-F1 on the 1,475 test chips. No intervals yet: one draw, one seed, so no K*."),
     dict(n=8, c=GREEN, title="Reporting", tags=["F8"], status="met",
          body="Every result logged with its settings; all draws released.",
          now="Every fit writes results.json with its settings, drawn parcels, metrics and commit."),
@@ -105,6 +107,28 @@ RULES = [
     ("F8", "Fixed in advance", "Metrics and criteria declared before results are seen.", "partly",
      "Macro-F1 fixed; the checkpoint criterion is still open."),
 ]
+
+
+# The research questions of docs/thesis_design.md, word for word; this workflow answers RQ1 only
+RQ1_HOW = ("This workflow answers it: the label-budget curves of every arm, within a country (E1) and across countries "
+           "(E2), against the baseline, now the U-Net trained from scratch (protocol D26). The answer is K*, the smallest "
+           "K at which a foundation model is no worse than the baseline at K = 100 %, within 0.02 Macro-F1 on paired "
+           "bootstrap replicates.")
+RQS = [
+    ("rq1", "RQ1", "Phase 1 · this workflow", "partly", [4, 5, 6, 7],
+     "How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature "
+     "baseline?"),
+    ("rq21", "RQ2.1", "Phase 2 · explainability", "no", [],
+     "Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?"),
+    ("rq22", "RQ2.2", "Phase 2 · uncertainty", "no", [],
+     "Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?"),
+    ("rq23", "RQ2.3", "Phase 2 · agreement", "no", [],
+     "Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?"),
+    ("rq3", "RQ3", "Phase 3 · LLM reporting", "no", [],
+     "Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring "
+     "reports?"),
+]
+RQ1_NOW = "E1 has run on Estonia, one draw and one seed per cell; K* waits for the bootstrap intervals. E2 has not started."
 
 
 def status_chip(key):
@@ -145,6 +169,21 @@ def rule(r):
             f'<div style="font-size:19px;line-height:1.5;color:#2a2f38">{text}</div></div></div>')
 
 
+def rq(r):
+    id_, label, phase, st, steps, q = r
+    active = bool(steps)
+    how = f'<div style="font-size:19px;line-height:1.5;color:#2a2f38;margin-top:6px">{RQ1_HOW}</div>' if active else ""
+    return (f'<div class="rq n{" on" if active else ""}" id="{id_}" data-steps="{" ".join(f"ws{n}" for n in steps)}" '
+            f'style="display:flex;gap:22px;align-items:flex-start">'
+            f'<div class="rq-lab">{label}</div><div style="flex:1;min-width:0"><div class="rq-q">{q}{status_chip(st)}</div>'
+            f'{how}</div><div class="rq-ph">{phase}</div></div>')
+
+
+RQ_PANEL = ('<div class="rqs" style="width:1771px;box-sizing:border-box;border:2px solid #2a2f38;border-radius:12px;'
+            'padding:30px 28px 26px"><div style="font-size:27px;font-weight:600;margin-bottom:22px">Research questions</div>'
+            '<div style="display:flex;flex-direction:column;gap:14px">' + "".join(rq(r) for r in RQS) + "</div></div>")
+
+
 def legend_item(swatch, label):
     return (f'<div style="display:flex;gap:10px;align-items:center"><div style="width:18px;height:18px;box-sizing:border-box;'
             f'{swatch};border-radius:3px"></div><span>{label}</span></div>')
@@ -153,7 +192,8 @@ def legend_item(swatch, label):
 workflow_html = (
     '<div class="stage" id="wf-stage" data-w="1920" style="width:1920px;box-sizing:border-box;padding:0 60px 0 0;'
     "font-family:'IBM Plex Sans','Helvetica Neue',Arial,sans-serif;color:#1f2430\">"
-    '<div style="display:flex;gap:80px;align-items:stretch"><div style="display:flex;flex-direction:column">'
+    + RQ_PANEL + CONN
+    + '<div style="display:flex;gap:80px;align-items:stretch"><div style="display:flex;flex-direction:column">'
     + CONN.join(wf_step(s) for s in WF_STEPS)
     + '</div><div class="rules" style="width:454px;box-sizing:border-box;border:2px solid #2a2f38;border-radius:12px;'
     'padding:30px 28px;display:flex;flex-direction:column"><div style="font-size:27px;font-weight:600;margin-bottom:30px">'
@@ -551,8 +591,10 @@ SHARED = ("Every arm: 45 epochs at every K · AdamW, weight decay 0.05 · effect
           "labelled pixels · D4 augmentation · checkpoint of lowest validation loss.")
 
 WALKS = {
-    "wf": [dict(title=s["title"], text=s.get("walk", s["body"]), now=s["now"],
-                targets=[f"#ws{s['n']}"] + [f"#fr{t[1]}" for t in s["tags"]]) for s in WF_STEPS],
+    "wf": [dict(title="Research question RQ1", text=f"{RQS[0][5]} {RQ1_HOW}", now=RQ1_NOW,
+                targets=["#rq1"] + [f"#ws{n}" for n in RQS[0][4]])]
+          + [dict(title=s["title"], text=s.get("walk", s["body"]), now=s["now"],
+                  targets=[f"#ws{s['n']}"] + [f"#fr{t[1]}" for t in s["tags"]]) for s in WF_STEPS],
     "ar": [
         dict(title="Data source", targets=["[data-row=src]"],
              text="Every lane reads the same chips and parcel masks. Five read the 12 monthly S2 + S1 composites; "
@@ -615,6 +657,15 @@ h2.sec{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:40px;fo
 .shaft{position:relative;flex:1;width:2px;background:#5a6270}
 .shaft-h{position:relative;flex:1;height:2px;background:#5a6270}
 .rule{cursor:default;padding:4px}
+.rq{padding:6px 8px;border-radius:8px;color:#8a8f99}
+.rq.on{cursor:default;color:#1f2430}
+.rq-lab{flex:none;width:84px;box-sizing:border-box;border:2px solid #b5b9c0;border-radius:16px;padding:2px 0;
+  text-align:center;font-size:16px;font-weight:600;margin-top:1px}
+.rq.on .rq-lab{background:#2a2f38;border-color:#2a2f38;color:#fff}
+.rq-q{font-size:20px;line-height:1.45}
+.rq.on .rq-q{font-weight:600}
+.rq-ph{flex:none;width:250px;text-align:right;font-size:16px;font-weight:600;margin-top:3px}
+.stage.focusing .rq.hl{background:#f1f5fb}
 .st{display:none;font-size:14px;font-weight:600;border-radius:12px;padding:2px 10px;vertical-align:middle;margin-left:8px}
 .show-status .st{display:inline-block}
 .wstep .st{margin-left:14px}
@@ -805,6 +856,13 @@ $$('.fpill span', wf).forEach(p => {
   p.addEventListener('mouseenter', () => ruleFocus(p.dataset.f));
   p.addEventListener('mouseleave', () => { if (!W) clear(wf); });
 });
+// research questions: the steps that answer them
+$$('.rq.on', wf).forEach(q => {
+  q.addEventListener('mouseenter', () => {
+    if (!W) focus(wf, [q, ...q.dataset.steps.split(' ').map(id => $('#' + id, wf))], true);
+  });
+  q.addEventListener('mouseleave', () => { if (!W) clear(wf); });
+});
 
 // architecture: follow one lane
 const ar = $('#ar-stage'), card = $('#card');
@@ -868,7 +926,7 @@ page = f"""<!doctype html>
 
 <section id="workflow">
 <h2 class="sec">1. Experimental workflow</h2>
-{toolbar("wf", '<button type="button" data-act="status" aria-pressed="false">Status</button><span class="hint">Hover a fairness rule to see the steps that carry it.</span>')}
+{toolbar("wf", '<button type="button" data-act="status" aria-pressed="false">Status</button><span class="hint">Hover RQ1 or a fairness rule to see the steps that carry it.</span>')}
 <div class="viewport" id="wf-vp">{workflow_html}</div>
 </section>
 
