@@ -1,3 +1,14 @@
+**Boundary head**: boundary pixels at 0.5 against the dense target, inside the extent of the test chips
+
+| Arm | precision, K = 100 % | recall, K = 100 % | F1, K = 100 % | precision, K = 20 % | recall, K = 20 % | F1, K = 20 % | precision, K = 5 % | recall, K = 5 % | F1, K = 5 % |
+|---|---|---|---|---|---|---|---|---|---|
+| TerraMind S2+S1 | 0.677 | 0.392 | 0.497 | 0.620 | 0.353 | 0.449 | 0.536 | 0.209 | 0.300 |
+| Prithvi 600M | 0.692 | 0.468 | 0.559 | 0.638 | 0.298 | 0.406 | 0.538 | 0.179 | 0.269 |
+| THOR S2+S1 | 0.597 | 0.193 | 0.291 | 0.547 | 0.085 | 0.147 | 0.510 | 0.020 | 0.038 |
+| TESSERA v2 | 0.754 | 0.555 | 0.639 | 0.774 | 0.508 | 0.614 | 0.742 | 0.510 | 0.605 |
+| AlphaEarth | 0.762 | 0.432 | 0.551 | 0.722 | 0.480 | 0.577 | 0.705 | 0.461 | 0.558 |
+| U-Net baseline | 0.755 | 0.582 | 0.657 | 0.725 | 0.568 | 0.637 | 0.647 | 0.512 | 0.571 |
+
 **Panoptic quality of the boundary parcels** (threshold 0.5), class-aware
 
 | Arm | PQ, K = 100 % | SQ, K = 100 % | RQ, K = 100 % | PQ, K = 20 % | SQ, K = 20 % | RQ, K = 20 % | PQ, K = 5 % | SQ, K = 5 % | RQ, K = 5 % |
@@ -30,17 +41,6 @@
 | TESSERA v2 | 0.551 | 0.340 | -0.211 | 0.524 | 0.318 | -0.205 | 0.490 | 0.292 | -0.198 |
 | AlphaEarth | 0.428 | 0.236 | -0.193 | 0.412 | 0.230 | -0.182 | 0.381 | 0.206 | -0.176 |
 | U-Net baseline | 0.493 | 0.371 | -0.122 | 0.446 | 0.320 | -0.126 | 0.388 | 0.262 | -0.126 |
-
-**Boundary pixels**: test F1 of the boundary head at 0.5, against the dense target
-
-| Arm | F1, K = 100 % | F1, K = 20 % | F1, K = 5 % |
-|---|---|---|---|
-| TerraMind S2+S1 | 0.497 | 0.449 | 0.300 |
-| Prithvi 600M | 0.559 | 0.406 | 0.269 |
-| THOR S2+S1 | 0.291 | 0.147 | 0.038 |
-| TESSERA v2 | 0.639 | 0.614 | 0.605 |
-| AlphaEarth | 0.551 | 0.577 | 0.558 |
-| U-Net baseline | 0.657 | 0.637 | 0.571 |
 
 **Threshold**: class-agnostic PQ of the boundary parcels at 0.3, 0.5, 0.7
 

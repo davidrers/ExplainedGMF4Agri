@@ -8,7 +8,7 @@ vegetation (4), not vegetated (5) or water (6), the classes the ``revised`` scre
 the most frequent of the three over those acquisitions, ties going to the lower class, and 0 where none sees it.
 
 Writes ``results/<name>/<set>/scl_july.npz``: per chip id, the July class (``<id>``) and the number of clear
-acquisitions (``<id>_n``); chips already there are skipped. Without ``--ids`` the chips are those of ``examples.png``:
+acquisitions (``<id>_n``); chips already there are skipped. Without ``--ids`` the chips are those of ``example_<n>.png``:
 
     poetry run python experiments/2026-10-18_parcel_delineation/fetch_scl.py --chips EE_2021_rev
 """
@@ -58,7 +58,7 @@ def july_scl(bounds_3035: tuple[float, float, float, float]) -> tuple[np.ndarray
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--chips", required=True, help="the chip set's name, e.g. EE_2021_rev")
-    ap.add_argument("--ids", nargs="*", help="chip ids; by default the chips of examples.png")
+    ap.add_argument("--ids", nargs="*", help="chip ids; by default the chips of example_<n>.png")
     ap.add_argument("--name", default=None, help="the results' experiment name, by default experiment.yaml's")
     args = ap.parse_args()
 

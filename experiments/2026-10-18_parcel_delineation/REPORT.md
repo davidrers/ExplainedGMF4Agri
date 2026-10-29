@@ -1,24 +1,29 @@
 # Parcel delineation by a boundary head trained beside the crop-type head: report, 19 October 2026
 
+Reordered on 30 October 2026 to follow the method: first the two heads, the intermediate outputs, then the parcels
+built from them, the final output.
+
 **Answer.** Trained jointly under the label budget, the boundary head does **not** delineate parcels beyond what the
 true parcel extent gives on its own, except for the U-Net baseline.
 
-* **Geometry alone (class-agnostic PQ).** The extent's connected regions, with nothing predicted, score **0.486**
-  on the 1,475 test chips. The boundary parcels of the five GFM arms score 0.462 to 0.512 at the agreed threshold
-  of 0.5, that is 0.024 below to 0.026 above that floor. The U-Net trained from scratch is the only arm above it at
-  every K, with 0.524 to 0.561.
-* **Where the head fails.** The parcels the head exists for are those that touch a parcel of their own class, 43 %
-  of the test parcels. Of the boundary pixels between two such parcels the heads mark at most 17 % (THOR 1 to 5 %),
-  against 23 to 64 % of the outer edges at K = 100 %, edges the extent gives for free. They find 13 to 30 % of
-  those parcels, against 12.7 % for the extent alone and 20 to 24 % for the crop-type map. What they do split is
-  paid for with false parcels: 1.5 to 8 times as many unmatched predicted parcels as the extent, a quarter to two
-  thirds of them slivers under 20 pixels.
-* **The cost of predicted geometry.** The parcel Macro-F1 at IoU > 0.5 (RQ) falls by 0.12 to 0.22 when the parcels
-  come from the head instead of from the parcel layer: 0.13 to 0.22 for the GFM arms, 0.12 to 0.13 for the U-Net.
-  Class-aware PQ of the boundary parcels is highest for the U-Net (0.338 at K = 100 %) and TESSERA (0.307), and
-  TESSERA loses the least to the budget (0.263 at 5 %).
-* **The crop-type head is not harmed.** Joint training moves the pixel Macro-F1 by +0.003 on average over the 18
+* **The two heads.** The boundary head is cautious. What it marks is mostly boundary (precision 0.51 to 0.77), but
+  it marks at most 58 % of the boundary pixels (recall 0.02 to 0.58). Its F1 is 0.55 to 0.66 for the 10 m arms and
+  the U-Net at every K, and falls with K for the token-grid models (THOR from 0.29 to 0.04). Between two parcels of
+  the same class, the boundaries the head exists for, it marks at most 17 % of the pixels. Training the boundary head
+  beside the crop-type head does not harm the crop types: the pixel Macro-F1 moves by +0.003 on average over the 18
   paired fits, between −0.044 and +0.044, within the run-to-run spread of these fits.
+* **The parcels, geometry alone (class-agnostic PQ).** The extent's connected regions, with nothing predicted, score
+  **0.486** on the 1,475 test chips. The boundary parcels of the five GFM arms score 0.462 to 0.512 at the agreed
+  threshold of 0.5, that is 0.024 below to 0.026 above that floor. The U-Net trained from scratch is the only arm
+  above it at every K, with 0.524 to 0.561.
+* **Where the parcels fail.** 43 % of the test parcels touch a parcel of their own class. The heads find 13 to 30 %
+  of those, against 12.7 % for the extent alone and 20 to 24 % for the crop-type map. What they do split is paid for
+  with false parcels: 1.5 to 8 times as many unmatched predicted parcels as the extent, a quarter to two thirds of
+  them slivers under 20 pixels.
+* **The parcels with their class.** Class-aware PQ is highest for the U-Net (0.338 at K = 100 %) and TESSERA
+  (0.307), and TESSERA loses the least to the budget (0.263 at 5 %). The parcel Macro-F1 at IoU > 0.5 (RQ) falls by
+  0.12 to 0.22 when the parcels come from the head instead of from the parcel layer: 0.13 to 0.22 for the GFM arms,
+  0.12 to 0.13 for the U-Net.
 
 One draw and one seed per cell, so single differences under about 0.04 are not resolved. The pattern itself (head
 near the floor, U-Net above it) holds at all three budgets and for every arm. The fixed threshold understates the
@@ -32,16 +37,247 @@ with the U-Net), while TESSERA and AlphaEarth stay on it.
 | Question | With one boundary logit beside each arm's crop-type head, trained jointly under the same label budget, how well does each arm delineate the test parcels (PQ), how much parcel F1 is lost when the parcels come from the model, does the head add anything over the crop-type map, and does it change the pixel Macro-F1 of RQ1? (README.md) |
 | Arms | The six of `configs/experiments/kshot.yaml`, unchanged: TerraMind v1 large and THOR v1 large on S2 + S1 and Prithvi-EO-2.0 600M TL on S2 (160 m tokens, `ChannelBottleneck` and UNet decoder, from cached features); TESSERA v2 Medium and AlphaEarth (10 m embeddings, per-pixel MLP); the U-Net trained from scratch on S2 + S1 (the baseline, end to end) |
 | What is added | **Target**: a labelled parcel pixel with a 4-neighbour inside the chip of another parcel or of none; only the drawn parcels carry it. **Head**: one logit on the decoder features, built like the arm's classifier (a 1 x 1 layer for the MLP arms). **Loss**: cross-entropy plus 1.0 x binary cross-entropy, for every arm; `val/loss`, the checkpoint criterion, is their sum |
-| Parcels and score | Inside the true parcel extent of each test chip: seeds where the boundary probability is below 0.5, grown by watershed; each parcel takes the majority class of its pixels (D28). Matched to the 55,575 true parcel pieces at IoU > 0.5; PQ = SQ x RQ, class-aware (mean over classes) and class-agnostic. Reference variants on the same units: `oracle` (true pieces, class predicted), `extent` (connected regions of the extent, the floor), `semantic` (connected regions of one predicted class), `combined` (seeds also cut where the class changes); thresholds 0.3 and 0.7 as a check |
+| Outputs | Per test chip, two intermediate maps, one per head: the boundary probability and the crop type of every pixel. The final output is built from both: inside the true parcel extent, seeds where the boundary probability is below 0.5, grown by watershed; each parcel takes the majority class of its pixels (D28) |
+| Scores | Boundary head: pixel precision, recall and F1 at 0.5 against the dense target. Crop-type head: pixel Macro-F1, as in RQ1. Parcels: matched to the 55,575 true parcel pieces at IoU > 0.5; PQ = SQ x RQ, class-aware (mean over classes) and class-agnostic. Reference parcels on the same units: `oracle` (true pieces, class predicted), `extent` (connected regions of the extent, the floor), `semantic` (connected regions of one predicted class), `combined` (seeds also cut where the class changes); thresholds 0.3 and 0.7 as a check. Details in the next section |
 | Chip set | `EE_2021_rev`, split `blocks4_buf1600_seed0__6b0eb4cb`: 4,898 training, 769 validation, 1,475 test chips |
 | Protocol | K = 100, 20 and 5 % (86,909, 17,390 and 4,354 training parcels), draw 0, seed 0, 45 epochs, checkpoint of lowest validation loss. Compared fit by fit with the main workflow's crop-type-only fits on the same draw and seed, `results/kshot/EE_2021_rev/` |
 | Runs | Pilot on `EE_2021_rev_mini`, cluster jobs 628975 to 628980, 18 October, all exit 0. Full Estonia: cluster jobs 629034 to 629039, commit `faec7ea`, 18 October; 17.3 GPU hours of fitting. Prithvi's job (629035) failed in its 20 % fit when a data-loader worker could not unlink a shared-memory file, one minute after THOR's job ended on the same node, the fault of 15 and 16 October (pipeline.md section 11); it was resubmitted as 629189 on the other node and finished. Its 20 % cell keeps the crashed fit's `best-loss.ckpt` beside the new `best-loss-v1.ckpt`; `results.json` names the new one, and every stored prediction reproduces its logged score (`predictions_match`) |
 
+## How the outputs are scored
+
+The model has two outputs, one per head, and the parcels are built from both. Each of the three is scored on the
+1,475 test chips. Every parcel of a test chip is labelled, since the label budget applies to training only.
+
+### The boundary head
+
+The head gives every pixel of the chip a probability that it lies on a parcel boundary (row 1 of the examples). It
+is scored against the target it was trained on, now complete: a pixel of a labelled parcel is a boundary pixel when
+one of its four neighbours inside the chip belongs to another parcel or to none. A probability of 0.5 or more counts
+as a boundary. Inside the true parcel extent, pooled over all test chips, every pixel is then a true positive (a
+boundary marked), a false positive (an interior pixel marked) or a false negative (a boundary missed), and
+
+* precision = TP / (TP + FP), the share of the marked pixels that are boundaries;
+* recall = TP / (TP + FN), the share of the boundary pixels that are marked;
+* F1 = 2 TP / (2 TP + FP + FN).
+
+Outside the extent there is no truth, and nothing is scored. The same F1 is logged on the validation chips during
+training. `diagnose.py` splits the recall by what lies across each boundary pixel, and adds the share of interior
+pixels marked, the false-alarm rate. Across a boundary pixel can lie:
+
+* a parcel of the same class: only the boundary head can find these;
+* a parcel of another class: the crop-type map also finds these;
+* non-parcel land (the outer edge): the extent gives these for free.
+
+The match is exact to the pixel. A boundary drawn one pixel beside the true one counts once as a false positive and
+once as a false negative. Delineation studies often allow a tolerance of one or two pixels. Here the pixel F1 only
+diagnoses the head; the geometry itself is scored on the parcels.
+
+### The crop-type head
+
+As in the main workflow: the pixel Macro-F1 over the labelled pixels of the test chips, the primary metric of RQ1,
+and the parcel Macro-F1 of protocol D28 on the declared parcels. Each joint fit is compared with the main workflow's
+crop-type-only fit of the same arm, budget, draw and seed.
+
+### The parcels: panoptic quality
+
+The final output is one layer of parcels, each with one class (row 3 of the examples). It is built inside the true
+parcel extent of each test chip in three steps (`panoptic.py`):
+
+1. **Seeds.** The pixels with a boundary probability below 0.5 are parcel interiors; each 4-connected piece of
+   them is one seed.
+2. **Growth.** A watershed on the boundary probability grows the seeds over the rest of the extent, lowest
+   probability first, so the line between two seeds settles on the ridge of probability between them. A connected
+   region of the extent that holds no seed becomes a parcel of its own. Every pixel of the extent then belongs to
+   exactly one parcel.
+3. **Class.** Each parcel takes the class most of its pixels were predicted as, ties to the lowest class index
+   (the vote of protocol D28).
+
+These parcels are compared with the true parcel pieces: the 4-connected pieces of each declared parcel inside the
+extent of a chip, 55,575 in the test chips. A parcel cut by the chip edge counts once per chip, as PASTIS scores
+its patches. The score is the panoptic quality of Kirillov et al. (2019), as the utae-paps code computes it for
+PASTIS:
+
+* **Matching.** A predicted and a true parcel match when their intersection over union (IoU) exceeds 0.5. Above
+  0.5 a parcel can match at most one parcel on the other side, so no assignment step is needed.
+* **Counts.** A match is a true positive (TP), a predicted parcel without a match a false positive (FP), a true
+  parcel without a match a false negative (FN).
+* **SQ**, the segmentation quality: the mean IoU of the matches, how well the parcels that are found fit.
+* **RQ**, the recognition quality: TP / (TP + FP/2 + FN/2), the F1 of finding parcels.
+* **PQ** = SQ x RQ = (sum of the IoU of the matches) / (TP + FP/2 + FN/2).
+
+The counts are summed over all test chips before the ratios are taken. The score is computed two ways:
+
+* **Class-aware:** a match must also agree on the class. A parcel with the right outline and the wrong class
+  therefore counts as a false negative of its true class and a false positive of the predicted one. SQ, RQ and PQ
+  are computed per class and averaged over the classes that occur.
+* **Class-agnostic:** the class is ignored, which scores the geometry alone.
+
+For example, take a chip with 10 true parcels, divided into 12 parcels of which 7 match with a mean IoU of 0.80.
+There are 5 false positives and 3 false negatives, so RQ = 7 / (7 + 2.5 + 1.5) = 0.64, SQ = 0.80 and PQ = 0.51.
+
+The same score is computed for reference parcels on the same units:
+
+* `oracle`: the true parcels, classed by the vote. Its RQ is the parcel Macro-F1 at IoU > 0.5 with the true
+  geometry.
+* `extent`: the connected regions of the extent, with nothing predicted. This is the floor.
+* `semantic`: the connected regions of one predicted class, which is what the crop-type map gives on its own.
+* `combined`: the boundary seeds, also cut where the predicted class changes.
+
 ## Results
 
-### Headline
+### Examples: from the two heads to the parcels
 
-![PQ, class-agnostic PQ and boundary pixel F1 against K](figures/pq_curves.png)
+![Test chip 1: the boundary head, the crop-type head and the parcels of every arm at K = 100 %](figures/example_1.png)
+
+![Test chip 2](figures/example_2.png)
+
+![Test chip 3](figures/example_3.png)
+
+The three test chips with the most contacts between parcels of one class, at K = 100 %. Each figure has one row per
+stage of the method.
+
+**Row 1, the boundary head.** Every head draws the outer edges of the fields, against forest, roads and farmyards,
+as its darkest lines. It draws the internal lines between strips of one crop faintly or not at all. The texture
+shows how each arm decodes:
+
+* **Token-grid heads** (TerraMind, Prithvi, THOR): smooth bands several pixels wide, blurred at the scale of a 160 m
+  token. THOR's map is a haze in which only the strongest edges stand out (F1 0.06 to 0.22 on these chips). Many
+  internal lines are visible in TerraMind's and Prithvi's maps but stay below 0.5, which is why a threshold of 0.3
+  helps them.
+* **10 m per-pixel heads** (TESSERA, AlphaEarth): sharp but grainy lines, with speckle inside the fields.
+* **U-Net:** the sharpest and most continuous lines, among them part of the internal strips of the second chip.
+
+**Row 2, the crop-type head.** Neighbouring parcels of one class form one block of colour, as the grassland strips
+of the first two chips do. The map alone cannot separate them, so the parcels drawn from it merge them. The errors
+take a different form in each group:
+
+* **Token-grid models:** they confuse classes in rounded patches a few tokens wide that ignore the parcel outlines,
+  as TerraMind and Prithvi do on the first chip, where grassland becomes legumes harvested green.
+* **TESSERA:** its errors are scattered pixels inside a parcel, such as the spring wheat (13 %) and oats (9 %) in
+  the spring barley block of the third chip.
+
+These chips were chosen for their same-class contacts and are mostly grassland. Their pixel accuracy (63 to 98 %)
+does not estimate that of the test set.
+
+**Row 3, the parcels.** Every arm returns far fewer parcels than there are, and only a minority of them match a
+true parcel of the same class:
+
+| Chip | True parcels | Predicted parcels | Matched |
+|---|---|---|---|
+| 1 | 58 | 27 to 53 | 16 to 20 |
+| 2 | 91 | 28 to 40 | 17 to 23 |
+| 3 | 74 | 12 to 25 | 3 to 10 |
+
+The outer outline of each block, which the extent gives, is kept. The internal lines of the strips and blocks are
+almost all lost: a single gap below 0.5 in a boundary line lets one seed run through into the next field. What the
+heads add are small closed rings of high probability, which become slivers, visible as black specks.
+
+The vote cleans the class. TESSERA's speckle disappears, and each parcel takes one class. A wrong class then covers
+a whole parcel, as with the three legumes parcels at the top left of the third chip:
+
+* TerraMind is the only arm that votes legumes for all three;
+* Prithvi and TESSERA vote spring barley;
+* THOR votes oats;
+* AlphaEarth votes peas;
+* the U-Net votes oats for two and spring wheat for one.
+
+The class-aware PQ of a single chip (0.05 to 0.45) swings with single parcels like these, and is not an estimate
+for the test set.
+
+**What the maps show and the scores do not.** The predicted crop types are shown wherever the July scene
+classification of Sentinel-2 (SCL) calls a pixel vegetation (class 4), inside the extent or not; the true ones only
+inside the extent. `fetch_scl.py` reads the SCL for these chips: a pixel takes its most frequent class among the
+July acquisitions that see it as vegetation, bare soil or water. The mask removes water, roads and farmyards, but it
+keeps forest, and it removes much of the cropland as well. In the third chip a third of the labelled pixels are bare
+in July, among them 89 % of the legumes harvested green, 67 % of the winter wheat and 65 % of the grassland, which
+are mown or ripening. That is why the three legumes parcels are blank in row 2.
+
+Outside the extent, which holds 74 % of the test pixels, every arm still names a crop, since the scheme has no
+background class:
+
+* TESSERA and AlphaEarth call 86 % of those pixels grassland, and the U-Net 65 %;
+* the token-grid models call only 39 to 45 % grassland and spread other crops over forest and settlements. On the
+  vegetation outside the extent of the first chip, mostly forest, TerraMind names winter barley (13 %), winter wheat
+  (10 %) and winter rapeseed (7 %).
+
+None of this enters a score, since every metric is computed inside the extent, over all its pixels, whatever their
+SCL class. The boundary probability outside the extent is likewise shown but not scored. It matters for a map of a
+whole region, which would need the cropland mask of stage 1 first.
+
+### The intermediate outputs: the two heads
+
+![Boundary pixel F1 and crop-type pixel Macro-F1 of the joint fit against K](figures/heads.png)
+
+#### The boundary head
+
+**Boundary pixels at 0.5** against the dense target, inside the extent of the test chips
+
+| Arm | precision, 100 % | recall, 100 % | F1, 100 % | precision, 20 % | recall, 20 % | F1, 20 % | precision, 5 % | recall, 5 % | F1, 5 % |
+|---|---|---|---|---|---|---|---|---|---|
+| TerraMind S2+S1 | 0.677 | 0.392 | 0.497 | 0.620 | 0.353 | 0.449 | 0.536 | 0.209 | 0.300 |
+| Prithvi 600M | 0.692 | 0.468 | 0.559 | 0.638 | 0.298 | 0.406 | 0.538 | 0.179 | 0.269 |
+| THOR S2+S1 | 0.597 | 0.193 | 0.291 | 0.547 | 0.085 | 0.147 | 0.510 | 0.020 | 0.038 |
+| TESSERA v2 | 0.754 | 0.555 | 0.639 | 0.774 | 0.508 | 0.614 | 0.742 | 0.510 | 0.605 |
+| AlphaEarth | 0.762 | 0.432 | 0.551 | 0.722 | 0.480 | 0.577 | 0.705 | 0.461 | 0.558 |
+| U-Net baseline | 0.755 | 0.582 | **0.657** | 0.725 | 0.568 | **0.637** | 0.647 | 0.512 | 0.571 |
+
+Every head is cautious: at every K, half or more of what it marks is boundary, but it misses at least 42 % of the
+boundary pixels. Two patterns appear with K:
+
+* **10 m arms and the U-Net:** F1 holds at 0.55 to 0.66 at every K.
+* **Token-grid heads:** F1 falls as K falls, mainly through recall. THOR's head almost stops marking boundaries
+  (recall 0.02 at 5 %).
+
+![Share of the boundary pixels the head marks, by what lies across them](figures/boundary_pixels.png)
+
+**Boundary pixels of the target marked by the head at 0.5**, by what lies across them; interior is the false-alarm
+rate. K = 100 % and, in brackets, 5 %.
+
+| Arm | same class | between classes | outer | interior |
+|---|---|---|---|---|
+| TerraMind S2+S1 | 0.100 (0.067) | 0.361 (0.136) | 0.444 (0.243) | 0.036 (0.035) |
+| Prithvi 600M | 0.154 (0.054) | 0.508 (0.137) | 0.512 (0.206) | 0.040 (0.030) |
+| THOR S2+S1 | 0.052 (0.008) | 0.104 (0.007) | 0.230 (0.024) | 0.025 (0.004) |
+| TESSERA v2 | 0.165 (0.144) | 0.436 (0.379) | 0.637 (0.590) | 0.035 (0.034) |
+| AlphaEarth | 0.102 (0.118) | 0.205 (0.224) | 0.522 (0.555) | 0.026 (0.037) |
+| U-Net baseline | **0.169** (0.148) | **0.683** (0.570) | 0.631 (0.560) | 0.036 (0.054) |
+
+The recall depends on what lies across the boundary:
+
+* **Same class:** at most one boundary pixel in six is marked, at every K. These are the boundaries the head is
+  for.
+* **Between classes:** better, since there the class signal helps.
+* **Outer edges:** learnt best. They make up three quarters of the target, and the scoring does not need them.
+
+The false alarms are few per pixel (0.4 to 5.4 %), but they matter for the parcels, as the next section shows.
+
+#### The crop-type head
+
+![Joint minus crop-type-only, per arm and K](figures/joint_vs_kshot.png)
+
+**Pixel Macro-F1**: the main workflow's fit, the joint fit, the difference; and the difference in parcel Macro-F1 (D28)
+
+| Arm | ref., 100 % | joint, 100 % | diff. | D28 diff. | ref., 20 % | joint, 20 % | diff. | D28 diff. | ref., 5 % | joint, 5 % | diff. | D28 diff. |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| TerraMind S2+S1 | 0.661 | 0.664 | +0.002 | −0.002 | 0.566 | 0.578 | +0.012 | +0.001 | 0.433 | 0.440 | +0.006 | +0.014 |
+| Prithvi 600M | 0.580 | 0.622 | +0.042 | +0.016 | 0.505 | 0.532 | +0.026 | +0.020 | 0.445 | 0.400 | −0.044 | −0.043 |
+| THOR S2+S1 | 0.594 | 0.614 | +0.020 | +0.020 | 0.547 | 0.513 | −0.035 | −0.030 | 0.393 | 0.371 | −0.021 | −0.016 |
+| TESSERA v2 | 0.618 | 0.618 | −0.000 | +0.003 | 0.582 | 0.585 | +0.003 | +0.000 | 0.504 | 0.548 | +0.044 | +0.035 |
+| AlphaEarth | 0.523 | 0.525 | +0.002 | −0.009 | 0.497 | 0.504 | +0.008 | +0.006 | 0.449 | 0.444 | −0.006 | −0.001 |
+| U-Net baseline | 0.616 | 0.619 | +0.004 | +0.009 | 0.564 | 0.541 | −0.023 | −0.011 | 0.467 | 0.473 | +0.006 | +0.003 |
+
+The differences have no consistent sign:
+
+* 12 of the 18 are positive, and the mean is +0.003.
+* The large ones (Prithvi ±0.04, THOR −0.035, TESSERA +0.044 at 5 %) are as large as the spread between refits of
+  the same cell seen before (up to 0.038 for the token-grid models, pipeline.md section 11).
+* The crop-type map's own parcels (right panel of the figure) move by at most 0.018.
+
+Training the boundary head neither helps nor harms the crop-type answer of RQ1.
+
+### The final output: parcels with a class
+
+![PQ of the boundary parcels against K, class-aware and class-agnostic, with the floor](figures/pq_curves.png)
 
 **Panoptic quality of the boundary parcels** (threshold 0.5), class-aware
 
@@ -54,14 +290,24 @@ with the U-Net), while TESSERA and AlphaEarth stay on it.
 | AlphaEarth | 0.210 | 0.762 | 0.236 | 0.205 | 0.759 | 0.230 | 0.182 | 0.749 | 0.206 |
 | U-Net baseline | **0.338** | 0.777 | 0.371 | **0.290** | 0.727 | 0.320 | 0.234 | 0.668 | 0.262 |
 
-The class-aware PQ ranks the arms much as the parcel Macro-F1 of D28 does. The U-Net leads at 100 and 20 % and
-TESSERA at 5 %, where its curve is the flattest, and the token-grid models fall fastest with K. The left panel
-mixes two things, the class and the geometry. The middle panel removes the class, and there only the U-Net
-separates from the rest. The boundary pixel F1 (right) does not predict the parcels. AlphaEarth and TESSERA mark
-boundary pixels about as well as the U-Net (0.55 to 0.64) yet sit at or below the floor. THOR barely learns the
-boundary (F1 0.04 at 5 %) and still lands near the floor.
+The two panels of the figure separate the class from the geometry.
 
-### Against the floor and the crop-type map
+* **Class-aware (left).** The arms rank much as they do on the parcel Macro-F1 of D28. The U-Net leads at 100 and
+  20 %, and TESSERA at 5 %, where its curve is the flattest. The token-grid models fall fastest with K.
+* **Class-agnostic (right).** Without the class, only the U-Net separates from the rest.
+
+Split into its two factors, the class-agnostic PQ depends on how many parcels are found, not on how well they fit:
+
+* **SQ:** the matched parcels of every arm fit closely, 0.90 to 0.92, against 0.93 for the extent.
+* **RQ:** 0.51 to 0.57 for the GFM arms and 0.58 to 0.62 for the U-Net, against 0.52 for the extent.
+* **Number of parcels:** every arm predicts fewer parcels than there are, 24,615 to 48,155 against 55,575 true
+  pieces; the extent alone gives 23,146.
+
+The boundary pixel F1 of the previous section does not predict the parcels. AlphaEarth and TESSERA mark boundary
+pixels about as well as the U-Net (0.55 to 0.64), yet sit at or below the floor. THOR barely learns the boundary
+(F1 0.04 at 5 %) and still lands near the floor.
+
+#### Against the floor and the crop-type map
 
 ![Class-agnostic PQ of the extent, the crop-type map, the boundary head and both](figures/variants.png)
 
@@ -76,21 +322,25 @@ boundary (F1 0.04 at 5 %) and still lands near the floor.
 | AlphaEarth | 0.486 | 0.129 | 0.470 | 0.154 | 0.109 | 0.467 | 0.133 | 0.118 | 0.467 | 0.147 |
 | U-Net baseline | 0.486 | 0.305 | **0.561** | 0.375 | 0.262 | **0.530** | 0.325 | 0.239 | **0.524** | 0.295 |
 
-Three things are clear. (1) Every arm's crop-type map gives worse parcels than the extent alone (0.07 to 0.39).
-Cutting where the predicted class changes fragments the parcels more than it separates them, and most for the 10 m
-per-pixel arms, whose maps are speckled (0.07 to 0.13). (2) The boundary head lies on the floor for the five GFM
-arms and above it for the U-Net only. (3) Adding the class changes to the head's seeds (`combined`) always lowers
-the score, for the same reason as (1).
+Three things are clear:
 
-### What the head finds, and what it misses
+1. Every arm's crop-type map gives worse parcels than the extent alone (0.07 to 0.39). Cutting where the predicted
+   class changes fragments the parcels more than it separates them. The 10 m per-pixel arms suffer most, because
+   their maps are speckled (0.07 to 0.13).
+2. The boundary head lies on the floor for the five GFM arms, and above it for the U-Net only.
+3. Adding the class changes to the head's seeds (`combined`) always lowers the score, for the same reason as (1).
+
+#### What the parcels find, and what they miss
 
 ![Share of the true parcels found, by what they touch](figures/where_found.png)
 
-![Share of the boundary pixels the head marks, by what lies across them](figures/boundary_pixels.png)
+The 55,575 true parcel pieces of the test chips split three ways (titles of the figure):
 
-The 55,575 true parcel pieces of the test chips split three ways (titles of the first figure): 28 % touch no
-other parcel inside the extent, 29 % touch only parcels of other classes, and 43 % touch at least one of their own
-class. (The 52 % of the study of 16 October counted whole parcels touching a same-class neighbour anywhere, on 300
+* 28 % touch no other parcel inside the extent;
+* 29 % touch only parcels of other classes;
+* 43 % touch at least one parcel of their own class.
+
+(The 52 % of the study of 16 October counted whole parcels touching a same-class neighbour anywhere, on 300
 chips.) The extent alone finds every isolated parcel and one in eight of the others, those that fill most of their
 connected region.
 
@@ -107,29 +357,19 @@ connected region.
 | AlphaEarth | 0.988 | 0.482 | 0.221 | 0.296 | 0.215 | 0.212 | 0.265 | 12,780 / 7,406 |
 | U-Net baseline | 0.987 | 0.499 | **0.448** | **0.494** | 0.226 | **0.299** | **0.353** | 11,050 / 5,616 |
 
-**Boundary pixels of the target marked by the head at 0.5**, by what lies across them; interior is the false-alarm
-rate. K = 100 % and, in brackets, 5 %.
+The heads keep the isolated parcels (98 to 99.9 %) and add some of the touching ones, but few. Between classes,
+every arm's crop-type map alone still finds more of those parcels (43 to 54 %) than its head at 0.5.
 
-| Arm | same class | between classes | outer | interior |
-|---|---|---|---|---|
-| TerraMind S2+S1 | 0.100 (0.067) | 0.361 (0.136) | 0.444 (0.243) | 0.036 (0.035) |
-| Prithvi 600M | 0.154 (0.054) | 0.508 (0.137) | 0.512 (0.206) | 0.040 (0.030) |
-| THOR S2+S1 | 0.052 (0.008) | 0.104 (0.007) | 0.230 (0.024) | 0.025 (0.004) |
-| TESSERA v2 | 0.165 (0.144) | 0.436 (0.379) | 0.637 (0.590) | 0.035 (0.034) |
-| AlphaEarth | 0.102 (0.118) | 0.205 (0.224) | 0.522 (0.555) | 0.026 (0.037) |
-| U-Net baseline | **0.169** (0.148) | **0.683** (0.570) | 0.631 (0.560) | 0.036 (0.054) |
+The few false alarms of the head become false parcels. A short run of them across a field, or a ring around a mixed
+pixel, makes a seed and so a parcel. The heads leave 7,900 to 20,800 predicted parcels unmatched, against 2,558 for
+the extent.
 
-The heads keep the isolated parcels (98 to 99.9 %) and add some of the touching ones, but few. Between parcels of the
-same class they mark at most one boundary pixel in six, at every K; the outer edges, which make up three quarters of
-the target and which the scoring does not need, are learnt best. Between classes they do better, since there the
-class signal helps, yet every arm's crop-type map alone still finds more of those parcels (43 to 54 %) than its head at 0.5.
-The false alarms are few per pixel (0.4 to 5.4 %), but a short run of them across a field, or a ring around a mixed
-pixel, makes a seed and so a parcel: the heads leave 7,900 to 20,800 predicted parcels unmatched, against 2,558 for
-the extent. TESSERA shows the trade most clearly. It finds the second most same-class parcels, but its per-pixel
-head also cuts the most slivers (13,500 under 20 pixels), and it lands below the floor. The U-Net finds the most
-touching parcels of both kinds with no more false parcels than AlphaEarth, and it alone clears the floor.
+* **TESSERA** shows the trade-off most clearly. It finds the second most same-class parcels, but its per-pixel head
+  also cuts the most slivers (13,500 under 20 pixels), and it lands below the floor.
+* **The U-Net** finds the most touching parcels of both kinds, with no more false parcels than AlphaEarth, and it
+  alone clears the floor.
 
-### The cost of predicted geometry
+#### The cost of predicted geometry
 
 ![RQ with the true parcels against the boundary parcels](figures/geometry_cost.png)
 
@@ -144,12 +384,13 @@ touching parcels of both kinds with no more false parcels than AlphaEarth, and i
 | AlphaEarth | 0.428 | 0.236 | −0.193 | 0.412 | 0.230 | −0.182 | 0.381 | 0.206 | −0.176 |
 | U-Net baseline | 0.493 | 0.371 | **−0.122** | 0.446 | 0.320 | **−0.126** | 0.388 | 0.262 | **−0.126** |
 
-With the true parcels, TESSERA leads at every K, as it does per parcel under D28. With predicted parcels, 38 to 47 %
-of that parcel F1 is lost for the GFM arms and 25 to 32 % for the U-Net, which puts the U-Net ahead of TESSERA at
-100 % and level with it at 20 %. The loss is smaller at low K for the token-grid models only because there is less
-left to lose.
+* **With the true parcels**, TESSERA leads at every K, as it does per parcel under D28.
+* **With predicted parcels**, 38 to 47 % of that parcel F1 is lost for the GFM arms, and 25 to 32 % for the U-Net.
+  That puts the U-Net ahead of TESSERA at 100 % and level with it at 20 %.
 
-### Threshold
+The loss is smaller at low K for the token-grid models only because there is less left to lose.
+
+#### Threshold
 
 ![Class-agnostic PQ of the boundary parcels against the threshold](figures/tau.png)
 
@@ -164,93 +405,55 @@ left to lose.
 | AlphaEarth | 0.484 | 0.470 | 0.463 | 0.480 | 0.467 | 0.459 | 0.474 | 0.467 | 0.462 |
 | U-Net baseline | 0.570 | 0.561 | 0.531 | 0.541 | 0.530 | 0.512 | 0.535 | 0.524 | 0.501 |
 
-A threshold of 0.3 lifts TerraMind and Prithvi by 0.04 to 0.05, to 0.51 to 0.57, THOR by up to 0.03 and the U-Net
-by about 0.01. TESSERA and AlphaEarth move by less than 0.02, TESSERA downwards. The fixed 0.5 was agreed to keep the arms comparable without tuning on the
-test set; the check shows that it understates the token-grid heads, whose probabilities are low, but would not
-change the conclusion for the 10 m arms. A threshold chosen on the validation chips is the fair way to use it.
+Lowering the threshold to 0.3 lifts the arms unevenly:
 
-### Joint against crop-type-only training
+* TerraMind and Prithvi by 0.04 to 0.05, to 0.51 to 0.57;
+* THOR by up to 0.03;
+* the U-Net by about 0.01;
+* TESSERA and AlphaEarth by less than 0.02, TESSERA downwards.
 
-![Joint minus crop-type-only, per arm and K](figures/joint_vs_kshot.png)
-
-**Pixel Macro-F1**: the main workflow's fit, the joint fit, the difference; and the difference in parcel Macro-F1 (D28)
-
-| Arm | ref., 100 % | joint, 100 % | diff. | D28 diff. | ref., 20 % | joint, 20 % | diff. | D28 diff. | ref., 5 % | joint, 5 % | diff. | D28 diff. |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| TerraMind S2+S1 | 0.661 | 0.664 | +0.002 | −0.002 | 0.566 | 0.578 | +0.012 | +0.001 | 0.433 | 0.440 | +0.006 | +0.014 |
-| Prithvi 600M | 0.580 | 0.622 | +0.042 | +0.016 | 0.505 | 0.532 | +0.026 | +0.020 | 0.445 | 0.400 | −0.044 | −0.043 |
-| THOR S2+S1 | 0.594 | 0.614 | +0.020 | +0.020 | 0.547 | 0.513 | −0.035 | −0.030 | 0.393 | 0.371 | −0.021 | −0.016 |
-| TESSERA v2 | 0.618 | 0.618 | −0.000 | +0.003 | 0.582 | 0.585 | +0.003 | +0.000 | 0.504 | 0.548 | +0.044 | +0.035 |
-| AlphaEarth | 0.523 | 0.525 | +0.002 | −0.009 | 0.497 | 0.504 | +0.008 | +0.006 | 0.449 | 0.444 | −0.006 | −0.001 |
-| U-Net baseline | 0.616 | 0.619 | +0.004 | +0.009 | 0.564 | 0.541 | −0.023 | −0.011 | 0.467 | 0.473 | +0.006 | +0.003 |
-
-The differences have no sign: 12 of 18 are positive, the mean is +0.003, and the large ones (Prithvi ±0.04, THOR
-−0.035, TESSERA +0.044 at 5 %) are as large as the spread between refits of the same cell seen before (up to 0.038
-for the token-grid models, pipeline.md section 11). The crop-type map's own parcels (right panel of the figure)
-move by at most 0.018. Training the boundary head neither helps nor harms the crop-type answer of RQ1.
+The fixed 0.5 was agreed to keep the arms comparable without tuning on the test set. The check shows that it
+understates the token-grid heads, whose probabilities are low, but it would not change the conclusion for the 10 m
+arms. A threshold chosen on the validation chips is the fair way to use it.
 
 ### Training dynamics
 
 ![Validation crop-type and boundary loss per epoch](figures/validation_curves.png)
 
-The checkpoint is the epoch of lowest summed loss, and the crop-type loss sets it. For the token-grid models that
-loss turns up after epoch 8 to 16, so their checkpoints fall at epochs 9 to 16 (as in the main workflow, 7 to 14),
-while their boundary loss is still falling at epoch 45. Their heads are tested part-trained: TerraMind's boundary
-loss at K = 100 % is about 0.318 at its checkpoint and 0.305 at epoch 45. The U-Net's checkpoints fall at epochs 35 to 42,
-where both losses are low. The 10 m per-pixel arms reach their boundary loss within a few epochs and stay there
-(0.28 to 0.33): a per-pixel MLP sees no neighbour, so it can mark a boundary only from what one pixel's embedding
-holds. THOR's boundary loss stays the highest of all (0.35 to 0.42).
+The checkpoint is the epoch of lowest summed loss, and the crop-type loss sets it.
 
-### Examples
-
-![Test chips: July composite, true parcels and crop types, and every arm's boundary parcels and predicted crop types where the July SCL calls vegetation, at K = 100 %](figures/examples.png)
-
-The three test chips with the most contacts between parcels of one class; for each, the parcels in the upper row
-and the crop types in the lower row. The true parcels (second column) are strips and blocks separated by thin
-internal lines. Every arm's boundary parcels keep the outer outline of the extent, which the extent gives, and draw
-few of the internal lines; what they add are small holes and slivers inside the fields.
-
-The crop-type rows show why the map alone cannot stand in for the head. Neighbouring parcels of one class form one
-block of colour, as the grassland strips of the first two chips do, and only the white outlines in the true
-crop types keep them apart; the parcels drawn from the map merge them. The errors take a different form in each
-group. The token-grid models confuse classes in rounded patches a few tokens wide that ignore the parcel outlines,
-as TerraMind and Prithvi do on the first chip, where grassland becomes legumes harvested green. TESSERA's errors
-are scattered pixels inside a parcel, such as the spring wheat (13 %) and oats (9 %) in the spring barley block of
-the third chip; when parcels are drawn from the map, each such class change cuts a sliver. Elsewhere a whole parcel
-takes one wrong class: the three legumes parcels at the top left of the third chip, blank in the predicted maps
-because the July SCL calls them bare, are oats for THOR (88 to 99 %),
-peas for AlphaEarth (100 %) and oats or spring wheat for the U-Net, while TerraMind alone gets part of each right (28 to
-76 %). These chips were chosen for their same-class contacts and are mostly grassland, so their pixel
-accuracy (63 to 98 %) does not estimate that of the test set.
-
-The predicted crop types are shown wherever the July scene classification of Sentinel-2 (SCL) calls a pixel
-vegetation (class 4), inside the extent or not, and the true ones only inside the extent. `fetch_scl.py` reads the SCL
-for these chips: a pixel takes its most frequent class among the July acquisitions that see it as vegetation, bare
-soil or water. The mask removes water, roads and farmyards but keeps forest, and it removes much of the cropland as
-well: in the third chip a third of the labelled pixels are bare in July, among them 89 % of the legumes harvested
-green, 67 % of the winter wheat and 65 % of the grassland, which are mown or ripening. Outside the extent, which holds
-74 % of the test pixels, every arm still names a crop, since the scheme has no background class. Over the whole test
-set TESSERA and AlphaEarth call 86 % of those pixels grassland and the U-Net 65 %, while the token-grid models call only
-39 to 45 % grassland and spread other crops over forest and settlements; on the vegetation outside the extent of the
-first chip, mostly forest, TerraMind names winter barley (13 %), winter wheat (10 %) and winter rapeseed (7 %). None of
-this enters a score, since every metric is computed inside the extent over all its pixels, whatever their SCL class;
-it matters for a map of a whole region, which would need the cropland mask of stage 1 first.
+* **Token-grid models:** that loss turns up after epoch 8 to 16, so their checkpoints fall at epochs 9 to 16 (as in
+  the main workflow, 7 to 14), while their boundary loss is still falling at epoch 45. Their heads are therefore
+  tested part-trained: TerraMind's boundary loss at K = 100 % is about 0.318 at its checkpoint and 0.305 at epoch 45.
+* **U-Net:** its checkpoints fall at epochs 35 to 42, where both losses are low.
+* **10 m per-pixel arms:** they reach their boundary loss within a few epochs and stay there (0.28 to 0.33). A
+  per-pixel MLP sees no neighbour, so it can mark a boundary only from what one pixel's embedding holds.
+* **THOR:** its boundary loss stays the highest of all (0.35 to 0.42).
 
 ## Analysis
 
 **The head is not the missing piece; a spatial decoder at 10 m is.** Every GFM arm meets the same limit from a
-different side. The token-grid models decode from 160 m tokens, one per 16 x 16 pixels, through a light UNet
-decoder with no 10 m input. A boundary between two parcels of one crop is a line one or two pixels wide inside a
-token, with no class change to betray it, and that decoder has nothing to place it with: TerraMind, Prithvi and THOR
-mark 1 to 15 % of those pixels, and lose even the outer edges as K falls (Prithvi 0.51 to 0.21). The 10 m arms see
-every pixel but only one at a time, since the per-pixel MLP of the matched design has no neighbourhood. They mark an
-edge where the embedding of a mixed pixel differs, which works where land cover changes (outer edges 0.52 to 0.64)
-and seldom where it does not (same class 0.10 to 0.17); and because nothing smooths the decision, they cut slivers.
-That is also why their boundary loss flattens within a few epochs and why their scores barely move with K: what the
-embedding does not hold, more labels cannot add. The U-Net is the only arm that works spatially at 10 m from input to output, and the
-only one whose head adds geometry beyond the extent (+0.04 to +0.075 class-agnostic PQ). That it does so without
-pretraining and under the same budgets suggests the limit lies in how the GFM features are decoded here, not in the
-amount of labelled geometry.
+different side.
+
+* **Token-grid models.** They decode from 160 m tokens, one per 16 x 16 pixels, through a light UNet decoder with
+  no 10 m input. A boundary between two parcels of one crop is a line one or two pixels wide inside a token, with no
+  class change to betray it, and that decoder has nothing to place it with. TerraMind, Prithvi and THOR mark 1 to
+  15 % of those pixels, and lose even the outer edges as K falls (Prithvi 0.51 to 0.21).
+* **10 m arms.** They see every pixel, but only one at a time, since the per-pixel MLP of the matched design has no
+  neighbourhood. They mark an edge where the embedding of a mixed pixel differs. That works where land cover
+  changes (outer edges 0.52 to 0.64) and seldom where it does not (same class 0.10 to 0.17). Because nothing smooths
+  the decision, they cut slivers. This is also why their boundary loss flattens within a few epochs and why their
+  scores barely move with K: what the embedding does not hold, more labels cannot add.
+* **The U-Net.** It is the only arm that works spatially at 10 m from input to output, and the only one whose head
+  adds geometry beyond the extent (+0.04 to +0.075 class-agnostic PQ). That it does so without pretraining and
+  under the same budgets suggests the limit lies in how the GFM features are decoded here, not in the amount of
+  labelled geometry.
+
+**A good boundary map is not enough.** The pixel F1 of the head and the PQ of its parcels rank the arms
+differently. A parcel needs a closed line: one gap merges two parcels, and one closed ring of false alarms makes a
+sliver. A head that marks most boundary pixels, but leaves gaps and marks scattered interior pixels, as the 10 m
+arms do, can score well per pixel and still fail per parcel. The pixel F1 therefore diagnoses the head, and PQ is
+the measure of the result.
 
 **The floor explains the first impression.** Without the `extent` variant, the head would look like a large gain:
 its parcels beat the crop-type map's by 0.10 to 0.40 class-agnostic PQ for every arm. Almost all of that gain is
@@ -258,17 +461,17 @@ the extent's, the parcels separated by non-parcel land, which any method inside 
 free. Measured against the extent, the five GFM heads add between −0.024 and +0.026, and +0.08 at most at a lower
 threshold.
 
-**What the parcel layer is worth.** With the true parcels, the arms' parcel F1 at IoU > 0.5 is 0.28 to 0.55;
-with their own parcels, 0.15 to 0.37. The declared parcel layer is therefore worth 0.12 to 0.22 parcel F1 for every
+**What the parcel layer is worth.** With the true parcels, the arms' parcel F1 at IoU > 0.5 is 0.28 to 0.55; with
+their own parcels, 0.15 to 0.37. The declared parcel layer is therefore worth 0.12 to 0.22 parcel F1 for every
 arm, more than any difference between the arms at a given K. For the thesis this supports keeping the parcel as the
 unit of the parcel-level scores (protocol D28) and of later reporting, taken from the declarations, not predicted.
 
-**RQ1 is unaffected.** Joint training leaves the pixel Macro-F1 where it was (mean +0.003, no consistent sign), so
-the delineation question and the label-budget curves of RQ1 can be kept apart: nothing here argues for changing the
-main workflow's heads or loss.
+**RQ1 is unaffected.** Joint training leaves the pixel Macro-F1 where it was (mean +0.003, no consistent sign).
+The delineation question and the label-budget curves of RQ1 can therefore be kept apart: nothing here argues for
+changing the main workflow's heads or loss.
 
 **Against the PaPs alternative.** The study of 16 October preferred a boundary head to PaPs because it keeps the
-label budget and the matched decoders. The result does not reopen that choice: PaPs would sit on the same decoders
+label budget and the matched decoders. The result does not reopen that choice. PaPs would sit on the same decoders
 and see the same features, and the diagnosis points to what those features and decoders can resolve at 10 m, not to
 how the parcels are assembled from them.
 
@@ -287,6 +490,9 @@ how the parcels are assembled from them.
 * **The target counts the outer edges.** Three in four boundary pixels of the target lie against non-parcel land,
   so the boundary loss and the boundary F1 are dominated by edges the scoring does not need. A target and a loss
   that weigh the boundaries between parcels would train a different head.
+* **The boundary F1 is exact to the pixel.** A boundary one pixel off counts as a miss and a false alarm, so the
+  pixel scores of the head are lower than a tolerance-based boundary score would give. The parcels, scored by IoU,
+  are not affected.
 * **Boundaries the data may not show.** Two adjacent parcels of the same crop under one manager can be one field
   on the ground; part of the same-class boundaries may not be visible in 10 m imagery at all. That limit applies to
   every method, PaPs included, and this experiment cannot separate it from the head's limits.
@@ -315,4 +521,5 @@ how the parcels are assembled from them.
     bash scripts/cluster/submit.sh experiments/2026-10-18_parcel_delineation/experiment.yaml EE_2021_rev      # on the cluster
     bash scripts/cluster/pull_results.sh 2026-10-18_parcel_delineation EE_2021_rev
     poetry run python experiments/2026-10-18_parcel_delineation/diagnose.py --chips EE_2021_rev
+    poetry run python experiments/2026-10-18_parcel_delineation/fetch_scl.py --chips EE_2021_rev
     poetry run python experiments/2026-10-18_parcel_delineation/report.py --chips EE_2021_rev

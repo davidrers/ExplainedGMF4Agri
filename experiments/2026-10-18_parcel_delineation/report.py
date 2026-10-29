@@ -4,8 +4,10 @@ Reads ``results/<name>/<chip set>/`` as ``run.py`` writes it, and, for the compa
 the main workflow's ``results/kshot/<chip set>/``, whose ``oracle`` and ``semantic`` parcels it scores once into
 ``results/<name>/<chip set>/kshot_panoptic.json``. Writes into ``figures/`` beside this file:
 
-* ``pq_curves.png``: PQ of the boundary parcels, class-aware and class-agnostic, and the boundary pixel F1,
-  against K per arm;
+* ``heads.png``: the two heads, the intermediate outputs: the boundary pixel F1 and the crop-type pixel Macro-F1
+  of the joint fit, against K per arm;
+* ``pq_curves.png``: the final output: PQ of the boundary parcels, class-aware and class-agnostic, against K per
+  arm;
 * ``geometry_cost.png``: RQ (the parcel Macro-F1 at IoU > 0.5) with the true parcels against the boundary parcels,
   per arm and K: what is lost when the parcels come from the model;
 * ``variants.png``: class-agnostic PQ of the parcels from the crop-type map alone, the boundary head and both,
@@ -14,9 +16,10 @@ the main workflow's ``results/kshot/<chip set>/``, whose ``oracle`` and ``semant
   in pixel Macro-F1, in RQ with the true parcels and in class-agnostic PQ of the crop-type map's parcels;
 * ``tau.png``: class-agnostic PQ of the boundary parcels against the threshold on the boundary probability;
 * ``validation_curves.png``: validation crop-type and boundary loss per epoch, with the checkpoint epochs;
-* ``examples.png``: test chips: a July composite, the true parcels and crop types, and every arm's boundary parcels
-  and predicted crop types at the largest K, the latter where the July SCL calls vegetation when ``fetch_scl.py`` has
-  run (over the whole chip otherwise);
+* ``example_<n>.png``: one test chip each, at the largest K, a row per stage: the boundary head's probability over
+  the whole chip against the true boundary pixels; the crop-type head's classes, where the July SCL calls
+  vegetation when ``fetch_scl.py`` has run (over the whole chip otherwise), against the true ones; and the final
+  panoptic output, the parcels built from both and coloured by their voted class, against the true parcels;
 * when ``diagnose.py`` has run: ``where_found.png``, the share of the true parcels found by the extent, the
   crop-type map and the boundary head, split by whether a parcel touches none, only other classes, or its own
   class; ``boundary_pixels.png``, the share of the target's boundary pixels the head marks, by what lies across
@@ -94,7 +97,8 @@ def _flat(pm: dict) -> dict:
             out[f"{variant}/{m}"] = q.get(m)
         out[f"{variant}/n_pred"] = q.get("predicted_parcels")
         out["true_parcels"] = q.get("true_parcels")
-    out["boundary_f1"] = pm.get("boundary_pixels", {}).get("f1")
+    for m in ("f1", "precision", "recall"):
+        out[f"boundary_{m}"] = pm.get("boundary_pixels", {}).get(m)
     return out
 
 
@@ -200,11 +204,18 @@ def _end_labels(ax, items: list[tuple[float, float, str, str]], gap: float) -> N
         ax.annotate(text, (x * 1.14, y - shift), va="center", fontsize=8.5, color=INK, annotation_clip=False)
 
 
-def fig_curves(df: pd.DataFrame, styles: dict, metrics: list[tuple[str, str]], path: Path, note: str) -> None:
+def fig_curves(df: pd.DataFrame, styles: dict, metrics: list[tuple[str, str]], path: Path, note: str,
+               refs: dict[str, tuple[float, str]] | None = None) -> None:
+    """One panel per metric against K, an arm per line; ``refs`` adds a labelled grey line to a metric's panel."""
     budgets = sorted(df["pct"].unique())
     fig, axes = plt.subplots(1, len(metrics), figsize=(5.2 * len(metrics), 4.3), squeeze=False)
     for ax, (metric, title) in zip(axes[0], metrics, strict=True):
         ends = []
+        if refs and metric in refs:
+            value, text = refs[metric]
+            ax.axhline(value, color=MUTED, lw=1.5, ls="--", zorder=2)
+            ax.annotate(text, (min(budgets) / 1.25, value), xytext=(0, 4), textcoords="offset points",
+                        fontsize=8.5, color=INK_2)
         for arm, (label, colour, marker) in styles.items():
             g = df[df["arm"] == arm].groupby("pct")[metric].mean().dropna()
             if g.empty:
@@ -520,15 +531,6 @@ def _outline(seg: np.ndarray) -> np.ndarray:
     return e
 
 
-def _show_parcels(ax, seg: np.ndarray, extent: np.ndarray, title: str) -> None:
-    img = np.ones(seg.shape + (3,))
-    img[extent] = matplotlib.colors.to_rgb("#e3eefb")
-    img[_outline(seg) & extent] = matplotlib.colors.to_rgb("#0d366b")
-    ax.imshow(img, interpolation="nearest")
-    ax.set_title(title, fontsize=9)
-    ax.axis("off")
-
-
 def pick_chips(chips_dir: Path, ids: list[str], n: int = 3) -> list[str]:
     """Test chips with the most contacts between same-class parcels: where delineation matters most."""
     from gfm4agri.benchmark.parcel_metrics import read_parcels
@@ -555,22 +557,25 @@ SHORT = {"pasture_meadow_grassland_grass": "grassland", "winter_common_soft_whea
 OTHER_CLASS = "#a3a29b"
 #: The class of the Sentinel-2 scene classification (SCL) the predicted crop types are shown on.
 SCL_VEGETATION = 4
+#: The boundary probability, white where the head sees a parcel interior and dark where it sees a boundary.
+PROBABILITY = LinearSegmentedColormap.from_list("probability", ["#ffffff", "#2a78d6", "#0d366b"])
 
 
 def _show_classes(ax, cls: np.ndarray, where: np.ndarray, colours: dict, title: str,
                   outline: np.ndarray | None = None) -> None:
-    """A crop-type map over ``where``, one colour per class, with ``outline`` in white when given."""
+    """A crop-type map over ``where``, one colour per class, with ``outline`` in ink when given."""
     img = np.ones(cls.shape + (3,))
     for k in np.unique(cls[where]):
         img[where & (cls == k)] = matplotlib.colors.to_rgb(colours.get(int(k), OTHER_CLASS))
     if outline is not None:
-        img[outline] = 1.0
+        img[outline] = matplotlib.colors.to_rgb(INK)
     ax.imshow(img, interpolation="nearest")
     ax.set_title(title, fontsize=9)
     ax.axis("off")
 
 
-def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
+def fig_examples(out: Path, chips: str, styles: dict, folder: Path) -> list[Path]:
+    """One figure per example chip, a row per stage: the boundary head, the crop-type head, the panoptic parcels."""
     import rasterio
 
     from gfm4agri.benchmark.parcel_metrics import read_parcels
@@ -584,78 +589,132 @@ def fig_examples(out: Path, chips: str, styles: dict, path: Path) -> None:
             cells[arm] = np.load(found[0])
             names = json.loads((found[0].parent / "results.json").read_text())["class_names"]
     if not cells:
-        return
+        return []
     ids = [str(c) for c in next(iter(cells.values()))["ids"]]
     chosen = pick_chips(chips_dir, ids)
     manifest = json.loads((REPO / "data/eurocrops_chips" / chips / "manifest.json").read_text())
     bands = manifest["imagery"]["band_names"]
+    n_cls = len(names)
+    # The chosen chips' rows of every arm, each array decompressed once.
+    rows = {arm: (lambda at: (d["pred"][at], d["boundary"][at].astype(np.float32) / 255.0))(
+                [[str(c) for c in d["ids"]].index(cid) for cid in chosen])
+            for arm, d in cells.items()}
+    masks = next(iter(cells.values()))["mask"][[ids.index(cid) for cid in chosen]]
 
     # Per chip: the extent, the pixels the July SCL calls vegetation (``fetch_scl.py``; the whole chip without it),
-    # the true pieces, the true classes and every arm's predicted classes and parcels.
+    # the true pieces and their classes, the boundary target, and per arm the predicted classes, the boundary
+    # probability and the panoptic parcels with their voted classes.
     scl = dict(np.load(out / "scl_july.npz")) if (out / "scl_july.npz").exists() else {}
     shown = []
-    for cid in chosen:
+    for i, cid in enumerate(chosen):
         parcels = read_parcels(chips_dir, cid)
-        first = next(iter(cells.values()))
-        mask = first["mask"][ids.index(cid)]
+        mask = masks[i]
         extent = (mask >= 0) & (parcels > 0)
         veg = scl[cid] == SCL_VEGETATION if cid in scl else np.ones(extent.shape, bool)
+        true = panoptic.pieces(np.where(extent, parcels, 0))
+        true_cls = np.zeros(int(true.max()) + 1, dtype=np.int64)
+        true_cls[true[extent]] = mask[extent]
+        target = extent & panoptic.boundary_target(parcels)
         arms = {}
-        for arm, d in cells.items():
-            j = [str(c) for c in d["ids"]].index(cid)
-            arms[arm] = (d["pred"][j], panoptic.from_boundary(extent, d["boundary"][j].astype(np.float32) / 255.0,
-                                                              panoptic.TAU))
-        shown.append((cid, extent, veg, panoptic.pieces(np.where(extent, parcels, 0)), mask, arms))
-    # One colour per class across the figure, in slot order by the pixels a class covers in all its crop-type maps
+        for arm, (preds, probs) in rows.items():
+            pred, prob = preds[i], probs[i]
+            seg = panoptic.from_boundary(extent, prob, panoptic.TAU)
+            seg_cls = panoptic.vote(seg, pred, n_cls)
+            aware, _ = panoptic.chip_counts(true, true_cls, seg, seg_cls, n_cls)
+            hit = extent & (prob >= panoptic.TAU)
+            tp, fp, fn = (hit & target).sum(), (hit & ~target).sum(), (target & ~hit).sum()
+            arms[arm] = {"pred": pred, "prob": prob, "seg": seg, "seg_cls": seg_cls,
+                         "border_f1": 2 * tp / max(2 * tp + fp + fn, 1),
+                         "correct": float((pred[extent] == mask[extent]).mean()),
+                         "pq": panoptic.quality(aware, np.zeros(4), names)["pq"], "matched": int(aware[:, 0].sum())}
+        shown.append((cid, extent, veg, true, true_cls, target, mask, arms))
+    # One colour per class across the figures, in slot order by the pixels a class covers in all the crop-type maps
     # (the true classes inside the extent, the predicted ones where they are shown); the classes past the eight slots
     # share one grey.
-    area = np.zeros(len(names), np.int64)
-    for _, extent, veg, _, mask, arms in shown:
-        area += np.bincount(mask[extent].astype(np.int64), minlength=len(names))
-        for pred, _ in arms.values():
-            area += np.bincount(pred[veg].astype(np.int64), minlength=len(names))
+    area = np.zeros(n_cls, np.int64)
+    for _, extent, veg, _, _, _, mask, arms in shown:
+        area += np.bincount(mask[extent].astype(np.int64), minlength=n_cls)
+        for a in arms.values():
+            area += np.bincount(a["pred"][veg].astype(np.int64), minlength=n_cls)
     ranked = [int(k) for k in np.argsort(-area, kind="stable") if area[k] > 0]
     colours = dict(zip(ranked, SLOTS))
 
+    paths = []
     ncol = 2 + len(cells)
-    fig, axes = plt.subplots(2 * len(chosen), ncol, figsize=(2.3 * ncol, 2.5 * 2 * len(chosen)), squeeze=False)
-    for r, (cid, extent, veg, true, mask, arms) in enumerate(shown):
-        top, bottom = axes[2 * r], axes[2 * r + 1]
+    for r, (cid, extent, veg, true, true_cls, target, mask, arms) in enumerate(shown, start=1):
+        fig, (border, crop, parts) = plt.subplots(3, ncol, figsize=(2.3 * ncol, 2.65 * 3))
         with rasterio.open(chips_dir / f"{cid}_merged.tif") as s:
             # Band index = month index x bands per month + band index (the manifest's layout).
             july = 6 * len(bands)
             rgb = np.stack([s.read(july + bands.index(b) + 1) for b in ("RED", "GREEN", "BLUE")], -1)
             rgb = rgb.astype(np.float32)
         rgb = np.clip(rgb / np.nanpercentile(rgb, 98), 0, 1)
-        top[0].imshow(np.nan_to_num(rgb), interpolation="nearest")
-        top[0].set_title(f"{cid}\nJuly" + (f", {veg.mean():.0%} SCL vegetation" if cid in scl else ""), fontsize=9)
-        top[0].axis("off")
-        outline = _outline(true)
-        _show_parcels(top[1], true, extent, "true parcels")
-        _show_classes(bottom[1], mask, extent, colours, "true crop types", outline)
-        for t_ax, b_ax, (arm, (pred, seg)) in zip(top[2:], bottom[2:], arms.items()):
-            _show_parcels(t_ax, seg, extent, f"{styles[arm][0]}: parcels")
-            correct = float((pred[extent] == mask[extent]).mean())
-            _show_classes(b_ax, pred, veg, colours, f"crop types, {correct:.0%} correct")
-        # The chip's classes, in the figure's colour order, as the legend of its crop-type row.
+        border[0].imshow(np.nan_to_num(rgb), interpolation="nearest")
+        border[0].set_title(f"{cid}\nJuly" + (f", {veg.mean():.0%} SCL vegetation" if cid in scl else ""),
+                            fontsize=9)
+        border[0].axis("off")
+
+        # 1. The boundary head: the target, and each arm's probability over the whole chip.
+        img = np.ones(extent.shape + (3,))
+        img[extent] = matplotlib.colors.to_rgb("#e3eefb")
+        img[target] = matplotlib.colors.to_rgb("#0d366b")
+        border[1].imshow(img, interpolation="nearest")
+        border[1].set_title("1. boundary head\ntrue boundary pixels", fontsize=9)
+        border[1].axis("off")
+        for ax, (arm, a) in zip(border[2:], arms.items()):
+            im = ax.imshow(a["prob"], cmap=PROBABILITY, vmin=0, vmax=1, interpolation="nearest")
+            ax.set_title(f"{styles[arm][0]}\nboundary probability, F1 {a['border_f1']:.2f}", fontsize=9)
+            ax.axis("off")
+
+        # 2. The crop-type head: the true classes inside the extent, the predicted ones where the SCL sees vegetation.
+        _show_classes(crop[1], mask, extent, colours, "2. crop-type head\ntrue crop types")
+        for ax, (arm, a) in zip(crop[2:], arms.items()):
+            _show_classes(ax, a["pred"], veg, colours, f"{styles[arm][0]}\ncrop types, {a['correct']:.0%} correct")
+
+        # 3. The panoptic output: parcels from the boundary probability, each with the class most of its pixels take.
+        _show_classes(parts[1], true_cls[true], extent, colours,
+                      f"3. panoptic output\ntrue: {int(np.unique(true[extent]).size)} parcels", _outline(true) & extent)
+        for ax, (arm, a) in zip(parts[2:], arms.items()):
+            n_pred = int(np.unique(a["seg"][extent]).size)
+            _show_classes(ax, a["seg_cls"][a["seg"]], extent, colours,
+                          f"{styles[arm][0]}\n{n_pred} parcels, {a['matched']} matched, PQ {a['pq']:.2f}",
+                          _outline(a["seg"]) & extent)
+
+        # The chip's classes, in the figure's colour order, as the legend of the crop-type rows.
         present = {int(k) for k in np.unique(mask[extent])}
-        for pred, _ in arms.values():
-            present |= {int(k) for k in np.unique(pred[veg])}
+        for a in arms.values():
+            present |= {int(k) for k in np.unique(a["pred"][veg])}
+            present |= {int(k) for k in np.unique(a["seg_cls"][a["seg"]][extent])}
         handles = [matplotlib.patches.Patch(color=colours[k], label=SHORT.get(names[k], names[k].replace("_", " ")))
                    for k in ranked if k in present and k in colours]
         if present - set(colours):
             handles.append(matplotlib.patches.Patch(color=OTHER_CLASS, label="other classes"))
-        bottom[0].axis("off")
-        bottom[0].legend(handles=handles, loc="center left", fontsize=8, handlelength=1.2, borderaxespad=0,
-                         title="crop type", title_fontsize=8.5, alignment="left")
-    fig.text(0.01, 0.0, "Per chip, top: parcels inside the true parcel extent (light), dark lines their outlines, "
-             "the boundary parcels at threshold 0.5. Bottom: the predicted crop type of every pixel the July "
-             "scene classification of Sentinel-2 calls vegetation (SCL 4; blank elsewhere), the true one inside the "
-             "extent, with the true parcel outlines in white; share of the extent's pixels correct, vegetation or not. Largest K fitted. Chips with the most contacts between parcels of one "
-             "class.", color=MUTED, fontsize=8.5, wrap=True, va="top")
-    fig.tight_layout()
-    fig.savefig(path, dpi=150, bbox_inches="tight")
-    plt.close(fig)
+        crop[0].axis("off")
+        crop[0].legend(handles=handles, loc="center left", fontsize=8, handlelength=1.2, borderaxespad=0,
+                       title="crop type", title_fontsize=8.5, alignment="left")
+        parts[0].axis("off")
+        cax = parts[0].inset_axes([0.05, 0.78, 0.9, 0.07])
+        bar = fig.colorbar(im, cax=cax, orientation="horizontal", ticks=[0, panoptic.TAU, 1])
+        bar.ax.tick_params(labelsize=8, colors=INK_2)
+        bar.outline.set_visible(False)
+        cax.set_title("boundary probability", fontsize=8.5, loc="left")
+        parts[0].text(0.05, 0.6, f"Parcels: pixels below {panoptic.TAU:g} seed\none parcel per connected "
+                      "piece,\ngrown by watershed over\nthe rest of the extent;\neach takes the class most\n"
+                      "of its pixels are given.", transform=parts[0].transAxes, fontsize=8, color=INK_2, va="top")
+        fig.text(0.01, 0.0, "Row 1: the boundary head's probability over the whole chip, and its pixel F1 at "
+                 f"{panoptic.TAU:g} inside the true parcel extent (light blue in the first panel). Row 2: the "
+                 "crop-type head's class wherever the July scene classification of Sentinel-2 calls vegetation "
+                 "(SCL 4; blank elsewhere), the true class inside the extent; share of the extent's pixels correct, "
+                 "vegetation or not. Row 3: the final output, the parcels built from rows 1 and 2 inside the extent, "
+                 "each coloured by its voted class, outlines in black; the number of parcels, how many match a true "
+                 "parcel of the same class at IoU > 0.5, and the class-aware PQ of this chip. Largest K fitted.",
+                 color=MUTED, fontsize=8.5, wrap=True, va="top")
+        fig.tight_layout()
+        path = folder / f"example_{r}.png"
+        fig.savefig(path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+        paths.append(path)
+    return paths
 
 
 # -------------------------------------------------------------------------------------------------------- tables
@@ -678,6 +737,10 @@ def _table(df: pd.DataFrame, styles: dict, cols: list[tuple[str, str]], fmt: str
 
 def tables(df: pd.DataFrame, ref: pd.DataFrame, styles: dict, facts: dict) -> str:
     out = []
+    out.append("**Boundary head**: boundary pixels at 0.5 against the dense target, inside the extent of the test "
+               "chips\n\n"
+               + _table(df, styles, [("boundary_precision", "precision"), ("boundary_recall", "recall"),
+                                     ("boundary_f1", "F1")]))
     out.append("**Panoptic quality of the boundary parcels** (threshold 0.5), class-aware\n\n"
                + _table(df, styles, [("boundary@0.5/pq", "PQ"), ("boundary@0.5/sq", "SQ"),
                                      ("boundary@0.5/rq", "RQ")]))
@@ -689,8 +752,6 @@ def tables(df: pd.DataFrame, ref: pd.DataFrame, styles: dict, facts: dict) -> st
     d["gap"] = d["boundary@0.5/rq"] - d["oracle/rq"]
     out.append("**Parcel Macro-F1 at IoU > 0.5 (RQ)**: true parcels, boundary parcels, the difference\n\n"
                + _table(d, styles, [("oracle/rq", "true"), ("boundary@0.5/rq", "pred."), ("gap", "diff.")]))
-    out.append("**Boundary pixels**: test F1 of the boundary head at 0.5, against the dense target\n\n"
-               + _table(df, styles, [("boundary_f1", "F1")]))
     out.append("**Threshold**: class-agnostic PQ of the boundary parcels at 0.3, 0.5, 0.7\n\n"
                + _table(df, styles, [(f"boundary@{t:g}/pq_agnostic", f"{t:g}") for t in panoptic.TAUS]))
     if not ref.empty:
@@ -738,10 +799,16 @@ def main() -> None:
     ref = load_reference(results, args.chips)
     styles = arm_styles(sorted(df["arm"].unique()))
     args.out.mkdir(parents=True, exist_ok=True)
-    fig_curves(df, styles, [("boundary@0.5/pq", "PQ, boundary parcels"),
-                            ("boundary@0.5/pq_agnostic", "PQ class-agnostic, boundary parcels"),
-                            ("boundary_f1", "Boundary pixel F1")], args.out / "pq_curves.png",
-               "Parcels inside the true parcel extent of the test chips, boundary threshold 0.5; one fit per point.")
+    fig_curves(df, styles, [("boundary_f1", "Boundary head: boundary pixel F1"),
+                            ("macro_f1", "Crop-type head: pixel Macro-F1")], args.out / "heads.png",
+               "The two heads of the joint fit on the test chips: boundary pixels at threshold 0.5 inside the true "
+               "parcel extent, crop types over the labelled pixels; one fit per point.")
+    fig_curves(df, styles, [("boundary@0.5/pq", "PQ, class-aware"),
+                            ("boundary@0.5/pq_agnostic", "PQ, class-agnostic")], args.out / "pq_curves.png",
+               "Parcels from the boundary head inside the true parcel extent of the test chips, threshold 0.5, "
+               "classed by the crop-type head's vote; one fit per point.",
+               refs={"boundary@0.5/pq_agnostic": (df["extent/pq_agnostic"].mean(),
+                                                  "floor: the extent alone, nothing predicted")})
     fig_geometry_cost(df, styles, args.out / "geometry_cost.png")
     fig_variants(df, styles, args.out / "variants.png")
     if not ref.empty:
@@ -749,7 +816,7 @@ def main() -> None:
     fig_tau(df, styles, args.out / "tau.png")
     if not curves.empty:
         fig_validation(df, curves, styles, args.out / "validation_curves.png")
-    fig_examples(results, args.chips, styles, args.out / "examples.png")
+    fig_examples(results, args.chips, styles, args.out)
     text = tables(df, ref, styles, facts)
     diag = load_diagnostics(results)
     if not diag.empty:
