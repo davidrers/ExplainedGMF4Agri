@@ -160,3 +160,21 @@
 | TESSERA v2 M | test, pixel | +0.042 | +0.047 | +0.077 |
 | TESSERA v2 M | test, parcel | +0.037 | +0.028 | +0.063 |
 | TESSERA v2 M | best validation | +0.053 | +0.051 | +0.056 |
+
+## Labelled training parcels per class
+
+| | K = 100 % | K = 20 % | K = 5 % |
+|---|---|---|---|
+| fewest | 332 | 67 | 17 |
+| median | 1,477 | 296 | 74 |
+| most | 43,330 | 8,666 | 2,167 |
+| total | 86,909 | 17,390 | 4,354 |
+
+## Published Estonian parcel Macro-F1 (DirPA, Table 6, plain cross-entropy, mean of five runs)
+
+| Model | Classes | k = 1 | k = 5 | k = 10 | k = 20 | k = 100 |
+|---|---|---|---|---|---|---|
+| Transformer from scratch | 127 crop types | 0.049 | 0.094 | 0.115 | 0.117 | 0.174 |
+| Presto, released weights | 127 crop types | 0.011 | 0.020 | 0.026 | 0.038 | 0.064 |
+| Transformer from scratch | coarse groups | 0.209 | 0.233 | 0.261 | 0.272 | 0.307 |
+| Presto, released weights | coarse groups | 0.152 | 0.195 | 0.203 | 0.213 | 0.255 |

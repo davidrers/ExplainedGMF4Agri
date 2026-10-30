@@ -7,7 +7,8 @@ arms of ``experiments/2026-10-15_kshot_finetune`` (``results/2026-10-15_kshot_fi
 * ``label_curves.png``: test Macro-F1 against the label budget K, per pixel and per parcel, frozen and fine-tuned;
 * ``finetune_gain.png``: fine-tuned minus frozen, per model and K, under three readouts;
 * ``per_class.png``: per-class test F1 per pixel at K = 100 and 5 %;
-* ``literature.png``: parcel overall accuracy and kappa against the published Estonian numbers;
+* ``literature.png``: parcel Macro-F1 against labelled parcels per class, ours beside the published Estonian
+  numbers;
 * ``tables.md``: every number the report quotes.
 
     poetry run python docs/phase1/results_estonia/report.py
@@ -52,13 +53,15 @@ SURFACE, INK, INK_2, MUTED, GRID, BASELINE_RULE = "#fcfcfb", "#0b0b0b", "#52514e
 SEQUENTIAL = LinearSegmentedColormap.from_list("level", ["#f0efec", "#cde2fb", "#2a78d6", "#0d366b"])
 K_SHADES = {100: "#0d366b", 20: "#2a78d6", 5: "#9ec5f4"}
 
-#: Published Estonian results (verified against the papers, 19 October 2026). Reuss et al. 2026 Table 4a (OA) and
-#: B.18 (kappa), EuroCropsML S2 benchmark, test set of 35,182 parcels; full-label OA from its section 6.1.
+#: The only published Estonian parcel Macro-F1 (verified against the paper, 30 October 2026): DirPA, Reuss, Gikalo
+#: and Körner 2026, arXiv 2603.12905v2, Table 6, EuroCropsML 2.0, rows trained with plain cross-entropy (CE and
+#: CE PRESTO) as ours are, mean of five runs, at k labelled parcels per class at most.
+SHOTS = [1, 5, 10, 20, 100]
 LITERATURE = [
-    ("Transformer from scratch, all labels", 0.787, None),
-    ("ANIL, pretrained on Latvia, 500 per class", 0.652, 0.556),
-    ("Transformer from scratch, 500 per class", 0.632, 0.529),
-    ("Presto (released weights), 500 per class", 0.553, 0.430),
+    ("Transformer from scratch", "127 crop types", [0.049, 0.094, 0.115, 0.117, 0.174]),
+    ("Presto, released weights", "127 crop types", [0.011, 0.020, 0.026, 0.038, 0.064]),
+    ("Transformer from scratch", "coarse groups", [0.209, 0.233, 0.261, 0.272, 0.307]),
+    ("Presto, released weights", "coarse groups", [0.152, 0.195, 0.203, 0.213, 0.255]),
 ]
 
 
@@ -86,7 +89,8 @@ def load() -> tuple[pd.DataFrame, pd.DataFrame]:
                 if iou is not None:
                     classes.append({"arm": s["arm"], "pct": int(s["pct"]), "cls": c, "f1": f1_from_iou(iou),
                                     "parcel_f1": r["parcel_metrics"]["per_class_f1"].get(c),
-                                    "train_parcels": r["label_budget"]["support"].get(c, {}).get("available")})
+                                    "train_parcels": r["label_budget"]["support"].get(c, {}).get("available"),
+                                    "labelled_parcels": r["label_budget"]["support"].get(c, {}).get("drawn")})
     return pd.DataFrame(rows), pd.DataFrame(classes)
 
 
@@ -199,37 +203,56 @@ def per_class(classes: pd.DataFrame) -> None:
     plt.close(fig)
 
 
-def literature(df: pd.DataFrame) -> None:
-    ours = [(l, f, SLOTS[s], m) for l, f, _, s, m in MODELS] + [(BASELINE[0], BASELINE[1], INK, "X"),
-                                                               ("TESSERA v2 M, fine-tuned", "tessera_v2_medium_ft",
-                                                                SLOTS[3], "^")]
-    labels = [f"{l}  [published]" for l, _, _ in LITERATURE] + [f"{l}  [ours]" for l, _, _, _ in ours]
-    sizes = {100: 10, 20: 7, 5: 4.5}
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 5.6), sharey=True, facecolor=SURFACE)
-    fig.subplots_adjust(left=0.30, right=0.98, top=0.80, bottom=0.10, wspace=0.08)
-    y = np.arange(len(labels))[::-1]
-    for ax, (col, idx, title) in zip(axes, (("parcel_accuracy", 1, "Parcel overall accuracy"),
-                                           ("parcel_kappa", 2, "Parcel Cohen's kappa"))):
-        style(ax)
-        ax.grid(False, axis="y")
-        for yi, row in zip(y, LITERATURE):
-            if row[idx] is not None:
-                ax.plot(row[idx], yi, marker="o", ms=8, color=MUTED, markeredgecolor=SURFACE)
-        for yi, (_, arm, colour, marker) in zip(y[len(LITERATURE):], ours):
-            vals = [value(df, arm, k, col) for k in KS]
-            ax.plot([min(vals), max(vals)], [yi, yi], color=colour, lw=1.5, alpha=0.5)
-            hollow = arm.endswith("_ft")
-            for k, v in zip(KS, vals):
-                ax.plot(v, yi, marker=marker, ms=sizes[k], color=colour, markerfacecolor=SURFACE if hollow else colour,
-                        markeredgecolor=colour if hollow else SURFACE, markeredgewidth=1.5 if hollow else 1)
-        ax.axhline(y[len(LITERATURE) - 1] - 0.5, color=BASELINE_RULE, lw=1)
-        ax.set_title(title, loc="left", fontsize=11, color=INK, fontweight="bold")
-    axes[0].set_yticks(y, labels, fontsize=8.5)
-    handles = [Line2D([], [], ls="", marker="o", ms=8, color=MUTED, label="published (one setting)")]
-    handles += [Line2D([], [], ls="", marker="o", ms=sizes[k], color=INK_2, label=f"ours, K = {k} %") for k in KS]
-    fig.legend(handles=handles, loc="upper left", ncol=4, frameon=False, fontsize=9, bbox_to_anchor=(0.30, 0.97))
-    fig.text(0.30, 0.875, "Published: EuroCropsML, 127 classes, random split (Reuss et al. 2026).  "
-             "Ours: 20 classes, spatial blocks. Hollow marks: fine-tuned.", fontsize=8.5, color=INK_2)
+def labelled_per_class(classes: pd.DataFrame) -> pd.DataFrame:
+    """Labelled training parcels per class at each K: the draw is the same for every arm, so the baseline's is read."""
+    c = classes[classes["arm"] == BASELINE[1]]
+    return c.groupby("pct")["labelled_parcels"].agg(["min", "median", "max", "sum"])
+
+
+def literature(df: pd.DataFrame, classes: pd.DataFrame) -> None:
+    per_class = labelled_per_class(classes)["median"]
+    x = [per_class[k] for k in KS]
+    fig, ax = plt.subplots(figsize=(10, 5.8), facecolor=SURFACE)
+    style(ax)
+    published = []
+    for model, scheme, vals in LITERATURE:
+        coarse, presto = scheme.startswith("coarse"), model.startswith("Presto")
+        colour, marker = (MUTED, "s") if coarse else (INK_2, "o")
+        ls = (0, (4, 2)) if presto else "-"
+        ax.plot(SHOTS, vals, color=colour, marker=marker, ls=ls, lw=1.8, ms=6, markeredgecolor=SURFACE)
+        published.append(Line2D([], [], color=colour, marker=marker, ls=ls, lw=1.8, label=f"{model}, {scheme}"))
+    ours = []
+    for label, frozen, _, slot, marker in MODELS:
+        ax.plot(x, [value(df, frozen, k, "parcel_macro_f1") for k in KS], color=SLOTS[slot], marker=marker, lw=2,
+                ms=7, markeredgecolor=SURFACE, markeredgewidth=1)
+        ours.append(Line2D([], [], color=SLOTS[slot], marker=marker, lw=2, label=f"{label}, frozen"))
+    ax.plot(x, [value(df, "tessera_v2_medium_ft", k, "parcel_macro_f1") for k in KS], color=SLOTS[3], marker="^",
+            lw=2, ms=7, ls=(0, (4, 2)), markerfacecolor=SURFACE, markeredgewidth=1.5)
+    ours.append(Line2D([], [], color=SLOTS[3], marker="^", lw=2, ls=(0, (4, 2)), markerfacecolor=SURFACE,
+                       label="TESSERA v2 M, fine-tuned"))
+    ax.plot(x, [value(df, BASELINE[1], k, "parcel_macro_f1") for k in KS], color=INK, marker="X", lw=2, ms=8,
+            markeredgecolor=SURFACE)
+    ours.append(Line2D([], [], color=INK, marker="X", lw=2, label=BASELINE[0]))
+    ax.set_xscale("log")
+    ticks = [1, 5, 10, 20, 100, 1000]
+    ax.set_xticks(ticks, [f"{t:,}" for t in ticks])
+    ax.minorticks_off()
+    ax.set_xlim(0.7, 2500)
+    ax.set_ylim(0, 0.7)
+    for k, xi in zip(KS, x):
+        ax.annotate(f"K = {k} %", (xi, 0.7), xytext=(0, 4), textcoords="offset points", ha="center", va="bottom",
+                    fontsize=8.5, color=INK_2)
+    ax.set_xlabel("Labelled training parcels per class (published: at most k; ours: median of the 20 classes)",
+                  fontsize=9, color=INK_2)
+    ax.set_ylabel("Test Macro-F1 per parcel", fontsize=9, color=INK_2)
+    ax.set_title("Parcel Macro-F1, ours against the published Estonian results", loc="left", fontsize=11,
+                 color=INK, fontweight="bold", pad=22)
+    first = ax.legend(handles=ours, title="Ours: 20 classes, spatial blocks, one run", loc="upper left",
+                      frameon=False, fontsize=8.5, title_fontsize=8.5, alignment="left", handlelength=3)
+    ax.add_artist(first)
+    ax.legend(handles=published, title="Published: DirPA, Reuss et al. 2026,\nrandom split, mean of five runs",
+              loc="lower right", frameon=False, fontsize=8.5, title_fontsize=8.5, alignment="left", handlelength=3)
+    fig.tight_layout()
     fig.savefig(OUT / "literature.png", dpi=160, facecolor=SURFACE)
     plt.close(fig)
 
@@ -260,6 +283,16 @@ def tables(df: pd.DataFrame, g: pd.DataFrame, classes: pd.DataFrame) -> str:
             out.append(f"| {m} | {lab} | " + " | ".join(
                 f"{g[(g['model'] == m) & (g['pct'] == k)][col].iloc[0]:+.3f}" for k in KS) + " |")
     out.append("")
+    n = labelled_per_class(classes)
+    out += ["## Labelled training parcels per class", "", "| | " + " | ".join(f"K = {k} %" for k in KS) + " |",
+            "|---|" + "---|" * len(KS)]
+    for stat, lab in (("min", "fewest"), ("median", "median"), ("max", "most"), ("sum", "total")):
+        out.append(f"| {lab} | " + " | ".join(f"{n.loc[k, stat]:,.0f}" for k in KS) + " |")
+    out += ["", "## Published Estonian parcel Macro-F1 (DirPA, Table 6, plain cross-entropy, mean of five runs)", "",
+            "| Model | Classes | " + " | ".join(f"k = {k}" for k in SHOTS) + " |", "|---|---|" + "---|" * len(SHOTS)]
+    for model, scheme, vals in LITERATURE:
+        out.append(f"| {model} | {scheme} | " + " | ".join(f"{v:.3f}" for v in vals) + " |")
+    out.append("")
     return "\n".join(out)
 
 
@@ -270,7 +303,7 @@ def main() -> None:
     label_curves(df)
     finetune_gain(g)
     per_class(classes)
-    literature(df)
+    literature(df, classes)
     (HERE / "tables.md").write_text(tables(df, g, classes))
     print((HERE / "tables.md").read_text())
 

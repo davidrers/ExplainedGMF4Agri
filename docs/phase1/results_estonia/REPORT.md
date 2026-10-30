@@ -1,8 +1,8 @@
 # Crop-type maps of Estonia 2021 from geospatial foundation models: first results
 
-19 October 2026. Every number below comes from one random draw of the labels and one training seed per setting, so
-none has a confidence interval yet (section 5). The figures and [tables.md](tables.md) are made by
-[report.py](report.py).
+19 October 2026; section 4 revised on 30 October 2026. Every number below comes from one random draw of the labels
+and one training seed per setting, so none has a confidence interval yet (section 5). The figures and
+[tables.md](tables.md) are made by [report.py](report.py).
 
 ## In short
 
@@ -18,12 +18,14 @@ none has a confidence interval yet (section 5). The figures and [tables.md](tabl
   about +0.01 in validation, within the noise of a single seed.
 - **Per parcel, every model scores lower than per pixel,** by 0.002 to 0.08, because small parcels are mapped badly
   and the parcel score counts each parcel once.
-- **Against published Estonian results:** our parcel overall accuracy with all labels, 0.75 to 0.82, is at the level
-  of the 0.787 reported on EuroCropsML. With 5 % of the labels (4,354 parcels) we reach 0.67 to 0.78, above the
-  0.55 to 0.65 published with up to 500 parcels per class. The tasks differ, though (section 4): the published
-  task has 127 classes and a random split, ours 20 classes and a spatial split. No published study maps Estonian
-  crops per pixel, and none has tested these five foundation models on Estonia; the one foundation model published
-  on Estonia, Presto, scored below a model trained from scratch.
+- **Against published Estonian results:** the only published Estonian Macro-F1 is per parcel, from DirPA (Reuss et
+  al. 2026), with at most 100 labelled parcels per class: 0.174 over 127 crop types and 0.307 over coarse groups for
+  a Transformer trained from scratch, 0.064 and 0.255 for the Presto foundation model. At K = 5 %, a median of 74
+  labelled parcels per class, our parcel Macro-F1 is 0.35 to 0.57. The gap comes mostly from the task, 20 crops
+  against 127 (section 4), so it shows our numbers are plausible, not that our models are better. The ranking
+  carries over: there Presto falls below the model trained from scratch, here every frozen model but TESSERA falls
+  below the U-Net at 5 %. No published study maps Estonian crops per pixel, and none has tested these five
+  foundation models on Estonia.
 
 ## 1. What was done
 
@@ -172,55 +174,72 @@ Rows are sorted by the number of training parcels, given in brackets.
 ## 4. Comparison with published results for Estonia
 
 No published study maps Estonian crops per pixel, and none has run TerraMind, THOR, Prithvi, TESSERA or AlphaEarth
-on Estonia. All published Estonian numbers are per parcel:
+on Estonia. The published Estonian results classify whole parcels, so they are set against our per-parcel score.
+**Only one study reports parcel Macro-F1 for Estonia:** DirPA (Reuss, Gikalo and Körner 2026, Table 6), on
+EuroCropsML 2.0, with 1 to 100 labelled parcels per class and no full-label result. The table puts its models
+trained with plain cross-entropy, as ours are, beside ours.
 
-| Study | Task | Model | Labels | Result |
-|---|---|---|---|---|
-| Reuss et al. 2026, *ISPRS Open J. Photogramm. Remote Sens.* 19, 100117 (EuroCropsML benchmark) | Parcel classification, 127 classes, Estonia 2021, random 60/20/20 split, 35,182 test parcels; input: per-parcel median Sentinel-2 L1C time series | Transformer from scratch | all (105,543 parcels) | OA 0.787 |
-| | | Transformer from scratch | 500 per class | OA 0.632, kappa 0.529 |
-| | | ANIL meta-learning, pretrained on Latvia (best at 500) | 500 per class | OA 0.652, kappa 0.556 |
-| | | **Presto** (foundation model, released weights, fine-tuned) | 500 per class | OA 0.553, kappa 0.430 |
-| Reuss, Gikalo and Körner 2026, arXiv 2603.12905 (DirPA) | Parcel classification on EuroCropsML 2.0, Estonia, 127 classes and coarser HCAT3 groups; random class-aware split; few-shot only | Transformer, best of plain cross-entropy and DirPA | 100 per class | Macro-F1 0.174 (127 classes), 0.313 (coarse) |
-| | | **Presto** | 100 per class | Macro-F1 0.064 (127 classes), 0.256 (coarse) |
-| Järveoja 2021, MSc thesis, University of Tartu | Parcel classification, 28 classes, Estonia 2018 and 2019 | Random forest on S1 and S2 features | all | Weighted F1 0.82 and 0.85 |
+**Matching the label budgets.** DirPA labels at most k parcels of each class. We label K % of the training parcels of
+each class, so the number per class varies with the crop: 17 to 2,167 at K = 5 % (median 74), 67 to 8,666 at 20 %
+(median 296), 332 to 43,330 with all labels (median 1,477). Our K = 5 % therefore stands beside their 100 per class.
 
-![Parcel overall accuracy and kappa, ours against EuroCropsML](figures/literature.png)
+| Parcel Macro-F1 | Classes | k = 20 per class | k = 100 per class, or K = 5 % (median 74) | K = 20 % (median 296) | K = 100 % (median 1,477) |
+|---|---|---|---|---|---|
+| **Published:** *DirPA, mean of five runs* | | | | | |
+| Transformer from scratch | 127 crop types | 0.117 | 0.174 | | |
+| Presto, released weights, fine-tuned | 127 crop types | 0.038 | 0.064 | | |
+| Transformer from scratch | coarse groups (HCAT level 3) | 0.272 | 0.307 | | |
+| Presto, released weights, fine-tuned | coarse groups (HCAT level 3) | 0.213 | 0.255 | | |
+| **Ours:** *one run* | | | | | |
+| U-Net from scratch | 20 crops | | 0.446 | 0.520 | 0.553 |
+| TerraMind v1 large, frozen | 20 crops | | 0.381 | 0.515 | 0.583 |
+| THOR v1 large, frozen | 20 crops | | 0.349 | 0.491 | 0.516 |
+| Prithvi-EO-2.0 600M, frozen | 20 crops | | 0.409 | 0.472 | 0.535 |
+| TESSERA v2 Medium, frozen | 20 crops | | 0.502 | 0.574 | 0.602 |
+| TESSERA v2 Medium, fine-tuned | 20 crops | | 0.566 | 0.603 | 0.639 |
+| AlphaEarth v1, frozen | 20 crops | | 0.425 | 0.455 | 0.484 |
 
-| Ours, per parcel, OA / kappa | K = 100 % (86,909 parcels) | K = 20 % (17,390) | K = 5 % (4,354) |
-|---|---|---|---|
-| TerraMind, frozen | 0.787 / 0.698 | 0.742 / 0.639 | 0.689 / 0.563 |
-| THOR, frozen | 0.753 / 0.650 | 0.727 / 0.613 | 0.673 / 0.540 |
-| Prithvi, frozen | 0.763 / 0.661 | 0.723 / 0.609 | 0.677 / 0.557 |
-| TESSERA, frozen | 0.798 / 0.709 | 0.784 / 0.687 | 0.755 / 0.638 |
-| TESSERA, fine-tuned | **0.821 / 0.745** | **0.793 / 0.702** | **0.777 / 0.675** |
-| AlphaEarth, frozen | 0.748 / 0.637 | 0.735 / 0.617 | 0.720 / 0.596 |
-| U-Net from scratch | 0.772 / 0.676 | 0.758 / 0.656 | 0.723 / 0.600 |
+DirPA's own prior correction moves its Transformer by -0.05 to +0.06; no Estonian result in the paper exceeds 0.174
+over the 127 types or 0.313 over the coarse groups. Its results at 1, 5 and 10 parcels per class are in the figure
+and in [tables.md](tables.md); the fine-tuned TerraMind, THOR and Prithvi are in section 3.1.
+
+![Parcel Macro-F1 against labelled parcels per class, ours beside DirPA](figures/literature.png)
+
+The x-axis puts both on labelled parcels per class: at most k for DirPA, the median over our 20 crops for ours.
 
 **How the numbers line up.**
 
-- **With all labels,** our parcel accuracy (0.75 to 0.82) is at the level of EuroCropsML's 0.787. Grassland is about
-  half of the parcels in both test sets, so overall accuracy rewards getting grassland right in both.
-- **With few labels,** our 5 % budget (4,354 parcels) is smaller than EuroCropsML's 500 per class (up to 63,500
-  parcels), yet our accuracy (0.67 to 0.78) and kappa (0.53 to 0.68) are above theirs (0.55 to 0.65; kappa 0.43
-  to 0.56).
-- **Presto, the only foundation model published on Estonia,** fell below the Transformer trained from scratch in
-  both Reuss papers. Here too several frozen foundation models fall below our from-scratch U-Net. Only TESSERA, and
-  TerraMind with all labels, beat it per parcel.
+- **At a similar number of labels per class, our parcel Macro-F1 is two to three times theirs over the 127 types**
+  and above their coarse groups: 0.35 to 0.57 at K = 5 %, against 0.174 and 0.307 for their Transformer.
+- **That gap comes mostly from the task, not the models** (table below). Over 127 crop types, Macro-F1 averages in
+  the many crops with a handful of parcels, which every model nearly misses; we score only the 20 crops with at
+  least 250 parcels. The coarse groups are fewer, but the paper gives neither their number nor their sizes for
+  Estonia, so they cannot be put on our 20-crop scale either.
+- **The ranking does carry over.** In DirPA, Presto from its released weights scores below the Transformer trained
+  from scratch at every budget, by 0.04 to 0.11 over the 127 types and 0.04 to 0.06 over the coarse groups. Here, at
+  K = 5 %, four of the five frozen foundation models fall below our U-Net trained from scratch (0.349 to 0.425
+  against 0.446); only TESSERA is above it, frozen (0.502) and fine-tuned (0.566). With all labels TerraMind passes
+  it too.
 
 **Why the numbers are not on the same scale.** The comparison says our results are plausible, not that our models
 are better:
 
-| | Published (EuroCropsML) | Ours | Effect on our numbers |
+| | Published (DirPA) | Ours | Effect on our numbers |
 |---|---|---|---|
-| Classes | 127, of which 107 hold under 5 % of the parcels | 20 most common, 95 % of the parcels | Higher, especially Macro-F1 |
-| Split | Random: test parcels sit next to training parcels | Spatial blocks with a 1.6 km buffer | Lower: a harder, more honest test |
-| Input | One median spectrum per parcel per date, Sentinel-2 L1C | Every 10 m pixel, monthly S2 L2A and S1 composites | Pixels add field shape and radar; medians add clean per-parcel spectra |
+| Classes | 127 crop types, most with few parcels, or coarser groups | The 20 most common crops, 95 % of the parcels; the rest are not scored | Higher |
+| Labelled set | At most k parcels of every class, so grassland gets no more labels than any other crop | K % of every class, so training keeps the test's crop shares | Not directly comparable; matched above by the median per class |
+| Split | Random within each class: test parcels sit next to training parcels | Spatial blocks with a 1.6 km buffer | Lower: a harder, more honest test |
+| Input | One median Sentinel-2 L1C spectrum per parcel per date | Every 10 m pixel, monthly S2 L2A and S1 composites | Pixels add field shape and radar; medians give clean per-parcel spectra |
 | Model output | One class per parcel | One class per pixel, then a vote | Lower on small parcels |
-| Few-shot unit | k parcels per class | K % of the parcels of each class | Not directly comparable; rare classes get few parcels at 5 % |
+| Runs | Mean of five | One draw, one seed | Ours carry no interval yet |
 
-The DirPA Macro-F1 numbers (0.06 to 0.31 at 100 parcels per class) sit far below ours (0.32 to 0.57 per parcel at
-5 %) mostly because of the 127 classes: Macro-F1 averages over the many rare classes with a handful of training
-parcels each.
+**Published results in other metrics.** The EuroCropsML benchmark (Reuss et al. 2026) and its follow-up *Mind the
+gap* (Reuss, Gikalo and Körner 2025) report overall accuracy and Cohen's kappa for Estonia, not Macro-F1; *Mind the
+gap* plots Macro-F1 but prints no values. Järveoja (2021) reports weighted F1 over 28 classes, 0.82 and 0.85 for 2018
+and 2019. Overall accuracy is the share of test parcels given the right crop, and weighted F1 weights each crop by
+its number of parcels; with grassland about half of the parcels, both mostly measure grassland, which is why our
+metric is Macro-F1. For the record, with all labels the benchmark's Transformer reaches an overall accuracy of 0.787
+and our models 0.75 to 0.82 ([tables.md](tables.md)).
 
 ## 5. Caveats and next steps
 
@@ -244,7 +263,9 @@ parcels each.
   few-shot time-series crop-type classification on the EuroCropsML dataset. *ISPRS Open Journal of Photogrammetry
   and Remote Sensing* 19, 100117. arXiv 2504.11022. Numbers from section 6.1, Table 4a and Table B.18.
 - J. Reuss, E. Gikalo, M. Körner (2026). DirPA: addressing prior shift in imbalanced few-shot crop-type
-  classification. arXiv 2603.12905.
+  classification. arXiv 2603.12905 (v2, July 2026). Estonian parcel Macro-F1 from Table 6.
+- J. Reuss, E. Gikalo, M. Körner (2025). Mind the gap: bridging prior shift in realistic few-shot crop-type
+  classification. arXiv 2511.16218. Estonian accuracy and kappa in Table 1; Macro-F1 only plotted (Figure 4).
 - The models: TerraMind, Jakubik et al. 2025, arXiv 2504.11171; THOR, Forgaard et al. 2026, arXiv 2601.16011;
   Prithvi-EO-2.0, Szwarcman et al. 2024, arXiv 2412.02732; TESSERA, Feng et al. 2025, arXiv 2506.20380; AlphaEarth
   Foundations, Brown et al. 2025, arXiv 2507.22291.
