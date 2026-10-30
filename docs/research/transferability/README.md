@@ -11,6 +11,8 @@ design into `docs/superpowers/specs/<date>-transferability-design.md`, with its 
 |---|---|
 | [eurocrops_coverage.md](eurocrops_coverage.md) | Which countries, regions and years EuroCrops v11 and v2.0 hold, what the repository already has, the v2 file layout, and what that means for spatial and temporal transfer |
 | [eurocrops_v2_files.csv](eurocrops_v2_files.csv) | The 153 yearly and 17 stack files of EuroCrops v2.0 (`gpqtv202/`, listed 26 October 2026) |
+| [transfer_setup.md](transfer_setup.md) | **Draft set-up of the spatial transfer experiment** (30 October 2026): the questions, how they are answered, the GAEZ zones of the 19 candidate countries with maps, the 18 GAEZ climate metrics (thermal regime, moisture regime, growing period) the loss is to be correlated with, with maps, and the empty matrix and correlation table; `gaez_domains.py` computes the zones (`gaez_domains*.csv`), `gaez_metrics.py` the metrics (`gaez_metrics*.csv`), both draw into `figures/` |
+| [transfer_literature.md](transfer_literature.md) | How transfer experiments in crop mapping are designed (pairs, held-out domain, held-out year, source plus K target), how they handle label spaces and years, what they report, and the findings that bear on our design (27 October 2026) |
 | [gaez_v5_and_zonings.md](gaez_v5_and_zonings.md) | GAEZ v5: access, inputs and resolution, the 57-zone class structure (thermal regime, moisture, soil, special classes), how it bears on the design; and Köppen-Geiger, the Environmental Stratification of Europe, the EEA regions and the UNESCO aridity map compared |
 
 ## What is already written down elsewhere

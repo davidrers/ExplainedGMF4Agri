@@ -1,20 +1,27 @@
-"""Build index.html: the Phase 1 pipeline page in the style of the Claude Design file
-"Architecture Diagram v2" (project cbea8928), with step-through, lane focus, live flow and zoom.
+"""Build the site: index.html here, the Phase 1 pipeline page in the style of the Claude Design file
+"Architecture Diagram v2" (project cbea8928), with step-through, lane focus, live flow and zoom; and through
+`site_shell.py` the landing at docs/index.html and the Phase 2 and Phase 3 pages.
 
     python docs/phase1/pipeline_page/build_page.py
 
-Section 1 recreates the design's experimental workflow under the research questions, section 2 its
-model architecture with the current arms, section 3 lists the six experiments of the analysis with
-links to their reports.
+Section 1 holds Phase 1's two experimental set-ups as tabs: the design's experimental workflow under the
+research questions, and the spatial transferability set-up, docs/research/transferability/transfer_setup.md
+converted by `md_html.py`. Section 2 is the design's model architecture with the current arms, section 3
+lists the six experiments of the analysis with links to their reports.
 Coordinates of section 2 are in design pixels; the page scales each diagram to the window.
 """
 from __future__ import annotations
 
 import html
 import json
+import re
 from pathlib import Path
 
+import md_html
+import site_shell as S
+
 OUT = Path(__file__).with_name("index.html")
+TRANSFER_MD = Path(__file__).resolve().parents[2] / "research/transferability/transfer_setup.md"
 REPO = "https://github.com/davidrers/ExplainedGMF4Agri/blob/main"
 AS_OF = "22 October 2026"   # the state of the docs the page shows, in its header
 E = html.escape
@@ -191,7 +198,7 @@ def legend_item(swatch, label):
 
 
 workflow_html = (
-    '<div class="stage" id="wf-stage" data-w="1920" style="width:1920px;box-sizing:border-box;padding:0 60px 0 0;'
+    '<div class="stage" id="wf-stage" data-w="1771" style="width:1771px;box-sizing:border-box;padding:0;'
     "font-family:'IBM Plex Sans','Helvetica Neue',Arial,sans-serif;color:#1f2430\">"
     + RQ_PANEL + CONN
     + '<div style="display:flex;gap:80px;align-items:stretch"><div style="display:flex;flex-direction:column">'
@@ -540,6 +547,21 @@ experiments_html = (
       f'and per parcel, beside the published Estonian results.</p></div></article></div>')
 
 # ----------------------------------------------------------------------------------------------
+# The second set-up of section 1: spatial transferability, from its research note
+# ----------------------------------------------------------------------------------------------
+
+transfer_text = TRANSFER_MD.read_text(encoding="utf-8")
+TRANSFER_DRAFT = re.search(r"Draft of ([^,.]+)", transfer_text).group(1)
+transfer_html = (
+    '<article class="md">'
+    + md_html.convert(transfer_text, asset_prefix="../../research/transferability/",
+                      blob_prefix=f"{REPO}/docs/research/transferability/", id_prefix="tr-", heading_shift=2,
+                      source_dir=TRANSFER_MD.parent)
+    + f'<p class="md-src">Source: the research note '
+      f'{S.external(f"{REPO}/docs/research/transferability/transfer_setup.md", "transfer_setup.md")}, draft of '
+      f'{TRANSFER_DRAFT}; not yet in the protocol.</p></article>')
+
+# ----------------------------------------------------------------------------------------------
 # Interactions: step-through, lane focus, live flow, zoom
 # ----------------------------------------------------------------------------------------------
 
@@ -628,12 +650,65 @@ CSS = r"""
 html{scroll-behavior:smooth}
 body{margin:0;background:#fff;color:#1f2430;font-family:'IBM Plex Sans','Helvetica Neue',Arial,sans-serif}
 a{color:#2b5c9e}a:hover{color:#1a3d6e}
-.top{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between;padding:20px 24px 0;
-  font-size:14px;color:#555}
-.top b{color:#222;font-size:16px}
-.top nav a{margin-left:16px;text-decoration:none}
+section,[id]{scroll-margin-top:72px}
 section{padding:40px 16px 24px}
-h2.sec{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:40px;font-weight:700;color:#222;text-align:center;
+/* the two set-ups of section 1 */
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:6px auto 28px}
+.tabs [role=tab]{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:320px;max-width:100%;
+  padding:12px 20px 13px;border:2px solid #2a2f38;border-radius:12px;background:#fff;color:#2a2f38;font:inherit;
+  text-align:left;cursor:pointer;transition:background .2s,color .2s}
+.tabs [role=tab]:hover{background:#f1f5fb}
+.tabs [role=tab][aria-selected=true]{background:#1f2430;color:#fff}
+.tabs .t{font-size:19px;font-weight:600}
+.tabs .d{font-size:14px;color:#5b616b}
+.tabs [aria-selected=true] .d{color:#c9ccd3}
+[role=tabpanel][hidden]{display:none}
+[role=tabpanel]:focus{outline:none}
+.md-fig{margin:8px 0 22px}
+/* the transferability set-up, converted from its research note */
+.md{max-width:1080px;margin:0 auto;padding:0 8px;font-size:16.5px;line-height:1.6;color:#2a2f38}
+.md-src{margin:40px 0 0;padding-top:16px;border-top:1px solid #e3dfd2;font-size:14px;color:#5b616b}
+.md-src a{display:inline-flex;align-items:center;font-weight:600}
+.md h3,.md h4,.md h5{color:#1f2430;text-wrap:balance}
+.md .md-h1{margin:6px 0 10px;font-size:31px;line-height:1.2;letter-spacing:-.01em}
+.md .md-h2{margin:48px 0 12px;padding-top:22px;border-top:1px solid #e3dfd2;font-size:24px;line-height:1.25}
+.md .md-h3{margin:30px 0 8px;font-size:18.5px}
+.md p{margin:0 0 14px;max-width:82ch}
+.md ul,.md ol{margin:0 0 16px;padding-left:24px;max-width:82ch}
+.md li{margin:5px 0}
+.md li>ul,.md li>ol{margin:6px 0 4px}
+.md li>p{margin:8px 0 0}
+.md strong{color:#1f2430;font-weight:600}
+.md code{font-family:var(--mono);font-size:.86em;background:#f3f1ea;padding:1px 5px;border-radius:3px;color:#383d46;
+  overflow-wrap:anywhere}
+.md blockquote{margin:12px 0 14px;padding:12px 18px;background:#f6f3ea;border-radius:6px;font-family:var(--mono);
+  font-size:15px;color:#1f2430}
+.md blockquote p{margin:0}
+.md a{color:#2b5c9e;text-underline-offset:3px}
+.md a .ic-s{margin-left:.15em}
+.md-img{display:block;margin:6px 0 4px}
+.md-img img{display:block;width:100%;height:auto;border:1px solid #e3dfd2;border-radius:6px;background:#fff}
+.md-figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:10px 0 22px}
+.md-figs figure{margin:0}
+.md-figs figcaption{margin-top:6px;font-size:14px;color:#5b616b}
+.md-table{overflow-x:auto;margin:8px 0 24px;border:1px solid #e3dfd2;border-radius:6px}
+.md-table table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.45;font-variant-numeric:tabular-nums}
+.md-table th,.md-table td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid #ece9df}
+.md-table thead th{background:#f6f3ea;font-weight:600;color:#1f2430;vertical-align:bottom}
+.md-table tbody tr:last-child>*{border-bottom:0}
+.md-table .a-center{text-align:center}.md-table .a-right{text-align:right}
+.md-table .nw{white-space:nowrap}
+.md-matrix table{width:auto;font-size:13px}
+.md-matrix th,.md-matrix td{min-width:40px;padding:5px 4px;text-align:center;border:1px solid #ece9df}
+.md-matrix thead th{font-size:12.5px;line-height:1.35}
+.md-matrix thead th:first-child,.md-matrix tbody th{position:sticky;left:0;z-index:1;background:#f6f3ea;text-align:left;
+  padding:5px 12px;white-space:nowrap}
+.md-matrix td{color:#a9a597}
+.md-matrix td.diag{background:#e6f0e8;color:#2e6b3a}
+.sw{display:inline-block;width:.78em;height:.78em;margin:0 .12em;vertical-align:-.04em;background:var(--c);
+  border:1px solid rgba(31,36,48,.45);border-radius:2px}
+.sw.ci{border-radius:50%}
+h2.sec{font-family:var(--sans);font-size:40px;font-weight:700;color:#222;text-align:center;
   margin:0 0 14px}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:0 0 22px;font-size:14px}
 .toolbar button,.walk button,.card button{font:inherit;font-size:14px;font-weight:600;background:#fff;color:#2a2f38;
@@ -658,7 +733,7 @@ h2.sec{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:40px;fo
 .shaft{position:relative;flex:1;width:2px;background:#5a6270}
 .shaft-h{position:relative;flex:1;height:2px;background:#5a6270}
 .rule{cursor:default;padding:4px}
-.rq{padding:6px 8px;border-radius:8px;color:#8a8f99}
+.rq{padding:6px 8px;border-radius:8px;color:#6b717c}
 .rq.on{cursor:default;color:#1f2430}
 .rq-lab{flex:none;width:84px;box-sizing:border-box;border:2px solid #b5b9c0;border-radius:16px;padding:2px 0;
   text-align:center;font-size:16px;font-weight:600;margin-top:1px}
@@ -727,7 +802,7 @@ h2.sec{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:40px;fo
 .walk p{margin:4px 0;font-size:15px;line-height:1.5}
 .walk p.now{color:#2e6b3a}
 .walk .nav{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-.card{position:fixed;right:18px;top:18px;width:min(380px,calc(100% - 24px));background:#fff;border:2px solid #2a2f38;
+.card{position:fixed;right:18px;top:74px;width:min(380px,calc(100% - 24px));background:#fff;border:2px solid #2a2f38;
   border-radius:12px;padding:16px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18);z-index:61;font-size:14px}
 .card h4{margin:0 0 10px;font-size:19px;padding-right:70px}
 .card dl{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;margin:0}
@@ -767,8 +842,41 @@ function clear(stage) {
 }
 function reveal(el) {
   const r = el.getBoundingClientRect();
-  if (r.top < 60 || r.bottom > innerHeight - 200) scrollBy({top: r.top - innerHeight * 0.3, behavior: 'smooth'});
+  if (r.top < 80 || r.bottom > innerHeight - 200) scrollBy({top: r.top - innerHeight * 0.3, behavior: 'smooth'});
 }
+
+// section 1: the two set-ups as tabs; a link to anything inside a panel opens that panel
+const tabs = $$('[role=tab]');
+function selectTab(t, write) {
+  tabs.forEach(x => {
+    const on = x === t;
+    x.setAttribute('aria-selected', on);
+    x.tabIndex = on ? 0 : -1;
+    $('#' + x.getAttribute('aria-controls')).hidden = !on;
+  });
+  if (t.id === 'tab-workflow') fitAll(); else endWalk();
+  if (write) history.replaceState(null, '', '#' + t.getAttribute('aria-controls'));
+}
+tabs.forEach((t, k) => {
+  t.addEventListener('click', () => selectTab(t, true));
+  t.addEventListener('keydown', e => {
+    const j = {ArrowRight: k + 1, ArrowLeft: k - 1, Home: 0, End: tabs.length - 1}[e.key];
+    if (j === undefined) return;
+    e.preventDefault();
+    const n = tabs[(j + tabs.length) % tabs.length];
+    n.focus();
+    selectTab(n, true);
+  });
+});
+function fromHash() {
+  const el = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  const panel = el && el.closest('[role=tabpanel]');
+  if (!panel) return;
+  selectTab($('#tab-' + panel.id), false);
+  requestAnimationFrame(() => el.scrollIntoView());
+  if (document.readyState !== 'complete') addEventListener('load', () => el.scrollIntoView(), {once: true});
+}
+addEventListener('hashchange', fromHash);
 
 // live flow
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -894,6 +1002,8 @@ $$('.show').forEach(b => b.addEventListener('click', () => {
   const s = DATA.show[b.dataset.exp];
   startWalk('ar', [s]);
 }));
+
+fromHash();
 """
 
 DATA_JSON = json.dumps(dict(
@@ -909,26 +1019,30 @@ def toolbar(target, extra=""):
             f'<button type="button" data-act="zoom" aria-pressed="false">Fit</button>{extra}</div>')
 
 
-page = f"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Phase 1 pipeline</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-<style>{CSS}</style>
-</head>
-<body>
-<header class="top"><div><b>ExplainedGFM4Agri · Phase 1 pipeline</b> &nbsp;Main workflow <code>kshot</code>, Estonia 2021,
-{AS_OF}</div><nav><a href="#workflow">1 · Workflow</a><a href="#architecture">2 · Architecture</a>
-<a href="#experiments">3 · Experiments</a><a href="{REPO}/docs/phase1/pipeline.md" target="_blank" rel="noopener">pipeline.md ↗</a>
-</nav></header>
+PHASE_NAV = ('<a href="#setup">1 · Experimental set-up</a><a href="#architecture">2 · Model architecture</a>'
+             '<a href="#experiments">3 · Experiments</a>' + S.external(f"{REPO}/docs/phase1/pipeline.md", "pipeline.md"))
 
-<section id="workflow">
-<h2 class="sec">1. Experimental workflow</h2>
+page = S.head("Phase 1 · GFMs Benchmark · ExplainedGFM4Agri",
+              "Phase 1 of the thesis: the experimental set-ups, the model architecture and the experiments behind it.",
+              CSS) + f"""<body>
+{S.sitebar(1)}
+{S.phasebar(1, PHASE_NAV, f"Main workflow <code>kshot</code>, Estonia 2021, {AS_OF}")}
+
+<section id="setup">
+<h2 class="sec">1. Experimental set-up</h2>
+<div class="tabs" role="tablist" aria-label="Experimental set-ups of Phase 1">
+<button type="button" role="tab" id="tab-workflow" aria-controls="workflow" aria-selected="true" tabindex="0">
+<span class="t">Pipeline</span><span class="d">The label-budget workflow, interactive</span></button>
+<button type="button" role="tab" id="tab-transferability" aria-controls="transferability" aria-selected="false" tabindex="-1">
+<span class="t">Spatial transferability</span><span class="d">Zero-shot across 19 countries, a draft</span></button>
+</div>
+<div role="tabpanel" id="workflow" aria-labelledby="tab-workflow" tabindex="0">
 {toolbar("wf", '<button type="button" data-act="status" aria-pressed="false">Status</button><span class="hint">Hover RQ1 or a fairness rule to see the steps that carry it.</span>')}
 <div class="viewport" id="wf-vp">{workflow_html}</div>
+</div>
+<div role="tabpanel" id="transferability" aria-labelledby="tab-transferability" tabindex="0" hidden>
+{transfer_html}
+</div>
 </section>
 
 <section id="architecture">
@@ -941,6 +1055,7 @@ page = f"""<!doctype html>
 <h2 class="sec">3. Experiments that justify the pipeline</h2>
 {experiments_html}
 </section>
+{S.footer(1)}
 
 <div class="walk" id="walk" hidden role="dialog" aria-live="polite"><div class="count"></div><h4></h4>
 <p class="text"></p><p class="now"></p><div class="nav"><button type="button" data-walk="prev">Back</button>
@@ -955,3 +1070,5 @@ page = f"""<!doctype html>
 
 OUT.write_text(page, encoding="utf-8")
 print(f"wrote {OUT} ({len(page):,} bytes)")
+for path in S.write_site():
+    print(f"wrote {path} ({path.stat().st_size:,} bytes)")

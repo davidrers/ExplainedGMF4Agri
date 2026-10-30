@@ -1,0 +1,21 @@
+,agro_climate,agro_climate,aez_climatic,aez_climatic,aez_special,profile,profile,profile,profile
+,group,pct,group,pct,pct,heat_sum_5C,days_above_5C,growing_period_days,precip_mm
+AT,Temperate sub-continental,75.0,"Temperate cool, moist",52.0,36.0,3507.0,246.0,243.0,902.0
+BE,Temperate oceanic,100.0,"Temperate cool, wet",100.0,16.0,3489.0,275.0,274.0,854.0
+BG,Temperate sub-continental,99.0,Temperate moderate,94.0,5.0,4458.0,277.0,214.0,696.0
+CZ,Temperate sub-continental,61.0,"Temperate cool, moist",73.0,13.0,3219.0,234.0,233.0,760.0
+DE,Temperate oceanic,100.0,"Temperate cool, wet",67.0,23.0,3358.0,252.0,252.0,803.0
+DK,Temperate oceanic,100.0,"Temperate cool, wet",99.0,38.0,2924.0,238.0,238.0,821.0
+EE,Temperate sub-continental,100.0,"Temperate cool, wet",99.0,14.0,2472.0,189.0,189.0,746.0
+ES,"Subtropics, winter rainfall (Mediterranean)",100.0,Subtropics cool,61.0,52.0,5106.0,337.0,205.0,563.0
+FI,Temperate sub-continental,96.0,"Temperate cool, wet",61.0,72.0,2183.0,172.0,172.0,710.0
+FR,Temperate oceanic,81.0,"Temperate cool, wet",66.0,19.0,4043.0,308.0,288.0,860.0
+IE,Temperate oceanic,100.0,"Temperate cool, wet",100.0,20.0,3530.0,353.0,353.0,973.0
+IT,"Subtropics, winter rainfall (Mediterranean)",100.0,Subtropics moderately cool,85.0,18.0,5348.0,356.0,279.0,930.0
+LT,Temperate sub-continental,100.0,"Temperate cool, wet",82.0,19.0,2819.0,209.0,209.0,732.0
+LV,Temperate sub-continental,97.0,"Temperate cool, wet",95.0,27.0,2665.0,200.0,200.0,743.0
+NL,Temperate oceanic,100.0,"Temperate cool, wet",100.0,51.0,3504.0,275.0,275.0,862.0
+PT,"Subtropics, winter rainfall (Mediterranean)",100.0,Subtropics moderately cool,97.0,38.0,5816.0,362.0,226.0,670.0
+SE,Temperate oceanic,67.0,"Temperate cool, wet",77.0,61.0,2569.0,204.0,204.0,748.0
+SI,Temperate sub-continental,74.0,"Temperate cool, wet",53.0,21.0,3813.0,260.0,260.0,1086.0
+SK,Temperate sub-continental,100.0,"Temperate cool, moist",60.0,18.0,3670.0,247.0,238.0,761.0

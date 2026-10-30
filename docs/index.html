@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExplainedGFM4Agri · Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions</title>
+<meta name="description" content="A user supplies an area of interest. The system returns a pixel-level crop segmentation of that area, pixel-level explanations of why each region was classified as it was, calibrated per-pixel confidence, and an LLM-written report traceable to that evidence.">
+<meta name="theme-color" content="#123222">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f2430;--ink-2:#2a2f38;--muted:#5b616b;--forest-950:#0d261a;--forest-900:#123222;--forest-800:#173f2c;
+  --forest-700:#22553a;--forest-600:#2e6b3a;--gold:#c9972b;--gold-deep:#8a5a14;--slate:#34485c;--paper:#f6f3ea;
+  --cream:#f0f0e6;--cream-2:#e9e7da;--line:#d8d1ba;--on-forest:#efe9d6;--on-forest-2:#c3c9b5;
+  --sans:'IBM Plex Sans','Helvetica Neue',Arial,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace}
+::selection{background:#f0d9a0;color:#1f2430}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:4px}
+.ext{white-space:nowrap}
+.ic-s{width:.95em;height:.95em;margin-left:.3em;vertical-align:-.12em;flex:none}
+.sitebar{position:sticky;top:0;z-index:70;display:flex;align-items:center;gap:20px;min-height:56px;padding:0 24px;
+  background:var(--forest-900);color:var(--on-forest);font-family:var(--sans);font-size:14px;
+  box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.sitebar a{color:inherit;text-decoration:none}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;letter-spacing:.01em;white-space:nowrap}
+.brand svg{width:20px;height:20px;color:var(--on-forest)}
+.sitebar nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.sitebar nav::-webkit-scrollbar{display:none}
+.sitebar nav a{display:flex;align-items:baseline;gap:8px;padding:17px 12px 15px;border-bottom:3px solid transparent;
+  white-space:nowrap;color:var(--on-forest-2);transition:color .2s,border-color .2s}
+.sitebar nav a:hover{color:var(--on-forest)}
+.sitebar nav a[aria-current=page]{color:var(--on-forest);border-bottom-color:var(--gold)}
+.sitebar .pn{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.sitebar .gh{display:flex;align-items:center;padding:6px 12px;border:1.5px solid rgba(239,233,214,.35);border-radius:16px;
+  color:var(--on-forest);white-space:nowrap;transition:border-color .2s,background .2s}
+.sitebar .gh:hover{border-color:var(--on-forest);background:rgba(239,233,214,.08)}
+.tag{display:inline-flex;flex-direction:column;gap:2px;padding:8px 14px 9px;border-radius:3px;background:var(--forest-800);
+  color:var(--on-forest);text-align:left;line-height:1.15}
+.tag.slate{background:var(--slate)}
+.tag-n{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--on-forest-2)}
+.tag-t{font-family:var(--sans);font-weight:700;font-size:19px;letter-spacing:-.005em}
+.phasebar{background:var(--paper);border-bottom:1px solid var(--line);font-family:var(--sans);color:var(--ink)}
+.pb-in{max-width:1240px;margin:0 auto;padding:30px 24px 0;display:flex;gap:24px;align-items:flex-start}
+.pb-text{flex:1;min-width:0}
+.pb-text h1{margin:2px 0 6px;font-size:32px;line-height:1.15;font-weight:600;letter-spacing:-.015em;text-wrap:balance}
+.pb-text p{margin:0;font-size:16px;line-height:1.5;color:var(--ink-2);max-width:72ch}
+.pb-text p b{font-weight:600}
+.state{display:inline-flex;align-items:center;gap:8px;flex:none;margin-top:8px;padding:5px 12px;border-radius:14px;
+  font-size:13.5px;font-weight:600;border:1.5px solid}
+.state::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.state.active{color:#7a4f0f;background:#fbefd6;border-color:#d6a54a}
+.state.planned{color:#5b616b;background:#fff;border-color:#c9c6bb}
+.pb-nav{max-width:1240px;margin:0 auto;padding:18px 24px 0;display:flex;flex-wrap:wrap;gap:4px 26px;font-size:14.5px}
+.pb-nav a{display:inline-flex;align-items:center;padding:0 0 12px;color:var(--ink-2);text-decoration:none;
+  border-bottom:2px solid transparent}
+.pb-nav a:hover{color:var(--ink);border-bottom-color:var(--gold)}
+.pb-nav .asof{margin-left:auto;padding-bottom:12px;color:var(--muted)}
+.sitefoot{background:var(--forest-950);color:var(--on-forest-2);font-family:var(--sans);font-size:14px;line-height:1.6}
+.sitefoot .in{max-width:1240px;margin:0 auto;padding:34px 24px 40px;display:flex;flex-wrap:wrap;gap:12px 40px;
+  justify-content:space-between}
+.sitefoot a{color:var(--on-forest);text-underline-offset:3px}
+.sitefoot p{margin:0;max-width:70ch}
+@media (max-width:820px){.sitebar{gap:10px;padding:0 12px}.brand span{display:none}.sitebar .pt{display:none}
+  .sitebar nav a{padding:17px 9px 15px}.sitebar .gh{padding:5px 9px}
+  .pb-in{flex-wrap:wrap;padding:22px 16px 0;gap:14px}.pb-text{flex:1 1 100%;order:3}.state{margin:4px 0 0 auto}
+  .pb-text h1{font-size:25px}.pb-nav{padding:14px 16px 0}
+  .pb-nav .asof{margin-left:0;width:100%}}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans)}
+.hero{background:var(--forest-900);color:var(--on-forest);overflow:hidden}
+.hero .in{max-width:1240px;margin:0 auto;padding:64px 24px 72px;display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:56px;align-items:center}
+.hero h1{margin:0 0 22px;font-size:clamp(30px,3.05vw,44px);line-height:1.1;font-weight:600;letter-spacing:-.02em;
+  text-wrap:balance}
+.hero .who{margin:0 0 4px;font-size:15.5px;color:var(--on-forest)}
+.hero .who b{font-weight:600}
+.hero .sup{margin:0 0 26px;font-size:14.5px;color:var(--on-forest-2)}
+.hero .lead{margin:0 0 30px;font-size:17.5px;line-height:1.6;color:var(--on-forest-2);max-width:52ch}
+.hero .lead b{color:var(--on-forest);font-weight:500}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:24px;font-weight:600;font-size:15px;
+  text-decoration:none;transition:background .2s,color .2s,border-color .2s,transform .2s}
+.btn .ic-s{margin-left:0}
+.btn.primary{background:var(--gold);color:var(--forest-950)}
+.btn.primary:hover{background:#ddb04e;transform:translateY(-1px)}
+.btn.ghost{border:1.5px solid rgba(239,233,214,.4);color:var(--on-forest)}
+.btn.ghost:hover{border-color:var(--on-forest);background:rgba(239,233,214,.07)}
+@property --x{syntax:'<percentage>';inherits:true;initial-value:56%}
+.wipe{position:relative;margin:0;border-radius:6px;overflow:hidden;aspect-ratio:2/1;background:#0b1f15;
+  box-shadow:0 18px 50px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.25);--x:56%;touch-action:pan-y}
+@media (prefers-reduced-motion:no-preference){.wipe.intro{animation:reveal 1.6s cubic-bezier(.16,1,.3,1) .5s backwards}}
+@keyframes reveal{from{--x:97%}}
+.wipe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:auto}
+.wipe .lab{position:absolute;inset:0;clip-path:inset(0 0 0 var(--x))}
+.wipe .lab .base{filter:grayscale(1) brightness(.42) contrast(1.1)}
+.wipe .bar{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:var(--on-forest);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25);pointer-events:none}
+.wipe .knob{position:absolute;top:50%;left:var(--x);width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+  background:var(--on-forest);box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;
+  pointer-events:none;color:var(--forest-900)}
+.wipe .knob svg{width:20px;height:20px}
+.wipe .cap{position:absolute;top:12px;padding:4px 10px;border-radius:3px;background:rgba(13,38,26,.78);font-size:12.5px;
+  font-family:var(--mono);letter-spacing:.04em;color:var(--on-forest);pointer-events:none}
+.wipe .cap.l{left:12px}.wipe .cap.r{right:12px}
+.wipe input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
+.wipe:has(input:focus-visible){outline:3px solid var(--gold);outline-offset:3px}
+.figcap{margin:14px 0 0;font-size:13.5px;line-height:1.55;color:var(--on-forest-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;padding:0;list-style:none;font-size:13px;
+  color:var(--on-forest-2)}
+.legend li{display:flex;align-items:center;gap:7px}
+.legend i{width:12px;height:12px;border-radius:2px;background:var(--c)}
+.phases{background:var(--cream);border-top:1px solid #d9d2bb}
+.phases .in{max-width:1240px;margin:0 auto;padding:64px 24px 72px}
+.phases h2{margin:0 0 8px;font-size:30px;font-weight:600;letter-spacing:-.015em}
+.phases .sub{margin:0 0 40px;font-size:16.5px;line-height:1.55;color:var(--ink-2);max-width:70ch}
+.chain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.ph{position:relative;display:flex;flex-direction:column;padding:18px 16px 22px;border-radius:8px;color:inherit;
+  text-decoration:none;transition:background .25s,box-shadow .25s}
+.ph:hover,.ph:focus-visible{background:rgba(255,255,255,.6);box-shadow:0 10px 28px rgba(33,52,40,.12),0 1px 3px rgba(33,52,40,.1)}
+.ph .tag{align-self:center;transition:transform .25s}
+.ph:hover .tag{transform:translateY(-2px)}
+.nodes{display:flex;align-items:flex-start;gap:14px;margin:26px -16px 22px;min-height:150px}
+.line,.spacer{flex:1 1 0;min-width:12px}
+.line{position:relative;height:2px;margin-top:51px;background:#8b9180}
+.line.arr::after{content:"";position:absolute;right:-1px;top:-5px;border-top:6px solid transparent;
+  border-bottom:6px solid transparent;border-left:9px solid #8b9180}
+.node{display:flex;flex-direction:column;align-items:center;gap:10px;width:118px;text-align:center}
+.disc{width:104px;height:104px;border-radius:50%;background:var(--cream-2);display:flex;align-items:center;
+  justify-content:center;color:var(--forest-800);transition:background .25s,box-shadow .25s}
+.ph:hover .disc{background:#fffdf6;box-shadow:0 0 0 3px var(--gold)}
+.disc .ic{width:68px;height:68px}
+.node .nl{min-height:1.4em;font-size:14px;font-weight:600;letter-spacing:.01em;color:var(--muted)}
+.node .nl.gold{color:var(--gold-deep)}.node .nl.forest{color:var(--forest-700)}.node .nl.slate{color:var(--slate)}
+.link{display:flex;align-items:center;width:30px;height:104px;color:#7d8472;flex:none}
+.link svg{width:30px;height:16px}
+.rqs{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.5;
+  color:var(--ink-2)}
+.rqs li{display:flex;gap:10px}
+.rqs b{flex:none;min-width:52px;padding:1px 0;border:1.5px solid #a9a594;border-radius:12px;text-align:center;font-size:12.5px;
+  font-weight:600;color:var(--ink-2);height:fit-content}
+.ph .foot{margin-top:auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding-top:14px;
+  border-top:1px solid var(--line);font-size:14px}
+.ph .now{color:var(--muted);flex:1 1 180px}
+.ph .go{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--forest-700)}
+.ph .go .ic-s{margin:0;transition:transform .25s}
+.ph:hover .go .ic-s{transform:translateX(3px)}
+.st{font-weight:600;font-size:13px;padding:2px 10px;border-radius:12px}
+.st.active{background:#fbefd6;color:#7a4f0f;border:1.5px solid #d6a54a}
+.st.planned{background:#fff;color:#5b616b;border:1.5px solid #c9c6bb}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:980px){.hero .in{grid-template-columns:1fr;gap:36px;padding:44px 16px 52px}
+  .chain{grid-template-columns:1fr;gap:18px}.phases .in{padding:48px 16px 56px}
+  .ph{padding:16px 6px 20px}.ph .tag{align-self:flex-start}.nodes{margin:18px 0 16px;min-height:0}
+  .line,.spacer{display:none}}
+@media (max-width:520px){.disc{width:84px;height:84px}.disc .ic{width:55px;height:55px}.node{width:96px}
+  .link{height:84px;width:22px}.link svg{width:22px}.wipe .cap{font-size:11px;top:8px}.wipe .cap.l{left:8px}
+  .wipe .cap.r{right:8px}.wipe .long{display:none}}
+</style>
+</head>
+<body>
+<header class="sitebar"><a class="brand" href="index.html" aria-label="Thesis home"><svg viewBox="0 0 22 22" aria-hidden="true"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="12" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity=".55"/><rect x="2" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity=".55"/><rect x="12" y="12" width="8" height="8" rx="1.5" fill="var(--gold)"/></svg><span>ExplainedGFM4Agri</span></a><nav aria-label="Thesis phases"><a href="phase1/pipeline_page/index.html"><span class="pn">Phase 1</span><span class="pt">GFMs Benchmark</span></a><a href="phase2/index.html"><span class="pn">Phase 2</span><span class="pt">XAI + UQ</span></a><a href="phase3/index.html"><span class="pn">Phase 3</span><span class="pt">LLM Report</span></a></nav><a class="ext gh" href="https://github.com/davidrers/ExplainedGMF4Agri" target="_blank" rel="noopener">GitHub<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></header>
+<main>
+<section class="hero"><div class="in">
+<div>
+<h1>Geospatial Foundation Models for Transparent Agricultural Monitoring under Label‑Scarce Conditions</h1>
+<p class="who"><b>David Reyes</b> · MSc thesis, M-GEO 2026–2027, GEO-AI track · ITC, University of Twente</p>
+<p class="sup">Supervisors: Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second)</p>
+<p class="lead"><b>The target system.</b> A user supplies an area of interest. The system returns a pixel-level crop segmentation of that area, pixel-level explanations of why each region was classified as it was, calibrated per-pixel confidence, and an LLM-written report traceable to that evidence.</p>
+<div class="cta"><a class="btn primary" href="phase1/pipeline_page/index.html">Open Phase 1<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<a class="ext btn ghost" href="https://github.com/davidrers/ExplainedGMF4Agri/blob/main/docs/thesis_design.md" target="_blank" rel="noopener">Research design<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div>
+<div>
+<figure class="wipe intro">
+<img src="assets/hero_s2.jpg" alt="Sentinel-2 true-colour composite of June 2021 over fields in Estonia" width="1344" height="672">
+<div class="lab" aria-hidden="true"><img class="base" src="assets/hero_s2.jpg" alt=""><img src="assets/hero_labels.png" alt=""></div>
+<span class="bar"></span><span class="knob"><svg class="kn" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="cap l">Sentinel-2<span class="long"> · June 2021</span></span><span class="cap r"><span class="long">EuroCrops </span>labels<span class="long"> · 2021</span></span>
+<input type="range" min="0" max="100" value="56" aria-label="Move the line between the image and its crop labels">
+</figure>
+<p class="figcap">Fields in Estonia, 13.4 × 6.7 km at 10 m: eighteen chips of the Phase 1 chip set. Left of the line, the
+monthly Sentinel-2 composite every model reads; right of it, the EuroCrops 2021 parcel labels the models learn to map,
+shown merged into seven crop groups. Move the line to compare.</p>
+<ul class="legend" aria-label="Crop groups"><li><i style="--c:#9cb87a"></i>grassland</li><li><i style="--c:#d9a441"></i>winter cereals</li><li><i style="--c:#ecd38a"></i>spring cereals</li><li><i style="--c:#f2d42c"></i>rapeseed</li><li><i style="--c:#5fa8a0"></i>legumes and fodder</li><li><i style="--c:#e07b39"></i>maize</li><li><i style="--c:#b5654a"></i>potatoes and vegetables</li><li><i style="--c:#3a3f3a"></i>no label</li></ul>
+</div>
+</div></section>
+<section class="phases" aria-labelledby="ph-h"><div class="in">
+<h2 id="ph-h">Three phases</h2>
+<p class="sub">From satellite time series to a report a person can check: Phase 1 maps the crops with frozen foundation
+models, Phase 2 explains the maps and says how sure they are, Phase 3 writes the report from that evidence. Phase 1 is the
+active workstream; Phases 2 and 3 are planned well enough to keep it compatible with them.</p>
+<div class="chain"><a class="ph" href="phase1/pipeline_page/index.html" aria-label="Phase 1, GFMs Benchmark: Label-efficient crop segmentation"><span class="tag"><span class="tag-n">PHASE 1</span><span class="tag-t">GFMs Benchmark</span></span><span class="nodes"><span class="spacer"></span><span class="node"><span class="disc"><svg class="ic" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="23" cy="42" r="16" fill="currentColor"/><g fill="none" stroke="var(--paper)" stroke-width="2.2"><ellipse cx="23" cy="42" rx="16" ry="6.5"/><ellipse cx="23" cy="42" rx="6.5" ry="16"/></g><g transform="rotate(35 45 19)"><rect x="27" y="15" width="11" height="8" rx="1" fill="currentColor"/><rect x="52" y="15" width="11" height="8" rx="1" fill="currentColor"/><path d="M32.5 15v8M57.5 15v8" stroke="var(--paper)" stroke-width="1.6"/><path d="M38 19h3M49 19h3" stroke="currentColor" stroke-width="3"/><rect x="41" y="14" width="8" height="10" rx="1.5" fill="var(--gold)"/></g><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M41.9 27.5A9 9 0 0 1 36.5 22.1"/><path d="M40.2 32.2A14 14 0 0 1 31.8 23.8"/></g></svg></span><span class="nl "></span></span><span class="link" aria-hidden="true"><svg viewBox="0 0 30 16"><path d="M2 8h24M20 3l6 5-6 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="node"><span class="disc"><svg class="ic" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M26 20v-6M32 20v-6M38 20v-6M26 44v6M32 44v6M38 44v6M20 26h-6M20 32h-6M20 38h-6M44 26h6M44 32h6M44 38h6" stroke="currentColor" stroke-width="3"/><rect x="20" y="20" width="24" height="24" rx="3" fill="currentColor"/><rect x="26" y="26" width="12" height="12" rx="1.5" fill="var(--gold)"/><circle cx="26" cy="11" r="2.9" fill="currentColor"/><circle cx="32" cy="11" r="2.9" fill="var(--gold)"/><circle cx="38" cy="11" r="2.9" fill="currentColor"/><circle cx="26" cy="53" r="2.9" fill="currentColor"/><circle cx="32" cy="53" r="2.9" fill="var(--gold)"/><circle cx="38" cy="53" r="2.9" fill="currentColor"/><circle cx="11" cy="26" r="2.9" fill="currentColor"/><circle cx="11" cy="32" r="2.9" fill="var(--gold)"/><circle cx="11" cy="38" r="2.9" fill="currentColor"/><circle cx="53" cy="26" r="2.9" fill="currentColor"/><circle cx="53" cy="32" r="2.9" fill="var(--gold)"/><circle cx="53" cy="38" r="2.9" fill="currentColor"/></svg></span><span class="nl gold">GFM</span></span><span class="line" aria-hidden="true"></span></span><ul class="rqs"><li><b>RQ1</b><span>How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature baseline?</span></li></ul><span class="foot"><span class="st active">In progress</span><span class="now">Estonia 2021 runs end to end: six arms at K = 100, 20 and 5 %.</span><span class="go">Open Phase 1<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a><a class="ph" href="phase2/index.html" aria-label="Phase 2, XAI + UQ: Explainability and uncertainty"><span class="tag"><span class="tag-n">PHASE 2</span><span class="tag-t">XAI + UQ</span></span><span class="nodes"><span class="line arr" aria-hidden="true"></span><span class="node"><span class="disc"><svg class="ic" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="27" cy="27" r="16"/><path d="M39 39l13 13" stroke-width="5"/><path d="M18.5 31a9 9 0 0 1 17 0"/><path d="M27 31l5.5-6" stroke="var(--gold)" stroke-width="3"/><circle cx="27" cy="31" r="1.8" fill="currentColor"/></g></svg></span><span class="nl forest">XAI · Uncertainty</span></span><span class="line" aria-hidden="true"></span></span><ul class="rqs"><li><b>RQ2.1</b><span>Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?</span></li><li><b>RQ2.2</b><span>Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?</span></li><li><b>RQ2.3</b><span>Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?</span></li></ul><span class="foot"><span class="st planned">Not started</span><span class="now">Planned; respecified once Phase 1 lands.</span><span class="go">Open Phase 2<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a><a class="ph" href="phase3/index.html" aria-label="Phase 3, LLM Report: XAI-grounded LLM reporting"><span class="tag slate"><span class="tag-n">PHASE 3</span><span class="tag-t">LLM Report</span></span><span class="nodes"><span class="line arr" aria-hidden="true"></span><span class="node"><span class="disc"><svg class="ic" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M31 11h15l8 8v33a2 2 0 0 1-2 2H31a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z"/><path d="M46 11v8h8"/><path d="M35 29h13M35 35h13M35 41h13M35 47h9"/></g><path d="M8 21h19a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H17l-6 5v-5H8a3 3 0 0 1-3-3V24a3 3 0 0 1 3-3z" fill="currentColor"/><text x="17.5" y="34" text-anchor="middle" font-family="IBM Plex Sans,Arial,sans-serif" font-size="10" font-weight="700" fill="var(--paper)">AI</text></svg></span><span class="nl slate">LLM</span></span><span class="link" aria-hidden="true"><svg viewBox="0 0 30 16"><path d="M2 8h24M20 3l6 5-6 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="node"><span class="disc"><svg class="ic" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 9h22l10 10v35a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2z"/><path d="M38 9v10h10"/><path d="M24 25h7M24 32h7M24 39h7"/><circle cx="39.5" cy="31" r="5.5"/><path d="M22 50v-3M27 50v-6M32 50v-4M37 50v-8M42 50v-5" stroke-width="3"/></g><circle cx="19.5" cy="25" r="1.7" fill="currentColor"/><circle cx="19.5" cy="32" r="1.7" fill="currentColor"/><circle cx="19.5" cy="39" r="1.7" fill="currentColor"/><path d="M39.5 31v-5.5a5.5 5.5 0 0 1 5.5 5.5z" fill="var(--gold)"/></svg></span><span class="nl "></span></span><span class="spacer"></span></span><ul class="rqs"><li><b>RQ3</b><span>Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring reports?</span></li></ul><span class="foot"><span class="st planned">Not started</span><span class="now">Planned; the first part reduced if the schedule slips.</span><span class="go">Open Phase 3<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></div>
+</div></section>
+</main>
+<footer class="sitefoot"><div class="in"><p><b style="color:var(--on-forest)">Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions</b><br>David Reyes · MSc thesis, M-GEO 2026–2027, GEO-AI track · ITC, University of Twente</p><p>Every page is built from the repository's documents: <a class="ext" href="https://github.com/davidrers/ExplainedGMF4Agri/blob/main/docs/thesis_design.md" target="_blank" rel="noopener">thesis_design.md<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a> · <a class="ext" href="https://github.com/davidrers/ExplainedGMF4Agri/blob/main/docs/phase1/protocol.md" target="_blank" rel="noopener">protocol.md<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a> · <a class="ext" href="https://github.com/davidrers/ExplainedGMF4Agri/blob/main/docs/phase1/pipeline.md" target="_blank" rel="noopener">pipeline.md<svg class="ic-s" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></p></div></footer>
+<script>
+const w = document.querySelector('.wipe'), r = w.querySelector('input');
+const set = v => { w.classList.remove('intro'); w.style.setProperty('--x', v + '%'); r.value = v; };
+r.addEventListener('input', () => set(r.value));
+w.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  const b = w.getBoundingClientRect();
+  set(Math.round(Math.max(0, Math.min(100, (e.clientX - b.left) / b.width * 100))));
+});
+</script>
+</body>
+</html>
