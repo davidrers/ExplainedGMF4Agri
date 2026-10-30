@@ -16,6 +16,7 @@ from pathlib import Path
 
 OUT = Path(__file__).with_name("index.html")
 REPO = "https://github.com/davidrers/ExplainedGMF4Agri/blob/main"
+AS_OF = "22 October 2026"   # the state of the docs the page shows, in its header
 E = html.escape
 
 # ----------------------------------------------------------------------------------------------
@@ -920,7 +921,7 @@ page = f"""<!doctype html>
 </head>
 <body>
 <header class="top"><div><b>ExplainedGFM4Agri · Phase 1 pipeline</b> &nbsp;Main workflow <code>kshot</code>, Estonia 2021,
-22 October 2026</div><nav><a href="#workflow">1 · Workflow</a><a href="#architecture">2 · Architecture</a>
+{AS_OF}</div><nav><a href="#workflow">1 · Workflow</a><a href="#architecture">2 · Architecture</a>
 <a href="#experiments">3 · Experiments</a><a href="{REPO}/docs/phase1/pipeline.md" target="_blank" rel="noopener">pipeline.md ↗</a>
 </nav></header>
 
