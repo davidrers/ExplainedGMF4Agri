@@ -1,0 +1,12 @@
+# Parcels without the oracle extent (README.md). The one arm fitted here is TESSERA v2 Medium fine-tuned on the
+# labelled-pixel route with the boundary head beside the crop-type head (run.py, pixelbnd.py); the frozen TESSERA
+# cells are the delineation experiment's, results/2026-10-18_parcel_delineation/<chip set>/tessera_v2_medium/,
+# fitted on the same draws, seed and epochs, and only rescored here (score.py). experiment_k<K>.yaml hold one budget
+# each, so the three fits run as three cluster jobs under this name.
+name: 2026-11-05_parcel_extent
+arms: [tessera_v2_medium_ft_bnd]
+budgets_pct: [100, 20, 5]
+draws: [0]
+seeds: [0]
+epochs: 45                     # kshot's (protocol D27), as the frozen delineation cells
+checkpoint: val_loss           # the lowest validation loss, crop-type plus boundary loss

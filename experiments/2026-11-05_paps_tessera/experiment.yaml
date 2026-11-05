@@ -1,0 +1,10 @@
+# Full PaPs (utae-paps) on TESSERA, frozen and fine-tuned (README.md). Run with this folder's run.py, which fits
+# U-Net + PaPs cells of its own; experiment_k<K>.yaml hold one budget each, so every cell runs as its own cluster
+# job under this name.
+name: 2026-11-05_paps_tessera
+arms: [paps_tessera_v2_frozen, paps_tessera_v2_ft]
+budgets_pct: [100, 20, 5]      # the draws of kshot, so the fine-tuned encoders match their cells
+draws: [0]
+seeds: [0]
+epochs: 100                    # utae-paps' train_panoptic.py
+worldcover: data/worldcover/EE_2021_rev/worldcover.npz   # experiments/2026-11-05_parcel_extent/fetch_worldcover.py

@@ -1,0 +1,22 @@
+# U-Net + PaPs on the frozen TESSERA v2 Medium raster (the core's raster cache, rasters.py), utae-paps' defaults
+# (paps_model.py, paps_loss.py, fit_paps.py). Read by this folder's run.py, not by the K-shot runner; in arms_run/, not arms/, for that reason.
+route: paps
+encoder: frozen                # rasters.frozen: the core's raster cache of tessera_v2_medium
+data:
+  batch_size: 4                # utae-paps
+  augment: true                # D4 on the raster and the label rasters before the targets are built
+model:                         # utae-paps' U-TAE widths and PaPs defaults
+  encoder_widths: [64, 64, 64, 128]
+  decoder_widths: [32, 32, 64, 128]
+  shape_size: 16
+  mask_conv: true
+  min_confidence: 0.2          # until tuned on the validation chips
+  min_remain: 0.5
+  mask_threshold: 0.4
+loss: {l_center: 1, l_size: 1, l_shape: 1, l_class: 1, beta: 4}
+optim:
+  lr: 0.01                     # Adam, utae-paps' train_panoptic.py
+  milestones: [60, 80]
+  gamma: 0.3
+  warmup: 5                    # epochs on the centerness loss alone
+  val_every: 5                 # validation (threshold tuning, PQ, checkpoint) every 5 epochs after the warm-up

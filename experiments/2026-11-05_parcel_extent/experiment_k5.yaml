@@ -1,0 +1,9 @@
+# One budget of experiment.yaml (K = 5 %), so that each fit runs as its own cluster job; same name, so the cells
+# land in the same results folder, results/2026-11-05_parcel_extent/<chip set>/.
+name: 2026-11-05_parcel_extent
+arms: [tessera_v2_medium_ft_bnd]
+budgets_pct: [5]
+draws: [0]
+seeds: [0]
+epochs: 45
+checkpoint: val_loss
