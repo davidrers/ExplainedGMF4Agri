@@ -226,6 +226,16 @@ class PaPs(nn.Module):
             stack.append(m[center_batch, h_mask, w_mask])
         stack = torch.cat(stack, dim=1)
 
+        if stack.shape[0] == 0:
+            # No centre (none above the confidence cut): no parcel. The source would run its mask loop once on an
+            # empty tensor and fail.
+            z = heatmap.new_zeros
+            n = center_mask.shape[0]
+            return dict(center_mask=center_mask, saliency=saliency, heatmap=heatmap, semantic=z((0, self.num_classes)),
+                        size=z((0, 2)), confidence=z((0, 1)), centerness=z((0, 1)), instance_masks=[],
+                        instance_boxes=z((0, 4), dtype=torch.long),
+                        pano_instance=z((n, H, W)) if pseudo_nms else None,
+                        pano_semantic=z((n, self.num_classes, H, W)) if pseudo_nms else None)
         if stack.shape[0] == 1 and self.training:
             # BatchNorm1d cannot train on one centre; the step is supervised by the heatmap alone.
             stack = stack.repeat(2, 1)

@@ -142,6 +142,10 @@ def test_model_steps():
             assert (a["pano_semantic"][i].argmax(0)[ia > 0] == b["pano_semantic"][i].argmax(0)[ib > 0]).all()
         one = model(x[:1], pseudo_nms=True, prune=True)                       # a batch of one
         assert one["pano_instance"].shape == (1, 64, 64)
+        model.min_confidence.fill_(1.1)                                       # no centre survives
+        none = model(x, pseudo_nms=True, prune=True)
+        assert none["pano_instance"].shape == (2, 64, 64) and not none["pano_instance"].any()
+        assert torch.isfinite(crit(model(x, pseudo_nms=False, prune=True), y))
 
 
 def test_scorer():
