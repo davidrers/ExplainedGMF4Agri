@@ -52,4 +52,10 @@ user, 5 November 2026), draw 0, seed 0, all of `EE_2021_rev`. One cluster job pe
 **Results.** `results/2026-11-05_paps_tessera/<set>/<arm>/P<k>_draw0_seed0/`: `results.json` (with
 `panoptic_metrics` per extent and the training history), `metrics.csv`, `predictions_test.npz`, `best-pq.pt`.
 
-**Outcome.** Pending.
+**Outcome** ([REPORT.md](REPORT.md), 5 November 2026). PaPs delineates the test parcels with no extent given:
+class-aware PQ 0.303 on frozen TESSERA and 0.357 fine-tuned over the whole chip (class-agnostic 0.336 and 0.366),
+against 0.145 (0.048) for the boundary head on the same frozen encoder; frozen PaPs without an extent is level with the
+boundary head given the declared parcels (0.307). With each parcel classed by the crop-type map of RQ1 instead of PaPs'
+class head, PQ rises to 0.322 and 0.361. PaPs finds 40 % of the true parcels; its misses are the pieces under 0.5 ha
+(11 % found) and its false parcels lie on undeclared grassland. The fine-tuned boundary head (job 678194) is still to
+be added.
