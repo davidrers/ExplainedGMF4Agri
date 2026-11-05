@@ -19,8 +19,9 @@ what does the boundary head add over each extent's own floor?
 | `tessera_v2_medium` | frozen | none: the delineation experiment's cells (`results/2026-10-18_parcel_delineation/<set>/tessera_v2_medium/`), rescored |
 | `tessera_v2_medium_ft_bnd` (`arms_run/`) | fine-tuned at 1e-5 on the labelled pixels, as `2026-10-15_kshot_finetune` | `run.py`: the per-pixel MLP with the boundary head and joint loss of the delineation experiment |
 
-Both: K = 100, 20 and 5 %, draw 0, seed 0, 45 epochs, checkpoint of lowest validation loss (crop-type plus boundary
-loss), all of `EE_2021_rev`. The fine-tuned fits are new; the frozen ones are reused, so the two differ in the
+Both: K = 100 % only (no budget sweep at this stage: the question is whether the method takes us anywhere; user,
+5 November 2026), draw 0, seed 0, 45 epochs, checkpoint of lowest validation loss (crop-type plus boundary loss),
+all of `EE_2021_rev`. The fine-tuned fits are new; the frozen ones are reused, so the two differ in the
 encoder and in the route (labelled pixels instead of whole chips, which changes only the MLP's batch-norm statistics;
 in `kshot_finetune` that moved validation Macro-F1 by less than 0.005).
 
@@ -51,7 +52,7 @@ neighbour onto every chip's grid, in `data/worldcover/EE_2021_rev/` (outside the
     poetry run python experiments/2026-11-05_parcel_extent/worldcover_stats.py --chips EE_2021_rev
     poetry run python experiments/2026-11-05_parcel_extent/check.py --regression EE_2021_rev
     poetry run python experiments/2026-11-05_parcel_extent/run.py -e experiments/2026-11-05_parcel_extent/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev --dry-run
-    for k in 100 20 5; do CPUS=16 MEM=100G bash scripts/cluster/submit.sh experiments/2026-11-05_parcel_extent/experiment_k$k.yaml EE_2021_rev; done   # cluster
+    bash scripts/cluster/submit.sh experiments/2026-11-05_parcel_extent/experiment_k100.yaml EE_2021_rev       # cluster
     bash scripts/cluster/pull_results.sh 2026-11-05_parcel_extent EE_2021_rev
     poetry run python experiments/2026-11-05_parcel_extent/score.py --chips EE_2021_rev       # every cell, every extent
     poetry run python experiments/2026-11-05_parcel_extent/report.py --chips EE_2021_rev

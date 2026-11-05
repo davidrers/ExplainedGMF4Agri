@@ -1,5 +1,7 @@
 """Score every TESSERA cell of this experiment in every extent, on the hub, where the WorldCover maps live.
 
+Only K = 100 % (the experiment's one budget).
+
 * ``tessera_v2_medium`` (frozen): the delineation experiment's stored cells,
   ``results/2026-10-18_parcel_delineation/<set>/tessera_v2_medium/P<k>_draw0_seed0/predictions_test.npz``, not
   refitted, not written to;
@@ -34,7 +36,7 @@ HEAD = ("extent", "semantic", "boundary@0.3", "boundary@0.5", "boundary@0.7", "c
 
 def cells(chips: str):
     for arm, exp in SOURCES.items():
-        for f in sorted((REPO / "results" / exp / chips / arm).glob("P*_draw*_seed*/predictions_test.npz")):
+        for f in sorted((REPO / "results" / exp / chips / arm).glob("P100_draw*_seed*/predictions_test.npz")):
             if (f.parent / "results.json").exists():
                 yield arm, f.parent
 

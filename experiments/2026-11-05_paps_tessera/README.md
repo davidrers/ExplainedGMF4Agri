@@ -15,7 +15,7 @@ frozen one? How does it compare with the boundary-head parcels of
 | Arm (`arms_run/`) | Raster (`rasters.py`) |
 |---|---|
 | `paps_tessera_v2_frozen` | the frozen TESSERA v2 Medium raster cache of the core |
-| `paps_tessera_v2_ft` | every chip re-encoded with the TESSERA student fine-tuned on crop type in `2026-10-15_kshot_finetune` at the same K, draw and seed, then frozen (the user's choice of 5 November 2026; fine-tuning end to end through PaPs would cost about 90 GPU hours per budget) |
+| `paps_tessera_v2_ft` | every chip re-encoded with the TESSERA student fine-tuned on crop type in `2026-10-15_kshot_finetune` at K = 100 %, draw 0 and seed 0, then frozen (the user's choice of 5 November 2026; fine-tuning end to end through PaPs would cost about 90 GPU hours per budget) |
 
 **The model** (`paps_model.py`, `paps_loss.py`, vendored from utae-paps, MIT). TESSERA encodes each pixel's time
 series alone, so PaPs needs a spatial backbone: U-TAE's spatial encoder and decoder (widths 64-64-64-128 down,
@@ -38,14 +38,14 @@ parcel layer is never used to say where background is, at any K.
 chip (`chip/paps`), and the same parcels cut to WorldCover (`worldcover/paps`, `worldcover_30_40_90/paps`) and to the
 declared parcels (`oracle/paps`, the upper bound), by the void rule.
 
-**Protocol.** K = 100, 20 and 5 %, draw 0, seed 0, all of `EE_2021_rev`. One cluster job per arm and budget
-(`experiment_k<K>.yaml`).
+**Protocol.** K = 100 % only (no budget sweep at this stage: the question is whether the method takes us anywhere;
+user, 5 November 2026), draw 0, seed 0, all of `EE_2021_rev`. One cluster job per arm.
 
 **How to run.**
 
     poetry run python experiments/2026-11-05_paps_tessera/check.py --chips EE_2021_rev_mini
     poetry run python experiments/2026-11-05_paps_tessera/run.py -e experiments/2026-11-05_paps_tessera/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev --dry-run
-    for k in 100 20 5; do CPUS=16 MEM=100G bash scripts/cluster/submit.sh experiments/2026-11-05_paps_tessera/experiment_k$k.yaml EE_2021_rev; done   # cluster
+    bash scripts/cluster/submit.sh experiments/2026-11-05_paps_tessera/experiment_k100.yaml EE_2021_rev        # cluster
     bash scripts/cluster/pull_results.sh 2026-11-05_paps_tessera EE_2021_rev
     poetry run python experiments/2026-11-05_paps_tessera/run.py -e experiments/2026-11-05_paps_tessera/experiment.yaml --chips data/eurocrops_chips/EE_2021_rev --summarise
 

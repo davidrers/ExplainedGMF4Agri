@@ -1,8 +1,0 @@
-# One budget of experiment.yaml (K = 20 %), so each cell runs as its own cluster job; same name, same results.
-name: 2026-11-05_paps_tessera
-arms: [paps_tessera_v2_frozen, paps_tessera_v2_ft]
-budgets_pct: [20]
-draws: [0]
-seeds: [0]
-epochs: 100                    # utae-paps' train_panoptic.py
-worldcover: data/worldcover/EE_2021_rev/worldcover.npz   # experiments/2026-11-05_parcel_extent/fetch_worldcover.py
