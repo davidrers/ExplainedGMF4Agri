@@ -214,7 +214,10 @@ def fig_examples(chips: str, folder: Path, n: int = 2) -> list[Path]:
     cells = {a: c for a, c in cells.items() if (c / "predictions_test.npz").exists()}
     if not cells:
         return []
-    data = {a: np.load(c / "predictions_test.npz") for a, c in cells.items()}
+    data = {}
+    for a, c in cells.items():
+        with np.load(c / "predictions_test.npz") as z:   # each array once: z[key] decompresses it again
+            data[a] = {k: z[k] for k in ("ids", "pred", "boundary", "mask")}
     first = next(iter(data.values()))
     ids = [str(c) for c in first["ids"]]
     wc_all = np.load(REPO / "data/worldcover" / chips.replace("_mini", "") / "worldcover.npz")

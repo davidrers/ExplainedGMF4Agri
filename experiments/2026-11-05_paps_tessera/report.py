@@ -215,7 +215,11 @@ def fig_examples(chips: str, folder: Path, n: int = 2) -> list[Path]:
     from gfm4agri.benchmark.parcel_metrics import read_parcels
 
     cells = {a: REPO / "results" / NAME / chips / a / "P100_draw0_seed0" / "predictions_test.npz" for a in ARMS}
-    data = {a: np.load(f) for a, f in cells.items() if f.exists()}
+    data = {}
+    for a, f in cells.items():
+        if f.exists():
+            with np.load(f) as z:                       # each array once: z[key] decompresses it again
+                data[a] = {k: z[k] for k in ("ids", "inst", "heatmap", "mask")}
     if not data:
         return []
     first = next(iter(data.values()))

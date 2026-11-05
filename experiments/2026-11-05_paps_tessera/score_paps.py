@@ -75,6 +75,9 @@ def score(preds: dict, chips_dir: Path, class_names: list[str], worldcover: Path
 
 def score_file(predictions: Path, chips_dir: Path, class_names: list[str], worldcover: Path | None,
                workers: int = 8) -> dict:
-    d = np.load(predictions)
-    preds = {str(c): (d["inst"][i], d["cls"][i], None, None, d["mask"][i]) for i, c in enumerate(d["ids"])}
+    # Each ``d[key]`` of an npz decompresses the whole array again, and a slice of it keeps that copy alive: read
+    # each array once (indexing ``d["inst"][i]`` per chip held one full copy per chip and ran out of memory).
+    with np.load(predictions) as d:
+        ids, inst, cls, mask = d["ids"], d["inst"], d["cls"], d["mask"]
+    preds = {str(c): (inst[i], cls[i], None, None, mask[i]) for i, c in enumerate(ids)}
     return score(preds, chips_dir, class_names, worldcover, workers=workers)
