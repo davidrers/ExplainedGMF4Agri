@@ -181,7 +181,8 @@ def fig_fp(df: pd.DataFrame, path: Path, pct: float = 100) -> None:
     ax.grid(axis="y", visible=False)
     ax.set_xlabel(f"false parcels of the boundary head (tau 0.5), K = {pct:g} %")
     ax.legend(ncol=5, fontsize=8, loc="upper center", bbox_to_anchor=(0.45, -0.18 - 0.02 * len(rows)))
-    ax.set_title("Where the false parcels lie: on the true parcels, or on background by WorldCover class")
+    fig.suptitle("Where the false parcels lie: on the true parcels, or on background by WorldCover class",
+                 x=0.01, ha="left", fontsize=10.5)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)

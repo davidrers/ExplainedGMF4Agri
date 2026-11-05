@@ -44,6 +44,8 @@ ARMS = {"paps_tessera_v2_frozen": ("PaPs, TESSERA frozen", 0, "tessera_v2_medium
         "paps_tessera_v2_ft": ("PaPs, TESSERA fine-tuned", 1, "tessera_v2_medium_ft_bnd")}
 EXTENTS = {"chip": "whole chip (PaPs as it is)", "worldcover": "cut to WorldCover 30 + 40",
            "oracle": "cut to the declared parcels (oracle)"}
+TICKS = {"chip": "whole chip\n(PaPs as it is)", "worldcover": "cut to\nWorldCover 30 + 40",
+         "oracle": "cut to the declared\nparcels (oracle)"}
 FP_PLACES = ["on parcels", "trees", "grassland", "cropland", "water", "built-up", "wetland", "shrubland", "bare",
              "other"]
 
@@ -123,7 +125,7 @@ def fig_pq(df: pd.DataFrame, path: Path, pct: float = 100) -> None:
                 f = fl[fl.extent == ext]
                 if not f.empty:
                     ax.hlines(float(f[metric].iloc[0]), j - 0.44, j + 0.44, color=INK, lw=1.6, ls="--")
-        ax.set_xticks(range(len(exts)), [EXTENTS[e].replace(" (", "\n(") for e in exts], fontsize=8.5)
+        ax.set_xticks(range(len(exts)), [TICKS[e] for e in exts], fontsize=8.5)
         ax.set_ylabel(ylab)
         ax.set_ylim(0, ax.get_ylim()[1] * 1.08)
     handles, labels = axes[0].get_legend_handles_labels()
@@ -196,7 +198,8 @@ def fig_fp(df: pd.DataFrame, path: Path, pct: float = 100) -> None:
     ax.grid(axis="y", visible=False)
     ax.set_xlabel(f"false parcels of PaPs, K = {pct:g} %")
     ax.legend(ncol=5, fontsize=8, loc="upper center", bbox_to_anchor=(0.45, -0.18 - 0.02 * len(rows)))
-    ax.set_title("Where PaPs' false parcels lie: on the true parcels, or on background by WorldCover class")
+    fig.suptitle("Where PaPs' false parcels lie: on the true parcels, or on background by WorldCover class",
+                 x=0.01, ha="left", fontsize=10.5)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -255,7 +258,9 @@ def fig_examples(chips: str, folder: Path, n: int = 2) -> list[Path]:
         fig, axes = plt.subplots(1, len(panels), figsize=(3.1 * len(panels), 3.5))
         for ax, (title, a, st) in zip(np.atleast_1d(axes), panels):
             if st is None:
-                ax.imshow(a, cmap="Greys", vmin=0, vmax=255, interpolation="nearest")
+                # Centre confidences are small (the threshold is about 0.07): stretch to the chip's 99.9th centile.
+                ax.imshow(a, cmap="Greys", vmin=0, vmax=max(1.0, float(np.percentile(a, 99.9))),
+                          interpolation="nearest")
                 ov = np.zeros(mask.shape + (4,))
                 ov[_outline(np.where(E, true, 0)) & E] = (*matplotlib.colors.to_rgb("#2a78d6"), 0.8)
                 ax.imshow(ov, interpolation="nearest")
