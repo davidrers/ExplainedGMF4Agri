@@ -4,9 +4,10 @@ Reads ``results/<name>/<chip set>/`` as ``run.py`` writes it, and, as the refere
 same TESSERA encoders in the same extents (``results/2026-11-05_parcel_extent/<chip set>/*/*/extent_scores.json``,
 tau 0.5) when they are there. Writes into ``figures/`` beside this file:
 
-* ``pq_curves.png``: PQ of PaPs' parcels against K, class-agnostic and class-aware, one column per extent, frozen
-  and fine-tuned, with the boundary head's parcels and each extent's floor;
-* ``validation_curves.png``: training losses and validation PQ per epoch, with the epoch kept;
+* ``pq_bars.png``: PQ of PaPs' parcels at K = 100 %, class-agnostic and class-aware, grouped by extent, frozen and
+  fine-tuned, beside the boundary head's parcels and each extent's floor;
+* ``validation_curves.png``: training loss, validation PQ and the number of validation parcels per epoch, with the
+  epoch kept;
 * ``fp_where.png``: where PaPs' false parcels lie, per extent and arm at K = 100 %;
 * ``example_<n>.png``: test chips at K = 100 %: the heatmap, then PaPs' parcels over the whole chip, coloured by how
   they score, for each arm;
@@ -90,66 +91,82 @@ def load(chips: str) -> tuple[pd.DataFrame, dict]:
     return pd.DataFrame(rows), cells
 
 
-def _k_axis(ax, ks):
-    ax.set_xticks(range(len(ks)), [f"{k:g} %" for k in ks])
-    ax.set_xlim(-0.3, len(ks) - 0.7)
-    ax.set_xlabel("label budget K")
+def fig_pq(df: pd.DataFrame, path: Path, pct: float = 100) -> None:
+    """Grouped bars per extent: PaPs (solid) and the boundary head (hatched) on each encoder, the extent's floor as a
+    black tick on the class-agnostic panel."""
+    from matplotlib.lines import Line2D
 
-
-def fig_pq(df: pd.DataFrame, path: Path) -> None:
-    ks = sorted(df[df.source == "paps"]["pct"].unique(), reverse=True)
-    fig, axes = plt.subplots(2, len(EXTENTS), figsize=(3.4 * len(EXTENTS), 6.4), sharey="row")
-    for j, (ext, title) in enumerate(EXTENTS.items()):
-        for i, (metric, ylab) in enumerate((("pq_agnostic", "PQ, class-agnostic"), ("pq", "PQ, class-aware"))):
-            ax = axes[i, j]
-            for arm, (label, slot, _) in ARMS.items():
-                for src, ls, mk, lab in (("paps", "-", "o", label),
-                                         ("boundary", ":", "s", label.replace("PaPs", "boundary head"))):
-                    d = df[(df.arm == arm) & (df.source == src) & (df.extent == ext) &
-                           (df.variant == ("paps" if src == "paps" else "boundary@0.5"))].set_index("pct")
-                    d = d[d.index.isin(ks)]
-                    if not d.empty:
-                        ax.plot([ks.index(k) for k in d.index], d[metric], ls=ls, marker=mk, color=SLOTS[slot],
-                                label=lab, lw=2 if src == "paps" else 1.5)
-            fl = df[(df.source == "boundary") & (df.extent == ext) & (df.variant == "extent")]
-            fl = fl[fl.arm == next(iter(ARMS))].set_index("pct")
-            fl = fl[fl.index.isin(ks)]
-            if not fl.empty and metric == "pq_agnostic":
-                ax.plot([ks.index(k) for k in fl.index], fl[metric], ls="--", lw=1.3, color=MUTED,
-                        label="floor: the extent's regions")
-            _k_axis(ax, ks)
-            if j == 0:
-                ax.set_ylabel(ylab)
-            if i == 0:
-                ax.set_title(title, fontsize=9.5)
-    axes[0, 0].legend(loc="lower left", fontsize=7.5)
-    fig.suptitle("PaPs' parcels (solid) against the boundary head's (dotted), same encoders, same extents",
+    d = df[df.pct == pct]
+    bars = []                                   # (arm, source, variant, label, slot, hatch)
+    for src, var, hatch in (("paps", "paps", None), ("boundary", "boundary@0.5", "///")):
+        for arm, (label, slot, _) in ARMS.items():
+            if not d[(d.arm == arm) & (d.source == src) & (d.variant == var)].empty:
+                bars.append((arm, src, var, label if src == "paps" else label.replace("PaPs", "boundary head"),
+                             slot, hatch))
+    exts = list(EXTENTS)
+    w = 0.84 / max(len(bars), 1)
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    for ax, (metric, ylab) in zip(axes, (("pq_agnostic", "PQ, class-agnostic"), ("pq", "PQ, class-aware"))):
+        for b, (arm, src, var, label, slot, hatch) in enumerate(bars):
+            for j, ext in enumerate(exts):
+                q = d[(d.arm == arm) & (d.source == src) & (d.variant == var) & (d.extent == ext)]
+                if q.empty:
+                    continue
+                x = j + (b - (len(bars) - 1) / 2) * w
+                v = float(q[metric].iloc[0])
+                ax.bar(x, v, w, color=SURFACE if hatch else SLOTS[slot], edgecolor=SLOTS[slot], hatch=hatch,
+                       linewidth=1.2, label=label if j == 0 else None)
+                ax.text(x, v + 0.008, f"{v:.2f}", ha="center", va="bottom", fontsize=7, color=INK_2)
+        if metric == "pq_agnostic":
+            fl = d[(d.source == "boundary") & (d.variant == "extent") & (d.arm == next(iter(ARMS)))]
+            for j, ext in enumerate(exts):
+                f = fl[fl.extent == ext]
+                if not f.empty:
+                    ax.hlines(float(f[metric].iloc[0]), j - 0.44, j + 0.44, color=INK, lw=1.6, ls="--")
+        ax.set_xticks(range(len(exts)), [EXTENTS[e].replace(" (", "\n(") for e in exts], fontsize=8.5)
+        ax.set_ylabel(ylab)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.08)
+    handles, labels = axes[0].get_legend_handles_labels()
+    handles.append(Line2D([], [], color=INK, lw=1.6, ls="--"))
+    labels.append("floor: the extent's own regions")
+    axes[0].legend(handles, labels, loc="upper left", fontsize=7.5)
+    axes[0].set_title("Class-agnostic: is the parcel there?")
+    axes[1].set_title("Class-aware: macro mean over the classes")
+    fig.suptitle(f"PaPs' parcels against the boundary head's (tau 0.5), same encoders, same extents, K = {pct:g} %",
                  x=0.01, ha="left", fontsize=11.5)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)
 
 
-def fig_validation(cells: dict, path: Path) -> None:
-    ks = sorted({k for _, k in cells}, reverse=True)
-    if not ks:
+def fig_validation(cells: dict, path: Path, pct: float = 100) -> None:
+    """Training loss per epoch (log scale) and validation PQ, class-aware and class-agnostic, with the epoch kept."""
+    runs = {a: r for (a, k), r in cells.items() if k == pct}
+    if not runs:
         return
-    fig, axes = plt.subplots(2, len(ks), figsize=(3.6 * len(ks), 5.8), squeeze=False)
-    for j, k in enumerate(ks):
-        for arm, (label, slot, _) in ARMS.items():
-            r = cells.get((arm, k))
-            if r is None:
-                continue
-            h = pd.DataFrame(r["history"])
-            axes[0, j].plot(h["epoch"], h["train/loss"], color=SLOTS[slot], lw=1.5, label=label)
-            v = h.dropna(subset=["val/PQ"]) if "val/PQ" in h else h.iloc[:0]
-            axes[1, j].plot(v["epoch"], v["val/PQ"], color=SLOTS[slot], marker="o", ms=4, lw=1.5, label=label)
-            axes[1, j].axvline(r["best_epoch"], color=SLOTS[slot], ls=":", lw=1)
-        axes[0, j].set_title(f"K = {k:g} %: training loss")
-        axes[0, j].set_yscale("log")
-        axes[1, j].set_title("validation PQ (void rule, whole chip)")
-        axes[1, j].set_xlabel("epoch")
-    axes[0, 0].legend(fontsize=8)
+    fig, axes = plt.subplots(1, 3, figsize=(12, 3.6))
+    for arm, r in runs.items():
+        label, slot, _ = ARMS[arm]
+        h = pd.DataFrame(r["history"])
+        axes[0].plot(h["epoch"], h["train/loss"], color=SLOTS[slot], lw=1.5, label=label)
+        v = h.dropna(subset=["val/PQ"]) if "val/PQ" in h else h.iloc[:0]
+        axes[1].plot(v["epoch"], v["val/PQ"], color=SLOTS[slot], marker="o", ms=4, lw=1.5, label=f"{label}, class-aware")
+        axes[1].plot(v["epoch"], v["val/PQ_agnostic"], color=SLOTS[slot], marker="o", ms=4, lw=1.5, ls="--",
+                     mfc=SURFACE, label=f"{label}, class-agnostic")
+        axes[2].plot(v["epoch"], v["val/predicted_parcels"], color=SLOTS[slot], marker="o", ms=4, lw=1.5,
+                     label=label)
+        for ax in axes[1:]:
+            ax.axvline(r["best_epoch"], color=SLOTS[slot], ls=":", lw=1)
+    axes[0].set_title("training loss (the first 5 epochs: heatmap only)")
+    axes[0].set_yscale("log")
+    axes[1].set_title("validation PQ (void rule, whole chip)")
+    axes[2].set_title("validation parcels predicted")
+    for ax in axes:
+        ax.set_xlabel("epoch")
+    axes[0].legend(fontsize=8)
+    axes[1].legend(fontsize=7)
+    fig.suptitle(f"PaPs training, K = {pct:g} %; dotted: the epoch kept (best validation PQ)", x=0.01, ha="left",
+                 fontsize=11)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -283,7 +300,7 @@ def tables(df: pd.DataFrame, cells: dict) -> str:
             continue
         refv = [ref.loc[(a, k, ext), "pq_agnostic"] if (a, k, ext) in ref.index else np.nan
                 for a, k in zip(d.arm, d.pct)]
-        t = pd.DataFrame({"Arm": d.arm.map(lab).values, "K": d.pct.map(lambda k: f"{k:g} %").values,
+        t = pd.DataFrame({"Arm": d.arm.map(lab).values,
                           "PQ": d.pq.values, "SQ": d.sq.values, "RQ": d.rq.values,
                           "PQ agn.": d.pq_agnostic.values, "boundary head PQ agn.": refv,
                           "TP": d.tp_agnostic.astype(int).values, "FP": d.fp_agnostic.astype(int).values,
@@ -291,7 +308,7 @@ def tables(df: pd.DataFrame, cells: dict) -> str:
                           "dropped": d.dropped_void.astype(int).values})
         out.append(f"**PaPs, {title}**\n\n" + _md(t))
     if cells:
-        t = pd.DataFrame([{"Arm": lab[a], "K": f"{k:g} %", "train chips": r["chips"]["train"],
+        t = pd.DataFrame([{"Arm": lab[a], "train chips": r["chips"]["train"],
                            "best epoch": r["best_epoch"], "val PQ": r["best_val_pq"],
                            "confidence": r["min_confidence"], "fit h": r["fit_seconds"] / 3600,
                            "peak GB": r["peak_gpu_gb"]} for (a, k), r in sorted(cells.items(), reverse=True)])
@@ -304,11 +321,13 @@ def main() -> None:
     ap.add_argument("--chips", required=True)
     a = ap.parse_args()
     df, cells = load(a.chips)
+    df = df[df.pct == 100] if not df.empty else df          # the experiment's one budget
+    cells = {key: r for key, r in cells.items() if key[1] == 100}
     if df.empty or (df.source == "paps").sum() == 0:
         raise SystemExit("no scored PaPs cells yet")
     folder = HERE / "figures" if a.chips == "EE_2021_rev" else HERE / "figures" / a.chips
     folder.mkdir(parents=True, exist_ok=True)
-    fig_pq(df, folder / "pq_curves.png")
+    fig_pq(df, folder / "pq_bars.png")
     fig_validation(cells, folder / "validation_curves.png")
     fig_fp(df, folder / "fp_where.png")
     fig_examples(a.chips, folder)

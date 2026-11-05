@@ -2,10 +2,11 @@
 
 Writes into ``figures/`` beside this file:
 
-* ``extents.png``: PQ of the boundary parcels (tau 0.5) against K, class-agnostic and class-aware, one column per
-  extent, frozen and fine-tuned TESSERA, with each extent's floor (its own connected regions, nothing predicted);
+* ``extents.png``: PQ of the boundary parcels (tau 0.5) at K = 100 %, class-agnostic and class-aware, grouped by
+  extent, frozen and fine-tuned TESSERA, each bar with its extent's floor (its own connected regions, nothing
+  predicted);
 * ``variants.png``: class-agnostic PQ of every variant (floor, crop-type map, boundary head at three thresholds,
-  boundary head and class changes) per extent, at each K;
+  boundary head and class changes) per extent;
 * ``fp_where.png``: where the false parcels of the boundary head lie (tau 0.5), per extent and arm at K = 100 %: on
   the true parcels (wrong split or merge) or on background, by WorldCover class; and the parcels dropped as void;
 * ``example_<n>.png``: test chips at K = 100 %: WorldCover's extent and the true parcels, then the boundary parcels
@@ -81,39 +82,50 @@ def load(chips: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def _k_axis(ax, ks):
-    ax.set_xticks(range(len(ks)), [f"{k:g} %" for k in ks])
-    ax.set_xlim(-0.3, len(ks) - 0.7)
-    ax.set_xlabel("label budget K")
+#: The extents of the bar figure, the sensitivity variant of WorldCover among them.
+BAR_EXTENTS = {"oracle": "declared parcels\n(oracle)", "worldcover": "WorldCover\n30 + 40",
+               "worldcover_30_40_90": "WorldCover\n30 + 40 + 90", "chip": "whole chip"}
 
 
-def fig_extents(df: pd.DataFrame, path: Path) -> None:
-    ks = sorted(df["pct"].unique(), reverse=True)
-    fig, axes = plt.subplots(2, len(EXTENTS), figsize=(3.3 * len(EXTENTS), 6.2), sharey="row")
-    for j, (ext, title) in enumerate(EXTENTS.items()):
-        for i, (metric, ylab) in enumerate((("pq_agnostic", "PQ, class-agnostic"), ("pq", "PQ, class-aware"))):
-            ax = axes[i, j]
-            floor = df[(df.extent == ext) & (df.variant == "extent")]
-            for arm, (label, slot) in ARMS.items():
-                d = df[(df.arm == arm) & (df.extent == ext) & (df.variant == "boundary@0.5")].set_index("pct")
-                if d.empty:
+def fig_extents(df: pd.DataFrame, path: Path, pct: float = 100) -> None:
+    """Grouped bars: PQ of the boundary parcels (tau 0.5) per extent and arm, each bar's floor as a black tick."""
+    from matplotlib.lines import Line2D
+
+    d = df[(df.pct == pct) & (df.variant == "boundary@0.5")]
+    fl = df[(df.pct == pct) & (df.variant == "extent")]
+    exts = [e for e in BAR_EXTENTS if not d[d.extent == e].empty]
+    arms = [a for a in ARMS if not d[d.arm == a].empty]
+    w = 0.8 / len(arms)
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.0))
+    for ax, (metric, ylab) in zip(axes, (("pq_agnostic", "PQ, class-agnostic"), ("pq", "PQ, class-aware"))):
+        for a, arm in enumerate(arms):
+            label, slot = ARMS[arm]
+            for j, ext in enumerate(exts):
+                q = d[(d.arm == arm) & (d.extent == ext)]
+                if q.empty:
                     continue
-                xs = [ks.index(k) for k in d.index]
-                ax.plot(xs, d[metric], marker="o", color=SLOTS[slot], label=f"{label}, boundary head")
-                fl = floor[floor.arm == arm].set_index("pct")[metric]
-                if metric == "pq" or arm == next(iter(ARMS)):
-                    ax.plot([ks.index(k) for k in fl.index], fl, ls="--", lw=1.4,
-                            color=SLOTS[slot] if metric == "pq" else MUTED,
-                            label=(f"{label}, floor" if metric == "pq" else "floor: the extent's regions"))
-            _k_axis(ax, ks)
-            if j == 0:
-                ax.set_ylabel(ylab)
-            if i == 0:
-                ax.set_title(title)
-    for ax in axes[:, 0]:
-        ax.legend(loc="lower left", fontsize=8)
-    fig.suptitle("Boundary parcels (tau 0.5) in each extent, against each extent's floor", x=0.01, ha="left",
-                 color=INK, fontsize=11.5)
+                x = j + (a - (len(arms) - 1) / 2) * w
+                v = float(q[metric].iloc[0])
+                ax.bar(x, v, w, color=SLOTS[slot], edgecolor=SURFACE, linewidth=1.5,
+                       label=f"{label}, boundary head" if j == 0 else None)
+                f = fl[(fl.arm == arm) & (fl.extent == ext)]
+                top = v
+                if not f.empty:
+                    fv = float(f[metric].iloc[0])
+                    ax.hlines(fv, x - w / 2 + 0.02, x + w / 2 - 0.02, color=INK, lw=2)
+                    top = max(v, fv)
+                ax.text(x, top + 0.01, f"{v:.3f}", ha="center", va="bottom", fontsize=7.5, color=INK_2)
+        ax.set_xticks(range(len(exts)), [BAR_EXTENTS[e] for e in exts], fontsize=8.5)
+        ax.set_ylabel(ylab)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.08)
+    handles, labels = axes[0].get_legend_handles_labels()
+    handles.append(Line2D([], [], color=INK, lw=2))
+    labels.append("floor: the extent's own regions, no boundary")
+    axes[0].legend(handles, labels, loc="upper right", fontsize=8)
+    axes[0].set_title("Class-agnostic: is the parcel there?")
+    axes[1].set_title("Class-aware: macro mean over the classes")
+    fig.suptitle(f"Boundary parcels (tau 0.5) in each extent, K = {pct:g} %", x=0.01, ha="left", color=INK,
+                 fontsize=11.5)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -136,7 +148,7 @@ def fig_variants(df: pd.DataFrame, path: Path) -> None:
                 ax.bar(np.arange(len(names)) + (a - (len(ARMS) - 1) / 2) * w, vals, w - 0.03, color=SLOTS[slot],
                        label=label)
             ax.set_xticks(range(len(names)), [VARIANTS[v] for v in names], rotation=35, ha="right", fontsize=7.5)
-            ax.set_title(f"{title}, K = {k:g} %", fontsize=9.5)
+            ax.set_title(title if len(ks) == 1 else f"{title}, K = {k:g} %", fontsize=9.5)
             if j == 0:
                 ax.set_ylabel("PQ, class-agnostic")
     axes[0, 0].legend(loc="upper left", fontsize=8)
@@ -283,19 +295,18 @@ def tables(df: pd.DataFrame, chips: str) -> str:
         fl = df[(df.extent == ext) & (df.variant == "extent")].set_index(["arm", "pct"])
         sem = df[(df.extent == ext) & (df.variant == "semantic")].set_index(["arm", "pct"])
         t = pd.DataFrame({
-            "Arm": d.arm.map(lab), "K": d.pct.map(lambda k: f"{k:g} %"),
+            "Arm": d.arm.map(lab),
             "floor PQ agn.": [fl.loc[(a, k), "pq_agnostic"] for a, k in zip(d.arm, d.pct)],
             "crop map PQ agn.": [sem.loc[(a, k), "pq_agnostic"] for a, k in zip(d.arm, d.pct)],
             "PQ agn.": d.pq_agnostic.values, "SQ agn.": d.sq_agnostic.values, "RQ agn.": d.rq_agnostic.values,
             "PQ": d.pq.values, "TP": d.tp_agnostic.astype(int).values, "FP": d.fp_agnostic.astype(int).values,
             "FN": d.fn_agnostic.astype(int).values, "parcels": d.predicted_parcels.astype(int).values,
             "dropped": d.dropped_void.astype(int).values})
-        out.append(f"**{title}**: boundary parcels at tau 0.5\n\n" + _md(t.sort_values(["Arm", "K"])))
+        out.append(f"**{title}**: boundary parcels at tau 0.5\n\n" + _md(t.sort_values("Arm")))
     tau = df[df.variant.isin(["boundary@0.3", "boundary@0.5", "boundary@0.7"]) & df.extent.isin(list(EXTENTS))]
     if not tau.empty:
-        t = tau.pivot_table(index=["arm", "pct", "extent"], columns="variant", values="pq_agnostic").reset_index()
+        t = tau.pivot_table(index=["arm", "extent"], columns="variant", values="pq_agnostic").reset_index()
         t["arm"] = t.arm.map(lab)
-        t["pct"] = t.pct.map(lambda k: f"{k:g} %")
         out.append("**Class-agnostic PQ against the threshold**\n\n" + _md(t))
     c = df[df.variant == "_cover"].drop_duplicates(["extent"])
     if not c.empty:
@@ -304,11 +315,11 @@ def tables(df: pd.DataFrame, chips: str) -> str:
         out.append("**The extents on the test chips**\n\n" + _md(t))
     bp = df[df.variant == "_boundary"]
     if not bp.empty:
-        t = pd.DataFrame({"Arm": bp.arm.map(lab), "K": bp.pct.map(lambda k: f"{k:g} %"),
+        t = pd.DataFrame({"Arm": bp.arm.map(lab),
                           "pixel Macro-F1": bp.pixel_macro_f1.values, "boundary F1 in E": bp.f1.values,
                           "precision": bp.precision.values, "recall": bp.recall.values})
         out.append("**The two heads** (boundary pixels at 0.5 inside E; crop-type pixel Macro-F1)\n\n" +
-                   _md(t.sort_values(["Arm", "K"])))
+                   _md(t.sort_values("Arm")))
     stats = REPO / "results" / NAME / chips / "worldcover_stats.json"
     if stats.exists():
         s = json.loads(stats.read_text())
@@ -326,6 +337,7 @@ def main() -> None:
     ap.add_argument("--chips", required=True)
     a = ap.parse_args()
     df = load(a.chips)
+    df = df[df.pct == 100]                     # the experiment's one budget
     if df.empty:
         raise SystemExit("no extent_scores.json yet: run score.py")
     folder = HERE / "figures" if a.chips == "EE_2021_rev" else HERE / "figures" / a.chips
