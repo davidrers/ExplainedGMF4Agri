@@ -22,6 +22,9 @@ series alone, so PaPs needs a spatial backbone: U-TAE's spatial encoder and deco
 32-32-64-128 up), without its temporal attention, which TESSERA's embedding replaces; then PaPs as published:
 centerness heatmap, saliency, and per centre the class, the box size and a 16 x 16 shape, with the pseudo-NMS.
 
+**Architecture, in diagrams**: [ARCHITECTURE.md](ARCHITECTURE.md), every head's target and output and the
+post-processing on one real test chip (`architecture.py`).
+
 **Training** (`fit_paps.py`), utae-paps' defaults: Adam at 0.01, x 0.3 after epochs 60 and 80, **100 epochs**,
 batch 4, 5 warm-up epochs on the heatmap alone, one supervised centre per parcel, D4 augmentation. Validation every
 5 epochs: the pseudo-NMS confidence is tuned on the validation chips and the checkpoint is the epoch of best

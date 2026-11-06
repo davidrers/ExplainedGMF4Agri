@@ -46,6 +46,9 @@ neighbour onto every chip's grid, in `data/worldcover/EE_2021_rev/` (outside the
 95.8 % of the parcel pixels lie in WorldCover 30 or 40, but 57 % of WorldCover grassland lies on no declared parcel
 (`worldcover_stats.py`): the undeclared-grassland leak is large and is reported.
 
+**Architecture, in diagrams**: [ARCHITECTURE.md](ARCHITECTURE.md), the boundary head's targets, outputs and
+post-processing in each extent on one real test chip (`architecture.py`).
+
 **How to run.**
 
     poetry run python experiments/2026-11-05_parcel_extent/fetch_worldcover.py --chips EE_2021_rev
