@@ -1,14 +1,20 @@
-"""Crop maps of held-out test blocks, as the models would map an area they have never seen (REPORT.md section 3.5).
+"""Crop maps of held-out test areas, as the models would map an area they have never seen (REPORT.md section 3.5).
 
 The test blocks of the split are areas the models never saw, 1.6 km away from any training parcel, and every fit
 predicted every 10 m pixel of every test tile, forest, roads and towns included. This script reads those stored
-predictions (``predictions_test.npz``), refits nothing, and mosaics whole blocks of 4 x 4 tiles (8.96 km):
+predictions (``predictions_test.npz``) of all ten fits of the report (the six frozen arms and the baseline of
+``results/kshot/EE_2021_rev/``, the four fine-tuned arms of ``results/2026-10-15_kshot_finetune/EE_2021_rev/``),
+refits nothing, and writes into ``figures/``:
 
-* ``map_block_<block>.png``: per block, the July true colour and the declared crops, then for fine-tuned TESSERA v2,
-  frozen TerraMind and the U-Net baseline at K = 100 and 5 %: the raw map (every pixel as predicted, since no
-  cropland mask exists yet) and the per-parcel map (each declared parcel takes the crop most of its pixels were
-  predicted as; scored parcels mapped wrong are outlined);
-* ``map_zoom.png``: about 1.1 km windows of two blocks at full resolution, the same models at K = 100 %.
+* ``map_<place>_K<k>.png``, for three whole test blocks of 4 x 4 tiles (8.96 km) and two single tiles (2.24 km, at
+  full resolution) at K = 100, 20 and 5 %: the July true colour and the declared crops, then every model in a
+  column. Rows: the raw map (every pixel as the model output it; nothing is masked, and there is no cropland mask
+  yet) and the per-parcel map (each declared parcel takes the crop most of its pixels were predicted as; scored
+  parcels mapped wrong are outlined), for the frozen encoder, then the fine-tuned one;
+
+and ``maps_tables.md`` beside this file: the share of each place's scored parcels mapped right, and what each fit,
+and the frozen TESSERA control of the fine-tuning experiment, predicts outside the declared parcels over all test
+tiles.
 
 The parcel vote is the pipeline's (:mod:`gfm4agri.benchmark.parcel_metrics`). Before drawing, the script reproduces
 each fit's parcel accuracy over all test tiles from the same votes and stops if it differs from ``results.json``.
@@ -18,6 +24,7 @@ each fit's parcel accuracy over all test tiles from the same votes and stops if 
 
 from __future__ import annotations
 
+import gc
 import json
 from pathlib import Path
 
@@ -30,6 +37,7 @@ import pandas as pd  # noqa: E402
 import rasterio  # noqa: E402
 from matplotlib.colors import to_rgb  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
+from PIL import Image  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 
 from gfm4agri.benchmark.parcel_metrics import chip_votes, pool_votes, read_parcels  # noqa: E402
@@ -38,16 +46,28 @@ HERE = Path(__file__).resolve().parent
 REPO = next(p for p in HERE.parents if (p / "pyproject.toml").exists())
 CHIPS = REPO / "data/eurocrops_chips/EE_2021_rev"
 SPLIT = REPO / "data/eurocrops_chips/EE_2021/splits/blocks4_buf1600_seed0__6b0eb4cb/chips.csv"
+FROZEN_DIR = REPO / "results/kshot/EE_2021_rev"
+FT_DIR = REPO / "results/2026-10-15_kshot_finetune/EE_2021_rev"
 OUT = HERE / "figures"
 TILE, GRID_M = 224, 2240
+KS = [100, 20, 5]
 
-#: Model label and the fit folder holding P<k>_draw0_seed0/.
+#: One column per model: label, frozen fit, fine-tuned fit (None: not run). The U-Net has no pretrained encoder:
+#: it is trained end to end and sits in the first two rows.
 MODELS = [
-    ("TESSERA v2 M, fine-tuned", REPO / "results/2026-10-15_kshot_finetune/EE_2021_rev/tessera_v2_medium_ft"),
-    ("TerraMind v1 L, frozen", REPO / "results/kshot/EE_2021_rev/terramind_v1_large_s2s1"),
-    ("U-Net from scratch", REPO / "results/kshot/EE_2021_rev/unet_r18_scratch_s2s1"),
+    ("TerraMind v1 L", FROZEN_DIR / "terramind_v1_large_s2s1", FT_DIR / "terramind_v1_large_s2s1_ft"),
+    ("THOR v1 L", FROZEN_DIR / "thor_v1_large_s2s1", FT_DIR / "thor_v1_large_s2s1_ft"),
+    ("Prithvi-EO-2.0 600M", FROZEN_DIR / "prithvi_eo_v2_600_tl", FT_DIR / "prithvi_eo_v2_600_tl_ft"),
+    ("TESSERA v2 M", FROZEN_DIR / "tessera_v2_medium", FT_DIR / "tessera_v2_medium_ft"),
+    ("AlphaEarth v1", FROZEN_DIR / "alphaearth_v1", None),
+    ("U-Net from scratch", FROZEN_DIR / "unet_r18_scratch_s2s1", None),
 ]
-KS = [100, 5]
+#: Not drawn, only in the table of off-parcel predictions: the fine-tuning experiment's frozen control, TESSERA's
+#: MLP trained on the labelled pixels alone, the route the fine-tuned TESSERA takes.
+CONTROL = ("TESSERA v2 M, frozen, labelled-pixel route (control)", FT_DIR / "tessera_v2_medium_lab")
+NO_FT = {"AlphaEarth v1": "AlphaEarth cannot be fine-tuned:\nonly its embeddings are published",
+         "U-Net from scratch": "No pretrained encoder: the U-Net\nis trained end to end (rows above)"}
+ROWS = ["Frozen encoder: raw", "Frozen encoder: per parcel", "Fine-tuned: raw", "Fine-tuned: per parcel"]
 
 #: Complete test blocks, picked from the 40 of the split for their landscape (profile of 6 November 2026).
 BLOCKS = [
@@ -55,16 +75,17 @@ BLOCKS = [
     ("593_445", "small plots: 32 potato parcels, 8 % of parcels under 0.16 ha"),
     ("594_443", "mostly forest and settlements: 11 % of the block declared, median parcel 1 ha"),
 ]
-#: Zoom windows: block, top-left pixel (row, col) in the block mosaic, size in pixels.
-#: Picked for the most crops besides grassland (583_457) and the most potato parcels (593_445) in 1.12 km.
-ZOOMS = [("583_457", (280, 140), 112), ("593_445", (784, 168), 112)]
+#: Single tiles: block, tile row from the top and tile column from the west. They hold the windows with the most
+#: crops besides grassland (583_457) and the most potato parcels (593_445) of a 1.12 km scan.
+TILES = [("583_457", 1, 0, "large fields beside a forest"), ("593_445", 3, 0, "narrow strips of potatoes and barley")]
 
 # Crop groups: one hue each (the reference palette of the dataviz method), crops within a group by lightness.
-# Grassland, half of all parcels, is a recessive neutral so the arable crops stand out.
+# Grassland, half of all parcels, is a mid grey: recessive beside the arable crops, yet clearly a prediction and
+# never the near-white of land without a declared parcel. Parcels of crops outside the 20 are hatched.
 SURFACE, INK, INK_2, MUTED = "#fcfcfb", "#0b0b0b", "#52514e", "#898781"
-NO_PARCEL, OTHER_CROP = "#f0efec", "#c3c2b7"
+NO_PARCEL, HATCH = "#f0efec", "#a9a79e"
 GROUPS = [
-    ("Grassland", "#cfd8c4", ["pasture_meadow_grassland_grass"]),
+    ("Grassland", "#a9a79e", ["pasture_meadow_grassland_grass"]),
     ("Winter cereals", "#eb6834", ["winter_common_soft_wheat", "winter_barley", "rye"]),
     ("Spring cereals", "#eda100", ["spring_barley", "oats", "spring_common_soft_wheat"]),
     ("Forage legumes", "#008300", ["legumes_harvested_green", "clover", "alfalfa_lucerne"]),
@@ -83,8 +104,6 @@ SHORT = {
     "fresh_vegetables": "vegetables", "grain_maize_corn_popcorn": "maize", "buckwheat": "buckwheat",
     "orchards_fruits": "orchards",
 }
-
-
 #: Lightness steps within a group: the base hue for its most common crop, then darker, then lighter.
 STEPS = [0.0, -0.3, 0.5]
 
@@ -126,6 +145,16 @@ def check_votes(fit: dict, parcels: dict) -> float:
     return acc
 
 
+def off_parcel(fit: dict, parcels: dict) -> float:
+    """Share of the test pixels outside any declared parcel that the fit gives a crop other than grassland."""
+    crop = total = 0
+    for c, p in fit["pred"].items():
+        off = parcels[c] == 0
+        crop += int((p[off] != 0).sum())
+        total += int(off.sum())
+    return crop / total
+
+
 def block_chips(split: pd.DataFrame, block: str) -> pd.DataFrame:
     b = split[(split.block_id == block) & (split.partition == "test")]
     if len(b) != 16:
@@ -157,10 +186,10 @@ def stretch(a: np.ndarray) -> np.ndarray:
 
 
 def parcel_vote_map(pred: np.ndarray, pid: np.ndarray, n: int) -> np.ndarray:
-    """Every declared parcel of the mosaic coloured by the crop most of its pixels were predicted as.
+    """Every declared parcel coloured by the crop most of its pixels were predicted as; -1 outside parcels.
 
     Scored parcels vote with all their pixels, which are all labelled, exactly as the pipeline's vote; parcels of
-    crops outside the 20 classes vote too, as any parcel of a new area would. -1 outside parcels.
+    crops outside the 20 classes vote too, as any parcel of a new area would.
     """
     sel = pid > 0
     ids, inv = np.unique(pid[sel], return_inverse=True)
@@ -182,11 +211,14 @@ def edges(seg: np.ndarray) -> np.ndarray:
 
 def paint(classes: np.ndarray, rgb: np.ndarray, pid: np.ndarray | None = None, wrong: np.ndarray | None = None,
           width: int = 1) -> np.ndarray:
-    """RGB image of a class map: -1 as no parcel, -2 as another crop; parcel borders, and wrong parcels outlined
-    ``width`` pixels deep inside them."""
+    """RGB image of a class map: -1 as no parcel, -2 hatched (a crop not scored); parcel borders, and wrong parcels
+    outlined ``width`` pixels deep inside them."""
     img = np.empty(classes.shape + (3,))
     img[classes == -1] = to_rgb(NO_PARCEL)
-    img[classes == -2] = to_rgb(OTHER_CROP)
+    yy, xx = np.indices(classes.shape)
+    other = classes == -2
+    img[other] = to_rgb(NO_PARCEL)
+    img[other & ((yy + xx) % 6 < 2)] = to_rgb(HATCH)
     ok = classes >= 0
     img[ok] = rgb[classes[ok]]
     if pid is not None:
@@ -209,15 +241,12 @@ def reference(mask: np.ndarray, pid: np.ndarray) -> np.ndarray:
     return np.where(mask >= 0, mask, np.where(pid > 0, -2, -1))
 
 
-def legend(ax, rgb: np.ndarray, names: list[str], present: set[int], ncol: int) -> None:
-    """The crops on show, grouped, in an axis of their own; a group never breaks across columns."""
-    blocks = []
-    for g, _, members in GROUPS:
-        here = [m for m in members if names.index(m) in present]
-        if here:
-            blocks.append([Patch(color="none", label=g)]
-                          + [Patch(color=rgb[names.index(m)], label=SHORT[m]) for m in here])
-    blocks.append([Patch(color="none", label=" "), Patch(color=OTHER_CROP, label="declared, crop not scored"),
+def legend(ax, rgb: np.ndarray, names: list[str], ncol: int) -> None:
+    """Every crop, grouped, in an axis of their own; a group never breaks across columns."""
+    blocks = [[Patch(color="none", label=g)] + [Patch(color=rgb[names.index(m)], label=SHORT[m]) for m in members]
+              for g, _, members in GROUPS]
+    blocks.append([Patch(color="none", label=" "),
+                   Patch(facecolor=NO_PARCEL, edgecolor=HATCH, hatch="////", label="declared, crop not scored"),
                    Patch(color=NO_PARCEL, label="no declared parcel"),
                    Patch(facecolor="white", edgecolor=INK, linewidth=1.5, label="parcel mapped wrong")])
     target = -(-sum(map(len, blocks)) // ncol)
@@ -230,8 +259,8 @@ def legend(ax, rgb: np.ndarray, names: list[str], present: set[int], ncol: int) 
     # The legend fills column by column, so each column is padded to the same height.
     handles = [h for col in columns for h in col + [Patch(color="none", label="")] * (height - len(col))]
     ax.axis("off")
-    leg = ax.legend(handles=handles, loc="center left", ncol=ncol, fontsize=9, frameon=False, handlelength=1.3,
-                    columnspacing=1.6, labelspacing=0.45)
+    leg = ax.legend(handles=handles, loc="center", ncol=ncol, fontsize=9.5, frameon=False, handlelength=1.3,
+                    columnspacing=1.2, labelspacing=0.32)
     for t, h in zip(leg.get_texts(), handles, strict=True):
         if h.get_facecolor()[3] == 0 and t.get_text().strip():
             t.set_fontweight("bold")
@@ -245,11 +274,11 @@ def style(ax, title: str | None = None) -> None:
         s.set_color(MUTED)
         s.set_linewidth(0.5)
     if title:
-        ax.set_title(title, fontsize=9.5, color=INK, loc="left")
+        ax.set_title(title, fontsize=10, color=INK, loc="left", pad=3)
 
 
-def block_scores(vote: np.ndarray, mask: np.ndarray, pid: np.ndarray, pred: np.ndarray) -> tuple[float, float]:
-    """Share right of the block's labelled pixels, and of its scored parcels (vote and class are per parcel)."""
+def scores(vote: np.ndarray, mask: np.ndarray, pid: np.ndarray, pred: np.ndarray) -> tuple[float, float]:
+    """Share right of the labelled pixels, and of the scored parcels (vote and class are per parcel)."""
     lab = mask >= 0
     px = float((pred[lab] == mask[lab]).mean())
     sel = lab & (pid > 0)
@@ -257,100 +286,126 @@ def block_scores(vote: np.ndarray, mask: np.ndarray, pid: np.ndarray, pred: np.n
     return px, float((vote[sel][first] == mask[sel][first]).mean())
 
 
-def lonlat(b: pd.DataFrame) -> tuple[float, float]:
-    x = (b.col.min() + 2) * GRID_M
-    y = (b.row.min() + 2) * GRID_M
-    lon, lat = Transformer.from_crs(3035, 4326, always_xy=True).transform(x, y)
-    return lon, lat
+def lonlat(x: float, y: float) -> tuple[float, float]:
+    return Transformer.from_crs(3035, 4326, always_xy=True).transform(x, y)
 
 
-def fig_block(block: str, about: str, b: pd.DataFrame, fits: dict, parcels: dict, bands: list[str],
-              rgb: np.ndarray, names: list[str]) -> Path:
-    tc = stretch(mosaic(b, {c: true_colour(c, bands) for c in b.chip_id}))
-    pid = mosaic(b, parcels)
-    mask = mosaic(b, fits[(MODELS[0][0], KS[0])]["mask"], fill=-1)
-    ref = reference(mask, pid)
-    n = len(names)
-    present = set(np.unique(mask[mask >= 0]).tolist())
+def places(split: pd.DataFrame) -> list[dict]:
+    """The blocks and single tiles to map: their tiles, the window of the block mosaic, and a heading."""
+    out = []
+    for block, about in BLOCKS:
+        b = block_chips(split, block)
+        lon, lat = lonlat((b.col.min() + 2) * GRID_M, (b.row.min() + 2) * GRID_M)
+        out.append({"name": f"block_{block}", "tiles": b, "win": (slice(None), slice(None)), "width": 4,
+                    "head": f"Test block {block}, 8.96 x 8.96 km, {lat:.2f} N {lon:.2f} E: {about}"})
+    for block, r, c, about in TILES:
+        b = block_chips(split, block)
+        row, col = b.row.max() - r, b.col.min() + c
+        cid = b[(b.row == row) & (b.col == col)].chip_id.item()
+        lon, lat = lonlat((col + 0.5) * GRID_M, (row + 0.5) * GRID_M)
+        out.append({"name": f"tile_{cid}", "tiles": b, "width": 1,
+                    "win": (slice(r * TILE, (r + 1) * TILE), slice(c * TILE, (c + 1) * TILE)),
+                    "head": f"Test tile {cid} (block {block}), 2.24 x 2.24 km at full 10 m resolution, "
+                            f"{lat:.2f} N {lon:.2f} E: {about}"})
+    return out
 
-    fig = plt.figure(figsize=(14, 15.2), facecolor=SURFACE)
-    gs = fig.add_gridspec(4, 4, left=0.04, right=0.99, top=0.915, bottom=0.01, hspace=0.12, wspace=0.03)
-    lon, lat = lonlat(b)
-    fig.text(0.04, 0.978, f"Test block {block}, 8.96 x 8.96 km, {lat:.2f} N {lon:.2f} E: {about}",
-             fontsize=12.5, color=INK, fontweight="bold")
-    fig.text(0.04, 0.948, "Never seen in training: 1.6 km from any training parcel. Raw: every 10 m pixel as "
-             "predicted; there is no cropland mask yet, so forest and towns get a crop too.\nPer parcel: each "
-             "declared parcel takes the crop most of its pixels were predicted as. Titles: share right of the "
-             "labelled pixels, and of the scored parcels.", fontsize=9.5, color=INK_2, linespacing=1.5)
+
+def fig_place(pl: dict, k: int, fits: dict, parcels: dict, bands: list[str], rgb: np.ndarray,
+              names: list[str]) -> tuple[Path, dict]:
+    """One place at one budget: reference column, then a column per model; rows as in ``ROWS``."""
+    b, win, n = pl["tiles"], pl["win"], len(names)
+    tc = stretch(mosaic(b, {c: true_colour(c, bands) for c in b.chip_id})[win])
+    pid = mosaic(b, parcels)[win]
+    mask = mosaic(b, next(iter(fits.values()))["mask"], fill=-1)[win]
+    width = 4 if pl["width"] == 4 else 1
+
+    fig = plt.figure(figsize=(23, 14.6), facecolor=SURFACE)
+    gs = fig.add_gridspec(4, 1 + len(MODELS), left=0.035, right=0.997, top=0.875, bottom=0.005, hspace=0.1,
+                          wspace=0.03)
+    fig.text(0.035, 0.972, pl["head"] + f"; K = {k} % of the training parcels labelled", fontsize=14,
+             color=INK, fontweight="bold")
+    fig.text(0.035, 0.925, "Never seen in training: 1.6 km from any training parcel. Raw: every 10 m pixel exactly as "
+             "the model output it; nothing is masked, and there is no cropland mask yet, so forest, roads and towns get "
+             "a crop too.\nPer parcel: each declared parcel takes the crop most of its pixels were predicted as. "
+             "Titles: share right of the labelled pixels, and of the scored parcels.", fontsize=11, color=INK_2,
+             linespacing=1.5)
     ax = fig.add_subplot(gs[0, 0])
     ax.imshow(tc, interpolation="nearest")
     style(ax, "July 2021, true colour")
-    ax = fig.add_subplot(gs[0, 1])
-    ax.imshow(paint(ref, rgb, pid), interpolation="nearest")
+    ax = fig.add_subplot(gs[1, 0])
+    ax.imshow(paint(reference(mask, pid), rgb, pid), interpolation="nearest")
     style(ax, "Declared crops (reference)")
-    for i, (label, _) in enumerate(MODELS, start=1):
-        for j, k in enumerate(KS):
-            f = fits[(label, k)]
-            pred = mosaic(b, f["pred"])
-            vote = parcel_vote_map(pred, pid, n)
-            scored = (mask >= 0) & (pid > 0)
-            wrong = scored & (vote != mask)
-            px, pa = block_scores(vote, mask, pid, pred)
-            ax = fig.add_subplot(gs[i, 2 * j])
-            ax.imshow(paint(pred, rgb), interpolation="nearest")
-            style(ax, f"K = {k} %, raw   pixels {px:.2f}")
-            if j == 0:
-                ax.set_ylabel(label, fontsize=10.5, color=INK, fontweight="bold")
-            ax = fig.add_subplot(gs[i, 2 * j + 1])
-            ax.imshow(paint(np.where(pid > 0, vote, -1), rgb, pid, wrong=wrong, width=3),
-                      interpolation="nearest")
-            style(ax, f"K = {k} %, per parcel   parcels {pa:.2f}")
-            present |= set(np.unique(pred).tolist())
-    legend(fig.add_subplot(gs[0, 2:]), rgb, names, present, ncol=3)
-    path = OUT / f"map_block_{block}.png"
-    fig.savefig(path, dpi=160, facecolor=SURFACE)
-    plt.close(fig)
-    return path
+    legend(fig.add_subplot(gs[2:, 0]), rgb, names, ncol=1)
 
-
-def fig_zoom(split: pd.DataFrame, fits: dict, parcels: dict, bands: list[str], rgb: np.ndarray,
-             names: list[str]) -> Path:
-    n = len(names)
-    k = KS[0]
-    fig = plt.figure(figsize=(15.5, 3.45 * 2 * len(ZOOMS) + 0.6), facecolor=SURFACE)
-    gs = fig.add_gridspec(2 * len(ZOOMS), 5, width_ratios=[1, 1, 1, 1, 0.78], left=0.01, right=0.995, top=0.95,
-                          bottom=0.01, hspace=0.14, wspace=0.03)
-    axes = [[fig.add_subplot(gs[r, c]) for c in range(4)] for r in range(2 * len(ZOOMS))]
-    present: set[int] = set()
-    for z, (block, (r0, c0), size) in enumerate(ZOOMS):
-        b = block_chips(split, block)
-        win = (slice(r0, r0 + size), slice(c0, c0 + size))
-        tc = stretch(mosaic(b, {c: true_colour(c, bands) for c in b.chip_id}))[win]
-        pid = mosaic(b, parcels)[win]
-        mask = mosaic(b, fits[(MODELS[0][0], k)]["mask"], fill=-1)[win]
-        top, bot = axes[2 * z], axes[2 * z + 1]
-        top[0].imshow(tc, interpolation="nearest")
-        style(top[0], f"Block {block}, {size * 10 / 1000:.2f} km: July")
-        bot[0].imshow(paint(reference(mask, pid), rgb, pid), interpolation="nearest")
-        style(bot[0], "Declared crops")
-        present |= set(np.unique(mask[mask >= 0]).tolist())
-        for j, (label, _) in enumerate(MODELS, start=1):
-            pred = mosaic(b, fits[(label, k)]["pred"])[win]
+    shares = {}
+    for j, (label, frozen, ft) in enumerate(MODELS, start=1):
+        for i, (variant, path) in enumerate([("frozen", frozen), ("fine-tuned", ft)]):
+            if path is None:
+                ax = fig.add_subplot(gs[2 * i:2 * i + 2, j])
+                ax.axis("off")
+                ax.text(0.5, 0.5, NO_FT[label], ha="center", va="center", fontsize=10, color=MUTED)
+                continue
+            pred = mosaic(b, fits[path]["pred"])[win]
             vote = parcel_vote_map(pred, pid, n)
             wrong = (mask >= 0) & (pid > 0) & (vote != mask)
-            top[j].imshow(paint(pred, rgb), interpolation="nearest")
-            style(top[j], f"{label}: raw")
-            bot[j].imshow(paint(np.where(pid > 0, vote, -1), rgb, pid, wrong=wrong, width=1),
-                          interpolation="nearest")
-            style(bot[j], f"{label}: per parcel")
-            present |= set(np.unique(pred).tolist())
-    fig.text(0.01, 0.982, f"Two zooms of 1.12 x 1.12 km at full 10 m resolution, K = {k} %", fontsize=12.5,
-             color=INK, fontweight="bold")
-    legend(fig.add_subplot(gs[:, 4]), rgb, names, present, ncol=1)
-    path = OUT / "map_zoom.png"
-    fig.savefig(path, dpi=130, facecolor=SURFACE)
+            px, pa = scores(vote, mask, pid, pred)
+            shares[(label, variant)] = pa
+            ax = fig.add_subplot(gs[2 * i, j])
+            ax.imshow(paint(pred, rgb), interpolation="nearest")
+            style(ax, f"raw   pixels {px:.2f}")
+            if i == 0:
+                ax.text(0, 1.13, label, transform=ax.transAxes, fontsize=12.5, fontweight="bold", color=INK)
+            ax = fig.add_subplot(gs[2 * i + 1, j])
+            ax.imshow(paint(np.where(pid > 0, vote, -1), rgb, pid, wrong=wrong, width=width),
+                      interpolation="nearest")
+            style(ax, f"per parcel   parcels {pa:.2f}")
+    for i, row in enumerate(ROWS):
+        y = gs[i, 0].get_position(fig)
+        fig.text(0.012, (y.y0 + y.y1) / 2, row, rotation=90, ha="center", va="center", fontsize=11.5,
+                 fontweight="bold", color=INK)
+    path = OUT / f"map_{pl['name']}_K{k}.png"
+    save(fig, path, 150 if pl["width"] == 4 else 110, rgb, tc)
+    return path, shares
+
+
+def save(fig, path: Path, dpi: int, rgb: np.ndarray, tc: np.ndarray) -> None:
+    """A PNG on a palette that holds every crop colour and the chrome exactly, a grey ramp for the lettering, and
+    the true colour in the remaining slots: a third of the size of full colour, with no crop colour changed."""
+    fig.savefig(path, dpi=dpi, facecolor=SURFACE)
     plt.close(fig)
-    return path
+    fixed = [tuple(int(round(v * 255)) for v in c) for c in rgb]
+    fixed += [tuple(int(round(v * 255)) for v in to_rgb(c)) for c in (NO_PARCEL, HATCH, SURFACE, INK, INK_2, MUTED)]
+    fixed += [(g, g, g) for g in np.linspace(0, 255, 18).astype(int)]
+    free = 256 - len(fixed)
+    tc_pal = Image.fromarray((tc * 255).astype(np.uint8)).quantize(free, method=Image.Quantize.MEDIANCUT)
+    pal = Image.new("P", (1, 1))
+    pal.putpalette([v for c in fixed for v in c] + tc_pal.getpalette()[:3 * free])
+    Image.open(path).convert("RGB").quantize(palette=pal, dither=Image.Dither.NONE).save(path, optimize=True)
+
+
+def tables(shares: dict, off: dict, pls: list[dict]) -> str:
+    lines = ["# Tables of the maps of REPORT.md section 3.5", "", "Written by [maps.py](maps.py). One draw, one seed "
+             "per fit; the shares of a place come from its parcels alone and illustrate the maps, they are not "
+             "test scores.", "", "## Share of the scored parcels mapped right, K = 100 / 20 / 5 %", ""]
+    head = "| Model | " + " | ".join(p["name"].replace("_", " ") for p in pls) + " |"
+    lines += [head, "|---" * (1 + len(pls)) + "|"]
+    for label, frozen, ft in MODELS:
+        for variant, path in [("frozen", frozen), ("fine-tuned", ft)]:
+            if path is None:
+                continue
+            name = label if label == "U-Net from scratch" else f"{label}, {variant}"
+            cells = [" / ".join(f"{shares[(p['name'], k)][(label, variant)]:.2f}" for k in KS) for p in pls]
+            lines.append(f"| {name} | " + " | ".join(cells) + " |")
+    lines += ["", "## Test pixels outside any declared parcel given a crop other than grassland, all test tiles", "",
+              "| Model | K = 100 % | K = 20 % | K = 5 % |", "|---|---|---|---|"]
+    for label, frozen, ft in MODELS:
+        for variant, path in [("frozen", frozen), ("fine-tuned", ft)]:
+            if path is None:
+                continue
+            name = label if label == "U-Net from scratch" else f"{label}, {variant}"
+            lines.append(f"| {name} | " + " | ".join(f"{off[(path, k)]:.3f}" for k in KS) + " |")
+    lines.append(f"| {CONTROL[0]} | " + " | ".join(f"{off[(CONTROL[1], k)]:.3f}" for k in KS) + " |")
+    return "\n".join(lines) + "\n"
 
 
 def main() -> None:
@@ -360,19 +415,30 @@ def main() -> None:
     bands = manifest["imagery"]["band_names"]
     rgb = class_colours(names)
     split = pd.read_csv(SPLIT)
+    pls = places(split)
+    paths = [p for _, frozen, ft in MODELS for p in (frozen, ft) if p is not None]
 
-    fits = {(label, k): load_fit(path, k) for label, path in MODELS for k in KS}
-    ids = list(next(iter(fits.values()))["pred"])
-    for f in fits.values():
-        if f["classes"] != names or list(f["pred"]) != ids:
-            raise SystemExit("fits disagree on the classes or the test tiles")
-    parcels = {c: read_parcels(CHIPS / "chips", c) for c in ids}
-    for (label, k), f in fits.items():
-        print(f"{label}, K = {k} %: parcel accuracy {check_votes(f, parcels):.4f} reproduced")
-
-    for block, about in BLOCKS:
-        print(fig_block(block, about, block_chips(split, block), fits, parcels, bands, rgb, names))
-    print(fig_zoom(split, fits, parcels, bands, rgb, names))
+    parcels, ids, shares, off = None, None, {}, {}
+    for k in KS:
+        fits = {p: load_fit(p, k) for p in paths}
+        if ids is None:
+            ids = list(next(iter(fits.values()))["pred"])
+            parcels = {c: read_parcels(CHIPS / "chips", c) for c in ids}
+        for p, f in fits.items():
+            if f["classes"] != names or list(f["pred"]) != ids:
+                raise SystemExit(f"{p}: the classes or the test tiles differ from the other fits")
+            acc = check_votes(f, parcels)
+            off[(p, k)] = off_parcel(f, parcels)
+            print(f"{p.name}, K = {k} %: parcel accuracy {acc:.4f} reproduced; "
+                  f"off-parcel crop share {off[(p, k)]:.3f}")
+        for pl in pls:
+            path, shares[(pl["name"], k)] = fig_place(pl, k, fits, parcels, bands, rgb, names)
+            print(path)
+        off[(CONTROL[1], k)] = off_parcel(load_fit(CONTROL[1], k), parcels)
+        del fits
+        gc.collect()
+    (HERE / "maps_tables.md").write_text(tables(shares, off, pls))
+    print(HERE / "maps_tables.md")
 
 
 if __name__ == "__main__":
