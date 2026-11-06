@@ -44,6 +44,10 @@ Per pixel: the boundary F1 inside the declared extent and the three-class IoU on
 **Protocol.** K = 100 % only (a method check, no budget sweep: user, 5 November 2026), draw 0, seed 0, all of
 `EE_2021_rev`. One cluster job per arm. Pilot first on `EE_2021_rev_mini` (`experiment_pilot.yaml`, 3 epochs).
 
+**Architecture, in diagrams**: [ARCHITECTURE.md](ARCHITECTURE.md), the three classes' targets and outputs and the
+post-processing on one real test chip (`architecture.py`; drawn from the epoch-9 checkpoint, to be redrawn from the
+final one).
+
 **How to run.**
 
     poetry run python experiments/2026-11-06_prue_tessera/check.py --chips EE_2021_rev_mini
