@@ -1,8 +1,9 @@
 # Crop-type maps of Estonia 2021 from geospatial foundation models: first results
 
-19 October 2026; section 4 revised on 30 October 2026. Every number below comes from one random draw of the labels
-and one training seed per setting, so none has a confidence interval yet (section 5). The figures and
-[tables.md](tables.md) are made by [report.py](report.py).
+19 October 2026; section 4 revised on 30 October 2026, section 3.5 added on 6 November 2026. Every number below
+comes from one random draw of the labels and one training seed per setting, so none has a confidence interval yet
+(section 5). The figures and [tables.md](tables.md) are made by [report.py](report.py), the maps of section 3.5 by
+[maps.py](maps.py).
 
 ## In short
 
@@ -170,6 +171,54 @@ Rows are sorted by the number of training parcels, given in brackets.
   potatoes drop to F1 0 for TerraMind, THOR, Prithvi and the U-Net but stay at 0.52 for frozen TESSERA and 0.70
   fine-tuned. Buckwheat behaves alike: 0.70 and 0.81 for TESSERA against 0 to 0.53 for the others. Prithvi misses
   potatoes even with all labels.
+
+### 3.5 What the maps look like
+
+A test block is an area the models never saw, 1.6 km from any training parcel, so its map is what a model would
+deliver on a new area. Every fit predicted every 10 m pixel of the test tiles, so each model is shown two ways.
+**Raw:** every pixel as predicted. **Per parcel:** each declared parcel takes the crop most of its pixels were
+predicted as, the vote behind the parcel score, and the parcels mapped wrong are outlined in black. The figures show
+three of the 40 complete test blocks (8.96 x 8.96 km), picked for their landscape, and two zooms of 1.12 km, for
+fine-tuned TESSERA v2, frozen TerraMind and the U-Net at K = 100 and 5 %. They are made by [maps.py](maps.py) from
+the stored test predictions, which reproduce the parcel accuracy of every fit shown. A colour's hue gives the crop
+group and its lightness the crop within it. Twenty crops cannot all be told apart by colour, so the reference panel
+and the outlines carry what is right and wrong.
+
+![Test block 583_457: large arable fields](figures/map_block_583_457.png)
+
+![Test block 593_445: small plots and potatoes](figures/map_block_593_445.png)
+
+![Test block 594_443: mostly forest and settlements](figures/map_block_594_443.png)
+
+![Two zooms of 1.12 km at 10 m, K = 100 %](figures/map_zoom.png)
+
+| Share of the block's scored parcels mapped right, K = 100 % / 5 % | 583_457, large fields | 593_445, small plots | 594_443, mostly forest |
+|---|---|---|---|
+| TESSERA v2 Medium, fine-tuned | 0.79 / 0.72 | 0.74 / 0.68 | 0.79 / 0.77 |
+| TerraMind v1 large, frozen | 0.75 / 0.66 | 0.68 / 0.52 | 0.77 / 0.70 |
+| U-Net from scratch | 0.74 / 0.71 | 0.68 / 0.54 | 0.77 / 0.75 |
+
+- **Outside the declared parcels, the raw maps are not crop maps.** 73 % of the test pixels lie outside any declared
+  parcel: forest, settlements, roads, water. No model was trained on them, as the loss counts labelled pixels only,
+  and there is no cropland mask yet (stage 1), so every model gives them a crop. Over all test tiles, fine-tuned
+  TESSERA calls 97 % of them grassland, which reads as background. Frozen TerraMind gives 62 % of them an arable crop
+  with all labels and 69 % with 5 %, the U-Net 32 and 24 %. In the forest block 594_443, TerraMind at K = 5 % covers
+  the forest with spring barley, rapeseed and peas. A map of a new area therefore needs the cropland mask, or the
+  parcel boundaries, before it can be read.
+- **Inside the parcels, the maps follow the declarations.** Per parcel, the three models map 0.74 to 0.79 of the
+  large-field block right with all labels, and their maps look alike. The differences sit in the small and narrow
+  parcels.
+- **TESSERA keeps the 10 m detail; TerraMind draws 160 m blobs.** In the second zoom, strips of potatoes and spring
+  barley a few tens of metres wide stay strips for TESSERA. TerraMind turns them into rounded blobs that cross field
+  edges, and the U-Net merges neighbouring strips. TESSERA's raw map is speckled inside some cereal fields, and the
+  vote removes the speckle. TESSERA also traces roads through the forest as thin lines of crops.
+- **Tiles are mapped one at a time.** Each 2.24 km tile is predicted on its own, and TerraMind's raw maps show
+  straight seams at tile edges (block 594_443).
+- **With 5 % of the labels, the small plots suffer most.** In block 593_445, TerraMind and the U-Net drop to 0.52
+  and 0.54 of the parcels right, TESSERA to 0.68, the pattern of section 3.4.
+
+The shares in the table come from one block each, mostly grassland parcels, so they illustrate the maps and are not
+test scores.
 
 ## 4. Comparison with published results for Estonia
 
