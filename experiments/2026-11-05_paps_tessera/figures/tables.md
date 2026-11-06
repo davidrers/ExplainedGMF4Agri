@@ -9,6 +9,9 @@
 | TESSERA frozen | extent alone | 0.000 | 0.000 | 0.000 | 0.000 | 0 | 1,475 | 55,575 | 1,475 |
 | TESSERA fine-tuned | PaPs, its own class | 0.357 | 0.697 | 0.432 | 0.366 | 22,829 | 21,007 | 32,746 | 43,836 |
 | TESSERA fine-tuned | PaPs parcels, crop-map class | 0.361 | 0.698 | 0.438 | 0.366 | 22,829 | 21,007 | 32,746 | 43,836 |
+| TESSERA fine-tuned | boundary head (tau 0.5) | 0.197 | 0.705 | 0.250 | 0.036 | 14,128 | 520,883 | 41,447 | 535,011 |
+| TESSERA fine-tuned | crop-map regions | 0.020 | 0.679 | 0.026 | 0.017 | 9,538 | 790,352 | 46,037 | 799,890 |
+| TESSERA fine-tuned | extent alone | 0.000 | 0.000 | 0.000 | 0.000 | 0 | 1,475 | 55,575 | 1,475 |
 
 **Cut to WorldCover 30 + 40**
 
@@ -21,6 +24,9 @@
 | TESSERA frozen | extent alone | 0.023 | 0.565 | 0.033 | 0.016 | 1,817 | 98,469 | 53,758 | 100,286 |
 | TESSERA fine-tuned | PaPs, its own class | 0.341 | 0.680 | 0.424 | 0.348 | 22,205 | 21,556 | 33,370 | 43,761 |
 | TESSERA fine-tuned | PaPs parcels, crop-map class | 0.345 | 0.681 | 0.430 | 0.348 | 22,205 | 21,556 | 33,370 | 43,761 |
+| TESSERA fine-tuned | boundary head (tau 0.5) | 0.204 | 0.692 | 0.262 | 0.083 | 15,050 | 197,406 | 40,525 | 212,456 |
+| TESSERA fine-tuned | crop-map regions | 0.031 | 0.678 | 0.040 | 0.023 | 11,609 | 689,130 | 43,966 | 700,739 |
+| TESSERA fine-tuned | extent alone | 0.025 | 0.565 | 0.036 | 0.016 | 1,817 | 98,469 | 53,758 | 100,286 |
 
 **Cut to WorldCover 30 + 40 + 90 (sensitivity)**
 
@@ -33,6 +39,9 @@
 | TESSERA frozen | extent alone | 0.023 | 0.566 | 0.033 | 0.017 | 1,806 | 88,871 | 53,769 | 90,677 |
 | TESSERA fine-tuned | PaPs, its own class | 0.341 | 0.680 | 0.424 | 0.349 | 22,221 | 21,544 | 33,354 | 43,765 |
 | TESSERA fine-tuned | PaPs parcels, crop-map class | 0.346 | 0.681 | 0.430 | 0.349 | 22,221 | 21,544 | 33,354 | 43,765 |
+| TESSERA fine-tuned | boundary head (tau 0.5) | 0.204 | 0.692 | 0.263 | 0.086 | 15,061 | 189,879 | 40,514 | 204,940 |
+| TESSERA fine-tuned | crop-map regions | 0.031 | 0.678 | 0.040 | 0.023 | 11,608 | 680,225 | 43,967 | 691,833 |
+| TESSERA fine-tuned | extent alone | 0.025 | 0.565 | 0.036 | 0.017 | 1,806 | 88,871 | 53,769 | 90,677 |
 
 **Cut to the declared parcels: upper bound, uses the test labels**
 
@@ -45,6 +54,9 @@
 | TESSERA frozen | extent alone | 0.251 | 0.768 | 0.279 | 0.486 | 20,588 | 2,558 | 34,987 | 23,146 |
 | TESSERA fine-tuned | PaPs, its own class | 0.380 | 0.716 | 0.448 | 0.455 | 23,700 | 6,678 | 31,875 | 30,378 |
 | TESSERA fine-tuned | PaPs parcels, crop-map class | 0.385 | 0.717 | 0.454 | 0.455 | 23,700 | 6,678 | 31,875 | 30,378 |
+| TESSERA fine-tuned | boundary head (tau 0.5) | 0.355 | 0.814 | 0.392 | 0.514 | 28,689 | 17,132 | 26,886 | 45,821 |
+| TESSERA fine-tuned | crop-map regions | 0.073 | 0.746 | 0.083 | 0.099 | 29,196 | 435,421 | 26,379 | 464,617 |
+| TESSERA fine-tuned | extent alone | 0.271 | 0.794 | 0.302 | 0.486 | 20,588 | 2,558 | 34,987 | 23,146 |
 
 **The class of the parcels PaPs found**
 
@@ -62,13 +74,16 @@
 | TESSERA frozen | boundary head, WorldCover | 0.243 | 0.388 | 0.236 | 0.153 | 0.069 | 0.310 | 0.332 | 0.367 | 0.462 |
 | TESSERA frozen | boundary head, declared parcels (upper bound) | 0.492 | 0.979 | 0.339 | 0.280 | 0.439 | 0.524 | 0.486 | 0.517 | 0.613 |
 | TESSERA fine-tuned | PaPs, whole chip | 0.411 | 0.477 | 0.479 | 0.323 | 0.112 | 0.543 | 0.622 | 0.684 | 0.565 |
+| TESSERA fine-tuned | boundary head, whole chip | 0.254 | 0.376 | 0.280 | 0.158 | 0.073 | 0.296 | 0.343 | 0.407 | 0.533 |
+| TESSERA fine-tuned | boundary head, WorldCover | 0.271 | 0.399 | 0.292 | 0.174 | 0.072 | 0.330 | 0.373 | 0.429 | 0.546 |
+| TESSERA fine-tuned | boundary head, declared parcels (upper bound) | 0.516 | 0.984 | 0.389 | 0.299 | 0.445 | 0.547 | 0.520 | 0.563 | 0.669 |
 
 **Class-aware RQ (parcel Macro-F1 at IoU > 0.5), whole chip**
 
 | Encoder | true parcels, crop-map class | PaPs, crop-map class | PaPs, its own class | boundary head |
 |---|---|---|---|---|
 | TESSERA frozen | 0.551 | 0.393 | 0.370 | 0.186 |
-| TESSERA fine-tuned | 0.581 | 0.438 | 0.432 |  |
+| TESSERA fine-tuned | 0.581 | 0.438 | 0.432 | 0.250 |
 
 **Fits**
 

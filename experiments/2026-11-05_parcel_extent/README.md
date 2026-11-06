@@ -63,4 +63,10 @@ post-processing in each extent on one real test chip (`architecture.py`).
 **Results.** `results/2026-11-05_parcel_extent/<set>/`: the fine-tuned cells, and for both arms
 `extent_scores.json` per cell.
 
-**Outcome.** Pending.
+**Outcome** ([REPORT.md](REPORT.md), 6 November 2026). Without the declared parcels the boundary head does not
+delineate: class-agnostic PQ 0.476 frozen and 0.514 fine-tuned given the declared parcels (the extent's own floor is
+0.486), 0.063 and 0.083 inside WorldCover 30 + 40, and 0.048 and 0.036 over the whole chip, with 255,000 to 535,000
+predicted parcels for 55,575 true ones. Trained only on the declared parcels' pixels, the model has no background, and
+the watershed turns undeclared grassland and forest into parcels; fine-tuning sharpens the edges inside the fields
+(boundary F1 0.639 → 0.665) but adds false parcels on forest. PaPs on the same encoders reaches 0.336 and 0.366 over the
+whole chip, and is the method to extend.

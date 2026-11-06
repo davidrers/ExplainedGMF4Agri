@@ -60,5 +60,6 @@ class-aware PQ 0.303 on frozen TESSERA and 0.357 fine-tuned over the whole chip 
 against 0.145 (0.048) for the boundary head on the same frozen encoder; frozen PaPs without an extent is level with the
 boundary head given the declared parcels (0.307). With each parcel classed by the crop-type map of RQ1 instead of PaPs'
 class head, PQ rises to 0.322 and 0.361. PaPs finds 40 % of the true parcels; its misses are the pieces under 0.5 ha
-(11 % found) and its false parcels lie on undeclared grassland. The fine-tuned boundary head (job 678194) is still to
-be added.
+(11 % found) and its false parcels lie on undeclared grassland. The fine-tuned boundary head (6 November 2026) reaches
+0.197 class-aware and 0.036 class-agnostic over the whole chip, so PaPs on the fine-tuned encoder with the crop map's
+class (0.361, class-agnostic 0.366) is the best system that uses no test label.

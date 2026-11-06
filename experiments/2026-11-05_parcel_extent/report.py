@@ -151,8 +151,9 @@ def fig_variants(df: pd.DataFrame, path: Path) -> None:
             ax.set_title(title if len(ks) == 1 else f"{title}, K = {k:g} %", fontsize=9.5)
             if j == 0:
                 ax.set_ylabel("PQ, class-agnostic")
-    axes[0, 0].legend(loc="upper left", fontsize=8)
-    fig.tight_layout()
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=len(labels), fontsize=8.5, frameon=False)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
     fig.savefig(path, dpi=160)
     plt.close(fig)
 

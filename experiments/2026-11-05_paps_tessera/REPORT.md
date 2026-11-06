@@ -1,21 +1,24 @@
 # Full PaPs (utae-paps) on TESSERA, frozen and fine-tuned: report, 5 November 2026
 
-The fine-tuned boundary head of [`../2026-11-05_parcel_extent/`](../2026-11-05_parcel_extent/README.md), the
-reference on the fine-tuned encoder, is still training (cluster job 678194). Its bars and rows are added when it ends;
-every other number here is final.
+Updated on 6 November 2026 with the fine-tuned boundary head of
+[`../2026-11-05_parcel_extent/`](../2026-11-05_parcel_extent/REPORT.md) (cluster job 678194); every number here is
+final. How each method works, step by step on one test chip: [ARCHITECTURE.md](ARCHITECTURE.md) and the boundary
+head's [ARCHITECTURE.md](../2026-11-05_parcel_extent/ARCHITECTURE.md).
 
 **Answer.** Yes, PaPs takes us somewhere. With no parcel extent given, only TESSERA's embedding of the chip, it
 delineates the test parcels of Estonia with a **class-aware PQ of 0.303 on the frozen encoder and 0.357 on the
-fine-tuned one**. The boundary head on the same frozen encoder, scored the same way, reaches 0.145, and 0.048
-class-agnostic against PaPs' 0.336. Frozen PaPs without an extent is level with what the boundary head reached when it
-was given the declared parcels (0.307).
+fine-tuned one**. The boundary head, scored the same way, reaches 0.145 frozen and 0.197 fine-tuned, and 0.048 and
+0.036 class-agnostic against PaPs' 0.336 and 0.366. Frozen PaPs without an extent is level with what the frozen
+boundary head reached when it was given the declared parcels (0.307). **PaPs on the fine-tuned encoder, with each
+parcel classed by the crop-type map, is the best system without test labels: PQ 0.361, class-agnostic 0.366.**
 
 * **The geometry (class-agnostic PQ).** 0.336 frozen and 0.366 fine-tuned over the whole chip. The boundary head
-  reaches 0.048 and its floor, the chip as one region, 0.000. PaPs proposes 44,000 to 48,000 parcels for the 55,575
-  true ones; the boundary head proposes 352,000.
+  reaches 0.048 frozen and 0.036 fine-tuned, and its floor, the chip as one region, 0.000. PaPs proposes 44,000 to
+  48,000 parcels for the 55,575 true ones; the boundary head proposes 352,000 frozen and 535,000 fine-tuned.
 * **What it finds and misses.** PaPs finds 40 % (frozen) and 41 % (fine-tuned) of the true parcels. On parcels that
   touch another parcel it finds more than the boundary head given the declared extent: 46 against 34 % of those
-  touching another class, 31 against 28 % of those touching their own class. Its misses are the small pieces: 38 % of
+  touching another class, 31 against 28 % of those touching their own class (fine-tuned: 48 against 39 % and 32
+  against 30 %). Its misses are the small pieces: 38 % of
   the true pieces are under 0.5 ha, and PaPs finds 11 % of them, against 54 to 68 % of the pieces between 0.5 and
   10 ha.
 * **The false parcels.** 26,000 frozen and 21,000 fine-tuned. About two thirds lie on land that WorldCover calls
@@ -30,10 +33,11 @@ was given the declared parcels (0.307).
 * **The cost of predicted geometry.** The parcel Macro-F1 at IoU > 0.5 (class-aware RQ) falls from 0.551 with the
   true parcels to 0.393 with PaPs' parcels, both classed by the frozen crop map (−0.158), and from 0.581 to 0.438
   fine-tuned (−0.143). The boundary head lost 0.211 for TESSERA in the delineation report while being given the
-  declared parcels; here it falls to 0.186 over the whole chip.
+  declared parcels; here it falls to 0.186 over the whole chip (0.250 fine-tuned).
 
 One draw and one seed per arm, K = 100 % only (no budget sweep at this stage, user, 5 November 2026), so differences
-under about 0.04 are not resolved. The gap between PaPs and the boundary head, 0.16 to 0.29 in PQ, is far larger.
+under about 0.04 are not resolved. The gap between PaPs and the boundary head over the whole chip, 0.16 to 0.33 in
+PQ, is far larger.
 
 ## Setup
 
@@ -79,7 +83,9 @@ main workflow on frozen TESSERA, test pixel Macro-F1 0.618; the fine-tuned stude
 
 The reference is the boundary head on the same encoder (`../2026-11-05_parcel_extent/`): its parcels grown by
 watershed from the boundary probability at 0.5 inside each extent, each with the class most of its pixels take. For the
-frozen encoder these are the stored predictions of the delineation experiment.
+frozen encoder these are the stored predictions of the delineation experiment; for the fine-tuned one, the extent
+experiment's joint fine-tuning (TESSERA trained with the two heads on the labelled pixels, 45 epochs, job 678194).
+"Fine-tuned" therefore names a different encoder in the two methods (Caveats).
 
 ## Results
 
@@ -129,6 +135,7 @@ every pixel of the parcel. Fine-tuning on crop type narrows the gap to 0.012.
 | PaPs, fine-tuned, its own class | 0.357 | 0.697 | 0.432 | 0.366 | 22,829 | 21,007 | 32,746 | 43,836 |
 | PaPs, fine-tuned, crop-map class | **0.361** | 0.698 | 0.438 | **0.366** | 22,829 | 21,007 | 32,746 | 43,836 |
 | boundary head, frozen (tau 0.5) | 0.145 | 0.702 | 0.186 | 0.048 | 13,118 | 338,546 | 42,457 | 351,664 |
+| boundary head, fine-tuned (tau 0.5) | 0.197 | 0.705 | 0.250 | 0.036 | 14,128 | 520,883 | 41,447 | 535,011 |
 | crop-map regions, frozen | 0.004 | 0.643 | 0.005 | 0.005 | 9,427 | 2,692,554 | 46,148 | 2,701,981 |
 | the chip as one region (floor) | 0.000 | | 0.000 | 0.000 | 0 | 1,475 | 55,575 | 1,475 |
 
@@ -137,6 +144,7 @@ every pixel of the parcel. Fine-tuning on crop type narrows the gap to 0.012.
 | PaPs, frozen, its own class / crop-map class | 0.289 / 0.307 | 0.319 | 21,371 | 26,525 | 34,204 |
 | PaPs, fine-tuned, its own class / crop-map class | 0.341 / 0.345 | 0.348 | 22,205 | 21,556 | 33,370 |
 | boundary head, frozen | 0.158 | 0.063 | 13,491 | 241,657 | 42,084 |
+| boundary head, fine-tuned | 0.204 | 0.083 | 15,050 | 197,406 | 40,525 |
 | WorldCover's regions (floor) | 0.023 | 0.016 | 1,817 | 98,469 | 53,758 |
 
 | Cut to the declared parcels: upper bound, uses the test labels | PQ | PQ agn. | TP | FP | FN |
@@ -144,6 +152,7 @@ every pixel of the parcel. Fine-tuning on crop type narrows the gap to 0.012.
 | PaPs, frozen, its own class / crop-map class | 0.324 / 0.345 | 0.435 | 22,885 | 7,704 | 32,690 |
 | PaPs, fine-tuned, its own class / crop-map class | 0.380 / 0.385 | 0.455 | 23,700 | 6,678 | 31,875 |
 | boundary head, frozen (the delineation experiment's result) | 0.307 | 0.476 | 27,354 | 20,801 | 28,221 |
+| boundary head, fine-tuned | 0.355 | 0.514 | 28,689 | 17,132 | 26,886 |
 | the declared parcels' regions (floor) | 0.251 | 0.486 | 20,588 | 2,558 | 34,987 |
 
 PaPs' class-aware PQ over the whole chip is twice the boundary head's (0.303 against 0.145) and its class-agnostic PQ
@@ -151,13 +160,22 @@ seven times (0.336 against 0.048), on the same frozen encoder. The boundary head
 class-agnostic one only because class-aware PQ is a mean over the classes: 96 % of its 341,000 false parcels are
 classed grassland, so they weigh on one class of twenty. PaPs' two PQs are close because its false parcels are few.
 
+Fine-tuning the boundary head's encoder pulls its two PQs further apart: class-aware 0.145 → 0.197, class-agnostic
+0.048 → 0.036. Inside the fields its edges are better (boundary F1 inside the declared parcels 0.639 → 0.665), but over
+the whole chip it proposes 535,000 parcels, 183,000 more than frozen: 79 % of its false parcels lie on WorldCover
+trees, where the jointly trained encoder, never shown forest, now draws many small edges, and 97 % are classed
+grassland, so the class-aware mean hardly notices them (`../2026-11-05_parcel_extent/REPORT.md`).
+
 Fine-tuning the encoder on crop type raises PaPs' PQ by 0.054 class-aware and 0.030 class-agnostic. It finds a few
 more parcels (22,829 against 22,034) and proposes 5,000 fewer false ones; the fit of what it finds (SQ 0.697 against
 0.695) does not change. With WorldCover 30 + 40 + 90 every number moves by at most 0.001 (`figures/tables.md`).
 
 The upper bound shows how little a perfect field mask would add to PaPs: class-aware PQ 0.303 → 0.324 frozen, and
 0.357 → 0.380 fine-tuned. The mask removes PaPs' false parcels on background (25,962 → 7,704) and lifts a few fits
-above IoU 0.5 (22,034 → 22,885 matches), but it cannot add a parcel PaPs did not propose. The boundary head, by contrast, owes everything to the mask: 0.476 class-agnostic with it, 0.048 without.
+above IoU 0.5 (22,034 → 22,885 matches), but it cannot add a parcel PaPs did not propose. The boundary head, by contrast, owes everything to the mask: 0.476
+class-agnostic with it, 0.048 without (fine-tuned 0.514 and 0.036). Given the declared parcels, the fine-tuned boundary
+head has the highest class-agnostic PQ of both experiments (0.514), but that number uses the test labels; class-aware,
+PaPs cut to the declared parcels is higher (0.385 against 0.355).
 
 ### The cost of predicted geometry
 
@@ -166,7 +184,7 @@ above IoU 0.5 (22,034 → 22,885 matches), but it cannot add a parcel PaPs did n
 With the true parcels and the crop map's class, the parcel Macro-F1 at IoU > 0.5 is 0.551 frozen and 0.581
 fine-tuned; this is the parcel score of RQ1 when the geometry is given. PaPs' parcels, with the same classes, reach
 0.393 and 0.438: −0.158 and −0.143. In the delineation report the boundary head lost 0.211 on TESSERA with the declared
-extent given; without it, it reaches 0.186 here.
+extent given; without it, it reaches 0.186 here, and 0.250 on the fine-tuned encoder.
 
 ### What PaPs finds, and what it misses
 
@@ -179,12 +197,16 @@ extent given; without it, it reaches 0.186 here.
 | boundary head, frozen, whole chip | 0.236 | 0.384 | 0.229 | 0.145 |
 | boundary head, frozen, WorldCover | 0.243 | 0.388 | 0.236 | 0.153 |
 | boundary head, frozen, declared parcels (upper bound) | 0.492 | 0.979 | 0.339 | 0.280 |
+| boundary head, fine-tuned, whole chip | 0.254 | 0.376 | 0.280 | 0.158 |
+| boundary head, fine-tuned, WorldCover | 0.271 | 0.399 | 0.292 | 0.174 |
+| boundary head, fine-tuned, declared parcels (upper bound) | 0.516 | 0.984 | 0.389 | 0.299 |
 
 The categories are the delineation report's. An isolated parcel touches no other declared parcel; the declared extent
 finds those for free, which is why the boundary head given that extent finds 98 % of them. Where parcels touch, which is
 what delineation is for, PaPs without any extent finds more than the boundary head with the declared extent: 46 against
-34 % of the parcels touching another class and 31 against 28 % of those touching their own class. The boundary head
-without an extent finds half as many as PaPs in every category.
+34 % of the parcels touching another class and 31 against 28 % of those touching their own class; on the fine-tuned
+encoders 48 against 39 % and 32 against 30 %. The boundary head without an extent finds about half as many as PaPs
+among touching parcels on either encoder.
 
 ![Share of the true parcels found, by area](figures/found_by_size.png)
 
@@ -194,10 +216,12 @@ without an extent finds half as many as PaPs in every category.
 | PaPs, fine-tuned | 0.112 | 0.543 | 0.622 | 0.684 | 0.565 |
 | boundary head, frozen, whole chip | 0.078 | 0.308 | 0.315 | 0.337 | 0.426 |
 | boundary head, frozen, declared parcels (upper bound) | 0.439 | 0.524 | 0.486 | 0.517 | 0.613 |
+| boundary head, fine-tuned, whole chip | 0.073 | 0.296 | 0.343 | 0.407 | 0.533 |
+| boundary head, fine-tuned, declared parcels (upper bound) | 0.445 | 0.547 | 0.520 | 0.563 | 0.669 |
 
 PaPs' misses are concentrated in one place. The pieces under 0.5 ha (fewer than 50 pixels) are 38 % of the true
-pieces, and PaPs finds 11 % of them; between 0.5 and 10 ha it finds 54 to 68 %, more than the boundary head given the
-declared extent. Many of the small pieces are slivers of parcels cut by the chip edge, which count once per chip, as
+pieces, and PaPs finds 11 % of them; between 0.5 and 10 ha it finds 54 to 68 %, as many as or more than the boundary
+head given the declared extent (from 2 ha up, more on either encoder). Many of the small pieces are slivers of parcels cut by the chip edge, which count once per chip, as
 PASTIS scores its patches. Above 10 ha the frozen PaPs falls back to 42 % and the fine-tuned one to 57 %: a large
 parcel's mask is its 16 x 16 shape scaled to a box of up to 224 pixels, too coarse for an IoU above 0.5 when the
 outline is irregular.
@@ -230,7 +254,9 @@ validation, the tuned centres reach an F of 0.70 frozen and 0.75 fine-tuned agai
 adds no geometry beyond the true extent, and the extent experiment that, without the true extent, its parcels collapse
 (class-agnostic PQ 0.476 → 0.048). PaPs needs no extent: it predicts where parcels are, one centre each, instead of
 where edges are. Over the whole chip it scores seven times the boundary head's class-agnostic PQ and twice its
-class-aware PQ, and on frozen TESSERA it equals the boundary head's best number, which needed the test labels.
+class-aware PQ on frozen TESSERA, ten times and 1.8 times on the fine-tuned encoders, and on frozen TESSERA it equals
+the frozen boundary head's number given the declared parcels, which needed the test labels. Fine-tuning does not
+rescue the boundary head: it sharpens the edges inside the fields and adds false parcels outside them.
 
 **What limits it is recall, not precision.** PaPs proposes about as many parcels as there are (44,000 to 48,000 for
 55,575) and finds 40 % of the true ones. Of its parcels, 46 % (frozen) and 52 % (fine-tuned) match a true parcel. A
@@ -256,8 +282,9 @@ detail those tokens keep.
 
 * One draw and one seed per arm, K = 100 % only. The epoch and the confidence threshold are chosen on the validation
   chips, so the test chips are untouched, but no interval exists.
-* The fine-tuned boundary head is not in yet (job 678194, expected around midnight on 6 to 7 November 2026), so the
-  comparison on the fine-tuned encoder is PaPs alone for now.
+* "Fine-tuned" is not the same encoder in the two methods. PaPs reads chips re-encoded by the student fine-tuned on
+  crop type alone (`2026-10-15_kshot_finetune`), then frozen; the boundary head's student was trained jointly with its
+  two heads (`../2026-11-05_parcel_extent/`). Both start from the same pretrained student, under the same budget.
 * "Fine-tuned" is the user's choice of 5 November: the chips re-encoded by the student fine-tuned on crop type, then
   frozen. PaPs is not trained end to end through the encoder.
 * PaPs runs without its temporal module: TESSERA's embedding stands in for U-TAE's temporal attention, and the spatial
@@ -271,11 +298,12 @@ detail those tokens keep.
   matters for the boundary head (its false parcels are one class).
 * The boundary head's class comes from its own crop-type head (the joint fit), PaPs' crop-map class from the main
   workflow's crop-type-only fit; both are frozen TESSERA with an MLP, with the same test pixel Macro-F1 (0.618).
+  Fine-tuned: 0.671 for the boundary head's joint fit, 0.660 for the crop map PaPs is classed by.
 
 ## Next steps
 
-1. Add the fine-tuned boundary head when job 678194 ends: pull, `../2026-11-05_parcel_extent/score.py`, then
-   `analyse.py --force` and `report.py` here.
+1. Compare with PRUE (`../2026-11-06_prue_tessera/`), the three-class boundary model trained end to end with TESSERA,
+   when its jobs end: the boundary route with a learned background.
 2. Recall on small pieces: score with chip-edge slivers merged or left out, and try a lower floor on the pseudo-NMS
    confidence, before changing the model.
 3. A full-resolution mask head in place of the 16 x 16 shape, for the large and irregular parcels.
