@@ -1,0 +1,9 @@
+# PRUE's field boundary segmentation on TESSERA v2 Medium, fine-tuned end to end and frozen, all of Estonia, K = 100 %
+# only (a method check: no budget sweep at this stage, user, 5 November 2026). Read by this folder's run.py.
+name: 2026-11-06_prue_tessera
+arms: [prue_tessera_v2_ft, prue_tessera_v2_frozen]
+budgets_pct: [100]
+draws: [0]
+seeds: [0]
+epochs: 30                     # ftw-prue's max_epochs
+worldcover: data/worldcover/EE_2021_rev/worldcover.npz   # experiments/2026-11-05_parcel_extent/fetch_worldcover.py

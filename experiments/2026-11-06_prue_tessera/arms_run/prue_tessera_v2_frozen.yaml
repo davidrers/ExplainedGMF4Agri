@@ -1,0 +1,25 @@
+# PRUE (CVPR 2026, ftw-prue) on the frozen TESSERA v2 Medium raster (the core's raster cache): the reference of the
+# fine-tuned arm, every setting the same but the encoder, which stays frozen. The raster, standardised with the
+# cache's training-chip statistics, feeds smp's U-Net with an EfficientNet-B7 encoder, three classes (background,
+# interior, boundary). Read by this folder's run.py, not by the K-shot runner; in arms_run/, not arms/, for that reason.
+route: prue
+encoder: frozen                # rasters.frozen: the core's raster cache of tessera_v2_medium
+cropmap: results/kshot/{set}/tessera_v2_medium/P100_draw0_seed0   # class of the fields, for class-aware PQ only
+data:
+  batch_size: 8                # chips per step
+  eval_batch_size: 8
+  crop: 128                    # random 128 x 128 window of each 224 x 224 training chip; validation and test whole
+  augment: true                # D4: FTW's rotations and flips
+  num_workers: 12
+model:
+  unet_encoder: efficientnet-b7  # PRUE
+  unet_weights: imagenet
+  trainable: false
+loss:
+  name: log_cosh_dice          # PRUE's loss
+  class_weights: [0.05, 0.20, 0.75]   # PRUE, omega = 0.75: [0.05, 0.95 - omega, omega]
+optim:
+  lr: 3.0e-3                   # the U-Net: PRUE's best rate in its sweep (3e-3 and 1e-2 tied), AdamW amsgrad
+  weight_decay: 0.01           # AdamW's default; ftw-prue sets none
+  min_lr: 1.0e-6               # cosine floor, as ftw-prue's CosineAnnealingLR eta_min
+  val_every: 1

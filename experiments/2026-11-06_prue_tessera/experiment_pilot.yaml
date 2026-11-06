@@ -1,0 +1,9 @@
+# Pilot of experiment.yaml on EE_2021_rev_mini: the same arms and settings, 3 epochs. Results land beside the full
+# run under results/2026-11-06_prue_tessera/EE_2021_rev_mini/. Read by this folder's run.py.
+name: 2026-11-06_prue_tessera
+arms: [prue_tessera_v2_ft, prue_tessera_v2_frozen]
+budgets_pct: [100]
+draws: [0]
+seeds: [0]
+epochs: 3                      # pilot: does every stage run, and how long does an epoch take
+worldcover: data/worldcover/EE_2021_rev/worldcover.npz   # experiments/2026-11-05_parcel_extent/fetch_worldcover.py

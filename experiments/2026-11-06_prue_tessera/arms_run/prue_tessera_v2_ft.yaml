@@ -1,0 +1,29 @@
+# PRUE (CVPR 2026, ftw-prue) on TESSERA v2 Medium trained end to end: the pretrained student runs on every pixel of
+# each training crop's twelve monthly S2 + S1 composites, its output standardised with fixed statistics, and feeds
+# smp's U-Net with an EfficientNet-B7 encoder, three classes (background, interior, boundary). Read by this folder's
+# run.py, not by the K-shot runner; in arms_run/, not arms/, for that reason.
+route: prue
+encoder: finetuned             # the student in the loop, trained (model.trainable)
+cropmap: results/2026-10-15_kshot_finetune/{set}/tessera_v2_medium_ft/P100_draw0_seed0   # class of the fields, for class-aware PQ only
+data:
+  batch_size: 8                # chips per step
+  eval_batch_size: 8
+  crop: 128                    # random 128 x 128 window of each 224 x 224 training chip; validation and test whole
+  augment: true                # D4: FTW's rotations and flips
+  num_workers: 12
+  stats_chips: 128             # training chips whose pretrained embedding fixes the standardisation
+model:
+  unet_encoder: efficientnet-b7  # PRUE
+  unet_weights: imagenet
+  trainable: true
+  encoder_lr: 1.0e-5           # kshot_finetune's TESSERA rate, 1-epoch linear warm-up, then constant
+  encoder_warmup_epochs: 1
+  encoder_chunk: 16384         # pixels per gradient-checkpointed encoder pass; memory only, not the result
+loss:
+  name: log_cosh_dice          # PRUE's loss
+  class_weights: [0.05, 0.20, 0.75]   # PRUE, omega = 0.75: [0.05, 0.95 - omega, omega]
+optim:
+  lr: 3.0e-3                   # the U-Net: PRUE's best rate in its sweep (3e-3 and 1e-2 tied), AdamW amsgrad
+  weight_decay: 0.01           # AdamW's default; ftw-prue sets none
+  min_lr: 1.0e-6               # cosine floor, as ftw-prue's CosineAnnealingLR eta_min
+  val_every: 1
