@@ -58,8 +58,22 @@ class. The **upper** image is what it is **trained to match** (drawn for this ch
 | Field interior | Is it inside a field? | the pixels of a declared parcel, except its outer ring | 0.20 |
 | Field boundary | Is it on a field's edge? | the outer ring of every declared parcel: one pixel on each side, so two pixels between neighbours | 0.75 |
 
-**Grey pixels get no loss.** These are WorldCover grassland and cropland outside the declared parcels, exactly as in
-PaPs' targets: such land may be an undeclared field, so the model is not told either way.
+**Where WorldCover comes in (our addition, not part of PRUE).** Published PRUE trains on the masks of Fields of The
+World, which mark the background themselves. EuroCrops holds only the parcels farmers declared: on this chip 62 % of
+the farmland WorldCover maps is declared, over all chips about two thirds. So the background comes from the public
+ESA WorldCover 2021 map, exactly as in [PaPs' targets](../2026-11-05_paps_tessera/ARCHITECTURE.md):
+
+![WorldCover, what training uses, and PRUE's target on the test chip](figures/worldcover_training.png)
+
+* **Declared parcel** (blue): interior, with its outer ring as boundary.
+* **WorldCover non-farm land** (green: forest, water, built-up, wetland): the background class. This is 60 % of the
+  pixels of the chips, and where PRUE learns what is not a field.
+* **Undeclared WorldCover grassland and cropland, and parcels of crops outside the 20 classes** (grey): no loss. They
+  carry the ignore label, which the log-cosh Dice leaves out of both the prediction and the target, so the model is
+  told neither "field" nor "no field" there. An undeclared field may still be a field.
+
+Unlike PaPs, PRUE learns "not a field" pixel by pixel: the background class is a full output, so wherever it wins,
+no field is drawn.
 
 **Why the boundary weighs most.** Boundary pixels are few and thin, yet they decide whether two neighbouring fields
 come out as one or two. PRUE's recipe gives them 0.75 of the loss (its "omega"). The loss is a log-cosh Dice: it
@@ -109,6 +123,57 @@ For a rough idea only: on the same chip, PaPs (frozen TESSERA) finds 16 of the 3
 PQ of 0.398 with the crop and 0.378 with the crop ignored with step 3, and 0.336 and 0.294 without it
 ([REPORT.md](REPORT.md)).
 
+## A real example: from the declared parcels to the output
+
+![PRUE on one test chip: what it is told, what it outputs, and how its borders compare with the declared ones](figures/example_walkthrough.png)
+
+The chip is the median of the border report: half the test chips with at least 20 declared parcels score better for
+PRUE, half worse. Row 1 is what the model is told, row 2 what it outputs:
+
+1. **Sentinel-2**, the July composite, for orientation.
+2. **WorldCover 2021** with the declared parcels outlined. Yellow is grassland and pink cropland, together the
+   farmland; 74 % of it is declared here.
+3. **What training uses** on a chip like this one.
+4. **The training target** drawn for this chip.
+5. and 6. **Two intermediate outputs**.
+7. **The final fields**, in random colours.
+8. **The border check** against the declared parcels: blue, a drawn border with a declared one within 10 m; orange,
+   a drawn border with none; black, a declared border with nothing drawn within 10 m; grey, undeclared farmland, not
+   scored.
+
+For PRUE, panel 4 is the three-class target, with no loss on the grey land. Panels 5 and 6 are the class map and the
+boundary probability.
+
+**On this chip** (fine-tuned arm) PRUE draws 97 fields for 129 declared parcels, and 56 of them match a declared
+parcel. 98 % of the borders it draws have a declared border within 10 m, and it draws 86 % of the declared borders.
+
+### Why it fits, and where it still fails
+
+PRUE asks the three questions the task needs, for every pixel at once: is this off the fields (background, learnt
+from WorldCover), inside a field (interior), or on a field's edge (boundary)? No centre has to be found first, so
+every field it sees is drawn, and the boundary class cuts the farmland where the image shows a line: tracks, ditches,
+tree lines, changes of crop. Over all test chips its borders are the best of the three: precision 0.95 and 0.94,
+recall 0.79 and 0.81, F1 0.86 and 0.87 (frozen, fine-tuned).
+
+Its weakness is the border between two parcels of the same crop, often invisible at 10 m in every month: it draws
+34 to 38 % of them, so the two parcels come out as one field (the short black segments in panel 8). That merge is
+its main error at parcel level: 39 % of the declared parcels are merged with a neighbour ([REPORT.md](REPORT.md)). It
+also draws fields on undeclared farmland, the grey land of panel 8; the border score leaves them out, but the parcel
+score (PQ) counts them as false.
+
+### The three methods on the same chip
+
+| On test chip EE_02302_01815 (129 declared parcels) | PRUE ([note](../2026-11-06_prue_tessera/ARCHITECTURE.md)), fine-tuned | PaPs ([note](../2026-11-05_paps_tessera/ARCHITECTURE.md)), frozen | Boundary head ([note](../2026-11-05_parcel_extent/ARCHITECTURE.md)), frozen |
+|---|---|---|---|
+| Fields drawn | 97 | 84 | 238 |
+| Fields matching a declared parcel (IoU above 0.5) | 56 | 44 | 18 |
+| Border precision / recall / F1, this chip | 0.98 / 0.86 / 0.92 | 0.89 / 0.54 / 0.67 | 0.47 / 0.50 / 0.48 |
+| Border F1, all 1,475 test chips, frozen / fine-tuned | **0.86 / 0.87** | 0.64 / 0.68 | 0.36 / 0.21 |
+| Main weakness | borders between parcels of the same crop: two parcels become one field | no centre, no parcel: half the real borders are never drawn | no notion of "not a field": borders everywhere |
+
+The border scores count a drawn border as right when a declared border lies within one pixel (10 m); land WorldCover
+calls farmland but nobody declared is not scored ([the border report](../2026-11-07_border_accuracy/REPORT.md)).
+
 ---
 
 ## The frozen arm
@@ -138,3 +203,8 @@ It needs the fine-tuned arm's `best.pt`, with `embedding_stats.json` beside it. 
 minutes and works on any test chip, since it starts from the satellite composites. This version was drawn from the
 final `best.pt` (epoch 25) on 7 November 2026. The script writes `figures/architecture.png` and
 its three parts (`architecture_1.png` to `architecture_3.png`).
+
+The WorldCover figure and the example (`figures/worldcover_training.png`, `figures/example_walkthrough.png`) come from
+the stored test predictions:
+
+    poetry run python experiments/2026-11-07_border_accuracy/walkthrough.py --chips EE_2021_rev

@@ -111,6 +111,61 @@ The class-aware PQ stays above the crop-ignored one because it averages over the
 are called grassland, so they weigh on one crop out of twenty. For comparison, PaPs reaches 0.303 (0.336) frozen and
 0.357 (0.366) fine-tuned over the whole chip, with no area given.
 
+## A real example: from the declared parcels to the output
+
+![The boundary head on one test chip: what it is told, what it outputs, and how its borders compare with the declared ones](figures/example_walkthrough.png)
+
+The chip is the median of the border report: half the test chips with at least 20 declared parcels score better for
+PRUE, half worse. Row 1 is what the model is told, row 2 what it outputs:
+
+1. **Sentinel-2**, the July composite, for orientation.
+2. **WorldCover 2021** with the declared parcels outlined. Yellow is grassland and pink cropland, together the
+   farmland; 74 % of it is declared here.
+3. **What training uses** on a chip like this one.
+4. **The training target** drawn for this chip.
+5. and 6. **Two intermediate outputs**.
+7. **The final fields**, in random colours.
+8. **The border check** against the declared parcels: blue, a drawn border with a declared one within 10 m; orange,
+   a drawn border with none; black, a declared border with nothing drawn within 10 m; grey, undeclared farmland, not
+   scored.
+
+For the boundary head, panel 3 shows the difference from PRUE and PaPs: **WorldCover does not enter its training**.
+It learns from the pixels of the declared parcels alone (blue); forest, water, villages and undeclared land (grey)
+never enter the loss. Panel 4 is its border target, panels 5 and 6 the border probability and the cores where it is
+below 0.5.
+
+**On this chip** the boundary head draws 238 fields over the whole chip for 129 declared parcels, and 18 of them
+match a declared parcel. Half of the borders it draws are false (precision 0.47).
+
+### The main weakness: it does not know what is not a parcel
+
+Nothing in training ever showed the head a forest, a road or a village. Its border probability there is patchy
+(panel 5), so cores form everywhere (panel 6), and the watershed must give every pixel of the chip to some field
+(panel 7). The result is borders drawn across land that holds no field: the orange in panel 8. Over all test chips:
+
+* its fields cover 100 % of the chip, forest and water included;
+* 73 % (frozen) and 87 % (fine-tuned) of the borders it draws lie on non-farm land, so its border precision is 0.27
+  and 0.13, and its F1 0.36 and 0.21;
+* cutting its fields to WorldCover's farmland afterwards helps little (PQ, crop ignored, 0.048 to 0.063 frozen, 0.036
+  to 0.083 fine-tuned): WorldCover keeps all the grassland, declared or not, and separates no fields.
+
+Inside the declared parcels its borders are as good as PRUE's: given the declared extent, its PQ (crop ignored) is
+0.476 frozen and 0.514 fine-tuned, against 0.487 and 0.511 for PRUE. What it lacks is the background class that
+PRUE learns from WorldCover.
+
+### The three methods on the same chip
+
+| On test chip EE_02302_01815 (129 declared parcels) | PRUE ([note](../2026-11-06_prue_tessera/ARCHITECTURE.md)), fine-tuned | PaPs ([note](../2026-11-05_paps_tessera/ARCHITECTURE.md)), frozen | Boundary head ([note](../2026-11-05_parcel_extent/ARCHITECTURE.md)), frozen |
+|---|---|---|---|
+| Fields drawn | 97 | 84 | 238 |
+| Fields matching a declared parcel (IoU above 0.5) | 56 | 44 | 18 |
+| Border precision / recall / F1, this chip | 0.98 / 0.86 / 0.92 | 0.89 / 0.54 / 0.67 | 0.47 / 0.50 / 0.48 |
+| Border F1, all 1,475 test chips, frozen / fine-tuned | **0.86 / 0.87** | 0.64 / 0.68 | 0.36 / 0.21 |
+| Main weakness | borders between parcels of the same crop: two parcels become one field | no centre, no parcel: half the real borders are never drawn | no notion of "not a field": borders everywhere |
+
+The border scores count a drawn border as right when a declared border lies within one pixel (10 m); land WorldCover
+calls farmland but nobody declared is not scored ([the border report](../2026-11-07_border_accuracy/REPORT.md)).
+
 ---
 
 ## The fine-tuned arm
@@ -137,3 +192,7 @@ crop-ignored PQ falls to 0.036.
 It needs the delineation experiment's stored frozen cell and the pilot TESSERA cache on the hub (for the embedding
 image only). The chip must be one of the nine pilot test chips. The script writes `figures/architecture.png` and its
 three parts (`architecture_1.png` to `architecture_3.png`).
+
+The example (`figures/example_walkthrough.png`) comes from the stored test predictions:
+
+    poetry run python experiments/2026-11-07_border_accuracy/walkthrough.py --chips EE_2021_rev

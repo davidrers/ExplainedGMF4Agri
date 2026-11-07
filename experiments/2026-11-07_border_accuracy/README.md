@@ -22,6 +22,11 @@ are unchanged copies from `../2026-11-06_prue_tessera/`, so this folder stands o
     poetry run python experiments/2026-11-07_border_accuracy/borders.py --chips EE_2021_rev --workers 12   # about 40 s
     poetry run python experiments/2026-11-07_border_accuracy/landcover.py --chips EE_2021_rev --workers 12 # about 30 s
     poetry run python experiments/2026-11-07_border_accuracy/report.py --chips EE_2021_rev                 # about 1 min
+    poetry run python experiments/2026-11-07_border_accuracy/walkthrough.py --chips EE_2021_rev            # about 30 s
+
+`walkthrough.py` draws the WorldCover figure and the one-chip example of the architecture notes of PaPs, PRUE and the
+boundary head, into those experiments' `figures/` (`worldcover_training.png`, `example_walkthrough.png`). `targets.py`
+is an unchanged copy of PaPs' target builder, so the centre target drawn is the one PaPs was trained on.
 
 **Results.** `results/2026-11-07_border_accuracy/EE_2021_rev/`: `borders.json` (every score), `per_chip.npz` (the
 counts of every test chip at 1 pixel) and `landcover.npz` (declared parcels, undeclared WorldCover farmland and

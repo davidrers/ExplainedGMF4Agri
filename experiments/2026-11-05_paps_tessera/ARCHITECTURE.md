@@ -58,10 +58,26 @@ comparison), and the **lower** image is what it **outputs** on this test chip.
 "The features at each centre" means the U-Net features of the centre pixel, taken from all four scales (256
 numbers). So heads 3, 4 and 5 describe a whole parcel from one point.
 
-**Where WorldCover comes in.** The targets use only two sources: the declared parcels and the public ESA WorldCover
-map. Land that WorldCover calls forest, water, built-up and so on is *background*: head 1 learns "no centre here".
-WorldCover grassland and cropland outside the declared parcels is *unknown* (grey in the targets) and gets no loss,
-because an undeclared field may still be a field.
+**Where WorldCover comes in (our addition, not part of PaPs).** Published PaPs was trained on PASTIS, where every
+pixel is labelled, and its centre loss counts every pixel. EuroCrops holds only the parcels farmers declared: on this
+chip 62 % of the farmland WorldCover maps is declared, over all chips about two thirds. Trained as published, PaPs
+would learn that the undeclared third holds no fields. So the targets use two sources, the declared parcels and the
+public ESA WorldCover 2021 map:
+
+![WorldCover, what training uses, and the centre target on the test chip](figures/worldcover_training.png)
+
+* **Declared parcel** (blue): head 1 learns a peak at its centre; heads 3 to 5 its box, shape and crop.
+* **WorldCover non-farm land** (green: forest, water, built-up, wetland): head 1 learns "no centre here". This is 60 %
+  of the pixels of the chips, and the only place PaPs learns what is not a parcel.
+* **Undeclared WorldCover grassland and cropland, and parcels of crops outside the 20 classes** (grey): no loss at all.
+  The target array holds values near 0 there, but a mask (`known`, built in `targets.py`) keeps those pixels out of
+  the centre loss (`paps_loss.py`), and no centre is taken from them. An undeclared field may still be a field.
+
+So PaPs learns "not a parcel" only as "no centre here". It never learns a per-pixel "not a field": once a centre
+exists, the parcel's extent comes from heads 3 and 4 and the saliency, which are trained only inside the boxes of
+declared parcels. On the test chips the centre target works: non-farm land is 60 % of the area, but only 0.4 to 0.6 %
+of PaPs' centres and 0.8 to 0.9 % of its parcel area lie there. On undeclared farmland PaPs places centres nearly as densely
+as on declared parcels, since nothing tells it otherwise.
 
 **What to notice in the outputs:**
 
@@ -117,6 +133,57 @@ better ones:
 | PQ with head 5's crop (crop ignored) | 0.303 (0.336) | 0.357 (0.366) |
 | PQ with the crop map's crop | 0.322 | 0.361 |
 
+## A real example: from the declared parcels to the output
+
+![PaPs on one test chip: what it is told, what it outputs, and how its borders compare with the declared ones](figures/example_walkthrough.png)
+
+The chip is the median of the border report: half the test chips with at least 20 declared parcels score better for
+PRUE, half worse. Row 1 is what the model is told, row 2 what it outputs:
+
+1. **Sentinel-2**, the July composite, for orientation.
+2. **WorldCover 2021** with the declared parcels outlined. Yellow is grassland and pink cropland, together the
+   farmland; 74 % of it is declared here.
+3. **What training uses** on a chip like this one.
+4. **The training target** drawn for this chip.
+5. and 6. **Two intermediate outputs**.
+7. **The final fields**, in random colours.
+8. **The border check** against the declared parcels: blue, a drawn border with a declared one within 10 m; orange,
+   a drawn border with none; black, a declared border with nothing drawn within 10 m; grey, undeclared farmland, not
+   scored.
+
+For PaPs, panel 4 is the centre target: a peak at the centre of every declared parcel, 0 on non-farm land, and no loss
+on the grey land. Panels 5 and 6 are the centre heatmap (each dot a peak, enlarged) and the saliency.
+
+**On this chip** PaPs draws 84 parcels for 129 declared ones, and 44 of them match a declared parcel. Its borders are
+mostly real (precision 0.89), but it draws only 54 % of the declared borders.
+
+### The main weakness: no centre, no parcel
+
+A parcel exists only if head 1 puts a peak above the threshold near its middle. Where no peak is found, the parcel is
+not drawn at all, and all its borders stay black in panel 8, even where the saliency (panel 6) covers the field well.
+That is PaPs' failure over all test chips:
+
+* it draws about half of the declared borders (recall 0.52 frozen, 0.56 fine-tuned) while those it draws are real
+  (precision 0.85, 0.86);
+* it finds 40 to 41 % of the declared parcels, and leaves 43 to 45 % of them mostly uncovered (at most half of
+  the parcel inside any of its parcels);
+* large parcels are not spared: of those above 10 ha it finds 42 % (frozen) and 57 % (fine-tuned), against 84 to
+  85 % for PRUE;
+* its false borders lie mostly inside declared parcels, likely where the 16 x 16 shape rounds the outlines.
+
+### The three methods on the same chip
+
+| On test chip EE_02302_01815 (129 declared parcels) | PRUE ([note](../2026-11-06_prue_tessera/ARCHITECTURE.md)), fine-tuned | PaPs ([note](../2026-11-05_paps_tessera/ARCHITECTURE.md)), frozen | Boundary head ([note](../2026-11-05_parcel_extent/ARCHITECTURE.md)), frozen |
+|---|---|---|---|
+| Fields drawn | 97 | 84 | 238 |
+| Fields matching a declared parcel (IoU above 0.5) | 56 | 44 | 18 |
+| Border precision / recall / F1, this chip | 0.98 / 0.86 / 0.92 | 0.89 / 0.54 / 0.67 | 0.47 / 0.50 / 0.48 |
+| Border F1, all 1,475 test chips, frozen / fine-tuned | **0.86 / 0.87** | 0.64 / 0.68 | 0.36 / 0.21 |
+| Main weakness | borders between parcels of the same crop: two parcels become one field | no centre, no parcel: half the real borders are never drawn | no notion of "not a field": borders everywhere |
+
+The border scores count a drawn border as right when a declared border lies within one pixel (10 m); land WorldCover
+calls farmland but nobody declared is not scored ([the border report](../2026-11-07_border_accuracy/REPORT.md)).
+
 ---
 
 ## The fine-tuned arm
@@ -142,3 +209,8 @@ and the five heads are trained from scratch in the same way. Its kept epoch is 7
 It needs the frozen arm's `best-pq.pt`, the pilot TESSERA cache on the hub and the stored test predictions. The chip
 must be one of the nine pilot test chips (the only ones with a TESSERA raster on the hub). The script writes
 `figures/architecture.png` and its three parts (`architecture_1.png` to `architecture_3.png`).
+
+The WorldCover figure and the example (`figures/worldcover_training.png`, `figures/example_walkthrough.png`) come from
+the stored test predictions:
+
+    poetry run python experiments/2026-11-07_border_accuracy/walkthrough.py --chips EE_2021_rev
