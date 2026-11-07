@@ -22,6 +22,11 @@
   draws (frozen) and seven in eight (fine-tuned) lie on non-farm land.
 * **Fine-tuning the encoder** changes PRUE by +0.006 F1, PaPs by +0.035, and lowers the boundary head's F1 by 0.15.
 * **Chip by chip**, PRUE is above PaPs on 99 % of the 1,008 test chips with at least 20 declared parcels.
+* **EuroCrops labels only part of the farmland in a chip** (a third of WorldCover's farmland is undeclared), and
+  none of the three methods is trained as if the chip were complete: each learns from the declared parcels and from
+  WorldCover's non-farm land, and ignores the rest. The one place where the pipeline does treat a chip as complete
+  is the parcel score (PQ) and the validation scores that chose the checkpoints, which count a field on undeclared
+  farmland as false. The border score of this report does not ([EuroCrops' partial labels](#eurocrops-partial-labels-and-the-three-methods)).
 
 ## The question and how it is measured
 
@@ -139,8 +144,10 @@ encoder; the fine-tuned versions are `figures/example_<n>_ft.png` and look alike
 
 How to read each figure:
 
-* **Row 1, the declaration**: the July Sentinel-2 composite; the declared parcels coloured by crop; the declared
-  borders in black on the scored land (white: non-farm land; light: declared parcels; grey: not scored).
+* **Row 1, the declaration**: the July Sentinel-2 composite; ESA WorldCover 2021 in its own colours (farmland is
+  grassland, yellow, and cropland, pink) with the declared parcels outlined, and in the title the share of the
+  chip's WorldCover farmland that is declared; the declared parcels coloured by crop; the declared borders in black
+  on the scored land (white: non-farm land; light: declared parcels; grey: not scored, mostly undeclared farmland).
 * **Rows 2 to 4, one method each**: two intermediate outputs, the final fields (random colours), and the border
   check.
   * PRUE: the class per pixel (sand background, light blue interior, dark blue boundary) and the boundary
@@ -171,7 +178,9 @@ head (0.60, 0.51, 0.55) draws borders in and around the forest on the upper left
 EE_02302_01815, 129 declared parcels. PRUE draws nearly nothing false (0.99, 0.79, 0.88). What it misses (black)
 lies inside blocks of grassland parcels: the borders between two parcels of the same crop. PaPs (0.89, 0.54, 0.67)
 places rounded parcels and leaves many out. The boundary head (0.47, 0.50, 0.48) draws orange borders over the
-unfarmed patches in the middle and on the right of the chip.
+unfarmed patches in the middle and on the right of the chip. WorldCover calls most of the chip farmland, and 74 % of
+it is declared; the undeclared rest lies in strips and patches between the parcels (grey in the border checks).
+PRUE covers much of it with fields, which are not scored.
 
 ### 3. PRUE at its 10th percentile: grassland blocks
 
@@ -179,17 +188,87 @@ unfarmed patches in the middle and on the right of the chip.
 
 EE_02263_01778, 46 declared parcels. On the right, a block of adjacent grassland parcels: PRUE draws its outline but
 few of the borders inside it (0.87, 0.66, 0.75), and so do the other two. PRUE also places a few small fields in
-the woodland (orange specks). The boundary head (0.12, 0.49, 0.19) fills the woodland with borders.
+the woodland (orange specks). The boundary head (0.12, 0.49, 0.19) fills the woodland with borders. Only 57 % of
+the chip's WorldCover farmland is declared: WorldCover finds grassland in many clearings of the woodland.
 
 ### 4. Where PaPs beats PRUE most: little farmland
 
 ![Example 4](figures/example_4.png)
 
-EE_02270_01785, 20 declared parcels, most of the chip forest and wetland. PRUE draws fields along the strip of open
-land on the right edge, which WorldCover does not call farmland and nobody declared, so their borders count as
-false (0.44, 0.55, 0.49). PaPs places fewer fields there (0.70, 0.55, 0.62). On a chip with so little farmland a few
-false fields decide the score; such chips are rare (PRUE is above PaPs on 99 % of the chips with at least 20
-parcels).
+EE_02270_01785, 20 declared parcels; WorldCover calls most of the chip water, with forest, wetland and a little
+grassland, of which 24 % is declared. PRUE draws fields on the undeclared grassland strip along the right edge. Their
+insides are not scored, but their edges run onto the wetland and water beside it, where they count as false (0.44,
+0.55, 0.49). PaPs places fewer fields there (0.70, 0.55, 0.62). This is the partial labelling at work: if the strip
+is a field, those borders are real. On a chip with so little farmland a few fields decide the score; such chips are
+rare (PRUE is above PaPs on 99 % of the chips with at least 20 parcels).
+
+## EuroCrops' partial labels and the three methods
+
+**The concern.** EuroCrops holds the parcels farmers declared for subsidies, not every field. A chip is therefore
+not a complete map of its fields: a method that took every pixel outside the declared parcels as "no field" would
+learn that real fields are not fields.
+
+### What the chips hold
+
+![What the chips hold, and how much of each chip's WorldCover farmland is declared](figures/landcover.png)
+
+| Land | train | validation | test |
+|---|---|---|---|
+| declared parcel, one of the 20 classes | 25.5 % | 25.8 % | 26.2 % |
+| declared parcel, other crop | 1.0 % | 0.9 % | 1.1 % |
+| undeclared WorldCover grassland | 11.9 % | 11.5 % | 11.9 % |
+| undeclared WorldCover cropland | 1.3 % | 1.4 % | 1.2 % |
+| non-farm land (WorldCover) | 60.4 % | 60.5 % | 59.6 % |
+| **WorldCover farmland inside a declared parcel** | **65.9 %** | **66.7 %** | **66.5 %** |
+
+Shares of the chips' pixels. A third of the farmland WorldCover maps in the chips is undeclared, nearly all of it
+grassland: meadows outside the scheme, margins, verges and strips between parcels. Chip by chip, the median training
+chip has 63 % of its farmland declared, and few have more than 90 %.
+
+### How each method treats each kind of land in training
+
+| Land | PRUE (`prue.target`) | PaPs (`targets.py`, `paps_loss.py`) | Boundary head (`delineation.py`) |
+|---|---|---|---|
+| declared parcel, 20 classes | interior, its outer ring boundary | a parcel: centre, box, shape, class | crop class, and border on its outer ring |
+| declared parcel, other crop | ignored on WorldCover farmland; background on non-farm land (0.04 % of pixels) | as PRUE | ignored |
+| undeclared WorldCover farmland | **ignored**: no loss | **ignored**: the heatmap loss is summed over known pixels only, and no centre is taken there | **ignored** |
+| non-farm land | background | known: no centre may be predicted there | **ignored** |
+
+So the understanding is right: **every method is trained only on what is labelled**, with WorldCover's non-farm
+land added as the only negative for PRUE and PaPs. The training code was read for this, not the reports:
+
+* **PRUE** gives undeclared farmland the ignore label, and the log-cosh Dice zeroes ignored pixels in both the
+  prediction and the truth. The training windows are cut before the target is built, so a window edge is never a
+  border.
+* **PaPs as published** (PASTIS) treats every unannotated pixel as background, which would be incompatible with
+  EuroCrops. Our copy carries a `known` channel: the centre loss counts only declared parcels and non-farm land, and
+  undeclared farmland belongs to no parcel's zone. Its confidence threshold is tuned on the centres inside declared
+  parcels only.
+* **The boundary head** learns from the pixels of declared parcels alone. It is compatible with partial labels, but
+  for another reason it never sees non-farm land, so nothing tells it where fields stop: that, not the labels, is
+  why its fields fill the chip.
+
+### Where the partial labels still matter
+
+1. **Every declared edge is taught as a border**, whatever lies beyond it. 53 % of the real border pixels are the
+   edge of a declared parcel against undeclared farmland. Where a farmer declared only part of a field, that edge is
+   invisible, and the target asks for a border that is not there. It seems rare: PRUE draws 85 % of these edges,
+   about as many as of the edges against forest or water (88 %) and more than between two crops (82 %), so most of
+   them are visible borders.
+2. **WorldCover decides what is not a field.** Undeclared farmland that WorldCover maps as forest or wetland is
+   trained as background by PRUE and PaPs. Its errors go uncounted without an independent map; one sign of them is
+   that 3.5 to 4.7 % of the declared parcel pixels lie on land WorldCover calls non-farm (those stay parcels in
+   training, since the declaration comes first).
+3. **The parcel score treats the chip as complete.** PQ, and the validation scores that chose the checkpoints of PRUE
+   (object F1) and PaPs (PQ), count a field drawn on undeclared farmland as a false parcel. 57 to 61 % of PRUE's false
+   fields lie on undeclared WorldCover grassland (13,581 frozen, 16,487 fine-tuned), and PaPs' show the same pattern
+   (13,071 to 16,940). This penalises a method for finding fields nobody declared, PRUE the most. The border score
+   of this report leaves undeclared farmland unscored, so it does not, apart from the edges of such fields that run
+   onto non-farm land (example 4).
+
+**No method is incompatible with EuroCrops as trained here.** The partial labelling shows in two places: the
+evaluation of whole parcels, which counts fields nobody declared as false, and the declared edges against
+undeclared land, which the targets take as borders.
 
 ## Analysis
 
@@ -222,7 +301,9 @@ the border F1 but merges two parcels. Both give the same ranking: PRUE, then PaP
   recall on same-crop borders is partly this.
 * **Undeclared farmland is not scored.** A field drawn there, and its borders, count neither as right nor as false.
   The PRUE report found 57 to 61 % of PRUE's false fields on undeclared WorldCover grassland, so PRUE's precision
-  here does not include them; neither does PaPs' or the boundary head's.
+  here does not include them; neither does PaPs' or the boundary head's. Where such a field's edge runs onto
+  non-farm land beside it, that edge does count, as false (example 4): at most the 1.7 to 2.1 % of PRUE's drawn
+  border that lies false on non-farm land.
 * **Half of the real border (53 %) is the edge of a declared parcel against undeclared farmland**: field margins,
   verges, undeclared meadows. They count as real borders, since the declared parcel ends there.
 * **The encoders' fine-tuning differs**: PRUE's encoder was trained end to end with it; PaPs' was fine-tuned on crop
@@ -238,7 +319,8 @@ the border F1 but merges two parcels. Both give the same ranking: PRUE, then PaP
 ## Reproduce
 
     poetry run python experiments/2026-11-07_border_accuracy/borders.py --chips EE_2021_rev --workers 12
+    poetry run python experiments/2026-11-07_border_accuracy/landcover.py --chips EE_2021_rev --workers 12
     poetry run python experiments/2026-11-07_border_accuracy/report.py --chips EE_2021_rev
 
-`borders.py` writes `results/2026-11-07_border_accuracy/EE_2021_rev/borders.json` and `per_chip.npz`; `report.py`
-the figures and `figures/tables.md`.
+`borders.py` writes `results/2026-11-07_border_accuracy/EE_2021_rev/borders.json` and `per_chip.npz`;
+`landcover.py` `landcover.npz` beside them; `report.py` the figures and `figures/tables.md`.

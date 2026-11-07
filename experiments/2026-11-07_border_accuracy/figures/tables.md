@@ -54,3 +54,17 @@ PRUE above PaPs (fine-tuned) on 99.2% of these chips.
 | example_2 | EE_02302_01815 | PRUE at its median |
 | example_3 | EE_02263_01778 | PRUE at its 10th percentile |
 | example_4 | EE_02270_01785 | where PaPs beats PRUE most |
+
+**What the chips hold** (share of pixels; WorldCover 2021, declared parcel layer)
+
+| Category | train | validation | test |
+|---|---|---|---|
+| declared, in scheme | 25.54% | 25.83% | 26.18% |
+| declared, other crop, on WorldCover farmland | 0.95% | 0.83% | 1.02% |
+| declared, other crop, on non-farm land | 0.04% | 0.04% | 0.04% |
+| undeclared, WorldCover grassland | 11.87% | 11.47% | 11.94% |
+| undeclared, WorldCover cropland | 1.25% | 1.37% | 1.20% |
+| undeclared, non-farm land | 60.35% | 60.47% | 59.62% |
+| undeclared, no WorldCover data | 0.00% | 0.00% | 0.00% |
+| WorldCover farmland inside a declared parcel | 65.9% | 66.7% | 66.5% |
+| declared in-scheme pixels WorldCover calls non-farm | 4.7% | 3.5% | 4.2% |

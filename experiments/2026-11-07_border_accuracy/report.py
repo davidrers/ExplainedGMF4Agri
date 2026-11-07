@@ -50,6 +50,16 @@ SHORT = {"pasture_meadow_grassland_grass": "grassland", "winter_common_soft_whea
          "grain_maize_corn_popcorn": "grain maize", "legumes_dried_pulses_protein_crops": "dried pulses",
          "alfalfa_lucerne": "alfalfa", "orchards_fruits": "orchards", "fresh_vegetables": "vegetables"}
 MIN_PARCELS = 20
+#: ESA WorldCover 2021 classes and their official colours.
+WORLDCOVER = {10: ("tree cover", "#006400"), 20: ("shrubland", "#ffbb22"), 30: ("grassland", "#ffff4c"),
+              40: ("cropland", "#f096ff"), 50: ("built-up", "#fa0000"), 60: ("bare, sparse", "#b4b4b4"),
+              70: ("snow, ice", "#f0f0f0"), 80: ("water", "#0064c8"), 90: ("herbaceous wetland", "#0096a0"),
+              95: ("mangroves", "#00cf75"), 100: ("moss, lichen", "#fae6a0"), 0: ("no data", "#ffffff")}
+#: The land of the chips, merged from ``landcover.CATEGORIES``: label, colour, the categories it sums.
+LAND = [("declared parcel, one of the 20 classes", "#2a78d6", (0,)),
+        ("declared parcel, other crop", "#4a3aa7", (1, 2)),
+        ("undeclared WorldCover farmland (grassland, cropland)", "#eda100", (3, 4)),
+        ("non-farm land (WorldCover)", "#008300", (5,))]
 plt.rcParams.update({
     "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
     "axes.edgecolor": BASELINE, "axes.labelcolor": INK_2, "axes.titlecolor": INK, "axes.titlesize": 10.5,
@@ -159,6 +169,65 @@ def fig_per_chip(f1: dict, keep: np.ndarray, path: Path) -> None:
     plt.close(fig)
 
 
+def load_landcover(chips: str) -> dict | None:
+    path = REPO / "results" / borders.NAME / chips / "landcover.npz"
+    if not path.exists():
+        return None
+    with np.load(path) as z:
+        return {k: z[k] for k in z.files}
+
+
+def fig_landcover(lc: dict, path: Path) -> None:
+    split, counts = lc["split"], lc["counts"]
+    fig, (a, b) = plt.subplots(1, 2, figsize=(12, 3.6), gridspec_kw={"width_ratios": [1.5, 1]})
+    names = ("train", "validation", "test")
+    for y, sname in enumerate(names):
+        c = counts[split == sname].sum(0).astype(float)
+        shares = [c[list(cats)].sum() / c.sum() for _, _, cats in LAND]
+        left = 0.0
+        for (lab, col, _), v in zip(LAND, shares):
+            a.barh(y, v, left=left, color=col, height=0.6, edgecolor=SURFACE, linewidth=2)
+            if v > 0.04:
+                a.text(left + v / 2, y, f"{v:.0%}", ha="center", va="center", fontsize=8.5,
+                       color="white" if col != "#eda100" else INK)
+            left += v
+    a.set_yticks(range(len(names)), [f"{n}\n{int((split == n).sum()):,} chips" for n in names])
+    a.invert_yaxis()
+    a.set_xlim(0, 1)
+    a.set_xlabel("share of the chips' pixels")
+    a.grid(False)
+    a.set_title("What the chips hold", fontsize=10)
+    a.legend(handles=[matplotlib.patches.Patch(color=col, label=lab) for lab, col, _ in LAND], loc="upper center",
+             bbox_to_anchor=(0.5, -0.25), ncol=2, fontsize=8)
+    sel = (split == "train") & (lc["farm"] >= 500)
+    share = lc["farm_declared"][sel] / lc["farm"][sel]
+    b.hist(share, bins=np.linspace(0, 1, 21), color="#2a78d6", edgecolor=SURFACE, linewidth=1.5)
+    med = float(np.median(share))
+    b.axvline(med, color=INK, linewidth=1.2, linestyle="--")
+    b.text(med, b.get_ylim()[1] * 0.97, f"median {med:.0%} ", fontsize=8.5, color=INK, va="top", ha="right")
+    b.set_xlabel("share of the chip's WorldCover farmland inside a declared parcel")
+    b.set_ylabel("training chips")
+    b.set_title(f"Chip by chip: {int(sel.sum()):,} training chips with at least 5 ha of farmland", fontsize=10)
+    fig.tight_layout()
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
+def landcover_table(lc: dict) -> str:
+    split, counts = lc["split"], lc["counts"]
+    cats = [str(c) for c in lc["categories"]]
+    t = ["**What the chips hold** (share of pixels; WorldCover 2021, declared parcel layer)\n",
+         "| Category | " + " | ".join(("train", "validation", "test")) + " |", "|---|---|---|---|"]
+    tot = {s: counts[split == s].sum(0).astype(float) for s in ("train", "validation", "test")}
+    for k, c in enumerate(cats):
+        t.append(f"| {c} | " + " | ".join(f"{tot[s][k] / tot[s].sum():.2%}" for s in tot) + " |")
+    t.append("| WorldCover farmland inside a declared parcel | " + " | ".join(
+        f"{lc['farm_declared'][split == s].sum() / lc['farm'][split == s].sum():.1%}" for s in tot) + " |")
+    t.append("| declared in-scheme pixels WorldCover calls non-farm | " + " | ".join(
+        f"{lc['in_scheme_on_nonfarm'][split == s].sum() / tot[s][0]:.1%}" for s in tot) + " |")
+    return "\n".join(t) + "\n"
+
+
 # -------------------------------------------------------------------------------------------------- examples
 
 def _fields_img(seg: np.ndarray) -> np.ndarray:
@@ -262,6 +331,13 @@ def fig_examples(chips: str, chosen: list[tuple[str, str]], folder: Path) -> lis
         crop[prue.boundary_map(parcels)] = matplotlib.colors.to_rgb(INK)
         truth_img = _base(E, scored)
         truth_img[true_border] = matplotlib.colors.to_rgb(INK)
+        wc_img = np.ones(E.shape + (3,))
+        for k in np.unique(wc):
+            wc_img[wc == k] = matplotlib.colors.to_rgb(WORLDCOVER.get(int(k), ("", "#ffffff"))[1])
+        wc_img[prue.boundary_map(parcels)] = matplotlib.colors.to_rgb(INK)
+        farm = np.isin(wc, prue.AGRI)
+        farm_declared = (farm & (parcels > 0)).sum() / max(farm.sum(), 1)
+        wc_present = [int(k) for k in WORLDCOVER if (wc == k).any()]
 
         for enc in ENCODERS:
             d = data[enc]
@@ -269,10 +345,12 @@ def fig_examples(chips: str, chosen: list[tuple[str, str]], folder: Path) -> lis
             pb = d["head"]["boundary"][i].astype(np.float32) / 255.0
             segs = {"PRUE": prue.parcels(prob, "grow"), "PaPs": d["PaPs"]["inst"][i].astype(np.int64),
                     "boundary head": px.from_boundary(np.ones(pb.shape, bool), pb, px.TAU)}
-            fig, axes = plt.subplots(4, 4, figsize=(11, 11.9))
+            fig, axes = plt.subplots(4, 4, figsize=(11, 14.2))
             _show(axes[0, 0], rgb, "Sentinel-2, July composite")
-            _show(axes[0, 1], crop, f"Declared parcels: {n_parcels},\ncoloured by crop")
-            _show(axes[0, 2], truth_img, f"Declared borders (black): {int(true_border.sum()):,} px\n"
+            _show(axes[0, 1], wc_img, f"WorldCover 2021, declared parcels\noutlined; farmland: {farm_declared:.0%} "
+                                      "declared")
+            _show(axes[0, 2], crop, f"Declared parcels: {n_parcels},\ncoloured by crop")
+            _show(axes[0, 3], truth_img, f"Declared borders (black): {int(true_border.sum()):,} px\n"
                                          "grey: not scored")
             cm = np.ones(E.shape + (3,))
             for k, c in CLASS3.items():
@@ -294,8 +372,6 @@ def fig_examples(chips: str, chosen: list[tuple[str, str]], folder: Path) -> lis
                 _show(axes[row, 2], _fields_img(seg), f"{m}: final fields ({n_f})")
                 img, p, r, f = _check(seg, true_border, E, scored)
                 _show(axes[row, 3], img, f"{m}: border check\nprecision {p:.2f}, recall {r:.2f}, F1 {f:.2f}")
-            ax = axes[0, 3]
-            ax.axis("off")
             present = [k for k in ranked if k in set(np.unique(mask[E]).tolist()) and k in colours]
             crops = [matplotlib.patches.Patch(color=colours[k], label=SHORT.get(names[k], names[k].replace("_", " ")))
                      for k in present]
@@ -303,18 +379,24 @@ def fig_examples(chips: str, chosen: list[tuple[str, str]], folder: Path) -> lis
                 crops.append(matplotlib.patches.Patch(color=OTHER_CLASS, label="other crops"))
             if ((mask < 0) & (parcels > 0)).any():
                 crops.append(matplotlib.patches.Patch(color=NOT_SCORED, label="crop outside the 20 classes"))
-            ax.legend(handles=crops, loc="upper left", fontsize=7.5, title="crop", title_fontsize=8,
-                      alignment="left", handlelength=1.2, borderaxespad=0)
+            fig.legend(handles=crops, ncol=2, fontsize=7.5, title="crop (row 1, third panel)",
+                       title_fontsize=8, alignment="left", handlelength=1.2, bbox_to_anchor=(0.01, 0.11),
+                       loc="upper left")
+            wc_handles = [matplotlib.patches.Patch(facecolor=WORLDCOVER[k][1], edgecolor=BASELINE,
+                                                   label=WORLDCOVER[k][0]) for k in wc_present]
+            fig.legend(handles=wc_handles, loc="upper left", ncol=2, fontsize=7.5,
+                       title="WorldCover (row 1, second panel)", title_fontsize=8, alignment="left",
+                       handlelength=1.2, bbox_to_anchor=(0.37, 0.11))
             check = [matplotlib.patches.Patch(color=CORRECT, label="drawn, real border within 10 m"),
                      matplotlib.patches.Patch(color=FALSE, label="drawn, no real border within 10 m"),
                      matplotlib.patches.Patch(color=MISSED, label="real border, nothing drawn within 10 m"),
                      matplotlib.patches.Patch(facecolor=PARCEL_BASE, edgecolor=BASELINE, label="declared parcel"),
                      matplotlib.patches.Patch(color=NOT_SCORED, label="not scored: undeclared farmland,\n"
                                                                      "crop outside the 20 classes")]
-            fig.legend(handles=check, loc="lower center", ncol=3, fontsize=8, title="border check (last column)",
-                       title_fontsize=8.5, handlelength=1.2, bbox_to_anchor=(0.5, 0.0))
+            fig.legend(handles=check, loc="upper left", ncol=1, fontsize=7.5, title="border check (last column)",
+                       title_fontsize=8, alignment="left", handlelength=1.2, bbox_to_anchor=(0.66, 0.11))
             fig.suptitle(f"Test chip {cid}, TESSERA {enc}: {why}", x=0.01, ha="left", fontsize=11, color=INK)
-            fig.tight_layout(rect=(0, 0.06, 1, 0.985))
+            fig.tight_layout(rect=(0, 0.115, 1, 0.985), h_pad=1.6)
             path = folder / (f"example_{i + 1}.png" if enc == "frozen" else f"example_{i + 1}_ft.png")
             fig.savefig(path, dpi=130)
             plt.close(fig)
@@ -399,10 +481,15 @@ def main() -> None:
     fig_scores(res, folder / "scores.png")
     fig_types(res, folder / "border_types.png")
     fig_per_chip(f1, keep, folder / "per_chip.png")
+    lc = load_landcover(a.chips)
+    if lc is not None:
+        fig_landcover(lc, folder / "landcover.png")
     chosen = pick(f1, keep, ids)
     if not a.no_examples:
         fig_examples(a.chips, chosen, folder)
     t = tables(res, f1, keep, chosen)
+    if lc is not None:
+        t += "\n" + landcover_table(lc)
     (folder / "tables.md").write_text(t)
     print(t)
 

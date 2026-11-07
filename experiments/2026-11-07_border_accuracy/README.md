@@ -20,14 +20,18 @@ are unchanged copies from `../2026-11-06_prue_tessera/`, so this folder stands o
 **How to run.**
 
     poetry run python experiments/2026-11-07_border_accuracy/borders.py --chips EE_2021_rev --workers 12   # about 40 s
+    poetry run python experiments/2026-11-07_border_accuracy/landcover.py --chips EE_2021_rev --workers 12 # about 30 s
     poetry run python experiments/2026-11-07_border_accuracy/report.py --chips EE_2021_rev                 # about 1 min
 
-**Results.** `results/2026-11-07_border_accuracy/EE_2021_rev/`: `borders.json` (every score) and `per_chip.npz` (the
-counts of every test chip at 1 pixel). Figures and `tables.md` in `figures/`.
+**Results.** `results/2026-11-07_border_accuracy/EE_2021_rev/`: `borders.json` (every score), `per_chip.npz` (the
+counts of every test chip at 1 pixel) and `landcover.npz` (declared parcels, undeclared WorldCover farmland and
+non-farm land in every chip of the split). Figures and `tables.md` in `figures/`.
 
 **Outcome** ([REPORT.md](REPORT.md)). With a tolerance of one pixel (10 m), PRUE's borders match the declared ones
 best: 95 % of the borders it draws are real and it draws 79 to 81 % of the real ones (F1 0.86 frozen, 0.87
 fine-tuned). PaPs draws real borders too (85 %) but only half of them (F1 0.64, 0.68), because it leaves parcels
 out. The boundary head draws borders across forest and wetland (F1 0.36, 0.21). PRUE scores above PaPs on 99 % of
 the test chips with at least 20 parcels. What all three miss most is the border between two parcels of the same
-crop: PRUE draws one in three.
+crop: PRUE draws one in three. A third of WorldCover's farmland in the chips is undeclared; none of the three
+methods is trained as if a chip were complete (each ignores undeclared farmland), but the parcel score (PQ) and the
+checkpoint choice count fields drawn there as false.
