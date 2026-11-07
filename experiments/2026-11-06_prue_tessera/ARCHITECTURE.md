@@ -6,9 +6,9 @@ boundary class keeps apart. Here it reads the TESSERA embedding, and TESSERA is 
 
 ![The whole architecture of PRUE on TESSERA, drawn from one real test chip](figures/architecture.png)
 
-> **Drawn mid-training.** The diagram uses the fine-tuned arm's best checkpoint so far, **epoch 9 of 30** (job 681338
-> is still training on the cluster, about 20 hours to go). The steps will not change, but the outputs and numbers
-> will. The diagram will be redrawn from the final checkpoint when the job ends.
+> **Final checkpoint.** The diagram uses the fine-tuned arm's kept checkpoint, **epoch 25 of 30**, the epoch of best
+> validation object F1 (job 681338, finished 7 November 2026). The results over all test chips are in
+> [REPORT.md](REPORT.md).
 
 **Every image in the diagram is real.** They come from the same test chip as the
 [PaPs](../2026-11-05_paps_tessera/ARCHITECTURE.md) and [boundary head](../2026-11-05_parcel_extent/ARCHITECTURE.md)
@@ -98,23 +98,24 @@ Again, the head gives no parcels, only a class per pixel. The parcels come from 
 4. **Give each a crop.** PRUE predicts no crop, so each field takes the crop that most of its pixels get in the RQ1
    crop-type map (the fine-tuned TESSERA + MLP of `../2026-10-15_kshot_finetune`). **This is the final output.**
 
-**On this chip (epoch 9 checkpoint).** 30 fields; 19 match a declared parcel (IoU above 0.5) and 16 of those have the
-right crop. Chip PQ is 0.17 with the crop, 0.43 with the crop ignored. Without step 3, PRUE's own fields match 15
-parcels (PQ 0.12, or 0.32 with the crop ignored), because their shrunken interiors reach IoU 0.5 less often. Class-aware
-PQ stays far below the crop-ignored one on a single chip, because it averages over the few crops present.
+**On this chip (epoch 25 checkpoint).** 31 fields; 21 match a declared parcel (IoU above 0.5) and 17 of those have the
+right crop. Chip PQ is 0.19 with the crop, 0.49 with the crop ignored. Without step 3, PRUE's own fields match 16
+parcels (PQ 0.12, or 0.36 with the crop ignored), because their shrunken interiors reach IoU 0.5 less often. Class-aware
+PQ stays far below the crop-ignored one on a single chip, because it averages over the few crops present. The
+boundary class has a pixel F1 of 0.78 inside the declared parcels.
 
 For a rough idea only: on the same chip, PaPs (frozen TESSERA) finds 16 of the 34 parcels and the boundary head
-(frozen, whole chip) 12. This is one chip and a mid-training checkpoint, so it is no result. The validation log of
-epoch 9 gives a PQ (crop ignored) of 0.377 with step 3 and 0.292 without it, on the validation chips. The test score
-over all 1,475 test chips comes when training ends.
+(frozen, whole chip) 12. This is one chip, so it is no result. Over all 1,475 test chips the fine-tuned arm reaches a
+PQ of 0.398 with the crop and 0.378 with the crop ignored with step 3, and 0.336 and 0.294 without it
+([REPORT.md](REPORT.md)).
 
 ---
 
 ## The frozen arm
 
 The same diagram with TESSERA frozen: its embedding is read from the main workflow's cache and only the U-Net is
-trained. It is the reference that shows what training the encoder adds. Job 681339 is running (encoding the chips
-when this was written).
+trained. It is the reference that shows what training the encoder adds (job 681339; its scores are in
+[REPORT.md](REPORT.md)).
 
 ## How PRUE differs from PaPs and the boundary head
 
@@ -134,6 +135,6 @@ when this was written).
         --checkpoint results/2026-11-06_prue_tessera/EE_2021_rev/prue_tessera_v2_ft/P100_draw0_seed0/best.pt
 
 It needs the fine-tuned arm's `best.pt`, with `embedding_stats.json` beside it. It runs on the CPU in about 1.5
-minutes and works on any test chip, since it starts from the satellite composites. This version was drawn from a copy
-of the epoch-9 `best.pt` taken from the cluster on 6 November 2026. The script writes `figures/architecture.png` and
+minutes and works on any test chip, since it starts from the satellite composites. This version was drawn from the
+final `best.pt` (epoch 25) on 7 November 2026. The script writes `figures/architecture.png` and
 its three parts (`architecture_1.png` to `architecture_3.png`).

@@ -315,8 +315,8 @@ def draw(D: dict, path: Path) -> None:
     C.text(17.85, 1.1, "How to read", fontsize=10, weight="bold", color=INK, va="top")
     C.text(17.85, 1.45, f"Every image is real: test chip {D['cid']}, never seen in training.\n"
                         "Boxes are steps of the model. TRAINED: learned from the 4,898 training chips.\n"
-                        f"Checkpoint: epoch {D['epoch']} of 30, the best so far; training is still running, so "
-                        "the outputs will change.\nFrozen arm: same diagram with TESSERA frozen.",
+                        f"Checkpoint: epoch {D['epoch']} of 30, the one kept (best validation object F1).\n"
+                        "Frozen arm: same diagram with TESSERA frozen.",
            width=34, fontsize=8.8, linespacing=1.35)
 
     # ----------------------------------------------------------------------------------- band 2: one head
@@ -427,8 +427,11 @@ def main() -> None:
     a = ap.parse_args()
     out = HERE / "figures" / "architecture.png"
     out.parent.mkdir(exist_ok=True)
-    draw(load(a.chip, a.checkpoint), out)
+    D = load(a.chip, a.checkpoint)
+    draw(D, out)
     print(out)
+    print(f"chip {D['cid']}, epoch {D['epoch']}, {len(np.unique(D['true'][D['true'] > 0]))} true pieces, boundary F1 "
+          f"{D['bf1']:.3f}; " + "; ".join(f"{v}: {s}" for v, s in D["scores"].items()))
 
 
 if __name__ == "__main__":

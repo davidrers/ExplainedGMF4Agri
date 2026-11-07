@@ -59,6 +59,13 @@ final one).
 
 **Results.** `results/2026-11-06_prue_tessera/<set>/<arm>/P100_draw0_seed0/`: `results.json` (with
 `panoptic_metrics` and the training history), `metrics.csv`, `predictions_test.npz` (class probabilities x 255),
-`best.pt`.
+`best.pt`; `analysis.json` (`analyse.py`) and, beside the arms, `ceiling.json`. Figures and tables: `report.py`.
 
-**Outcome.** Pending.
+**Outcome** (7 November 2026, [REPORT.md](REPORT.md); architecture: [ARCHITECTURE.md](ARCHITECTURE.md)). With each
+field grown back into its rim (`grow`), PRUE is the best parcel method on TESSERA without test labels: class-agnostic
+PQ over the whole chip 0.374 frozen and 0.378 fine-tuned (PaPs 0.336 and 0.366, the boundary head 0.048 and 0.036),
+class-aware with the crop-map class 0.367 and 0.397 (PaPs 0.322 and 0.361). PRUE's own fields (`cc`) score 0.289 and
+0.294, below PaPs. It finds 45 % of the true parcels (PaPs 41 %), most of those above 10 ha, and fails by merging
+neighbours (39 % of the true parcels), where PaPs misses them. Training TESSERA end to end adds +0.004 to the geometry
+at 50 times the training time (28.3 h against 0.56 h). One draw and one seed: the gains over fine-tuned PaPs are within
+the noise. The perfect three-class map reaches 0.741 with the same post-processing.
