@@ -1,0 +1,38 @@
+# joint_tessera_v2_frozen with the crop loss weighted 0.01 instead of 0.1 (see loss_weight), added 8 November 2026.
+# One model on the frozen TESSERA v2 Medium raster (the core's raster cache): PRUE's U-Net (smp, EfficientNet-B7) with
+# its border head and the main workflow's crop head beside it, the crop head reading the embedding and the U-Net's
+# 16 decoder channels (joint.py). Every setting as the fine-tuned arm but the encoder, which stays frozen. Read by this
+# folder's run.py, not by the K-shot runner; in arms_run/, not arms/, for that reason.
+route: joint
+encoder: frozen                # rasters.frozen: the core's raster cache of tessera_v2_medium
+data:
+  batch_size: 8                # chips per step
+  eval_batch_size: 8
+  crop: 128                    # random 128 x 128 window of each 224 x 224 training chip; validation and test whole
+  augment: true                # D4: FTW's rotations and flips, exact for a per-pixel embedding
+  num_workers: 12
+model:
+  unet_encoder: efficientnet-b7  # PRUE
+  unet_weights: imagenet
+  trainable: false
+loss:
+  name: log_cosh_dice          # PRUE's loss, on the border classes
+  class_weights: [0.05, 0.20, 0.75]   # PRUE, omega = 0.75: [0.05, 0.95 - omega, omega]
+crop:                          # the main workflow's tessera_v2_medium head: PixelMLPDecoder (512, 256) + SegmentationHead
+  hidden: [512, 256]
+  dropout: 0.2                 # decoder_dropout of the pixel_raster group
+  head_dropout: 0.2            # the arm's head_dropout
+  lr: 1.0e-3                   # the arm's lr and weight decay, AdamW without amsgrad
+  weight_decay: 0.05
+  loss: ce                     # cross-entropy on the labelled pixels of the drawn parcels
+  loss_weight: 0.01            # a tenth of joint_tessera_v2_frozen's 0.1. At 0.1 the logged pull of the crop loss on the
+                               # U-Net was 1.4 to 9.8 x the border loss's from epoch 3 on (median about 3.7 x), not the
+                               # 0.4 x the 40-step probe gave, and the borders fell below PRUE's (F1 at 1 px 0.844 against
+                               # 0.862, 8 November 2026). At 0.01 the crop pull is about 0.15 to 1 x: the border task
+                               # leads the U-Net. Adam scales each parameter's step by its own gradient, so the crop head
+                               # itself trains as at 0.1; only its say in the shared U-Net shrinks
+optim:                         # the U-Net, as PRUE
+  lr: 3.0e-3                   # AdamW amsgrad
+  weight_decay: 0.01
+  min_lr: 1.0e-6               # cosine floor; the crop head decays on the same curve
+  val_every: 1
