@@ -38,10 +38,16 @@ import numpy as np  # noqa: E402
 NAME = "2026-11-07_prue_crop_tessera"
 CELL = "P100_draw0_seed0"
 #: Arm -> label, the separate crop arm's cell, PRUE's cell, PRUE's name in the border-accuracy experiment.
-ARMS = {"joint_tessera_v2_frozen": ("TESSERA frozen", "kshot/{set}/tessera_v2_medium",
+ARMS = {"joint_tessera_v2_frozen": ("TESSERA frozen, crop weight 0.1", "kshot/{set}/tessera_v2_medium",
                                     "2026-11-06_prue_tessera/{set}/prue_tessera_v2_frozen", "PRUE frozen"),
-        "joint_tessera_v2_ft": ("TESSERA fine-tuned", "2026-10-15_kshot_finetune/{set}/tessera_v2_medium_ft",
-                                "2026-11-06_prue_tessera/{set}/prue_tessera_v2_ft", "PRUE fine-tuned")}
+        "joint_tessera_v2_frozen_cw001": ("TESSERA frozen, crop weight 0.01", "kshot/{set}/tessera_v2_medium",
+                                          "2026-11-06_prue_tessera/{set}/prue_tessera_v2_frozen", "PRUE frozen"),
+        "joint_tessera_v2_ft": ("TESSERA fine-tuned, crop weight 0.1",
+                                "2026-10-15_kshot_finetune/{set}/tessera_v2_medium_ft",
+                                "2026-11-06_prue_tessera/{set}/prue_tessera_v2_ft", "PRUE fine-tuned"),
+        "joint_tessera_v2_ft_cw001": ("TESSERA fine-tuned, crop weight 0.01",
+                                      "2026-10-15_kshot_finetune/{set}/tessera_v2_medium_ft",
+                                      "2026-11-06_prue_tessera/{set}/prue_tessera_v2_ft", "PRUE fine-tuned")}
 BORDERS = "2026-11-07_border_accuracy/{set}"
 #: Metric key -> label; all higher-is-better scores in [0, 1].
 METRICS = {"crop_pixel_macro_f1": "crop types: pixel Macro-F1", "crop_parcel_macro_f1": "crop types: parcel Macro-F1",

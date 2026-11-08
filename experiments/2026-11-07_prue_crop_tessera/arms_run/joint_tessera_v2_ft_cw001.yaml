@@ -1,0 +1,42 @@
+# joint_tessera_v2_ft with the crop loss weighted 0.01 instead of 0.1 (see loss_weight), added 8 November 2026.
+# One model on TESSERA v2 Medium trained end to end: the pretrained student runs on every pixel of each training
+# window's twelve monthly S2 + S1 composites, its output standardised with fixed statistics, and feeds PRUE's U-Net
+# (smp, EfficientNet-B7) with its border head and the main workflow's crop head beside it, the crop head reading the
+# embedding and the U-Net's 16 decoder channels (joint.py); both losses train the student. Read by this folder's
+# run.py, not by the K-shot runner; in arms_run/, not arms/, for that reason.
+route: joint
+encoder: finetuned             # the student in the loop, trained (model.trainable)
+data:
+  batch_size: 8                # chips per step
+  eval_batch_size: 8
+  crop: 128                    # random 128 x 128 window of each 224 x 224 training chip; validation and test whole
+  augment: true                # D4: FTW's rotations and flips, exact for a per-pixel encoder
+  num_workers: 12
+  stats_chips: 128             # training chips whose pretrained embedding fixes the standardisation
+model:
+  unet_encoder: efficientnet-b7  # PRUE
+  unet_weights: imagenet
+  trainable: true
+  encoder_lr: 1.0e-5           # kshot_finetune's and PRUE's TESSERA rate, 1-epoch linear warm-up, then constant
+  encoder_warmup_epochs: 1
+  encoder_chunk: 16384         # pixels per gradient-checkpointed encoder pass; memory only, not the result
+loss:
+  name: log_cosh_dice          # PRUE's loss, on the border classes
+  class_weights: [0.05, 0.20, 0.75]   # PRUE, omega = 0.75: [0.05, 0.95 - omega, omega]
+crop:                          # the main workflow's tessera_v2_medium head: PixelMLPDecoder (512, 256) + SegmentationHead
+  hidden: [512, 256]
+  dropout: 0.2                 # decoder_dropout of the pixel_raster group
+  head_dropout: 0.2            # the arm's head_dropout
+  lr: 1.0e-3                   # the arm's lr and weight decay, AdamW without amsgrad
+  weight_decay: 0.05
+  loss: ce                     # cross-entropy on the labelled pixels of the drawn parcels
+  loss_weight: 0.01            # as joint_tessera_v2_frozen_cw001. With the frozen encoder, 0.1 let the crop loss pull on
+                               # the U-Net 1.4 to 9.8 x as hard as the border loss and cost the borders (F1 at 1 px 0.844
+                               # against PRUE's 0.862); 0.01 kept its pull at 0.06 to 0.9 x and matched PRUE (0.861) with
+                               # the crop map at 0.624 against the MLP's 0.618 (8 November 2026). Here the weight also
+                               # sets the crop task's share of the student's updates
+optim:                         # the U-Net, as PRUE
+  lr: 3.0e-3                   # AdamW amsgrad
+  weight_decay: 0.01
+  min_lr: 1.0e-6               # cosine floor; the crop head decays on the same curve
+  val_every: 1

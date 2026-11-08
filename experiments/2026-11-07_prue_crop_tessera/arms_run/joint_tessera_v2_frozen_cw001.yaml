@@ -26,7 +26,7 @@ crop:                          # the main workflow's tessera_v2_medium head: Pix
   weight_decay: 0.05
   loss: ce                     # cross-entropy on the labelled pixels of the drawn parcels
   loss_weight: 0.01            # a tenth of joint_tessera_v2_frozen's 0.1. At 0.1 the logged pull of the crop loss on the
-                               # U-Net was 1.4 to 9.8 x the border loss's from epoch 3 on (median about 3.7 x), not the
+                               # U-Net was 1.4 to 9.8 x the border loss's from epoch 3 on (median about 3.6 x), not the
                                # 0.4 x the 40-step probe gave, and the borders fell below PRUE's (F1 at 1 px 0.844 against
                                # 0.862, 8 November 2026). At 0.01 the crop pull is about 0.15 to 1 x: the border task
                                # leads the U-Net. Adam scales each parameter's step by its own gradient, so the crop head
