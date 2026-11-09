@@ -63,7 +63,9 @@ run.
 
 **Files.** Copied unchanged from `../2026-11-06_prue_tessera`: `prue.py`, `rasters.py`, `tessera_ft.py`,
 `score_prue.py`, `panoptic_x.py`; from `../2026-11-07_border_accuracy`: `borders.py`. `data.py` is PRUE's with the
-crop target added. New: `joint.py`, `fit_joint.py`, `score_joint.py`, `run.py`, `check.py`.
+crop target added. New: `joint.py`, `fit_joint.py`, `score_joint.py`, `run.py`, `check.py`, `report.py`, and
+`architecture.py`, which draws the figures of [ARCHITECTURE.md](ARCHITECTURE.md): the model step by step on one test
+chip, from the two heads' outputs to fields with a crop, and four test chips to check the results.
 
 **How to run.**
 

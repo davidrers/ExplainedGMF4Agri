@@ -10,6 +10,10 @@ boundary class keeps apart. Here it reads the TESSERA embedding, and TESSERA is 
 > validation object F1 (job 681338, finished 7 November 2026). The results over all test chips are in
 > [REPORT.md](REPORT.md).
 
+> **With a crop-type head.** The same network with a second head beside the border head, which gives each pixel a
+> crop, so that one model draws the fields and their crops:
+> [../2026-11-07_prue_crop_tessera/ARCHITECTURE.md](../2026-11-07_prue_crop_tessera/ARCHITECTURE.md).
+
 **Every image in the diagram is real.** They come from the same test chip as the
 [PaPs](../2026-11-05_paps_tessera/ARCHITECTURE.md) and [boundary head](../2026-11-05_parcel_extent/ARCHITECTURE.md)
 diagrams, `EE_02265_01779`. It holds 34 declared parcels (counted as the pieces inside the chip) and was never seen in
