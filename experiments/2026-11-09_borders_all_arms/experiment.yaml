@@ -1,0 +1,13 @@
+# Every arm of the main workflow with PRUE's border head beside its crop head, frozen encoders, under the K-shot
+# protocol (budgets, draw, seed, epochs of configs/experiments/kshot.yaml), all of Estonia: which GFM draws the
+# field borders best, and what the second head does to its crop map. Read by this folder's run.py.
+name: 2026-11-09_borders_all_arms
+arms: [terramind_v1_large_s2s1, prithvi_eo_v2_600_tl, thor_v1_large_s2s1, tessera_v2_medium, alphaearth_v1,
+       unet_b7_s2s1]
+budgets_pct: [100, 20, 5]      # per cent of the trainable parcels of each class, as kshot.yaml
+draws: [0]
+seeds: [0]
+epochs: 45                     # kshot.yaml
+worldcover: data/worldcover/EE_2021_rev/worldcover.npz   # the background class (experiments/2026-11-05_parcel_extent)
+loss: {class_weights: [0.05, 0.20, 0.75]}                 # PRUE's log-cosh Dice, omega = 0.75
+balance: {target: 0.3, every: 25, smooth: 0.5}            # heads.Balance: the crop loss pulls 0.3 x the border loss
