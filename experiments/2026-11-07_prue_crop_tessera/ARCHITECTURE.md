@@ -202,10 +202,19 @@ in part. 17 parcels are missed.
 
 Four test chips, chosen from all 1,475 by one number, the share of their declared parcels found with the right crop,
 among the chips with at least 20 parcels: the 90th percentile, the median, the 10th percentile, and the chip with
-most fields matched with a wrong crop. Each row shows Sentinel-2 in July, the declared parcels with their crops, the
-crop head's pixels inside the fields (before the vote), the fields after the vote, and the check. In the check
-panel, black lines are the fields' edges and white lines the declared parcels': a white line inside one field means
-two parcels came out as one.
+most fields matched with a wrong crop. **In every panel, black lines are the edges of the predicted fields and white
+lines the borders of the declared parcels.** The columns of each row:
+
+1. **Sentinel-2, July**: the input, for orientation.
+2. **Truth: the declared parcels**, each filled with its declared crop, their borders in white. Faint: farmland
+   nobody declared. Nothing the model drew is in this panel.
+3. **Prediction: the crop head, pixel by pixel**, inside the predicted fields (black edges, from steps 1 to 3). This
+   is what the vote counts: the scattered colours inside one field are pixels that disagree with the rest.
+4. **Prediction after the vote (step 4)**: the same predicted fields, each now one colour, the crop most of its pixels
+   got. This is the final output.
+5. **Check: prediction against truth.** Each predicted field coloured by how it fares against the declared parcels
+   (legend below the figure), with both sets of lines: a white line inside one black-edged field means two declared
+   parcels came out as one field.
 
 | Chip | Chosen as | Parcels | Fields | Match a parcel | Right crop | Wrong crop | Match none | Parcels missed |
 |---|---|---|---|---|---|---|---|---|

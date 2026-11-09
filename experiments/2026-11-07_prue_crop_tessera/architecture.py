@@ -187,14 +187,16 @@ def outline(seg: np.ndarray) -> np.ndarray:
     return e
 
 
-def class_image(cls_map, where, colours, edges=None, faint=None):
+def class_image(cls_map, where, colours, edges=None, faint=None, edge_colour=INK):
+    """Classes in their colours where ``where``; ``edges`` drawn in ``edge_colour``. Convention of every figure here:
+    black edges are the predicted fields', white edges the declared parcels'."""
     img = np.ones(cls_map.shape + (3,))
     if faint is not None:
         img[faint] = to_rgb(FAINT)
     for k in np.unique(cls_map[where]):
         img[where & (cls_map == k)] = to_rgb(colours.get(int(k), OTHER))
     if edges is not None:
-        img[edges] = to_rgb(INK)
+        img[edges] = to_rgb(edge_colour)
     return img
 
 
@@ -549,16 +551,16 @@ def draw(D: dict, arm: dict, path: Path) -> None:
     seg, cls = D["seg"], D["cls"]
     C.image(px_[3], py, S, S, class_image(cls[seg], seg > 0, colours, outline(seg)),
             title="Step 4: a crop by majority  =  FINAL",
-            caption="Crop head: each field takes the crop most of its pixels get (its rim included). "
-                    f"{D['n_fields'] + D['dropped']} fields", cap_width=36)
+            caption="The predicted fields of step 3 (black edges), each filled with the crop most of its pixels "
+                    f"get from the crop head (rim included). {D['n_fields'] + D['dropped']} fields", cap_width=36)
     C.line([px_[4] - 0.45, px_[4] - 0.45], [py - 0.4, py + S + 1.2], colour=BASELINE, lw=1.2)
     C.image(px_[4], py, S, S, class_image(D["true_cls"][true], true > 0, colours, outline(true),
-                                          faint=D["farmland"]),
-            title="Compare: declared parcels",
-            caption=f"{D['n_true']} parcels (pieces inside the chip) with their crops. Faint: farmland nobody "
-                    "declared", cap_width=36)
+                                          faint=D["farmland"], edge_colour="#ffffff"),
+            title="Truth: the declared parcels",
+            caption=f"{D['n_true']} parcels (pieces inside the chip) with their declared crops; white lines: "
+                    "their borders. Faint: farmland nobody declared", cap_width=36)
     C.image(px_[5], py, S, S, check_image(D["outcome"], seg, true, D["missed"], D["farmland"]),
-            title="Check: each field against them",
+            title="Check: prediction against truth",
             caption=f"{D['matched']} fields match a parcel (IoU > 0.5): {D['right']} with the right crop, "
                     f"{D['wrong']} with a wrong one; {D['false']} match none. {len(D['missed'])} parcels missed "
                     "(hatched)", cap_width=36)
@@ -586,11 +588,15 @@ def draw_examples(chips: list[tuple[dict, str]], arm: dict, path: Path) -> None:
     rows = len(chips)
     S, gx, top, rh = 3.0, 0.32, 0.95, 3.75
     W = 0.5 + 5 * (S + gx) + 3.7
-    C = Canvas(W, top + rows * rh + 1.0)
-    titles = ["Sentinel-2, July", "Declared parcels, their crops", "Crop head per pixel, in the fields",
-              "Step 4: one crop per field (final)", "Check: fields against parcels"]
-    for j, t in enumerate(titles):
-        C.text(0.5 + j * (S + gx), 0.42, t, fontsize=10.5, weight="bold", color=INK, va="center")
+    C = Canvas(W, top + rows * rh + 1.3)
+    titles = [("Sentinel-2, July", "the input, for orientation"),
+              ("TRUTH: declared parcels", "fill: declared crop; white lines: declared borders"),
+              ("PREDICTION: crop head per pixel", "black lines: predicted fields (steps 1 to 3)"),
+              ("PREDICTION: after the vote (step 4)", "the same predicted fields, one crop each"),
+              ("CHECK: prediction against truth", "black: predicted edges; white: declared")]
+    for j, (t, sub) in enumerate(titles):
+        C.text(0.5 + j * (S + gx), 0.36, t, fontsize=10.5, weight="bold", color=INK, va="center")
+        C.text(0.5 + j * (S + gx), 0.66, sub, fontsize=8.6, color=INK_2, va="center")
     for r, (D, why) in enumerate(chips):
         y = top + r * rh
         names, E, true, seg, cls = D["names"], D["E"], D["true"], D["seg"], D["cls"]
@@ -599,7 +605,7 @@ def draw_examples(chips: list[tuple[dict, str]], arm: dict, path: Path) -> None:
         xs = [0.5 + j * (S + gx) for j in range(5)]
         C.image(xs[0], y, S, S, s2_rgb(D["cid"]))
         C.image(xs[1], y, S, S, class_image(D["true_cls"][true], true > 0, colours, outline(true),
-                                            faint=D["farmland"]))
+                                            faint=D["farmland"], edge_colour="#ffffff"))
         inside = seg > 0
         C.image(xs[2], y, S, S, class_image(D["pred"], inside, colours, outline(seg), faint=D["farmland"] & ~inside))
         C.image(xs[3], y, S, S, class_image(cls[seg], inside, colours, outline(seg), faint=D["farmland"] & ~inside))
@@ -631,9 +637,10 @@ def draw_examples(chips: list[tuple[dict, str]], arm: dict, path: Path) -> None:
     C.swatch(lx, ly, FAINT, "farmland nobody declared")
     C.text(0.5, ly + 0.35, f"{arm['label']}, crop loss weight {arm['weight']:g}: the stored test output. Chips "
                            "chosen from all 1,475 test chips with at least 20 declared parcels, by the share of "
-                           "their parcels found with the right crop. Check panel: black lines are the fields' edges, "
-                           "white lines the declared parcels' (a white line inside one field: parcels merged).",
-           fontsize=8.8)
+                           "their parcels found with the right crop. In every panel black lines are the predicted fields' edges and "
+                           "white lines the declared parcels' borders (in the check, a white line inside one field: "
+                           "parcels merged).",
+           fontsize=8.8, width=230, linespacing=1.4)
     C.save(path)
 
 
