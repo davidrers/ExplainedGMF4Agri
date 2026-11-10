@@ -108,19 +108,44 @@ def _legend(fig, d, extra=()):
     fig.legend(handles=h, loc="lower center", ncol=min(len(h), 4), bbox_to_anchor=(0.5, -0.02))
 
 
+def _end_labels(ax, points: list[tuple[float, float]], gap: float = 0.055) -> None:
+    """The value at the end of each line, pushed apart vertically so that none overlaps (``gap`` as a share of
+    the y range), each tied to its point by a thin leader when it had to move."""
+    if not points:
+        return
+    lo, hi = ax.get_ylim()
+    step = gap * (hi - lo)
+    order = sorted(range(len(points)), key=lambda i: points[i][1])
+    ys = [points[i][1] for i in order]
+    for j in range(1, len(ys)):                      # push up from the bottom
+        ys[j] = max(ys[j], ys[j - 1] + step)
+    over = ys[-1] - (hi + 0.5 * step)                # then shift back down if the top left the axes
+    if over > 0:
+        ys = [y - over for y in ys]
+        for j in range(len(ys) - 2, -1, -1):
+            ys[j] = min(ys[j], ys[j + 1] - step)
+    for j, i in enumerate(order):
+        x, y = points[i]
+        ax.annotate(f"{y:.3f}", (x, y), xytext=(x * 1.12, ys[j]), textcoords="data", fontsize=8, color=INK_2,
+                    va="center", annotation_clip=False,
+                    arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6) if abs(ys[j] - y) > 0.3 * step else None)
+
+
 def fig_borders(d: dict, dest: Path) -> None:
     ks = sorted({k for a in d for k in d[a]})
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.4))
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.4))
     for ax, key, title in zip(axes, ("border_f1", "pq_agn", "pq"),
                               ("borders: F1 at 1 px", "fields: PQ, class-agnostic", "fields: PQ, class-aware")):
+        ends = []
         for a in d:
             xs = sorted(d[a])
             ax.plot(xs, [d[a][k][key] for k in xs], color=colour(a), marker=marker(a))
             if xs:
-                ax.annotate(f"{d[a][xs[-1]][key]:.3f}", (xs[-1], d[a][xs[-1]][key]), xytext=(6, 0),
-                            textcoords="offset points", fontsize=8, color=INK_2, va="center")
+                ends.append((xs[-1], d[a][xs[-1]][key]))
         ax.set_title(title)
         _k_axis(ax, ks)
+        ax.set_xlim(ks[0] / 1.25, ks[-1] * 1.25)
+        _end_labels(ax, ends)
     fig.suptitle("Each arm with PRUE's border head, frozen encoders, test chips of Estonia", x=0.01, ha="left",
                  fontsize=11.5, color=INK)
     _legend(fig, d)

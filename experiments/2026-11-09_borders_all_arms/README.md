@@ -79,4 +79,11 @@ cells, the scoring), `check.py`.
 `crop_metrics`, `parcel_metrics`, `panoptic_metrics`, `border_metrics`, the history with the crop weight per epoch),
 `metrics.csv`, `predictions_test.npz`, `borders_per_chip.npz`, `best.pt`; `summary.csv` beside the arms.
 
-**Outcome.** To be written with REPORT.md.
+**Outcome, 10 November 2026** ([REPORT.md](REPORT.md)). Every cell ran on all of `EE_2021_rev`. Among the GFMs,
+TESSERA draws the field borders best (F1 at 1 px 0.868, 0.811 and 0.761 at K = 100, 20 and 5 %), with AlphaEarth
+within 0.025, but it only ties the baseline, PRUE from ImageNet on S2 + S1 (0.868, 0.812, 0.752). The token-grid GFMs
+draw weaker borders and lose more of them as labels get scarce (Prithvi 0.822 to 0.579, TerraMind 0.797 to 0.542,
+THOR 0.658 to 0.432). The border head lifts the 10 m arms' crop maps by 0.03 to 0.07 pixel Macro-F1 over the main
+workflow's MLP, and lowers the token-grid arms' by 0.02 to 0.16, whose crop head here reads only the border-trained
+fifth block. The baseline ties TESSERA on the crop map too and is 0.04 to 0.10 above the main workflow's ResNet-18 from
+scratch; one draw and one seed per cell.
