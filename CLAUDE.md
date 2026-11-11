@@ -1,8 +1,10 @@
 # ExplainedGFM4Agri: working guide
 
-MSc thesis of David Reyes, ITC, University of Twente, 2026-2027: frozen geospatial foundation models (GFMs) with
-trainable decoders for pixel-level crop-type segmentation under label scarcity, followed by explainability,
-uncertainty and LLM reporting. **Phase 1, the label-budget curves of RQ1, is the only active workstream.**
+MSc thesis of David Reyes, ITC, University of Twente, 2026-2027, *Towards an Explainable Panoptic Crop Mapping and
+Reporting System with Geospatial Foundation Models and Large Language Models* (title and research questions revised
+11 November 2026): frozen geospatial foundation models (GFMs) with trained decoders map the fields of an area and
+their crops (RQ1.1), also with fewer labelled fields and across countries (RQ1.2), followed by explainability,
+uncertainty and evidence-grounded LLM reporting (RQ2, RQ3). **Phase 1 is the only active workstream.**
 
 ## Where things are written down
 
@@ -132,8 +134,9 @@ Border F1 within 1 px / crop pixel Macro-F1:
 
 TESSERA draws the borders best of the GFMs and ties the baseline. The border head raises the 10 m arms' crop maps
 by 0.03 to 0.07 over the crop-only workflow and lowers the token-grid arms' (their crop head reads only the
-border-trained block), so the crop-only workflow stays the reading of crop types. Open: which baseline RQ1 is read
-against, ResNet-18 from scratch (D26) or this workflow's PRUE from ImageNet. Details in
+border-trained block), so the crop-only workflow stays the reading of crop types. **RQ1.1 and RQ1.2 are answered by
+this workflow against PRUE from ImageNet** (protocol D31, user 11 November 2026); the crop-only workflow and its
+ResNet-18 baseline are the reference for crop types alone. Details in
 [docs/phase1/results_estonia_borders/REPORT.md](docs/phase1/results_estonia_borders/REPORT.md).
 
 **Not built:** repeated, nested draws with bootstrap intervals; the stage 1 cropland mask; Latvia

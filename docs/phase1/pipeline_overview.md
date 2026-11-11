@@ -8,9 +8,10 @@ change it.
 
 ## What the system is for
 
-A user names an area. The system returns a map that says which crop grows in each 10 m pixel,
-an explanation of why, and a confidence for each pixel. Phase 1 builds the map. Phases 2 and 3
-add the explanation and the report.
+A user names an area. The system returns the fields of that area and the crop each one holds,
+an explanation of why each field was mapped as it was, a confidence for each field, and a report
+written from that evidence by a large language model. Phase 1 builds the map of fields and crops.
+Phases 2 and 3 add the explanation, the confidence and the report.
 
 The single idea that shapes everything else:
 
@@ -197,6 +198,10 @@ The borders are scored by how many of the declared field edges the model draws w
 and how many of its edges are real: their F1. The fields are scored as whole objects, a field
 counting as found when it overlaps a declared one by more than half. Where nobody knows whether a
 field lies, on undeclared grassland and cropland, nothing is scored.
+
+Since 11 November 2026 this workflow is the one that answers the thesis's first questions: how well
+each model maps fields and their crops, and how that holds with fewer labels and in another country.
+The crop-only workflow stays as the reference for crop types alone.
 
 On all of Estonia, TESSERA draws the borders best of the foundation models and AlphaEarth is close
 behind, but neither beats the baseline; the transformer models draw weaker borders and lose more

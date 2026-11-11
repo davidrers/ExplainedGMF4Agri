@@ -2,9 +2,11 @@
 
 MSc thesis by David Reyes (student number 3598535), M-GEO 2026-2027, GEO-AI track, ITC, University of Twente.
 Supervisors: Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second).
-Title revised on 11 November 2026, formerly *Geospatial Foundation Models for Transparent Agricultural
-Monitoring under Label-Scarce Conditions*, when the pipeline gained the two-head workflow that maps fields
-and their crops together; the research questions below are being revised to match.
+Title, objective and research questions revised on 11 November 2026, when the pipeline gained the two-head
+workflow that maps fields and their crops together. The former title was *Geospatial Foundation Models for
+Transparent Agricultural Monitoring under Label-Scarce Conditions*; the former questions are kept in
+[phase1/proposal_deltas.md](phase1/proposal_deltas.md), Delta 25. Label scarcity stays in the thesis as a dimension
+of the evaluation (RQ1.2), no longer its focus.
 
 This document states the research design: the target system, the objectives and research questions,
 the task formulation, the datasets, the model set and the phases. It was the project `CLAUDE.md` until
@@ -18,38 +20,45 @@ The working environments, repository layout and conventions are in [CLAUDE.md](.
 
 ## Target system
 
-A user supplies an area of interest or a bounding box. The system returns a pixel-level crop
-segmentation of that area, pixel-level explanations of why each region was classified as it was,
-calibrated per-pixel confidence, and an LLM-written report traceable to that evidence. Every design
-decision below serves that end state.
+A user supplies an area of interest or a bounding box. The system returns the fields of that area with
+the crop each holds (a panoptic crop map), explanations of why each field was mapped as it was,
+calibrated confidence per field, and a report written by a large language model that is traceable to that
+evidence. Every design decision below serves that end state.
 
 ## Main objective
 
-To investigate the potential of geospatial foundation models (GFMs) as a transparent and scalable foundation for agricultural monitoring under label-scarce conditions.
+To design and evaluate a system that maps agricultural fields and their crops from satellite imagery with geospatial foundation models (GFMs), explains and qualifies that map, and turns it into reports grounded in that evidence with large language models (LLMs).
 
 ## Sub-objectives and research questions
 
-- **SO1.** Label-budget characterisation of GFM-based crop segmentation against a raw-feature baseline, in-country and cross-country.
-  - **RQ1.** How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature baseline?
-- **SO2.** Transparency and reliability of GFM-based crop segmentation through explainability and uncertainty quantification.
-  - **RQ2.1.** Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?
-  - **RQ2.2.** Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?
-  - **RQ2.3.** Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?
-- **SO3.** An XAI-grounded LLM reporting pipeline producing reports traceable to the underlying evidence.
-  - **RQ3.** Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring reports?
+- **SO1.** Panoptic crop mapping with geospatial foundation models: the fields of an area and their crop types, from frozen GFMs, against a network trained on the raw imagery.
+  - **RQ1.1.** How accurately can frozen geospatial foundation models, each with a trained decoder, delineate agricultural fields and assign their crop types, compared with a segmentation network trained on the raw imagery?
+  - **RQ1.2.** How does that accuracy hold as fewer fields are labelled, and across countries of the same agro-ecological zone?
+- **SO2.** Explaining and qualifying the panoptic map through explainability and uncertainty quantification.
+  - **RQ2.1.** Can explainability methods identify the spectral and temporal evidence behind each field's crop type and behind its borders?
+  - **RQ2.2.** Can uncertainty quantification give calibrated confidence for each field's crop type and for its delineation?
+  - **RQ2.3.** Do the explanations and confidence agree with agronomic knowledge, such as crop calendars, and with the raw-imagery baseline?
+- **SO3.** Evidence-grounded reporting with large language models, traceable to the map, its explanations and its confidence.
+  - **RQ3.1.** Given the field map, its explanations and its confidence as structured context, can a large language model write agricultural reports that are faithful to that evidence?
+  - **RQ3.2.** Do the explanations and confidence make the reports better than the map alone, in accuracy, traceability and usefulness?
 
 ## Task formulation
 
-The task is **pixel-level crop-type semantic segmentation**, not per-parcel classification.
+The task is **panoptic crop mapping**: delineating the fields of an area and assigning each its crop type,
+built from pixel-level predictions (a border head and a crop head on every model, protocol D30), not per-parcel
+classification of parcels given in advance. Crop-type semantic segmentation alone, the crop-only workflow,
+remains the reference for crop types.
 
 The distinction that makes the label budget meaningful:
 
 > The **annotation unit** is the parcel polygon. The **inference unit** is the pixel.
 
 One polygon is one human annotation action and yields a few thousand labelled pixels, so K counts
-polygons per class. K counted in pixels would not measure annotation effort and would not answer RQ1.
+polygons per class. K counted in pixels would not measure annotation effort and would not answer RQ1.2.
 
-Every map is **scored both per pixel and per parcel**. The pixel Macro-F1 is the primary metric. Beside
+The fields are scored as objects, by panoptic quality under a void rule, class-agnostic and class-aware, and their
+borders by precision, recall and F1 within one pixel of the declared borders (protocol D30, section 4.6). The crop
+map is **scored both per pixel and per parcel**, its pixel Macro-F1 the primary crop-type metric. Beside
 it, each test parcel takes the class most of its pixels were predicted as, and Macro-F1, overall accuracy
 and kappa are reported over the parcels, because the EuroCrops labels are parcel declarations and the
 published EuroCrops benchmarks score parcels (protocol decision D28). The pixel score weighs every
@@ -65,7 +74,9 @@ Segmentation runs in **two stages**. Stage 1 predicts cropland against non-cropl
 taken from ESA WorldCover and the declared-parcel extent. Stage 2 predicts crop type inside that mask
 only. This keeps crop-type Macro-F1 uncontaminated by easy background classes while still producing a
 complete wall-to-wall map for an arbitrary area of interest. Stage 1 errors propagate into stage 2 and
-must be reported as such.
+must be reported as such. In the two-head workflow the border head's background class, learnt from WorldCover's
+non-agricultural land, already separates field from non-field, the role stage 1 was planned for; whether a separate
+stage 1 is still needed is open.
 
 ## Datasets
 
@@ -138,7 +149,13 @@ explicitly wherever AlphaEarth numbers appear.
 **Phase 1 is the sole active workstream.** Phases 2 and 3 are described only well enough to keep Phase 1
 decisions compatible with them, and are respecified once Phase 1 lands.
 
-### Phase 1 (SO1, RQ1): label-efficient crop segmentation
+### Phase 1 (SO1, RQ1.1 and RQ1.2): panoptic crop mapping
+
+RQ1.1 and RQ1.2 are answered by the two-head workflow (protocol D30, D31): every model frozen, a border head
+beside its crop head, the fields built from the border map, against PRUE's U-Net (EfficientNet-B7 from ImageNet)
+trained on the raw composites, the strongest published recipe for field boundaries at 10 m. The crop-only
+workflow below, with its U-Net from scratch, remains the reference for crop types alone. Both run under the
+protocol of this section.
 
 A fit is a segmentation training run: frozen encoder, cached multi-scale feature maps, trainable
 decoder, per-pixel logits, cross-entropy with `ignore_index`. Because the encoder is frozen its output
@@ -147,7 +164,7 @@ reads from cache. This is an implementation optimisation and not a change of met
 augmentation is not free under caching, because ViTs are not exactly equivariant, so the eight D4
 variants are cached rather than approximated in feature space.
 
-Baseline: a 2D U-Net trained from scratch on the same chips, a ResNet-18 encoder randomly
+Crop-only baseline: a 2D U-Net trained from scratch on the same chips, a ResNet-18 encoder randomly
 initialised, about 15 M parameters, all trained, on the twelve monthly Sentinel-2 and Sentinel-1
 composites stacked on 168 input channels. It sees every sensor a foundation model sees and learns its
 spatial and temporal features from the labels alone, so the gap between it and a foundation model is
@@ -186,6 +203,8 @@ which is neither comparable nor trainable on a 16 GB card.
 
 Not active. Pixel-level segmentation makes Integrated Gradients, Occlusion and AttnLRP natively
 per-pixel, per-band and per-date, which is a stronger basis for RQ2.1 than attributing a pooled vector.
+Since the research questions were revised, explanations and confidence are summarised per field, for its crop
+type and for its borders (the border head is explained and calibrated like the crop head).
 The **embedding tier** applies to all four models and the **backbone tier** to the models with open
 weights: TerraMind, THOR and TESSERA v2.
 Uncertainty uses Monte Carlo Dropout as primary and Deep Ensembles as the heavier comparison, both at
@@ -195,13 +214,15 @@ concepts, on the same axes as the baseline importances.
 
 ### Phase 3 (SO3, RQ3): XAI-grounded LLM reporting
 
-Not active. A structured JSON context document per target zone with three blocks: predictions,
+Not active. RQ3.1 asks whether reports stay faithful to their evidence, RQ3.2 whether explanations and
+confidence improve them over the map alone (an ablation of the context document). A structured JSON context
+document per target zone with three blocks: predictions,
 explanations, and external context (ERA5 weather variables, geographic descriptors including country,
 elevation and soil class from SoilGrids, and image-texture descriptors where available). Select an LLM
 that follows the required output format reliably and is reproducible, generate at temperature zero,
 constrain it to the context document, and score each report for traceability against its source.
-Pixel-level attribution cannot be passed to an LLM directly, so the aggregation from pixels to zone
-summaries is a Phase 3 design problem that Phase 1 must not foreclose.
+Pixel-level attribution cannot be passed to an LLM directly; the fields of the panoptic map give the
+aggregation its unit, and how fields are summarised into zones is a Phase 3 design problem.
 
 ## Priority under time pressure
 

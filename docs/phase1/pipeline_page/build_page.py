@@ -71,17 +71,17 @@ WF_STEPS = [
     dict(n=5, c=GREY, title="Models and training", tags=["F4", "F6"], status="partly", boxed=True,
          body=('<div style="display:flex;align-items:center;margin:0 -6px">'
                + inner("Foundation model", "frozen", "#ececec", "#666") + ARROW_H
-               + inner("Decoder", "trained", "#fbefd9", "#c08a2a")
+               + inner("Decoder, border and crop heads", "trained", "#fbefd9", "#c08a2a")
                + '<div style="flex:none;width:32px"></div>'
-               + inner("Baseline: U-Net", "trained from scratch", "#fbefd9", "#c08a2a")
+               + inner("Baseline: PRUE's U-Net", "from ImageNet, all trained", "#fbefd9", "#c08a2a")
                + '</div><div style="margin:20px -6px 0;border:2px dashed #666;border-radius:6px;padding:14px;'
                'text-align:center;font-size:19px;font-weight:600">Same training effort: equal tuning trials, same number '
                'of training steps at every K</div>'),
-         walk="A frozen foundation model feeds a trained decoder; the U-Net baseline trains from scratch. Every arm "
-              "gets the same training effort at every K.",
-         now="Six arms, 45 epochs each at every K; the checkpoint of lowest validation loss is tested. "
-             "No tuning trials yet. A second workflow, kshot_borders (D30), gives every arm a field-border head "
-             "beside its crop head, with PRUE from ImageNet as its baseline."),
+         walk="A frozen foundation model feeds a trained decoder with a border head and a crop head; the baseline, "
+              "PRUE's U-Net from ImageNet, trains end to end. Every arm gets the same training effort at every K.",
+         now="Two workflows of six arms, 45 epochs each at every K. The two-head workflow (D30) answers RQ1.1 and "
+             "RQ1.2 against PRUE from ImageNet; the crop-only workflow, with its U-Net from scratch, is the reference "
+             "for crop types. No tuning trials yet."),
     dict(n=6, c=BROWN, title="Experiments", tags=["F2", "F3"], status="partly", boxed=True,
          body=('<div style="display:flex;gap:32px;margin:0 -6px">'
                + inner("E1 · Label-budget curves", "within each country", "#fff", "#e2b56a")
@@ -91,9 +91,10 @@ WF_STEPS = [
               "zone, zero-shot, target only, and source plus target.",
          now="E1 has run on Estonia, one draw and one seed per cell. E2 has not started."),
     dict(n=7, c=GREEN, title="Evaluation", tags=["F3", "F7", "F8"], status="partly",
-         body="Fixed test blocks only. Macro-F1 (primary) per pixel and per parcel, mIoU and per-class F1, also per AEZ "
-              "class.<br>Paired comparisons between models, with 95 % intervals. K*, the matching budget against the "
-              "baseline, answers RQ1.",
+         body="Fixed test blocks only. The fields by border F1 and panoptic quality; the crops by Macro-F1 per pixel and "
+              "per parcel, mIoU and per-class F1, also per AEZ class.<br>Paired comparisons between models, with 95 % "
+              "intervals. K*, the matching budget against the "
+              "baseline, answers RQ1.2.",
          now="Pixel and parcel Macro-F1 on the 1,475 test chips. No intervals yet: one draw, one seed, so no K*. "
              "The two-head workflow adds the border F1 within 1 px and the panoptic quality of each model's fields."),
     dict(n=8, c=GREEN, title="Reporting", tags=["F8"], status="met",
@@ -119,26 +120,44 @@ RULES = [
 ]
 
 
-# The research questions of docs/thesis_design.md, word for word; this workflow answers RQ1 only
-RQ1_HOW = ("This workflow answers it: the label-budget curves of every arm, within a country (E1) and across countries "
-           "(E2), against the baseline, now the U-Net trained from scratch (protocol D26). The answer is K*, the smallest "
-           "K at which a foundation model is no worse than the baseline at K = 100 %, within 0.02 Macro-F1 on paired "
-           "bootstrap replicates.")
+# The research questions of docs/thesis_design.md, word for word; this workflow answers RQ1.1 and RQ1.2 only
+RQ_HOW = {
+    "rq11": "The two-head workflow answers it (protocol D30, D31): every arm frozen, a border head beside its crop head, "
+            "the fields built from the border map and scored by border F1 and panoptic quality, the crops per pixel and "
+            "per parcel, against PRUE's U-Net from ImageNet trained on the raw composites. The crop-only workflow is "
+            "the reference for crop types.",
+    "rq12": "The same scores along the label budget, within a country (E1) and across countries of one agro-ecological "
+            "zone (E2). The answer is K*, the smallest K at which a foundation model is no worse than the baseline at "
+            "K = 100 %, within 0.02 on paired bootstrap replicates.",
+}
 RQS = [
-    ("rq1", "RQ1", "Phase 1 · this workflow", "partly", [4, 5, 6, 7],
-     "How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature "
-     "baseline?"),
+    ("rq11", "RQ1.1", "Phase 1 · this workflow", "partly", [5, 7],
+     "How accurately can frozen geospatial foundation models, each with a trained decoder, delineate agricultural "
+     "fields and assign their crop types, compared with a segmentation network trained on the raw imagery?"),
+    ("rq12", "RQ1.2", "Phase 1 · this workflow", "partly", [1, 4, 6, 7],
+     "How does that accuracy hold as fewer fields are labelled, and across countries of the same agro-ecological "
+     "zone?"),
     ("rq21", "RQ2.1", "Phase 2 · explainability", "no", [],
-     "Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?"),
+     "Can explainability methods identify the spectral and temporal evidence behind each field's crop type and behind "
+     "its borders?"),
     ("rq22", "RQ2.2", "Phase 2 · uncertainty", "no", [],
-     "Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?"),
+     "Can uncertainty quantification give calibrated confidence for each field's crop type and for its delineation?"),
     ("rq23", "RQ2.3", "Phase 2 · agreement", "no", [],
-     "Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?"),
-    ("rq3", "RQ3", "Phase 3 · LLM reporting", "no", [],
-     "Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring "
-     "reports?"),
+     "Do the explanations and confidence agree with agronomic knowledge, such as crop calendars, and with the "
+     "raw-imagery baseline?"),
+    ("rq31", "RQ3.1", "Phase 3 · LLM reporting", "no", [],
+     "Given the field map, its explanations and its confidence as structured context, can a large language model write "
+     "agricultural reports that are faithful to that evidence?"),
+    ("rq32", "RQ3.2", "Phase 3 · LLM reporting", "no", [],
+     "Do the explanations and confidence make the reports better than the map alone, in accuracy, traceability and "
+     "usefulness?"),
 ]
-RQ1_NOW = "E1 has run on Estonia, one draw and one seed per cell; K* waits for the bootstrap intervals. E2 has not started."
+RQ_NOW = {
+    "rq11": "Estonia 2021, both workflows, one draw and one seed per cell: TESSERA draws the field borders best of the "
+            "foundation models (border F1 0.868 with all labels) and ties the baseline.",
+    "rq12": "E1 has run on Estonia at K = 100, 20 and 5 %, one draw and one seed per cell; K* waits for the bootstrap "
+            "intervals. E2 has not started.",
+}
 
 
 def status_chip(key):
@@ -182,7 +201,8 @@ def rule(r):
 def rq(r):
     id_, label, phase, st, steps, q = r
     active = bool(steps)
-    how = f'<div style="font-size:19px;line-height:1.5;color:#2a2f38;margin-top:6px">{RQ1_HOW}</div>' if active else ""
+    how = (f'<div style="font-size:19px;line-height:1.5;color:#2a2f38;margin-top:6px">{RQ_HOW[id_]}</div>'
+           if active else "")
     return (f'<div class="rq n{" on" if active else ""}" id="{id_}" data-steps="{" ".join(f"ws{n}" for n in steps)}" '
             f'style="display:flex;gap:22px;align-items:flex-start">'
             f'<div class="rq-lab">{label}</div><div style="flex:1;min-width:0"><div class="rq-q">{q}{status_chip(st)}</div>'
@@ -631,8 +651,8 @@ SHARED = ("Every arm: 45 epochs at every K · AdamW, weight decay 0.05 · effect
           "labelled pixels · D4 augmentation · checkpoint of lowest validation loss.")
 
 WALKS = {
-    "wf": [dict(title="Research question RQ1", text=f"{RQS[0][5]} {RQ1_HOW}", now=RQ1_NOW,
-                targets=["#rq1"] + [f"#ws{n}" for n in RQS[0][4]])]
+    "wf": [dict(title=f"Research question {r[1]}", text=f"{r[5]} {RQ_HOW[r[0]]}", now=RQ_NOW[r[0]],
+                targets=[f"#{r[0]}"] + [f"#ws{n}" for n in r[4]]) for r in RQS if r[4]]
           + [dict(title=s["title"], text=s.get("walk", s["body"]), now=s["now"],
                   targets=[f"#ws{s['n']}"] + [f"#fr{t[1]}" for t in s["tags"]]) for s in WF_STEPS],
     "ar": [
@@ -1049,12 +1069,12 @@ page = S.head("Phase 1 · GFMs Benchmark · ExplainedGFM4Agri",
 <h2 class="sec">1. Experimental set-up</h2>
 <div class="tabs" role="tablist" aria-label="Experimental set-ups of Phase 1">
 <button type="button" role="tab" id="tab-workflow" aria-controls="workflow" aria-selected="true" tabindex="0">
-<span class="t">Pipeline</span><span class="d">The label-budget workflow, interactive</span></button>
+<span class="t">Pipeline</span><span class="d">Fields and crops under the label budget, interactive</span></button>
 <button type="button" role="tab" id="tab-transferability" aria-controls="transferability" aria-selected="false" tabindex="-1">
 <span class="t">Spatial transferability</span><span class="d">Zero-shot across 19 countries, a draft</span></button>
 </div>
 <div role="tabpanel" id="workflow" aria-labelledby="tab-workflow" tabindex="0">
-{toolbar("wf", '<button type="button" data-act="status" aria-pressed="false">Status</button><span class="hint">Hover RQ1 or a fairness rule to see the steps that carry it.</span>')}
+{toolbar("wf", '<button type="button" data-act="status" aria-pressed="false">Status</button><span class="hint">Hover RQ1.1, RQ1.2 or a fairness rule to see the steps that carry it.</span>')}
 <div class="viewport" id="wf-vp">{workflow_html}</div>
 </div>
 <div role="tabpanel" id="transferability" aria-labelledby="tab-transferability" tabindex="0" hidden>

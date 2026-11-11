@@ -4,7 +4,7 @@
 
 Every point at which `docs/phase1/protocol.md` departs from `docs/proposal/current_proposal.md` or from `CLAUDE.md`, with the original wording, the replacement, and the reason. Use this list to correct those two documents. Line numbers refer to `docs/proposal/current_proposal.md` as of commit `db663cb`.
 
-Twenty-four deltas. Deltas 1, 2, 3, 6, 13 and 21 are the consequential ones.
+Twenty-five deltas. Deltas 1, 2, 3, 6, 13, 21 and 25 are the consequential ones.
 
 ---
 
@@ -338,3 +338,44 @@ Both documents describe EuroCropsML's per-parcel median time series as though it
 5. **Datasets section.** The description of EuroCropsML as providing a per-parcel median time series should note that raw Sentinel-2 imagery is downloaded for the parcel footprints where a model requires it, so the shipped time series is one input representation among several and the input format does not constrain model selection, per Delta 23.
 
 **Reason.** `CLAUDE.md` states that the proposal wins where the two disagree. Phase 1 now has a third document that is more specific than either, so the precedence order should be stated: `docs/phase1/protocol.md` for Phase 1, the proposal elsewhere.
+
+---
+
+## Delta 25. The title, the main objective and the research questions are refocused on a panoptic mapping and reporting system
+
+**Severity: consequential.** Decided by the user on 11 November 2026, after the pipeline gained the two-head workflow
+(protocol D30, D31).
+
+**Former title:**
+> "Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions"
+
+**New title:**
+> "Towards an Explainable Panoptic Crop Mapping and Reporting System with Geospatial Foundation Models and Large Language Models"
+
+**Former main objective:**
+> "To investigate the potential of geospatial foundation models (GFMs) as a transparent and scalable foundation for agricultural monitoring under label-scarce conditions."
+
+**New main objective:**
+> "To design and evaluate a system that maps agricultural fields and their crops from satellite imagery with geospatial foundation models (GFMs), explains and qualifies that map, and turns it into reports grounded in that evidence with large language models (LLMs)."
+
+**Former research questions:**
+> "RQ1. How few labelled parcel polygons per class are required for GFM-based crop segmentation to match a raw-feature baseline?"
+> "RQ2.1. Can explainability methods identify the spectral and temporal information used by GFM-based crop segmenters?"
+> "RQ2.2. Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?"
+> "RQ2.3. Do the explanations and confidence estimates agree with the raw-feature baseline and with agronomic knowledge?"
+> "RQ3. Can XAI-derived information serve as effective structured context for an LLM generating agricultural monitoring reports?"
+
+**New research questions:**
+> "RQ1.1. How accurately can frozen geospatial foundation models, each with a trained decoder, delineate agricultural fields and assign their crop types, compared with a segmentation network trained on the raw imagery?"
+> "RQ1.2. How does that accuracy hold as fewer fields are labelled, and across countries of the same agro-ecological zone?"
+> "RQ2.1. Can explainability methods identify the spectral and temporal evidence behind each field's crop type and behind its borders?"
+> "RQ2.2. Can uncertainty quantification give calibrated confidence for each field's crop type and for its delineation?"
+> "RQ2.3. Do the explanations and confidence agree with agronomic knowledge, such as crop calendars, and with the raw-imagery baseline?"
+> "RQ3.1. Given the field map, its explanations and its confidence as structured context, can a large language model write agricultural reports that are faithful to that evidence?"
+> "RQ3.2. Do the explanations and confidence make the reports better than the map alone, in accuracy, traceability and usefulness?"
+
+**Reason.** The system the thesis builds delivers fields and their crops, explanations, confidence and a report;
+it does not monitor anything through time, and label scarcity is one dimension of its evaluation, not the whole of
+it. The former RQ1 survives as RQ1.2, with its matching criterion (Delta 12, protocol section 4.8) applied to the
+field and crop scores of D31. The unit of the explanations, the confidence and the reports moves from the pixel to
+the field, which also gives Phase 3 the aggregation unit it lacked.

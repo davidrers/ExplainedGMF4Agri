@@ -1,7 +1,8 @@
 # Field borders and crop types of Estonia 2021 from geospatial foundation models: the two-head workflow
 
 11 November 2026. The two-head workflow of the pipeline (protocol D30, [pipeline.md](../pipeline.md) section 9) gives
-every model a field-border head beside its crop head. Every number below comes from one random draw of the labels and
+every model a field-border head beside its crop head; it answers RQ1.1, and RQ1.2 for the label budgets (protocol
+D31). Every number below comes from one random draw of the labels and
 one training seed per setting, so none has a confidence interval yet (section 5). The figures and
 [tables.md](tables.md) are made by [report.py](report.py), the maps of section 3.5 and
 [maps_tables.md](maps_tables.md) by [maps.py](maps.py). The crop-only workflow's results are in
@@ -315,9 +316,9 @@ Our object F1 is the class-agnostic recognition quality of the fields at an IoU 
 - **One draw, one seed.** Differences below about 0.01 to 0.02 are ties. Repeated draws with intervals are next in
   the protocol, for both workflows.
 - **Two baselines.** The crop-only workflow is read against a ResNet-18 U-Net from scratch, this one against PRUE
-  from ImageNet, which scores 0.04 to 0.10 higher on crop types and ties TESSERA. Training PRUE's network on crop types
-  alone would show whether the encoder or the border head makes the difference, and which baseline RQ1 should be read
-  against.
+  from ImageNet, which scores 0.04 to 0.10 higher on crop types and ties TESSERA. Since 11 November 2026 RQ1.1 and
+  RQ1.2 are read against PRUE (protocol D31). Training PRUE's network on crop types alone would show whether its
+  advantage on crop types comes from the encoder or from the border head.
 - **The token-grid crop head.** Here it reads only the border-trained block; a crop head on the decoder before the
   fifth block would give those models a fair crop map in this workflow.
 - **Borders between fields of the same crop** are the main error of every model. Nothing in the setup targets them.

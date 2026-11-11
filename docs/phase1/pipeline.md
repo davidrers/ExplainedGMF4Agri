@@ -20,8 +20,9 @@ than hidden. The runs made with it so far are listed in [section 11](#11-runs).
 `configs/experiments/kshot.yaml` runs: the six arms of section 9, every foundation-model encoder
 frozen, at the budgets, draws, seeds and fit budget that file states. Beside it, since 11 November
 2026, the **two-head workflow** of `configs/experiments/kshot_borders.yaml` gives every arm a
-field-border head beside its crop head, under the same protocol (protocol D30, section 9).
-Everything else is an experiment in its own folder of `experiments/`, fine-tuning among them
+field-border head beside its crop head, under the same protocol (protocol D30, section 9); since the
+research questions were revised the same day, it answers RQ1.1 and RQ1.2, and the crop-only workflow is
+its reference for crop types (protocol D31). Everything else is an experiment in its own folder of `experiments/`, fine-tuning among them
 (protocol D29). This
 document cites an experiment where its result justifies a decision of the main workflow, and
 section 11 keeps the runs of the two apart and lists the six experiments the thesis analysis
@@ -715,7 +716,8 @@ score difference is attributable to the encoder.
   frozen TESSERA v2 and kept out (`experiments/2026-10-15_tessera_decoder`, section 11): the 10 m
   group therefore sees no spatial context beyond its encoder's, which for TESSERA is none.
 
-**The baseline**, `unet_r18_scratch_s2s1`, is the model RQ1 measures the GFMs against: a 2D U-Net
+**The baseline**, `unet_r18_scratch_s2s1`, is the model the crop-only workflow measures the GFMs against (RQ1
+until 11 November 2026; RQ1.1 and RQ1.2 are now read against the two-head workflow's PRUE, protocol D31): a 2D U-Net
 with a ResNet-18 encoder (`segmentation_models_pytorch`), randomly initialised, 14.8 M
 parameters, all trained. It reads the Sentinel-2 and Sentinel-1 stacks, Sentinel-1 interleaved
 behind Sentinel-2 in every month as for THOR, and flattens the months onto the channels, 12 x 14
@@ -1087,7 +1089,8 @@ EfficientNet-B7 U-Net from ImageNet (D30). On the crop map the second scores 0.0
 Macro-F1 and 0.08 to 0.10 parcel Macro-F1 above the first (0.655, 0.618 and 0.561 per pixel against
 0.616, 0.564 and 0.467 at K = 100, 20 and 5 %), and ties TESSERA. How much of that comes from the
 larger pretrained encoder and how much from the border head is not separated, since the B7 has not
-been fitted without the border head; which baseline RQ1 is read against is open.
+been fitted without the border head. Since 11 November 2026 RQ1.1 and RQ1.2 are read against PRUE (protocol D31);
+the crop-only baseline stays the reference for crop types alone.
 
 **The token-grid crop head reads only the border-trained block.** In the two-head workflow a
 token-grid arm's crop head is a 1 x 1 convolution on the fifth block, whose features the border loss

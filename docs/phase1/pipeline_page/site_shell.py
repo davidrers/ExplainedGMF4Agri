@@ -20,41 +20,47 @@ AUTHOR = "David Reyes"
 PROGRAMME = "MSc thesis, M-GEO 2026–2027, GEO-AI track · ITC, University of Twente"
 SUPERVISORS = "Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second)"
 TITLE_HTML = E(TITLE)
-TARGET = ("A user supplies an area of interest. The system returns a pixel-level crop segmentation of that area, "
-          "pixel-level explanations of why each region was classified as it was, calibrated per-pixel confidence, and an "
-          "LLM-written report traceable to that evidence.")
+TARGET = ("A user supplies an area of interest. The system returns the fields of that area with the crop each holds, "
+          "explanations of why each field was mapped as it was, calibrated confidence per field, and a report written by "
+          "a large language model that is traceable to that evidence.")
 
 # Where each page sits, from the docs/ root that GitHub Pages serves
 PAGES = {0: "index.html", 1: "phase1/pipeline_page/index.html", 2: "phase2/index.html", 3: "phase3/index.html"}
 DEPTH = {0: "", 1: "../../", 2: "../", 3: "../"}
 
 PHASES = {
-    1: dict(name="GFMs Benchmark", topic="Label-efficient crop segmentation", so="SO1", status="active",
+    1: dict(name="GFMs Benchmark", topic="Panoptic crop mapping", so="SO1", status="active",
             status_text="In progress", tone="forest",
-            rqs=[("RQ1", "How few labelled parcel polygons per class are required for GFM-based crop segmentation to "
-                         "match a raw-feature baseline?")],
-            now="Estonia 2021 runs end to end: six arms at K = 100, 20 and 5 %."),
+            rqs=[("RQ1.1", "How accurately can frozen geospatial foundation models, each with a trained decoder, "
+                           "delineate agricultural fields and assign their crop types, compared with a segmentation "
+                           "network trained on the raw imagery?"),
+                 ("RQ1.2", "How does that accuracy hold as fewer fields are labelled, and across countries of the same "
+                           "agro-ecological zone?")],
+            now="Estonia 2021 runs end to end, fields and crops: six arms at K = 100, 20 and 5 %."),
     2: dict(name="XAI + UQ", topic="Explainability and uncertainty", so="SO2", status="planned",
             status_text="Not started", tone="forest",
-            rqs=[("RQ2.1", "Can explainability methods identify the spectral and temporal information used by "
-                           "GFM-based crop segmenters?"),
-                 ("RQ2.2", "Can uncertainty quantification methods deliver reliable, calibrated confidence estimates?"),
-                 ("RQ2.3", "Do the explanations and confidence estimates agree with the raw-feature baseline and with "
-                           "agronomic knowledge?")],
+            rqs=[("RQ2.1", "Can explainability methods identify the spectral and temporal evidence behind each "
+                           "field's crop type and behind its borders?"),
+                 ("RQ2.2", "Can uncertainty quantification give calibrated confidence for each field's crop type and "
+                           "for its delineation?"),
+                 ("RQ2.3", "Do the explanations and confidence agree with agronomic knowledge, such as crop calendars, "
+                           "and with the raw-imagery baseline?")],
             now="Planned; respecified once Phase 1 lands."),
-    3: dict(name="LLM Report", topic="XAI-grounded LLM reporting", so="SO3", status="planned",
+    3: dict(name="LLM Report", topic="Evidence-grounded LLM reporting", so="SO3", status="planned",
             status_text="Not started", tone="slate",
-            rqs=[("RQ3", "Can XAI-derived information serve as effective structured context for an LLM generating "
-                         "agricultural monitoring reports?")],
+            rqs=[("RQ3.1", "Given the field map, its explanations and its confidence as structured context, can a large "
+                           "language model write agricultural reports that are faithful to that evidence?"),
+                 ("RQ3.2", "Do the explanations and confidence make the reports better than the map alone, in accuracy, "
+                           "traceability and usefulness?")],
             now="Planned; the first part reduced if the schedule slips."),
 }
 
 # The planned set-ups of Phases 2 and 3, as docs/thesis_design.md states them
 PLANNED = {
     2: [
-        dict(title="The segmenters of Phase 1", kind="data",
-             body="The GFM-based crop segmenters: pixel-level segmentation makes attribution natively per pixel, per "
-                  "band and per date, a stronger basis for RQ2.1 than attributing a pooled vector."),
+        dict(title="The panoptic maps of Phase 1", kind="data",
+             body="Fields and their crops from every model: attribution is native per pixel, per band and per date, "
+                  "then summarised per field, for its crop type and for its borders."),
         [dict(title="Explainability", kind="method", rq="RQ2.1",
              body="Integrated Gradients, Occlusion and AttnLRP. The embedding tier applies to every model; the backbone "
                   "tier to the models with open weights: TerraMind, THOR and TESSERA v2."),
@@ -66,9 +72,9 @@ PLANNED = {
                   "importances."),
     ],
     3: [
-        dict(title="From pixels to zones", kind="method",
-             body="Pixel-level attribution cannot be passed to an LLM directly; aggregating it to zone summaries is a "
-                  "Phase 3 design problem that Phase 1 must not foreclose."),
+        dict(title="From fields to zones", kind="method",
+             body="Pixel-level attribution cannot be passed to an LLM directly; the fields of the panoptic map give the "
+                  "aggregation its unit, and summarising fields into zones is a Phase 3 design problem."),
         dict(title="Context document", kind="data",
              body="A structured JSON document per target zone with three blocks: predictions, explanations, and external "
                   "context (ERA5 weather variables; country, elevation and SoilGrids soil class; image-texture "
@@ -76,9 +82,13 @@ PLANNED = {
         dict(title="Report generation", kind="method",
              body="An LLM that follows the required output format reliably and is reproducible, generating at "
                   "temperature zero and constrained to the context document."),
-        dict(title="Traceability", kind="eval", rq="RQ3",
-             body="Each report scored for traceability against its source. If explanations fail their faithfulness "
-                  "checks, the context document can still operate from predictions and calibrated uncertainty alone."),
+        dict(title="Faithfulness", kind="eval", rq="RQ3.1",
+             body="Each report scored for faithfulness and traceability against its source. If explanations fail their "
+                  "faithfulness checks, the context document can still operate from predictions and calibrated "
+                  "uncertainty alone."),
+        dict(title="What the evidence adds", kind="eval", rq="RQ3.2",
+             body="Reports written from the map alone, and with its explanations and confidence, compared for "
+                  "accuracy, traceability and usefulness."),
     ],
 }
 
@@ -419,8 +429,9 @@ shown merged into seven crop groups. Move the line to compare.</p>
 </div></section>
 <section class="phases" aria-labelledby="ph-h"><div class="in">
 <h2 id="ph-h">Three phases</h2>
-<p class="sub">From satellite time series to a report a person can check: Phase 1 maps the crops with frozen foundation
-models, Phase 2 explains the maps and says how sure they are, Phase 3 writes the report from that evidence. Phase 1 is the
+<p class="sub">From satellite time series to a report a person can check: Phase 1 maps the fields and their crops with
+frozen foundation models, Phase 2 explains the maps and says how sure they are, Phase 3 writes the report from that
+evidence. Phase 1 is the
 active workstream; Phases 2 and 3 are planned well enough to keep it compatible with them.</p>
 <div class="chain">{"".join(chain_column(n) for n in PHASES)}</div>
 </div></section>
@@ -526,11 +537,11 @@ compatible with it; it is respecified once Phase 1 lands.</p>
 
 
 SO_TEXT = {
-    1: "Label-budget characterisation of GFM-based crop segmentation against a raw-feature baseline, in-country and "
-       "cross-country.",
-    2: "Transparency and reliability of GFM-based crop segmentation through explainability and uncertainty "
-       "quantification.",
-    3: "An XAI-grounded LLM reporting pipeline producing reports traceable to the underlying evidence.",
+    1: "Panoptic crop mapping with geospatial foundation models: the fields of an area and their crop types, from "
+       "frozen GFMs, against a network trained on the raw imagery.",
+    2: "Explaining and qualifying the panoptic map through explainability and uncertainty quantification.",
+    3: "Evidence-grounded reporting with large language models, traceable to the map, its explanations and its "
+       "confidence.",
 }
 
 
