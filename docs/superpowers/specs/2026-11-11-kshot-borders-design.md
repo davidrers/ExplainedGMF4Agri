@@ -97,7 +97,8 @@ reads the chip set's own file, or its parent's for a pilot set (`subset.json`), 
    `unet_b7_s2s1`, `terramind_v1_large_s2s1`), with the core and with the experiment's code, same seed, on the
    CPU: the history (losses, crop weights, validation scores) and the final weights must be identical.
 
-Both are kept as a script (`scripts/hub/check_borders_core.py`) so they can be repeated.
+Both are kept as a script so they can be repeated: `experiments/2026-11-09_borders_all_arms/check_core.py`, beside
+the experiment's modules it imports (the core never imports an experiment).
 
 ## 6. Tests
 
