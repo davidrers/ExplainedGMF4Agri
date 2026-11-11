@@ -14,11 +14,12 @@ REPO_URL = "https://github.com/davidrers/ExplainedGMF4Agri"
 REPO = f"{REPO_URL}/blob/main"
 E = html.escape
 
-TITLE = "Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions"
+TITLE = ("Towards an Explainable Panoptic Crop Mapping and Reporting System with Geospatial Foundation Models "
+         "and Large Language Models")
 AUTHOR = "David Reyes"
 PROGRAMME = "MSc thesis, M-GEO 2026–2027, GEO-AI track · ITC, University of Twente"
 SUPERVISORS = "Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second)"
-TITLE_HTML = E(TITLE).replace("Label-", "Label\u2011")   # no line break inside "Label-Scarce"
+TITLE_HTML = E(TITLE)
 TARGET = ("A user supplies an area of interest. The system returns a pixel-level crop segmentation of that area, "
           "pixel-level explanations of why each region was classified as it was, calibrated per-pixel confidence, and an "
           "LLM-written report traceable to that evidence.")

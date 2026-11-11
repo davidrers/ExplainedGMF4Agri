@@ -1,6 +1,6 @@
 # ExplainedGFM4Agri
 
-Working repository for the MSc thesis *Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions* (David Reyes, ITC, University of Twente, 2026-2027).
+Working repository for the MSc thesis *Towards an Explainable Panoptic Crop Mapping and Reporting System with Geospatial Foundation Models and Large Language Models* (David Reyes, ITC, University of Twente, 2026-2027).
 
 The research design, objectives, research questions and work plan are specified in
 [docs/proposal/current_proposal.md](docs/proposal/current_proposal.md). A condensed statement of the research design

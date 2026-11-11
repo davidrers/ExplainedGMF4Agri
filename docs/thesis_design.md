@@ -1,7 +1,10 @@
-# Geospatial Foundation Models for Transparent Agricultural Monitoring under Label-Scarce Conditions
+# Towards an Explainable Panoptic Crop Mapping and Reporting System with Geospatial Foundation Models and Large Language Models
 
 MSc thesis by David Reyes (student number 3598535), M-GEO 2026-2027, GEO-AI track, ITC, University of Twente.
 Supervisors: Dr. Mahdi Farnaghi (first) and Dr. Mariana Belgiu (second).
+Title revised on 11 November 2026, formerly *Geospatial Foundation Models for Transparent Agricultural
+Monitoring under Label-Scarce Conditions*, when the pipeline gained the two-head workflow that maps fields
+and their crops together; the research questions below are being revised to match.
 
 This document states the research design: the target system, the objectives and research questions,
 the task formulation, the datasets, the model set and the phases. It was the project `CLAUDE.md` until
