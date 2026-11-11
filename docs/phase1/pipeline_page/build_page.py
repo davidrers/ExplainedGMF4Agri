@@ -424,6 +424,8 @@ add(box("disk", X["tm"], 1070, DISK_W, 100, "tm th pr ts ae", "disk",
         f'line-height:1.45"><span><b>Encode once</b> (TESSERA) or <b>download once</b> (AlphaEarth): embeddings saved per '
         f'chip</span></div>'))
 
+N_SHARED = len(parts)            # data, backbones and saved features: the same in the two-head view
+
 # Token-grid lanes go through the neck; TESSERA and AlphaEarth split off straight to the pixel-wise MLP
 for k in ("tm", "th", "pr"):
     add(arrow(CX[k], 1170, 44, k, "neck"))
@@ -489,7 +491,7 @@ add(f'<div class="brk" id="brk-frozen" style="left:{BX}px;top:553px;height:617px
     f'<div class="brk-t" style="left:{BX + 30}px;top:1420px"><div style="font-weight:700">Repeated for every label budget, '
     f'draw and seed</div><div style="font-size:16px;color:#555">(trained)</div></div>')
 
-# Legend
+# Legend (the last part of the view: the two-head view copies it)
 add(f'<div style="position:absolute;left:244px;top:1858px;width:{RIGHT - 244}px;height:1px;background:#ccc"></div>'
     '<div style="position:absolute;left:244px;top:1880px;display:flex;gap:40px;align-items:center">'
     + "".join(f'<div style="display:flex;gap:12px;align-items:center"><div style="width:34px;height:22px;box-sizing:border-box;'
@@ -504,6 +506,127 @@ add(f'<div style="position:absolute;left:244px;top:1858px;width:{RIGHT - 244}px;
 architecture_html = (f'<div class="stage" id="ar-stage" data-w="{STAGE_W}" style="position:relative;width:{STAGE_W}px;'
                      f'height:{STAGE_H}px;font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;color:#222;font-size:18px">'
                      + "".join(parts) + "</div>")
+
+
+# ----------------------------------------------------------------------------------------------
+# Section 2b: the two-head architecture (protocol D30): the same data, backbones and saved features, then
+# PRUE's U-Net on the 10 m lanes and the baseline, a fifth block on the token-grid lanes, and two heads
+# ----------------------------------------------------------------------------------------------
+
+STAGE_H2 = 2070
+
+
+def _two_head_ids(html):
+    """The shared rows again, with ids of their own so that both views can sit in one page."""
+    return re.sub(r'id="([^"]+)"', r'id="h-\1"', html)
+
+
+h_parts = [_two_head_ids(p) for p in parts[:N_SHARED] if 'class="rowlab"' not in p]
+h_parts = [p.replace(">U-Net</button>", ">PRUE</button>")
+            .replace("crop mask + parcel ids</div>", "crop mask + parcel ids · WorldCover 2021</div>") for p in h_parts]
+hadd = h_parts.append
+
+for label, top in [("DATA SOURCE", 168), ("PREPROCESSING", 294), ("MODEL INPUT", 421), ("BACKBONE", 779),
+                   ("EMBEDDINGS<br>ON DISK", 1094), ("NECK", 1323), ("DECODER", 1516), ("TO 10 M", 1616),
+                   ("HEADS", 1741), ("OUTPUT", 1890)]:
+    hadd(f'<div class="rowlab" style="width:213px;top:{top}px">{label}</div>')
+
+
+def stack(items, width, size=17):
+    """Boxes one above the other, joined by small arrows, as the U-Net stack of the crop-only view."""
+    gap = ('<div style="width:1.5px;height:20px;background:#222;position:relative"><div style="position:absolute;bottom:0;'
+           'left:-4px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid #222">'
+           '</div></div>')
+    boxes = [f'<div style="width:{width}px;min-height:38px;padding:5px 8px;box-sizing:border-box;background:#fff;'
+             f'border:1.5px solid #c0802a;display:flex;align-items:center;justify-content:center;text-align:center;'
+             f'font-size:{size}px;line-height:1.3">{t}</div>' for t in items]
+    return gap.join(boxes)
+
+
+# Token-grid lanes: the crop-only neck and decoder, then the fifth block to 10 m
+for k in ("tm", "th", "pr"):
+    hadd(arrow(CX[k], 1170, 44, k, "neck"))
+hadd(box("h-neck", X["tm"], 1214, TG[1] - TG[0], 242, "tm th pr", "neck", TRAIN,
+         f'<div style="position:absolute;left:{(TG[1] - TG[0] - 464) // 2}px;top:16px;display:flex;flex-direction:column;'
+         f'align-items:center">{NECK_STACK}</div>'))
+for k in ("tm", "th", "pr"):
+    hadd(arrow(CX[k], 1456, 44, k, "dec"))
+hadd(box("h-dec-tg", X["tm"], 1500, TG[1] - TG[0], 56, "tm th pr", "dec",
+         TRAIN + ";display:flex;align-items:center;justify-content:center",
+         "<span><b>UNetDecoder</b> → 64 × 56 × 56 (Prithvi 64 × 64 × 64)</span>"))
+for k in ("tm", "th", "pr"):
+    hadd(arrow(CX[k], 1556, 44, k, "up"))
+hadd(box("h-up", X["tm"], 1600, TG[1] - TG[0], 56, "tm th pr", "up",
+         TRAIN + ";display:flex;align-items:center;justify-content:center",
+         "<span><b>Fifth block to 10 m</b>: bilinear to 224 × 224, two 3 × 3 convolutions of 64 channels</span>"))
+
+# TESSERA and AlphaEarth: PRUE's U-Net on the embedding
+for k in ("ts", "ae"):
+    hadd(arrow(CX[k], 1170, 44, k, "dec"))
+PXW = PX[1] - PX[0]
+hadd(box("h-prue-px", PX[0], 1214, PXW, 442, "ts ae", "dec", TRAIN,
+         '<div style="position:absolute;left:0;top:18px;width:100%;text-align:center;font-weight:700">PRUE\'s U-Net, '
+         'one per lane</div>'
+         f'<div style="position:absolute;left:18px;top:58px;width:{PXW - 36}px;display:flex;flex-direction:column;'
+         f'align-items:center">'
+         + stack(["EfficientNet-B7 encoder from ImageNet, its first convolution taking 128 or 64 channels",
+                  "U-Net decoder → 16 × 224 × 224"], PXW - 36)
+         + '</div><div style="position:absolute;left:18px;top:236px;width:' + str(PXW - 36) + 'px;font-size:16px;'
+         'line-height:1.45;text-align:center;color:#333">Trained. Gives each 10 m pixel the spatial context its '
+         'embedding lacks, so the border head can see where a field ends. 67.2 M parameters.</div>'))
+
+# The baseline becomes PRUE itself on the raw composites
+hadd(box("h-prue-un", X["un"], 1214, COLW, 442, "un", "dec", TRAIN,
+         '<div style="position:absolute;left:0;top:18px;width:100%;text-align:center;font-weight:700">PRUE</div>'
+         '<div style="position:absolute;left:18px;top:58px;width:264px;display:flex;flex-direction:column;'
+         'align-items:center">'
+         + stack(["EfficientNet-B7 encoder from ImageNet, 168 channels", "U-Net decoder → 16 × 224 × 224"], 264, 15)
+         + '</div><div style="position:absolute;left:18px;top:236px;width:264px;font-size:15px;line-height:1.45;'
+         'text-align:center;color:#333">Trained end to end, everything: the published recipe for field boundaries at '
+         '10 m. 67.4 M parameters.</div>'))
+
+# Two heads on every lane
+for k in X:
+    hadd(arrow(CX[k], 1656, 44, k, "head"))
+HEADS_W = RIGHT - X["tm"]
+pill_style = ('position:absolute;top:12px;height:34px;box-sizing:border-box;background:#fff;border:1.5px solid #c0802a;'
+              'border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:18px')
+hadd(box("h-heads", X["tm"], 1700, HEADS_W, 110, "tm th pr ts ae un", "head", TRAIN,
+         f'<div style="{pill_style};left:{HEADS_W // 2 - 560}px;width:520px"><span><b>Border head</b> → background · '
+         f'interior · border</span></div>'
+         f'<div style="{pill_style};left:{HEADS_W // 2 + 40}px;width:520px"><span><b>Crop head</b> → 20 crop classes'
+         f'</span></div>'
+         f'<div style="position:absolute;left:0;top:54px;width:{TG[1] - TG[0]}px;text-align:center;color:#444;'
+         f'font-size:16px">both on the fifth block: a 3 × 3 and a 1 × 1 convolution</div>'
+         f'<div style="position:absolute;left:{TG[1] + 23 - X["tm"]}px;top:53px;height:24px;border-left:1.5px dashed '
+         f'#c0802a"></div><div style="position:absolute;left:{PX[0] - X["tm"]}px;top:54px;width:{RIGHT - PX[0]}px;'
+         f'text-align:center;color:#444;font-size:16px">border head on the U-Net\'s 16 features; crop MLP 512 → 256 on '
+         f'the input and those 16 features</div>'
+         '<div style="position:absolute;left:0;top:80px;width:100%;text-align:center;color:#444;font-size:16px">loss: '
+         'PRUE\'s log-cosh Dice + w × cross-entropy, w held so that the crop loss pulls 0.3 × as hard as the border '
+         'loss</div>'))
+
+# Fields and crops
+for k in X:
+    hadd(arrow(CX[k], 1810, 44, k, "out"))
+hadd(box("h-out", X["tm"], 1854, HEADS_W, 100, "tm th pr ts ae un", "out",
+         EVAL + ";display:flex;align-items:center;justify-content:center;text-align:center;padding:0 40px",
+         "<span><b>Fields and their crops</b>: each predicted interior grown to its border over the whole tile, its crop "
+         "the vote of its pixels. Evaluated identically for every lane on the same 1,475 test chips: border F1 within "
+         "1 px, panoptic quality of the fields, crop Macro-F1 per pixel and per parcel</span>"))
+
+# Brackets and legend, as in the crop-only view
+hadd(f'<div class="brk" id="h-brk-frozen" style="left:{BX}px;top:553px;height:617px"></div>'
+     f'<div class="brk-t" style="left:{BX + 30}px;top:836px"><div style="font-weight:700">Runs once per model</div>'
+     f'<div style="font-size:16px;color:#555">(frozen)</div></div>'
+     f'<div class="brk" id="h-brk-trained" style="left:{BX}px;top:1214px;height:596px"></div>'
+     f'<div class="brk-t" style="left:{BX + 30}px;top:1470px"><div style="font-weight:700">Repeated for every label '
+     f'budget, draw and seed</div><div style="font-size:16px;color:#555">(trained)</div></div>')
+hadd(parts[-1].replace("top:1858px", "top:1985px").replace("top:1880px", "top:2007px"))
+
+architecture_html_2h = (f'<div class="stage" id="ah-stage" data-w="{STAGE_W}" style="position:relative;width:{STAGE_W}px;'
+                        f'height:{STAGE_H2}px;font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;color:#222;'
+                        f'font-size:18px">' + "".join(h_parts) + "</div>")
 
 # ----------------------------------------------------------------------------------------------
 # Section 3: the experiments of the analysis
@@ -544,7 +667,29 @@ EXPERIMENTS = [
                 "set by the checkpoint. Fine-tuning costs 4 to 15 times the frozen fit.",
          decision="Encoders stay frozen in the main workflow; fine-tuning is reported as an insight.",
          show=["bb-tmth", "bb-pr", "bb-ts", "brk-frozen"]),
+    dict(n=7, arch="two-head", title="PRUE on TESSERA: field borders from a frozen embedding",
+         folder="2026-11-06_prue_tessera",
+         setup="TESSERA v2, frozen and fine-tuned, all of EE_2021_rev at K = 100 %.",
+         result="PRUE's fields reach a class-agnostic PQ of 0.374 frozen and 0.378 fine-tuned, above PaPs (0.336, 0.366) "
+                "and a boundary head on the crop decoder; fine-tuning adds almost nothing at 50 times the cost.",
+         decision="PRUE's U-Net and recipe carry the border head of the 10 m lanes; the encoder stays frozen.",
+         show=["h-prue-px", "h-heads"]),
+    dict(n=8, arch="two-head", title="One network for crop types and field borders",
+         folder="2026-11-07_prue_crop_tessera",
+         setup="TESSERA v2, frozen and fine-tuned, all of EE_2021_rev at K = 100 %, the crop loss weighted 0.1 or 0.01.",
+         result="At 0.01 one network matches the two separate models' borders and improves their crop map (fine-tuned "
+                "0.678 against 0.660 pixel Macro-F1); at 0.1 the crop loss pulls three times as hard and the borders "
+                "fall by 0.02.",
+         decision="Both heads share one network, the crop loss held at 0.3 times the border loss's pull.",
+         show=["h-heads"]),
+    dict(n=9, arch="two-head", title="Field borders from every arm", folder="2026-11-09_borders_all_arms",
+         setup="Every arm with both heads, frozen, all of EE_2021_rev, K = 100, 20 and 5 %.",
+         result="TESSERA draws the borders best of the GFMs (border F1 0.868, 0.811, 0.761) and ties PRUE from ImageNet; "
+                "the token-grid models lose 0.23 to 0.25 by K = 5 %.",
+         decision="Became the two-head workflow (protocol D30, D31); its grid is the workflow's first run.",
+         show=["h-up", "h-prue-px", "h-prue-un"]),
 ]
+ARCH = {"crop": "Crop-only architecture", "two-head": "Two-head architecture"}
 
 
 def exp_card(e):
@@ -552,6 +697,7 @@ def exp_card(e):
     return (f'<article class="exp"><div class="exp-num">{e["n"]}</div><div class="exp-box">'
             f'<a class="rep" href="{url}" target="_blank" rel="noopener">REPORT.md ↗</a>'
             f'<h3><a href="{url}" target="_blank" rel="noopener">{E(e["title"])}</a></h3>'
+            f'<p class="arch">{ARCH[e.get("arch", "crop")]}</p>'
             f'<p class="setup">{E(e["setup"])}</p>'
             f'<p><b>Result.</b> {E(e["result"])}</p><p><b>Decision.</b> {E(e["decision"])}</p>'
             f'<button class="show" type="button" data-exp="{e["n"]}">Show in the architecture</button></div></article>')
@@ -559,20 +705,29 @@ def exp_card(e):
 
 estonia_url = f"{REPO}/docs/phase1/results_estonia/REPORT.md"
 borders_url = f"{REPO}/docs/phase1/results_estonia_borders/REPORT.md"
+def results_card(url, title, tag, text):
+    return (f'<article class="exp res"><div class="exp-num">R</div><div class="exp-box"><a class="rep" href="{url}" '
+            f'target="_blank" rel="noopener">REPORT.md ↗</a><h3><a href="{url}" target="_blank" rel="noopener">{title}'
+            f'</a></h3><p class="arch">{tag}</p><p>{text}</p></div></article>')
+
+
 experiments_html = (
-    '<p class="lead">Each experiment varies one factor on one encoder and compares the variants fit by fit, on shared '
-    'draws and seeds. The relative result backs the decision, so none is rerun on the current arms; experiments 1 to 3 ran '
-    'on TerraMind or THOR with Sentinel-2 alone.</p><div class="exp-list">'
-    + "".join(exp_card(e) for e in EXPERIMENTS)
-    + f'<article class="exp res"><div class="exp-num">R</div><div class="exp-box"><a class="rep" href="{estonia_url}" '
-      f'target="_blank" rel="noopener">REPORT.md ↗</a><h3><a href="{estonia_url}" target="_blank" rel="noopener">First '
-      f'results for Estonia 2021</a></h3><p>The main workflow on all of Estonia: every arm frozen and fine-tuned, per pixel '
-      f'and per parcel, beside the published Estonian results.</p></div></article>'
-    + f'<article class="exp res"><div class="exp-num">R</div><div class="exp-box"><a class="rep" href="{borders_url}" '
-      f'target="_blank" rel="noopener">REPORT.md ↗</a><h3><a href="{borders_url}" target="_blank" rel="noopener">Field '
-      f'borders and crop types for Estonia 2021</a></h3><p>The two-head workflow on all of Estonia: which model draws the '
-      f'field borders best beside its crop map, frozen at every budget and fine-tuned TESSERA, with reference '
-      f'results.</p></div></article></div>')
+    '<p class="lead">Each experiment varies one factor and compares the variants fit by fit, on shared draws and seeds. '
+    '<b>Experiments 1 to 6 ran on the crop-only architecture</b>, before the two-head workflow existed. Each decided a part '
+    'both architectures share (the inputs, the frozen backbones and their saved features, frozen encoders), so their '
+    'decisions carry over and none is rerun; experiments 1 to 3 ran on TerraMind or THOR with Sentinel-2 alone. '
+    '<b>Experiments 7 to 9 designed the two-head architecture.</b></p><div class="exp-list">'
+    '<h3 class="exp-group">On the crop-only architecture</h3>'
+    + "".join(exp_card(e) for e in EXPERIMENTS if e.get("arch", "crop") == "crop")
+    + '<h3 class="exp-group">Behind the two-head architecture</h3>'
+    + "".join(exp_card(e) for e in EXPERIMENTS if e.get("arch") == "two-head")
+    + '<h3 class="exp-group">Results for Estonia 2021</h3>'
+    + results_card(estonia_url, "First results for Estonia 2021", "Crop-only workflow",
+                   "Every arm frozen and fine-tuned, per pixel and per parcel, beside the published Estonian results.")
+    + results_card(borders_url, "Field borders and crop types for Estonia 2021", "Two-head workflow",
+                   "Which model draws the field borders best beside its crop map, frozen at every budget and fine-tuned "
+                   "TESSERA, with reference results. Answers RQ1.1, and RQ1.2 for the label budgets.")
+    + '</div>')
 
 # ----------------------------------------------------------------------------------------------
 # The second set-up of section 1: spatial transferability, from its research note
@@ -647,6 +802,17 @@ LANES = {
         ("Two-head workflow", "replaced by PRUE itself: the EfficientNet-B7 U-Net from ImageNet with both heads, "
                               "everything trained; 67.4 M")]),
 }
+LANES_2H = {
+    "un": ("PRUE, the baseline of the two-head workflow", [
+        ("Input", "S2 + S1 on 168 channels (12 months × 14 bands)"),
+        ("Model", "U-Net with an EfficientNet-B7 encoder from ImageNet, its first convolution widened to 168 channels"),
+        ("Heads", "border head on the U-Net's 16 features; crop MLP 512 → 256 on the input and those features"),
+        ("Trained", "everything: 67.4 M parameters"),
+        ("Optimiser", "AdamW with amsgrad, 3e-3, cosine to 1e-6; the crop head 1e-3")]),
+}
+SHARED_2H = ("Every arm: 45 epochs at every K · whole chips in batches of 4 · PRUE's log-cosh Dice + the crop "
+             "cross-entropy, its weight held at 0.3 × the border loss's pull · D4 augmentation · checkpoint of the best "
+             "(object F1 + crop Macro-F1) / 2.")
 SHARED = ("Every arm: 45 epochs at every K · AdamW, weight decay 0.05 · effective batch 4 chips · cross-entropy on "
           "labelled pixels · D4 augmentation · checkpoint of lowest validation loss.")
 
@@ -678,8 +844,32 @@ WALKS = {
              text="Every lane is scored the same way on the 1,475 test chips: Macro-F1 per pixel, the primary metric, and "
                   "per parcel."),
     ],
+    "ah": [
+        dict(title="Data source", targets=["[data-row=src]"],
+             text="As in the crop-only view. The border target also reads ESA WorldCover 2021: its non-agricultural "
+                  "land is the background class."),
+        dict(title="Backbone", targets=["[data-row=bb]"], text="The same frozen encoders."),
+        dict(title="Embeddings on disk", targets=["[data-row=disk]"], text="The same saved features."),
+        dict(title="Neck", targets=["[data-row=neck]"], text="The token-grid lanes keep their trained neck."),
+        dict(title="Decoder", targets=["[data-row=dec]"],
+             text="The token-grid lanes keep their UNetDecoder. TESSERA and AlphaEarth get PRUE's U-Net (EfficientNet-B7 "
+                  "from ImageNet), which gives each pixel the spatial context its embedding lacks. The baseline becomes "
+                  "PRUE itself on the raw composites."),
+        dict(title="To 10 m", targets=["[data-row=up]"],
+             text="A fifth block brings the token-grid decoder from 20 m to the 10 m grid, where the borders are. No raw "
+                  "band enters it: the borders come from what the tokens know."),
+        dict(title="Heads", targets=["[data-row=head]"],
+             text="Two heads on every lane: the border head (background, interior, border; PRUE's log-cosh Dice) and the "
+                  "crop head (20 classes). The crop loss is held at 0.3 times the border loss's pull on the shared "
+                  "network."),
+        dict(title="Output", targets=["[data-row=out]"],
+             text="Fields are built from the border map over the whole tile, each taking the crop most of its pixels were "
+                  "given. Scored on the 1,475 test chips by border F1, the fields' panoptic quality and the crop Macro-F1 "
+                  "per pixel and per parcel."),
+    ],
 }
 SHOW = {str(e["n"]): dict(title=f"Experiment {e['n']}: {e['title']}", text=e["decision"],
+                          view="ah" if e.get("arch") == "two-head" else "ar",
                           targets=["#" + t for t in e["show"]]) for e in EXPERIMENTS}
 
 CSS = r"""
@@ -753,6 +943,9 @@ h2.sec{font-family:var(--sans);font-size:40px;font-weight:700;color:#222;text-al
 .toolbar button:hover,.walk button:hover{background:#f1f5fb}
 .toolbar button[aria-pressed=true]{background:#2a2f38;color:#fff}
 .toolbar .hint{color:#666;margin-left:6px}
+.toolbar .seg{display:inline-flex;gap:0;margin-left:10px}.toolbar .seg button{border-radius:0}
+.toolbar .seg button:first-child{border-radius:16px 0 0 16px}.toolbar .seg button:last-child{border-radius:0 16px 16px 0;margin-left:-2px}
+.viewport[hidden]{display:none}
 .viewport{position:relative;width:100%;overflow-x:auto;overflow-y:hidden}
 .stage{position:absolute;left:0;top:0;transform-origin:0 0}
 /* focus */
@@ -825,6 +1018,9 @@ h2.sec{font-family:var(--sans);font-size:40px;font-weight:700;color:#222;text-al
 .exp h3 a{color:#1f2430;text-decoration:none}.exp h3 a:hover{text-decoration:underline}
 .exp p{margin:6px 0;font-size:16px;line-height:1.5;color:#2a2f38}
 .exp p.setup{color:#666;font-size:15px}
+.exp p.arch{display:inline-block;margin:0 0 6px;padding:1px 10px;border:1.5px solid #8a5a14;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:.3px;color:#8a5a14;background:#fff}
+.exp.res p.arch{border-color:#2e6b3a;color:#2e6b3a}
+.exp-group{margin:14px 0 0 56px;font-size:15px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#666}
 .rep{position:absolute;right:16px;top:16px;border:2px solid #2a2f38;border-radius:16px;padding:3px 14px;font-size:14px;
   font-weight:600;background:#fff;color:#2a2f38;text-decoration:none}
 .rep:hover{background:#2a2f38;color:#fff}
@@ -976,6 +1172,7 @@ $$('.toolbar').forEach(tb => tb.addEventListener('click', e => {
   const act = b.dataset.act, vp = $('#' + tb.dataset.for + '-vp');
   if (act === 'live') setLive(!document.body.classList.contains('live'));
   if (act === 'walk') startWalk(tb.dataset.for, DATA.walks[tb.dataset.for]);
+  if (act === 'view') setView(b.dataset.view);
   if (act === 'zoom') {
     vp.dataset.zoom = vp.dataset.zoom === 'full' ? 'fit' : 'full';
     b.textContent = vp.dataset.zoom === 'full' ? '100 %' : 'Fit';
@@ -1010,34 +1207,55 @@ $$('.rq.on', wf).forEach(q => {
   q.addEventListener('mouseleave', () => { if (!W) clear(wf); });
 });
 
-// architecture: follow one lane
-const ar = $('#ar-stage'), card = $('#card');
-let lane = null;
+// architecture: two views, crop types only (ar) and with field borders (ah)
+const arTb = $('#architecture .toolbar');
+function setView(v) {
+  const old = arTb.dataset.for;
+  if (old === v) return;
+  endWalk(); closeCard();
+  const vp = $('#' + v + '-vp');
+  vp.dataset.zoom = $('#' + old + '-vp').dataset.zoom || 'fit';
+  $('#' + old + '-vp').hidden = true;
+  vp.hidden = false;
+  arTb.dataset.for = v;
+  $$('[data-act=view]', arTb).forEach(b => b.setAttribute('aria-pressed', b.dataset.view === v));
+  fit(vp);
+}
+
+// architecture: follow one lane, in either view
+const card = $('#card'), arStages = ['ar', 'ah'].map(k => $('#' + k + '-stage'));
+let lane = null, laneStage = null;
 function closeCard() {
   if (!lane) return;
   lane = null;
   card.hidden = true;
-  $$('.lane-btn', ar).forEach(b => b.setAttribute('aria-pressed', false));
-  if (!W) clear(ar);
+  arStages.forEach(st => $$('.lane-btn', st).forEach(b => b.setAttribute('aria-pressed', false)));
+  if (!W && laneStage) clear(laneStage);
+  laneStage = null;
 }
-$$('.lane-btn', ar).forEach(b => b.addEventListener('click', () => {
+arStages.forEach(st => $$('.lane-btn', st).forEach(b => b.addEventListener('click', () => {
   const k = b.dataset.lane;
-  if (lane === k) return closeCard();
+  if (lane === k && laneStage === st) return closeCard();
   endWalk();
+  closeCard();
   lane = k;
-  $$('.lane-btn', ar).forEach(x => x.setAttribute('aria-pressed', x === b));
-  focus(ar, $$('.n', ar).filter(e => (e.dataset.lanes || '').split(' ').includes(k)));
-  const [title, rows] = DATA.lanes[k];
+  laneStage = st;
+  $$('.lane-btn', st).forEach(x => x.setAttribute('aria-pressed', x === b));
+  focus(st, $$('.n', st).filter(e => (e.dataset.lanes || '').split(' ').includes(k)));
+  const two = st.id === 'ah-stage';
+  const [title, rows] = (two && DATA.lanes2[k]) || DATA.lanes[k];
   $('h4', card).textContent = title;
   $('dl', card).innerHTML = rows.map(([t, d]) => `<dt>${t}</dt><dd>${d}</dd>`).join('');
+  $('.shared', card).textContent = two ? DATA.shared2 : DATA.shared;
   card.hidden = false;
-}));
+})));
 $('button', card).addEventListener('click', closeCard);
 
-// experiments: show where they act in the architecture
+// experiments: show where they act, in the architecture they ran on
 $$('.show').forEach(b => b.addEventListener('click', () => {
   const s = DATA.show[b.dataset.exp];
-  startWalk('ar', [s]);
+  setView(s.view);
+  startWalk(s.view, [s]);
 }));
 
 fromHash();
@@ -1047,6 +1265,8 @@ DATA_JSON = json.dumps(dict(
     walks=WALKS,
     lanes={k: [t, [[a, b] for a, b in rows]] for k, (t, rows) in LANES.items()},
     show=SHOW,
+    lanes2={k: [t, [[a, b] for a, b in rows]] for k, (t, rows) in LANES_2H.items()},
+    shared=SHARED, shared2=SHARED_2H,
 ), ensure_ascii=False).replace("</", "<\\/")
 
 
@@ -1084,8 +1304,9 @@ page = S.head("Phase 1 · GFMs Benchmark · ExplainedGFM4Agri",
 
 <section id="architecture">
 <h2 class="sec">2. Model architecture</h2>
-{toolbar("ar", '<span class="hint">Click a model name to follow its lane.</span>')}
+{toolbar("ar", '<span class="seg" role="group" aria-label="Architecture"><button type="button" data-act="view" data-view="ar" aria-pressed="true">Crop types only</button><button type="button" data-act="view" data-view="ah" aria-pressed="false">Crop types + field borders</button></span><span class="hint">Click a model name to follow its lane.</span>')}
 <div class="viewport" id="ar-vp">{architecture_html}</div>
+<div class="viewport" id="ah-vp" hidden>{architecture_html_2h}</div>
 </section>
 
 <section id="experiments">

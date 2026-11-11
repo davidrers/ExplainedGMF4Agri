@@ -5,7 +5,7 @@ GitHub Pages serves `docs/` from `main`. The site has four pages, all generated 
 | Page | File | Holds |
 |---|---|---|
 | Landing | `docs/index.html` | The thesis title, author and supervisors, the target system, a Sentinel-2 mosaic of Estonian fields with a draggable wipe to its EuroCrops labels, and the three phases as the chain of `phases.png` (satellite, GFM, XAI and uncertainty, LLM, report), each opening its page |
-| Phase 1 · GFMs Benchmark | `docs/phase1/pipeline_page/index.html` | (1) The experimental set-up, as two tabs: **Pipeline**, the interactive experimental workflow under the research questions with its fairness rules, and **Spatial transferability**, `docs/research/transferability/transfer_setup.md` converted to HTML with its maps; (2) the model architecture of the six arms; (3) the six experiments of the analysis, each linked to its `REPORT.md`, with the Estonia results report |
+| Phase 1 · GFMs Benchmark | `docs/phase1/pipeline_page/index.html` | (1) The experimental set-up, as two tabs: **Pipeline**, the interactive experimental workflow under the research questions with its fairness rules, and **Spatial transferability**, `docs/research/transferability/transfer_setup.md` converted to HTML with its maps; (2) the model architecture of the six arms, switchable between the crop-only and the two-head architecture; (3) the experiments, each linked to its `REPORT.md` and marked with the architecture it ran on (1 to 6 crop-only, 7 to 9 behind the two-head workflow), with the Estonia results reports of both workflows |
 | Phase 2 · XAI + UQ | `docs/phase2/index.html` | The planned experimental set-up and the research questions, as `thesis_design.md` states them |
 | Phase 3 · LLM Report | `docs/phase3/index.html` | The same for Phase 3 |
 
@@ -17,7 +17,7 @@ https://raw.githack.com/davidrers/ExplainedGMF4Agri/main/docs/index.html
 
 Phase 1 interactions: **Step through** walks each diagram step by step; **Live** animates the flow along the arrows;
 **Fit / 100 %** switches between the whole diagram and its design size; **Status** marks what is built in the
-workflow; hovering RQ1 or a fairness rule lights the steps that carry it; clicking a model name follows its lane
+workflow; hovering RQ1.1, RQ1.2 or a fairness rule lights the steps that carry it; **Crop types only / Crop types + field borders** switches the architecture view; clicking a model name follows its lane
 and shows its settings; **Show in the architecture** points from an experiment to the part of the pipeline it
 decided. A link to `#workflow`, `#transferability` or any heading inside the transferability set-up opens its tab.
 
@@ -51,7 +51,8 @@ reports say, and nothing they do not. They change with them, under the same rule
 | An arm's settings, shown when its name is clicked | `LANES`; what every arm shares in `SHARED` |
 | The architecture drawing | Section 2 of `build_page.py`. Columns sit at `X` (design pixels, each `COLW` wide), boxes are made with `box()` and arrows with `arrow()`. Each element names the arms it belongs to (`lanes`, which a model-name click lights) and its row (`row`, which a Step through step lights) |
 | The architecture's Step through text | `WALKS["ar"]` |
-| An experiment of the analysis | `EXPERIMENTS`: `folder` makes the `REPORT.md` link, `show` lists the ids of the architecture boxes that Show in the architecture lights |
+| The two-head architecture drawing | Section 2b of `build_page.py`: it reuses the crop-only view's rows up to the saved features (`N_SHARED`, ids prefixed `h-`) and draws its own decoders, fifth block, heads and output; its Step through text is `WALKS["ah"]`, the baseline's card `LANES_2H`, the card footer `SHARED_2H` |
+| An experiment of the analysis | `EXPERIMENTS`: `folder` makes the `REPORT.md` link, `arch` (`crop`, the default, or `two-head`) its tag, its group and the view Show in the architecture opens, `show` the ids of the boxes it lights (`h-` ids for the two-head view) |
 | The transferability set-up | `docs/research/transferability/transfer_setup.md` itself; `md_html.py` converts it at every build. Its colour emoji become swatches in the colours of its maps (`SWATCHES`) |
 | The thesis title, author, supervisors, target system | `TITLE`, `AUTHOR`, `PROGRAMME`, `SUPERVISORS`, `TARGET` in `site_shell.py` |
 | A phase's name, topic, status and research questions | `PHASES` in `site_shell.py` (the landing, the top bar and every banner read it) |
