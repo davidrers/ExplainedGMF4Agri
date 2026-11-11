@@ -23,7 +23,7 @@ import site_shell as S
 OUT = Path(__file__).with_name("index.html")
 TRANSFER_MD = Path(__file__).resolve().parents[2] / "research/transferability/transfer_setup.md"
 REPO = "https://github.com/davidrers/ExplainedGMF4Agri/blob/main"
-AS_OF = "22 October 2026"   # the state of the docs the page shows, in its header
+AS_OF = "11 November 2026"   # the state of the docs the page shows, in its header
 E = html.escape
 
 # ----------------------------------------------------------------------------------------------
@@ -80,7 +80,8 @@ WF_STEPS = [
          walk="A frozen foundation model feeds a trained decoder; the U-Net baseline trains from scratch. Every arm "
               "gets the same training effort at every K.",
          now="Six arms, 45 epochs each at every K; the checkpoint of lowest validation loss is tested. "
-             "No tuning trials yet."),
+             "No tuning trials yet. A second workflow, kshot_borders (D30), gives every arm a field-border head "
+             "beside its crop head, with PRUE from ImageNet as its baseline."),
     dict(n=6, c=BROWN, title="Experiments", tags=["F2", "F3"], status="partly", boxed=True,
          body=('<div style="display:flex;gap:32px;margin:0 -6px">'
                + inner("E1 · Label-budget curves", "within each country", "#fff", "#e2b56a")
@@ -93,7 +94,8 @@ WF_STEPS = [
          body="Fixed test blocks only. Macro-F1 (primary) per pixel and per parcel, mIoU and per-class F1, also per AEZ "
               "class.<br>Paired comparisons between models, with 95 % intervals. K*, the matching budget against the "
               "baseline, answers RQ1.",
-         now="Pixel and parcel Macro-F1 on the 1,475 test chips. No intervals yet: one draw, one seed, so no K*."),
+         now="Pixel and parcel Macro-F1 on the 1,475 test chips. No intervals yet: one draw, one seed, so no K*. "
+             "The two-head workflow adds the border F1 within 1 px and the panoptic quality of each model's fields."),
     dict(n=8, c=GREEN, title="Reporting", tags=["F8"], status="met",
          body="Every result logged with its settings; all draws released.",
          now="Every fit writes results.json with its settings, drawn parcels, metrics and commit."),
@@ -536,6 +538,7 @@ def exp_card(e):
 
 
 estonia_url = f"{REPO}/docs/phase1/results_estonia/REPORT.md"
+borders_url = f"{REPO}/docs/phase1/results_estonia_borders/REPORT.md"
 experiments_html = (
     '<p class="lead">Each experiment varies one factor on one encoder and compares the variants fit by fit, on shared '
     'draws and seeds. The relative result backs the decision, so none is rerun on the current arms; experiments 1 to 3 ran '
@@ -544,7 +547,12 @@ experiments_html = (
     + f'<article class="exp res"><div class="exp-num">R</div><div class="exp-box"><a class="rep" href="{estonia_url}" '
       f'target="_blank" rel="noopener">REPORT.md ↗</a><h3><a href="{estonia_url}" target="_blank" rel="noopener">First '
       f'results for Estonia 2021</a></h3><p>The main workflow on all of Estonia: every arm frozen and fine-tuned, per pixel '
-      f'and per parcel, beside the published Estonian results.</p></div></article></div>')
+      f'and per parcel, beside the published Estonian results.</p></div></article>'
+    + f'<article class="exp res"><div class="exp-num">R</div><div class="exp-box"><a class="rep" href="{borders_url}" '
+      f'target="_blank" rel="noopener">REPORT.md ↗</a><h3><a href="{borders_url}" target="_blank" rel="noopener">Field '
+      f'borders and crop types for Estonia 2021</a></h3><p>The two-head workflow on all of Estonia: which model draws the '
+      f'field borders best beside its crop map, frozen at every budget and fine-tuned TESSERA, with reference '
+      f'results.</p></div></article></div>')
 
 # ----------------------------------------------------------------------------------------------
 # The second set-up of section 1: spatial transferability, from its research note
@@ -573,7 +581,8 @@ LANES = {
         ("Layers kept", "5, 11, 17, 23"),
         ("Decoder", "ChannelBottleneck 768 + UNetDecoder"),
         ("Trained", "53.3 M parameters"),
-        ("Optimiser", "learning rate 1e-4, batch 2 accumulated twice")]),
+        ("Optimiser", "learning rate 1e-4, batch 2 accumulated twice"),
+        ("Two-head workflow", "a fifth decoder block to 10 m carries PRUE's border head beside the crop head; 53.4 M")]),
     "th": ("THOR v1 large", [
         ("Input", "S2 10 bands (B01, B09 left out) + S1 VV, VH"),
         ("Encoder", "frozen, one pass per month; three band groups (S2 10 m, S2 20 m, S1) averaged"),
@@ -581,7 +590,8 @@ LANES = {
         ("Layers kept", "5, 11, 17, 23"),
         ("Decoder", "ChannelBottleneck 768 + UNetDecoder, exactly TerraMind's"),
         ("Trained", "53.3 M parameters"),
-        ("Optimiser", "learning rate 1e-4, batch 2 accumulated twice")]),
+        ("Optimiser", "learning rate 1e-4, batch 2 accumulated twice"),
+        ("Two-head workflow", "a fifth decoder block to 10 m carries PRUE's border head beside the crop head; 53.4 M")]),
     "pr": ("Prithvi-EO-2.0 600M TL", [
         ("Input", "S2 6 HLS bands + date and location"),
         ("Encoder", "frozen, 12 months in one ViT, joint space-time attention"),
@@ -589,26 +599,33 @@ LANES = {
         ("Layers kept", "7, 15, 23, 31"),
         ("Decoder", "ChannelBottleneck 768 + UNetDecoder"),
         ("Trained", "62.7 M parameters (12 × 1,280 channels into the bottleneck)"),
-        ("Optimiser", "learning rate 1e-4, batch 2 accumulated twice")]),
+        ("Optimiser", "learning rate 1e-4, batch 2 accumulated twice"),
+        ("Two-head workflow", "a fifth decoder block to 10 m carries PRUE's border head beside the crop head; 62.8 M")]),
     "ts": ("TESSERA v2 Medium", [
         ("Input", "S2 10 bands + S1 VV, VH, each month dated the 15th"),
         ("Encoder", "frozen, 21.0 M; one Transformer per sensor over time, per pixel"),
         ("Output", "128-d per 10 m pixel, computed once per chip set"),
         ("Decoder", "per-pixel MLP, 512 and 256"),
         ("Trained", "0.20 M parameters"),
-        ("Optimiser", "learning rate 1e-3, batch 4")]),
+        ("Optimiser", "learning rate 1e-3, batch 4"),
+        ("Two-head workflow", "PRUE's U-Net (EfficientNet-B7, ImageNet) carries the border head; the MLP reads the "
+                              "embedding and its 16 features; 67.4 M")]),
     "ae": ("AlphaEarth v1", [
         ("Input", "Google's annual 64-d embedding of 2021"),
         ("Encoder", "none run here: precomputed and downloaded once"),
         ("Output", "64-d per 10 m pixel, warped onto the chip grid"),
         ("Decoder", "per-pixel MLP, 512 and 256"),
         ("Trained", "0.17 M parameters"),
-        ("Optimiser", "learning rate 1e-3, batch 4")]),
+        ("Optimiser", "learning rate 1e-3, batch 4"),
+        ("Two-head workflow", "PRUE's U-Net (EfficientNet-B7, ImageNet) carries the border head; the MLP reads the "
+                              "embedding and its 16 features; 67.3 M")]),
     "un": ("U-Net from scratch, the baseline", [
         ("Input", "S2 + S1 on 168 channels (12 months × 14 bands)"),
         ("Model", "ResNet-18 U-Net, randomly initialised"),
         ("Trained", "all 14.8 M parameters: encoder 11.7 M, decoder 3.2 M"),
-        ("Optimiser", "learning rate 1e-3, batch 4")]),
+        ("Optimiser", "learning rate 1e-3, batch 4"),
+        ("Two-head workflow", "replaced by PRUE itself: the EfficientNet-B7 U-Net from ImageNet with both heads, "
+                              "everything trained; 67.4 M")]),
 }
 SHARED = ("Every arm: 45 epochs at every K · AdamW, weight decay 0.05 · effective batch 4 chips · cross-entropy on "
           "labelled pixels · D4 augmentation · checkpoint of lowest validation loss.")

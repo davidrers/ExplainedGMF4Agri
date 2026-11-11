@@ -159,6 +159,53 @@ flowchart LR
 
 ---
 
+## A second workflow: crop types and field borders
+
+Since 11 November 2026 the pipeline has a second workflow beside the crop map. It asks a second
+question of the same models: **can each one also draw where one field ends and the next begins?**
+A crop map says what grows in each pixel; it does not say which pixels belong to the same field.
+For a paying agency, or for anyone who wants field-level statistics, that matters as much.
+
+Each model gets a second output, a **border head**, beside its crop head. The border head labels
+every pixel as background, inside a field, or on a field's edge, following PRUE, the best method
+on the Fields of The World benchmark. The fields are then read off that picture, with no help from
+the test labels: each patch of "inside" is a field, grown back out to its edge.
+
+```mermaid
+flowchart LR
+    X["The model's input<br/>(frozen as before)"] --> S["Shared network"]
+    S --> CH["Crop head:<br/>which crop in each pixel"]
+    S --> BH["Border head:<br/>background, inside, or edge"]
+    BH --> FL["Fields: each inside patch,<br/>grown to its edge"]
+    CH --> V["Each field's crop:<br/>the vote of its pixels"]
+    FL --> V
+```
+
+What the shared network is depends on what the model lacks. TESSERA and AlphaEarth describe each
+10 m pixel on its own, so nothing in them knows where a field ends; they get PRUE's own network,
+which looks around each pixel. The transformer models already look around, but only at 160 m; they
+keep their decoder and gain one more block that brings it down to 10 m, where the edges are. The
+baseline becomes PRUE itself on the raw pictures, starting from a network pretrained on everyday
+photographs (ImageNet).
+
+Two choices keep it fair. The edges are hidden exactly as the crop labels are: a field that is not
+among the K % labelled teaches nothing about its edge either. And the two tasks share one network,
+so one could crowd out the other; the crop task's pull is therefore held at 0.3 times the border
+task's throughout training, whatever the model.
+
+The borders are scored by how many of the declared field edges the model draws within one pixel,
+and how many of its edges are real: their F1. The fields are scored as whole objects, a field
+counting as found when it overlaps a declared one by more than half. Where nobody knows whether a
+field lies, on undeclared grassland and cropland, nothing is scored.
+
+On all of Estonia, TESSERA draws the borders best of the foundation models and AlphaEarth is close
+behind, but neither beats the baseline; the transformer models draw weaker borders and lose more
+of them as labels get scarce. Every model misses most of the borders between two fields of the
+same crop, which can look alike all year. The numbers are in
+[results_estonia_borders/REPORT.md](results_estonia_borders/REPORT.md).
+
+---
+
 ## What the Estonian results can and cannot tell you
 
 The main comparison has run on all of Estonia: 7,402 tiles, split by area into 4,898 for

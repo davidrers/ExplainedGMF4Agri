@@ -18,8 +18,11 @@ than hidden. The runs made with it so far are listed in [section 11](#11-runs).
 
 **The main workflow and the experiments.** The main workflow is what
 `configs/experiments/kshot.yaml` runs: the six arms of section 9, every foundation-model encoder
-frozen, at the budgets, draws, seeds and fit budget that file states. Everything else is an
-experiment in its own folder of `experiments/`, fine-tuning among them (protocol D29). This
+frozen, at the budgets, draws, seeds and fit budget that file states. Beside it, since 11 November
+2026, the **two-head workflow** of `configs/experiments/kshot_borders.yaml` gives every arm a
+field-border head beside its crop head, under the same protocol (protocol D30, section 9).
+Everything else is an experiment in its own folder of `experiments/`, fine-tuning among them
+(protocol D29). This
 document cites an experiment where its result justifies a decision of the main workflow, and
 section 11 keeps the runs of the two apart and lists the six experiments the thesis analysis
 reports.
@@ -62,10 +65,12 @@ the chip set's composites once and caches their output (section 9), TESSERA v2 a
 | 5. TESSERA v1.0 store embeddings, retired from K-shot | `src/gfm4agri/embeddings/tessera.py`, `scripts/hub/build_tessera_chips.py` | `<chip>_tessera.tif`, `tessera_v1.json` |
 | 5b. AlphaEarth embeddings | `src/gfm4agri/embeddings/alphaearth.py`, `scripts/hub/fetch_alphaearth_tiles.py`, `scripts/hub/build_alphaearth_chips.py` | tiles in `data/alphaearth/aef_v1_annual/<year>/`; `<chip>_alphaearth.tif`, `alphaearth_v1.json` |
 | 6. Spatial split | `src/gfm4agri/data/chip_split.py`, `scripts/hub/build_chip_split.py` | `splits/<name>__<hash8>/`, `chip_parcels.parquet` |
+| 6b. WorldCover on the chip grid, for the two-head workflow | `scripts/hub/build_worldcover_chips.py` | `data/worldcover/<chip set>/worldcover.npz` (one land-cover map per chip), `worldcover.json` |
 | 7. Supervision | `src/gfm4agri/benchmark/segmentation_data.py` | the training mask at a budget |
 | 8. Model assembly | `src/gfm4agri/benchmark/{backbones,necks,decoders,segmentation}.py`; the baseline's U-Net in `benchmark/scratch_unet.py` | a `SemanticSegmentationTask` |
 | 9. The fit | `scripts/run_kshot.py`, the K-shot workflow of `src/gfm4agri/pipeline/`: `fit_end_to_end` (`benchmark/fit.py`) for the raster arms and the baseline, after `build_raster_cache` (`pipeline/raster_cache.py`, with `embeddings/tessera_v2.py`) for a computed raster; `generate_embeddings` then `fit_cached` (`benchmark/cached.py`) for the token-grid arms; every finished cell scored per parcel by `benchmark/parcel_metrics.py` | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json`, with the pixel test metrics and `parcel_metrics`, and `predictions_test.npz`; `summary.csv` with both; the feature cache, or TESSERA v2's `chips/<chip>_tessera_v2_medium.tif` and `tessera_v2_medium.json`, in `data/embeddings/<backbone>/<chip set>/`, or job-scoped on the cluster |
-| 10. Inspection | `notebooks/pipeline/kshot_results.ipynb` (`EXPERIMENT`, `CHIPS`); an experiment's `report.py`; `docs/phase1/results_estonia/report.py` for the main workflow on Estonia; `src/gfm4agri/benchmark/evaluation.py` to reload a fit | K curves per pixel and per parcel, validation curves with the checkpoint epochs, per-class F1, maps of test chips; [results_estonia/REPORT.md](results_estonia/REPORT.md). The grid of 2 October 2026 keeps `notebooks/pipeline/eurocrops_ee_results.ipynb` and `results/seg_cached/ee_predictions/` |
+| 9b. The two-head fit | `scripts/run_kshot.py` with a spec of `workflow: borders`, the package `src/gfm4agri/borders/`: `runner.py` (inputs, cells, scoring), `fit.py` (one cell), `networks.py` (the two network shapes, the crop-loss balance), `prue.py` (the border target, loss and fields), `data.py`, `scoring.py` | `results/<experiment>/<chip set>/<arm>/P<k>_draw<d>_seed<s>/results.json` with `crop_metrics`, `parcel_metrics`, `panoptic_metrics` and `border_metrics`; `predictions_test.npz` (border probabilities and crop classes), `borders_per_chip.npz`, `best.pt`; `summary.csv` |
+| 10. Inspection | `notebooks/pipeline/kshot_results.ipynb` (`EXPERIMENT`, `CHIPS`); an experiment's `report.py`; `docs/phase1/results_estonia/report.py` for the main workflow on Estonia, `docs/phase1/results_estonia_borders/report.py` for the two-head workflow; `src/gfm4agri/benchmark/evaluation.py` to reload a fit | K curves per pixel and per parcel, validation curves with the checkpoint epochs, per-class F1, maps of test chips; [results_estonia/REPORT.md](results_estonia/REPORT.md), [results_estonia_borders/REPORT.md](results_estonia_borders/REPORT.md). The grid of 2 October 2026 keeps `notebooks/pipeline/eurocrops_ee_results.ipynb` and `results/seg_cached/ee_predictions/` |
 
 ---
 
@@ -870,6 +875,103 @@ and deleted when the job ends. The test predictions are written inside the job f
 since two-stage prediction reads the cache. The workflow between the two machines is in
 [`docs/utwente_hpc.md`](../utwente_hpc.md).
 
+### The two-head workflow
+
+`configs/experiments/kshot_borders.yaml` runs every arm with a field-border head beside its crop
+head (protocol D30), through the same entry point and the same cluster scripts:
+
+```
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot_borders.yaml --chips data/eurocrops_chips/EE_2021_rev [--dry-run]
+bash scripts/cluster/submit.sh kshot_borders EE_2021_rev
+poetry run python scripts/run_kshot.py -e configs/experiments/kshot_borders.yaml --chips data/eurocrops_chips/EE_2021_rev --summarise [--rescore]
+```
+
+`run_kshot.py` hands a spec with `workflow: borders` to `src/gfm4agri/borders/`, moved on 11
+November 2026 from `experiments/2026-11-09_borders_all_arms` without a change in behaviour. That
+experiment's grid on all of Estonia is therefore this workflow's first run (section 11): the
+core's scorer reproduces every number of its 18 cells from their stored predictions, and the
+core's fit reproduces its training histories and weights on `EE_2021_rev_mini`
+(`experiments/2026-11-09_borders_all_arms/check_core.py`).
+
+**Why a second workflow.** The question it answers, which foundation model draws the field borders
+best beside its crop map, needs a network per resolution group that can draw 10 m borders, a
+second loss, a checkpoint that weighs both tasks and three more scores. Built as options of the
+crop-only fit, these would have changed the code path every crop-only result rests on; as a
+package of its own, beside it, the crop-only workflow keeps its arms, its baseline and its
+checkpoint of lowest validation loss unchanged. The two share the chip set, the split, the label
+budget (`draw_support`), the caches, the machine profiles and the per-parcel crop score.
+
+**The arms** (`configs/arms_borders/`). Each names the crop-only arm whose backbone, normalisation
+and settings it takes (`kshot_arm`) and its input; an experiment can vary one from its own
+`arms_borders/`, as with `arms/`.
+
+| Arm | Crop-only arm | Input | Network, trainable parameters |
+|---|---|---|---|
+| `tessera_v2_medium` | `tessera_v2_medium` | 10 m embedding, 128 dimensions, the raster cache of section 7 | PRUE's U-Net (EfficientNet-B7 from ImageNet) with the border head on its 16 last features; the crop MLP (512, 256) on the embedding and those features; 67.2 M + 0.21 M |
+| `alphaearth_v1` | `alphaearth_v1` | 10 m embedding, 64 dimensions, from the chip set | the same; 67.1 M + 0.18 M |
+| `unet_b7_s2s1`, the baseline | `unet_r18_scratch_s2s1` | the 12 monthly S2 + S1 composites, 168 channels | PRUE itself: the same U-Net, everything trained; 67.2 M + 0.23 M |
+| `terramind_v1_large_s2s1` | `terramind_v1_large_s2s1` | cached tokens, 160 m | the crop-only arm's token decoder, then a fifth block to 10 m (bilinear, two 3 x 3 convolutions of 64 channels) carrying both heads; 53.4 M |
+| `thor_v1_large_s2s1` | `thor_v1_large_s2s1` | cached tokens, 160 m | the same; 53.4 M |
+| `prithvi_eo_v2_600_tl` | `prithvi_eo_v2_600_tl` | cached tokens | the same; 62.8 M |
+
+The network follows from what each input lacks. A 10 m embedding encodes each pixel on its own, so
+nothing in it knows where a field ends; PRUE's U-Net supplies the spatial context, and the crop head
+reads the embedding and the U-Net's last features together, the arrangement that on frozen TESSERA
+matched both separate models (`experiments/2026-11-07_prue_crop_tessera`). A token-grid encoder
+carries context through attention, but only at 140 to 160 m, and its decoder's last learned map is
+at 20 m; the fifth block brings it to the chip's grid so that the border head works at 10 m, and no
+raw band enters it, so the borders come from what the tokens know. The baseline reads the raw
+composites, so it simply becomes PRUE, from ImageNet in place of the crop-only baseline's ResNet-18
+from scratch.
+
+**Targets.** The border target is PRUE's: a drawn in-scheme parcel pixel is boundary when a
+4-neighbour inside the chip is another parcel or none, interior otherwise; background is the land
+outside the drawn parcels that ESA WorldCover 2021 calls neither cropland nor grassland; everything
+else is ignored, since undeclared grassland or cropland may or may not be a field. The crop target
+is the class of every in-scheme pixel of a drawn parcel. An undrawn parcel is ignored in both, so
+the borders are as scarce as the crop labels. The labels, parcel ids and WorldCover map go through
+the same D4 symmetry as the input before the targets are built.
+
+**Training.** PRUE's log-cosh Dice on the three classes (weights 0.05, 0.20, 0.75) plus a weight
+times the crop cross-entropy. The heads are separate, so the weight hardly changes how fast each
+learns; it decides how each step of the shared part, the U-Net or the token decoder, is split
+between borders and crops. A fixed weight would mean something different on every decoder, and on
+TESSERA a weight of 0.1 let the crop loss pull three times as hard as the border loss and cost 0.02
+border F1 (`experiments/2026-11-07_prue_crop_tessera`). So the weight is set during training
+(`networks.Balance`): every 25 steps the two losses' gradient norms over the shared parameters are
+measured, and the weight moves, smoothed in log space, so that the crop loss pulls 0.3 times as
+hard, the median pull of the setting that matched both separate models. Optimisers: PRUE's for its
+U-Net (AdamW with amsgrad, 3e-3, weight decay 0.01, cosine to 1e-6), the crop-only arm's for the
+token decoder (AdamW, 1e-4, weight decay 0.05, constant) and for every crop head. Whole chips in
+batches of 4, 45 epochs, bf16 on the GPU; a `last.pt` after every epoch lets a killed job resume.
+
+**Checkpoint.** The epoch of the best validation `(object F1 of the arm's own fields + crop pixel
+Macro-F1) / 2`, with the epochs each criterion alone would pick recorded beside it. Neither task's
+criterion alone serves both: on TESSERA at K = 100 % the object F1 alone picked epoch 6 and the
+crop loss alone epoch 43.
+
+**Scores** (`scoring.py`, protocol section 4.6). The crop map as the crop-only workflow scores it,
+per pixel and per parcel (D28). The fields, PRUE's own (`prue.parcels`, variant `grow`: the
+interior regions of at least 5 pixels grown into the predicted field by watershed on the boundary
+probability), over the whole chip with no test label, by panoptic quality under the void rule,
+class-agnostic and class-aware with each field's class voted by the arm's own crop map; the
+variants `cc` (interior regions only) and `field` (predicted field, nothing split) beside it. The
+borders of the grown fields by precision, recall and F1 at 0, 1 and 2 pixels against the declared
+borders, where the truth is known, with recall by what lies across the border and the false
+borders by where they lie; the declared parcels must score 1 against themselves, or the scoring
+stops. The IoU sums are added in a fixed order of chunks, so a rescore with the same number of
+workers (16 on the cluster) reproduces the stored scores to every digit.
+
+**WorldCover.** `scripts/hub/build_worldcover_chips.py` reads the ESA WorldCover 2021 v200 tiles
+from the Planetary Computer once and resamples them by nearest neighbour onto every chip's grid,
+into `data/worldcover/<chip set>/worldcover.npz`, outside the chip set. The file of `EE_2021_rev`
+was written on 5 November 2026 by the same code in `experiments/2026-11-05_parcel_extent`, and is
+on the cluster; a pilot set reads its parent's, and the runner stops when there is none.
+
+**Cost.** On the cluster a cell took 0.9 to 2.5 hours for the token-grid arms, 1.7 to 4.3 hours
+for the 10 m embeddings and 1.9 to 5.9 hours for the baseline, the B7 encoder trained end to end;
+the token-grid arms compute their feature cache first, as in the crop-only workflow.
+
 ---
 
 ## 10. Known gaps
@@ -979,6 +1081,21 @@ directory has been granted. Each cluster job therefore encodes its arm's chip se
 persistent cache is placed under `data/embeddings/` in the clone. A project directory linked there
 would remove the repetition without a change to the code.
 
+**The two workflows have different baselines.** The crop-only workflow measures the foundation
+models against a ResNet-18 U-Net trained from scratch (D26), the two-head workflow against PRUE's
+EfficientNet-B7 U-Net from ImageNet (D30). On the crop map the second scores 0.04 to 0.09 pixel
+Macro-F1 and 0.08 to 0.10 parcel Macro-F1 above the first (0.655, 0.618 and 0.561 per pixel against
+0.616, 0.564 and 0.467 at K = 100, 20 and 5 %), and ties TESSERA. How much of that comes from the
+larger pretrained encoder and how much from the border head is not separated, since the B7 has not
+been fitted without the border head; which baseline RQ1 is read against is open.
+
+**The token-grid crop head reads only the border-trained block.** In the two-head workflow a
+token-grid arm's crop head is a 1 x 1 convolution on the fifth block, whose features the border loss
+dominates (the crop loss pulls 0.3 times as hard). Their crop maps fall 0.02 to 0.16 pixel Macro-F1
+below the crop-only workflow's, while the 10 m arms, whose crop head also reads the embedding, gain
+0.03 to 0.07. The two-head workflow's token-grid crop maps are therefore not a reading of those
+encoders for crop types; the crop-only workflow's are.
+
 ---
 
 ## 11. Runs
@@ -989,8 +1106,9 @@ logs and `results.json`. The runs up to 8 October were made before the K-shot wo
 scripts of the snapshot commit `a81bd9e`, and stay in `results/seg/` and `results/seg_cached/`;
 runs of the workflow are in `results/<experiment>/<chip set>/`.
 
-The runs fall in three groups. **The main workflow** is the experiment `kshot` with the arms of
-section 9. **The experiments of the analysis** are the six experiments the thesis reports, each
+The runs fall in four groups. **The main workflow** is the experiment `kshot` with the arms of
+section 9. **The two-head workflow** is `kshot_borders` (section 9, protocol D30). **The experiments
+of the analysis** are the six experiments the thesis reports, each
 backing a decision of the main workflow, followed by two more experiment runs that a decision rests
 on; an experiment not listed is documented in its own `REPORT.md` only. **Earlier runs** were made
 with the arms before 15 October 2026, or before the K-shot workflow, and are not paired with the
@@ -1105,6 +1223,55 @@ workflow, not the models. Test Macro-F1, JupyterHub / cluster:
 * THOR on Sentinel-2 and Sentinel-1 has exactly TerraMind's 53,281,492 trainable parameters.
 * TESSERA v2's cache took 0.64 s per chip on the cluster. The caches came to 5.1 GB each for
   TerraMind and THOR, 8.3 GB for Prithvi and 1.4 GB for TESSERA v2.
+
+### The two-head workflow
+
+The experiment `kshot_borders` (section 9, protocol D30). Its first grid was run as
+`experiments/2026-11-09_borders_all_arms`, before the workflow moved into the core on 11 November
+2026, and stands as the workflow's run: the core reproduces its scores and its fit (section 9).
+
+#### Full Estonia, 45 epochs
+
+`EE_2021_rev`, the six arms of section 9 with the baseline, K = 100, 20 and 5 %, draw 0, seed 0,
+45 epochs, six Slurm jobs on `itc-gpu` (709456 to 709461) at commit `eb74944`, submitted on 9
+November 2026. Prithvi's job stopped at its check of free space on the node's local disk (1,219 GB
+free, 1,350 GB needed for its cache) and ran again as job 712940 on another node; the last cell
+finished on 10 November. The results are in `results/2026-11-09_borders_all_arms/EE_2021_rev/`, the
+figures and the analysis in that folder's `REPORT.md` and in
+[results_estonia_borders/REPORT.md](results_estonia_borders/REPORT.md). Over the 1,475 test chips,
+draw 0, seed 0, border F1 within 1 pixel / class-agnostic PQ of the grown fields:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large, S2 + S1 | 0.797 / 0.327 | 0.669 / 0.275 | 0.542 / 0.215 |
+| THOR v1 large, S2 + S1 | 0.658 / 0.226 | 0.567 / 0.189 | 0.432 / 0.127 |
+| Prithvi-EO-2.0 600M TL, S2 | 0.822 / 0.348 | 0.735 / 0.303 | 0.579 / 0.241 |
+| TESSERA v2 Medium + PRUE's U-Net | 0.868 / 0.369 | 0.811 / 0.328 | 0.761 / 0.311 |
+| AlphaEarth v1 + PRUE's U-Net | 0.850 / 0.348 | 0.787 / 0.318 | 0.754 / 0.284 |
+| PRUE from ImageNet, S2 + S1 (baseline) | 0.868 / 0.374 | 0.812 / 0.334 | 0.752 / 0.305 |
+
+and the crop map of the same models, test Macro-F1 per pixel / per parcel:
+
+| Arm | 100 % | 20 % | 5 % |
+|---|---|---|---|
+| TerraMind v1 large, S2 + S1 | 0.598 / 0.531 | 0.475 / 0.442 | 0.275 / 0.251 |
+| THOR v1 large, S2 + S1 | 0.562 / 0.507 | 0.505 / 0.463 | 0.317 / 0.282 |
+| Prithvi-EO-2.0 600M TL, S2 | 0.559 / 0.513 | 0.471 / 0.425 | 0.293 / 0.277 |
+| TESSERA v2 Medium + PRUE's U-Net | 0.645 / 0.621 | 0.614 / 0.594 | 0.569 / 0.566 |
+| AlphaEarth v1 + PRUE's U-Net | 0.567 / 0.520 | 0.524 / 0.488 | 0.477 / 0.457 |
+| PRUE from ImageNet, S2 + S1 (baseline) | 0.655 / 0.629 | 0.618 / 0.596 | 0.561 / 0.550 |
+
+* TESSERA draws the borders best of the foundation models at every budget, AlphaEarth within
+  0.025 of it, and both tie the baseline. The token-grid arms draw weaker borders and lose 0.23 to
+  0.25 border F1 from K = 100 to 5 %, against 0.10 to 0.12 for the 10 m arms and the baseline.
+* Every arm finds the borders between parcels of different crops far more often than those between
+  two parcels of the same crop (recall within 1 pixel 0.46 to 0.86 against 0.18 to 0.37); as labels
+  get scarce, the borders against non-farm land are lost first (recall 0.68 to 0.91 at K = 100 %,
+  0.24 to 0.55 at 5 %).
+* The border head raises the 10 m arms' crop maps above the crop-only workflow's and lowers the
+  token-grid arms' (section 10). The baseline ties TESSERA on the crop map too.
+* The checkpoint fell at epoch 30 to 45, and the crop weight settled at 0.0012 to 0.016. One draw and
+  one seed per cell, so differences below about 0.01 to 0.02 are ties.
 
 ### The experiments of the analysis
 

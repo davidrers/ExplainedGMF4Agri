@@ -87,3 +87,10 @@ THOR 0.658 to 0.432). The border head lifts the 10 m arms' crop maps by 0.03 to 
 workflow's MLP, and lowers the token-grid arms' by 0.02 to 0.16, whose crop head here reads only the border-trained
 fifth block. The baseline ties TESSERA on the crop map too and is 0.04 to 0.10 above the main workflow's ResNet-18 from
 scratch; one draw and one seed per cell.
+
+**In the core since 11 November 2026.** On the user's instruction this setup became the pipeline's two-head workflow
+(protocol D30): `configs/experiments/kshot_borders.yaml`, `configs/arms_borders/`, the package `src/gfm4agri/borders/`,
+run by `scripts/run_kshot.py`. Its grid here stands as that workflow's first run: `check_core.py` shows that the
+core's scorer reproduces every number of the 18 cells from their stored predictions, and that the core's fit
+reproduces this folder's training histories and weights on `EE_2021_rev_mini`. The results report is
+[docs/phase1/results_estonia_borders/REPORT.md](../../docs/phase1/results_estonia_borders/REPORT.md).
