@@ -22,6 +22,7 @@ at K = 100 %, draw 0, seed 0, on the 1,475 test chips of `EE_2021_rev`:
 |---|---|
 | `joint_tessera_v2_frozen` | the core's frozen raster cache (`rasters.py`), as PRUE's frozen arm |
 | `joint_tessera_v2_ft` | the pretrained v2 Medium student on the composites of every training window, trained with both heads end to end at 1e-5 after a one-epoch warm-up, as PRUE's fine-tuned arm (`tessera_ft.py`) |
+| `joint_tessera_v2_frozen_cw001`, `joint_tessera_v2_ft_cw001` | as the two above with the crop loss weighted 0.01, added 8 November 2026 after the frozen 0.1 arm's crop pull on the U-Net ran at 1.4 to 9.8 times the border loss's and its borders fell below PRUE's |
 
 **The model** (`joint.py`). PRUE's network unchanged: smp's U-Net with an EfficientNet-B7 encoder (ImageNet), its
 first convolution on TESSERA's 128 dimensions, its head from the decoder's last 16 channels to background,
@@ -82,4 +83,10 @@ chip, from the two heads' outputs to fields with a crop, and four test chips to 
 `predictions_test.npz`, `borders_per_chip.npz`, `best.pt`; `summary.csv` beside the arms. Figures and tables:
 `report.py`.
 
-**Outcome.** To be written with REPORT.md.
+**Outcome, 11 November 2026** ([REPORT.md](REPORT.md)). With the crop loss weighted 0.01, one network matches PRUE's
+borders and beats the MLP's crop map. Fine-tuned it reaches crop pixel / parcel Macro-F1 0.678 / 0.658 against
+0.660 / 0.639, border F1 at 1 px 0.870 against 0.868, and class-aware PQ 0.411 against 0.397. Frozen: 0.624 / 0.604
+against 0.618 / 0.602, and border F1 0.861 against 0.862. At 0.1 the crop loss pulls on the U-Net three times as hard
+as the border loss, so the crop map gains more (+0.021, +0.027 per pixel) but the borders fall by 0.017 to 0.020 F1.
+The balanced weight of `../2026-11-09_borders_all_arms` does better still on frozen TESSERA (0.645 / 0.621, border F1
+0.868). One draw and one seed, K = 100 % only.
