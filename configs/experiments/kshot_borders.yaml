@@ -1,0 +1,17 @@
+# The two-head workflow (protocol D30, since 11 November 2026): every arm of the crop-only K-shot workflow with
+# PRUE's border head beside its crop head, encoders frozen, under the same protocol (budgets, draw, seed, epochs of
+# kshot.yaml): which GFM draws the field borders best, beside its crop map. Moved from
+# experiments/2026-11-09_borders_all_arms, whose grid on EE_2021_rev is this workflow's first run. Arm files in
+# configs/arms_borders/; the border target needs data/worldcover/<chip set>/worldcover.npz
+# (scripts/hub/build_worldcover_chips.py). Read by gfm4agri.borders.runner through scripts/run_kshot.py:
+#   poetry run python scripts/run_kshot.py -e configs/experiments/kshot_borders.yaml --chips <dir>
+name: kshot_borders
+workflow: borders
+arms: [terramind_v1_large_s2s1, prithvi_eo_v2_600_tl, thor_v1_large_s2s1, tessera_v2_medium, alphaearth_v1,
+       unet_b7_s2s1]
+budgets_pct: [100, 20, 5]      # per cent of the trainable parcels of each class, as kshot.yaml
+draws: [0]
+seeds: [0]
+epochs: 45                     # kshot.yaml
+loss: {class_weights: [0.05, 0.20, 0.75]}                 # PRUE's log-cosh Dice, omega = 0.75
+balance: {target: 0.3, every: 25, smooth: 0.5}            # networks.Balance: the crop loss pulls 0.3 x the border loss

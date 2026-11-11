@@ -91,7 +91,7 @@ reads the chip set's own file, or its parent's for a pilot set (`subset.json`), 
 
 ## 5. Checks that make the reused results valid
 
-1. **Scoring.** The core's scorer rescores the 16 cells of `results/2026-11-09_borders_all_arms/EE_2021_rev/` from
+1. **Scoring.** The core's scorer rescores the 18 cells of `results/2026-11-09_borders_all_arms/EE_2021_rev/` from
    their stored predictions; every crop, PQ (chip extent) and border number must equal the experiment's.
 2. **Training.** On `EE_2021_rev_mini`, two epochs at K = 100 % of one arm per input (`tessera_v2_medium`,
    `unet_b7_s2s1`, `terramind_v1_large_s2s1`), with the core and with the experiment's code, same seed, on the

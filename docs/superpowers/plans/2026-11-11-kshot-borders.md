@@ -520,7 +520,7 @@ two-head workflow reads its output. The experiment's copy stays (its folder is t
 - Create: `experiments/2026-11-09_borders_all_arms/check_core.py` (it imports the experiment's modules, so it lives
   with them; the spec's `scripts/hub/check_borders_core.py` is moved here for that reason)
 
-**Check 1, scoring.** For each of the 16 cells under `results/2026-11-09_borders_all_arms/EE_2021_rev/`, score
+**Check 1, scoring.** For each of the 18 cells under `results/2026-11-09_borders_all_arms/EE_2021_rev/`, score
 `predictions_test.npz` with `gfm4agri.borders.scoring.score_file` (into memory, nothing written) and compare with the
 cell's `results.json`: `crop_metrics` (`macro_f1`, `miou`, `accuracy`, `confusion`), `parcel_metrics`,
 `panoptic_metrics["variants"]["chip/<v>"]` for every variant, `panoptic_metrics["pixels"]`, `border_metrics` (every
@@ -534,7 +534,7 @@ every tensor). The token arm's cache must exist on the hub for the mini set (`da
 skip an arm whose cache is missing and say so.
 
 - [ ] **Step 1:** write `check_core.py` with `--scoring`, `--training`, `--arms`, exiting 1 on any difference.
-- [ ] **Step 2:** run `--scoring` (all 16 cells, about 2 to 5 minutes per cell on 16 workers), expect 0 differences.
+- [ ] **Step 2:** run `--scoring` (all 18 cells, about 2 to 5 minutes per cell on 16 workers), expect 0 differences.
 - [ ] **Step 3:** run `--training`, expect identical histories and weights.
 - [ ] **Step 4: Commit** `check_core.py` with its output summarised in the commit message.
 

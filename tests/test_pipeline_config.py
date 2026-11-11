@@ -107,11 +107,16 @@ def test_every_cache_arm_has_an_encode_batch_on_both_machines():
 RETIRED = {"tessera_v1", "terramind_v1_large", "thor_v1_large"}
 
 
-def test_the_main_workflow_holds_only_its_own_experiment_and_arms():
-    assert sorted(p.name for p in (CONFIGS / "experiments").glob("*.yaml")) == ["kshot.yaml"]
+def test_the_main_workflow_holds_only_its_own_experiments_and_arms():
+    # The crop-only workflow and, since 11 November 2026, the two-head workflow (protocol D30).
+    assert sorted(p.name for p in (CONFIGS / "experiments").glob("*.yaml")) == ["kshot.yaml",
+                                                                                "kshot_borders.yaml"]
     exp = load_experiment(CONFIGS / "experiments" / "kshot.yaml")
     assert not RETIRED & set(exp["arms"])
     assert sorted(p.stem for p in (CONFIGS / "arms").glob("*.yaml")) == sorted([*exp["arms"], *RETIRED])
+    borders = load_experiment(CONFIGS / "experiments" / "kshot_borders.yaml")
+    assert borders["workflow"] == "borders"
+    assert sorted(p.stem for p in (CONFIGS / "arms_borders").glob("*.yaml")) == sorted(borders["arms"])
 
 
 def test_every_kshot_encoder_that_reads_s1_is_given_it():

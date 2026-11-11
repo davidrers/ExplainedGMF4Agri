@@ -1,0 +1,12 @@
+# TESSERA v2 Medium, frozen, from the core's raster cache (128 dims at 10 m), with PRUE's U-Net and two heads
+# (networks.UNetJoint): the border head on the U-Net's 16 features, the main workflow's crop MLP on the embedding and
+# those features. As the frozen arm of experiments/2026-11-07_prue_crop_tessera, under the K-shot protocol (whole
+# chips, 45 epochs, batches of 4). Read by gfm4agri.borders.runner (configs/experiments/kshot_borders.yaml).
+kshot_arm: tessera_v2_medium   # the main workflow's arm: backbone, normalisation (training-chip statistics)
+input: raster
+data: {batch_size: 4, eval_batch_size: 8, augment: true}   # the arm's batch; D4 is exact for a per-pixel embedding
+unet: {encoder: efficientnet-b7, weights: imagenet}        # PRUE
+crop: {hidden: [512, 256], dropout: 0.2, head_dropout: 0.2}   # the arm's PixelMLPDecoder and head_dropout
+optim:
+  unet: {lr: 3.0e-3, weight_decay: 0.01, amsgrad: true, schedule: cosine, min_lr: 1.0e-6}        # PRUE
+  crop_head: {lr: 1.0e-3, weight_decay: 0.05, amsgrad: false, schedule: cosine, min_lr: 3.33e-7}  # the arm's, same curve

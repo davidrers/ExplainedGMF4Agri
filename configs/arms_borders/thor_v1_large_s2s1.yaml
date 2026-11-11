@@ -1,0 +1,17 @@
+# thor_v1_large_s2s1, frozen, from the core's feature cache (every D4 variant of the training chips), with the main workflow's
+# trainable stack on the tokens (ChannelBottleneck, LearnedInterpolateToPyramidal, UNetDecoder 512-256-128-64, from
+# the core's build_cached_model) and, after it, a fifth block to the 10 m grid (bilinear, two 3 x 3 convolutions of
+# 64 channels; user, 9 November 2026) carrying both heads (networks.TokenJoint): PRUE's border head and the arm's crop
+# head (dropout, 1 x 1 convolution). No raw band enters the decoder. Read by gfm4agri.borders.runner
+# (configs/experiments/kshot_borders.yaml).
+kshot_arm: thor_v1_large_s2s1
+input: token
+data: {batch_size: 4, eval_batch_size: 8, augment: true}   # the arm's effective batch; one cached variant per sample
+token: {width: 64}
+# The feature cache on the node's local disk (every D4 variant of the training chips, float16): the runner stops at
+# once when less is free.
+cache_gb: 850
+crop: {head_dropout: 0.1}                                  # the arm's head_dropout
+optim:                                                     # the arm's: AdamW, 1e-4, weight decay 0.05, constant
+  decoder: {lr: 1.0e-4, weight_decay: 0.05, amsgrad: false, schedule: constant}
+  crop_head: {lr: 1.0e-4, weight_decay: 0.05, amsgrad: false, schedule: constant}
