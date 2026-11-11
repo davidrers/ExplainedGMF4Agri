@@ -689,7 +689,8 @@ EXPERIMENTS = [
          decision="Became the two-head workflow (protocol D30, D31); its grid is the workflow's first run.",
          show=["h-up", "h-prue-px", "h-prue-un"]),
 ]
-ARCH = {"crop": "Crop-only architecture", "two-head": "Two-head architecture"}
+ARCH = {"crop": "Done on the crop segmentation only pipeline",
+        "two-head": "Done on the crop segmentation + border pipeline"}
 
 
 def exp_card(e):
@@ -705,26 +706,26 @@ def exp_card(e):
 
 estonia_url = f"{REPO}/docs/phase1/results_estonia/REPORT.md"
 borders_url = f"{REPO}/docs/phase1/results_estonia_borders/REPORT.md"
-def results_card(url, title, tag, text):
+def results_card(url, title, text):
     return (f'<article class="exp res"><div class="exp-num">R</div><div class="exp-box"><a class="rep" href="{url}" '
             f'target="_blank" rel="noopener">REPORT.md ↗</a><h3><a href="{url}" target="_blank" rel="noopener">{title}'
-            f'</a></h3><p class="arch">{tag}</p><p>{text}</p></div></article>')
+            f'</a></h3><p>{text}</p></div></article>')
 
 
 experiments_html = (
     '<p class="lead">Each experiment varies one factor and compares the variants fit by fit, on shared draws and seeds. '
-    '<b>Experiments 1 to 6 ran on the crop-only architecture</b>, before the two-head workflow existed. Each decided a part '
-    'both architectures share (the inputs, the frozen backbones and their saved features, frozen encoders), so their '
-    'decisions carry over and none is rerun; experiments 1 to 3 ran on TerraMind or THOR with Sentinel-2 alone. '
-    '<b>Experiments 7 to 9 designed the two-head architecture.</b></p><div class="exp-list">'
-    '<h3 class="exp-group">On the crop-only architecture</h3>'
+    '<b>Experiments 1 to 6 were done on the crop segmentation only pipeline</b>, before the crop segmentation + border '
+    'pipeline existed. Each decided a part both pipelines share (the inputs, the frozen backbones and their saved '
+    'features, frozen encoders), so their decisions carry over and none is rerun; experiments 1 to 3 ran on TerraMind or '
+    'THOR with Sentinel-2 alone. <b>Experiments 7 to 9 designed the crop segmentation + border pipeline.</b></p>'
+    '<div class="exp-list"><h3 class="exp-group">Crop segmentation only pipeline</h3>'
     + "".join(exp_card(e) for e in EXPERIMENTS if e.get("arch", "crop") == "crop")
-    + '<h3 class="exp-group">Behind the two-head architecture</h3>'
+    + '<h3 class="exp-group">Crop segmentation + border pipeline</h3>'
     + "".join(exp_card(e) for e in EXPERIMENTS if e.get("arch") == "two-head")
     + '<h3 class="exp-group">Results for Estonia 2021</h3>'
-    + results_card(estonia_url, "First results for Estonia 2021", "Crop-only workflow",
+    + results_card(estonia_url, "Crop segmentation only model - Estonia 2021",
                    "Every arm frozen and fine-tuned, per pixel and per parcel, beside the published Estonian results.")
-    + results_card(borders_url, "Field borders and crop types for Estonia 2021", "Two-head workflow",
+    + results_card(borders_url, "Crop segmentation + border model - Estonia 2021",
                    "Which model draws the field borders best beside its crop map, frozen at every budget and fine-tuned "
                    "TESSERA, with reference results. Answers RQ1.1, and RQ1.2 for the label budgets.")
     + '</div>')
@@ -1018,8 +1019,7 @@ h2.sec{font-family:var(--sans);font-size:40px;font-weight:700;color:#222;text-al
 .exp h3 a{color:#1f2430;text-decoration:none}.exp h3 a:hover{text-decoration:underline}
 .exp p{margin:6px 0;font-size:16px;line-height:1.5;color:#2a2f38}
 .exp p.setup{color:#666;font-size:15px}
-.exp p.arch{display:inline-block;margin:0 0 6px;padding:1px 10px;border:1.5px solid #8a5a14;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:.3px;color:#8a5a14;background:#fff}
-.exp.res p.arch{border-color:#2e6b3a;color:#2e6b3a}
+.exp p.arch{margin:-4px 0 8px;font-size:15px;font-style:italic;color:#8a5a14}
 .exp-group{margin:14px 0 0 56px;font-size:15px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#666}
 .rep{position:absolute;right:16px;top:16px;border:2px solid #2a2f38;border-radius:16px;padding:3px 14px;font-size:14px;
   font-weight:600;background:#fff;color:#2a2f38;text-decoration:none}
@@ -1304,7 +1304,7 @@ page = S.head("Phase 1 · GFMs Benchmark · ExplainedGFM4Agri",
 
 <section id="architecture">
 <h2 class="sec">2. Model architecture</h2>
-{toolbar("ar", '<span class="seg" role="group" aria-label="Architecture"><button type="button" data-act="view" data-view="ar" aria-pressed="true">Crop types only</button><button type="button" data-act="view" data-view="ah" aria-pressed="false">Crop types + field borders</button></span><span class="hint">Click a model name to follow its lane.</span>')}
+{toolbar("ar", '<span class="seg" role="group" aria-label="Architecture"><button type="button" data-act="view" data-view="ar" aria-pressed="true">Crop segmentation only</button><button type="button" data-act="view" data-view="ah" aria-pressed="false">Crop segmentation + borders</button></span><span class="hint">Click a model name to follow its lane.</span>')}
 <div class="viewport" id="ar-vp">{architecture_html}</div>
 <div class="viewport" id="ah-vp" hidden>{architecture_html_2h}</div>
 </section>

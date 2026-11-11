@@ -5,7 +5,7 @@ GitHub Pages serves `docs/` from `main`. The site has four pages, all generated 
 | Page | File | Holds |
 |---|---|---|
 | Landing | `docs/index.html` | The thesis title, author and supervisors, the target system, a Sentinel-2 mosaic of Estonian fields with a draggable wipe to its EuroCrops labels, and the three phases as the chain of `phases.png` (satellite, GFM, XAI and uncertainty, LLM, report), each opening its page |
-| Phase 1 · GFMs Benchmark | `docs/phase1/pipeline_page/index.html` | (1) The experimental set-up, as two tabs: **Pipeline**, the interactive experimental workflow under the research questions with its fairness rules, and **Spatial transferability**, `docs/research/transferability/transfer_setup.md` converted to HTML with its maps; (2) the model architecture of the six arms, switchable between the crop-only and the two-head architecture; (3) the experiments, each linked to its `REPORT.md` and marked with the architecture it ran on (1 to 6 crop-only, 7 to 9 behind the two-head workflow), with the Estonia results reports of both workflows |
+| Phase 1 · GFMs Benchmark | `docs/phase1/pipeline_page/index.html` | (1) The experimental set-up, as two tabs: **Pipeline**, the interactive experimental workflow under the research questions with its fairness rules, and **Spatial transferability**, `docs/research/transferability/transfer_setup.md` converted to HTML with its maps; (2) the model architecture of the six arms, switchable between the crop-only and the two-head architecture; (3) the experiments, each linked to its `REPORT.md` with a subtitle naming the pipeline it was done on (1 to 6 crop segmentation only, 7 to 9 crop segmentation + border), with the Estonia results reports of both workflows |
 | Phase 2 · XAI + UQ | `docs/phase2/index.html` | The planned experimental set-up and the research questions, as `thesis_design.md` states them |
 | Phase 3 · LLM Report | `docs/phase3/index.html` | The same for Phase 3 |
 
@@ -17,7 +17,7 @@ https://raw.githack.com/davidrers/ExplainedGMF4Agri/main/docs/index.html
 
 Phase 1 interactions: **Step through** walks each diagram step by step; **Live** animates the flow along the arrows;
 **Fit / 100 %** switches between the whole diagram and its design size; **Status** marks what is built in the
-workflow; hovering RQ1.1, RQ1.2 or a fairness rule lights the steps that carry it; **Crop types only / Crop types + field borders** switches the architecture view; clicking a model name follows its lane
+workflow; hovering RQ1.1, RQ1.2 or a fairness rule lights the steps that carry it; **Crop segmentation only / Crop segmentation + borders** switches the architecture view; clicking a model name follows its lane
 and shows its settings; **Show in the architecture** points from an experiment to the part of the pipeline it
 decided. A link to `#workflow`, `#transferability` or any heading inside the transferability set-up opens its tab.
 
