@@ -7,26 +7,26 @@ comes from one random draw of the labels and one training seed per setting, so n
 
 ## In short
 
-- **Best map:** TESSERA v2 with its encoder fine-tuned. Test Macro-F1 per pixel is 0.660, 0.630 and 0.581 with
-  100 %, 20 % and 5 % of the training parcels labelled, and 0.639, 0.603 and 0.566 per parcel. It leads at every
-  budget except per pixel with all labels, where it ties frozen TerraMind (0.661).
-- **Best frozen encoder:** TerraMind per pixel with all labels. With fewer labels, and per parcel at every budget,
-  frozen TESSERA v2 leads (0.582 and 0.504 per pixel at 20 % and 5 %).
-- **The baseline is hard to beat.** A U-Net trained from scratch, with no pretraining, scores 0.616, 0.564 and 0.467.
-  TESSERA is above it at every budget, though frozen only narrowly with all labels (0.618). TerraMind beats it with
-  all labels and ties it at 20 %. At 5 %, every token-grid model falls below it.
-- **Fine-tuning pays off for TESSERA only:** +0.04 to +0.08 Macro-F1. For TerraMind, THOR and Prithvi the gain is
-  about +0.01 in validation, within the noise of a single seed.
-- **Per parcel, every model scores lower than per pixel,** by 0.002 to 0.08, because small parcels are mapped badly
-  and the parcel score counts each parcel once.
-- **Against published Estonian results:** the only published Estonian Macro-F1 is per parcel, from DirPA (Reuss et
-  al. 2026), with at most 100 labelled parcels per class: 0.174 over 127 crop types and 0.307 over coarse groups for
-  a Transformer trained from scratch, 0.064 and 0.255 for the Presto foundation model. At K = 5 %, a median of 74
-  labelled parcels per class, our parcel Macro-F1 is 0.35 to 0.57. The gap comes mostly from the task, 20 crops
-  against 127 (section 4), so it shows our numbers are plausible, not that our models are better. The ranking
-  carries over: there Presto falls below the model trained from scratch, here every frozen model but TESSERA falls
-  below the U-Net at 5 %. No published study maps Estonian crops per pixel, and none has tested these five
-  foundation models on Estonia.
+- Fine-tuned TESSERA v2 gives the best map. Its test Macro-F1 per pixel is 0.660, 0.630 and 0.581 with 100 %, 20 %
+  and 5 % of the training parcels labelled, and 0.639, 0.603 and 0.566 per parcel. It leads at every budget except
+  per pixel with all labels, where it ties frozen TerraMind (0.661).
+- Among the frozen encoders, TerraMind is best per pixel with all labels. With fewer labels, and per parcel at every
+  budget, frozen TESSERA v2 leads (0.582 and 0.504 per pixel at 20 % and 5 %).
+- A U-Net trained from scratch, without pretraining, is hard to beat: it scores 0.616, 0.564 and 0.467. TESSERA
+  stays above it at every budget, although frozen TESSERA is only narrowly above it with all labels (0.618).
+  TerraMind beats it with all labels and ties it at 20 %. At 5 %, every token-grid model falls below it.
+- Fine-tuning pays off for TESSERA alone, by 0.04 to 0.08 Macro-F1. TerraMind, THOR and Prithvi gain about 0.01 in
+  validation, which lies within the variation of a single seed.
+- Every model scores lower per parcel than per pixel, by 0.002 to 0.08, because small parcels are mapped poorly and
+  the parcel score counts each parcel once.
+- The only published Estonian Macro-F1 is per parcel, from DirPA (Reuss et al. 2026), with at most 100 labelled
+  parcels per class: 0.174 over 127 crop types and 0.307 over coarse groups for a Transformer trained from scratch,
+  and 0.064 and 0.255 for the Presto foundation model. At K = 5 %, with a median of 74 labelled parcels per class, our
+  parcel Macro-F1 is 0.35 to 0.57. The difference comes mostly from the task, 20 crops against 127 (section 4), so it
+  shows that our numbers are plausible rather than that our models are better. The ranking carries over: Presto
+  falls below the model trained from scratch in DirPA, and every frozen model except TESSERA falls below the U-Net
+  at 5 % here. No published study maps Estonian crops per pixel, and none has tested these five foundation models on
+  Estonia.
 
 ## 1. What was done
 
@@ -40,29 +40,30 @@ flowchart LR
     F --> G["Crop map of the test tiles,<br/>scored per pixel and per parcel"]
 ```
 
-1. **Labels.** Farmers' declarations of 2021 from EuroCrops v11: a polygon and a crop per parcel. We keep the 20 most
-   common crop classes of Estonia (each with at least 250 parcels). They hold 95 % of the declared parcels;
-   grassland alone is about half. Pixels of other classes are left unlabelled.
-2. **Tiles.** Estonia is cut into a fixed grid of 7,402 tiles of 2.24 x 2.24 km, 224 x 224 pixels of 10 m. Each tile
-   has two label rasters: the crop of each pixel, and the parcel each pixel belongs to.
-3. **Imagery.** For every tile, twelve monthly composites of 2021, each the median of the cloud-free views of that
-   month: Sentinel-2 L2A (12 optical bands) and Sentinel-1 RTC radar (VV and VH, which see through cloud).
-4. **Split.** Tiles are grouped into blocks of 4 x 4 tiles (9 km) and whole blocks go to training, validation or test,
-   with a 1.6 km buffer, so the model is never tested next to a field it was trained on: 4,898 training, 769
+1. The labels are the farmers' declarations of 2021 from EuroCrops v11, each a polygon with a crop. We keep the 20
+   most common crop classes of Estonia, each with at least 250 parcels; together they hold 95 % of the declared
+   parcels, and grassland alone accounts for about half. Pixels of other classes are left unlabelled.
+2. Estonia is cut into a fixed grid of 7,402 tiles of 2.24 x 2.24 km, each 224 x 224 pixels of 10 m. Each tile has
+   two label rasters: the crop of every pixel and the parcel to which it belongs.
+3. Each tile has twelve monthly composites of 2021, each the median of the month's cloud-free views: Sentinel-2 L2A
+   with 12 optical bands, and Sentinel-1 RTC radar with VV and VH, which see through cloud.
+4. Tiles are grouped into blocks of 4 x 4 tiles (9 km), and whole blocks go to training, validation or test with a
+   1.6 km buffer, so that no model is tested next to a field it was trained on. This gives 4,898 training, 769
    validation and 1,475 test tiles, with 34,610 test parcels.
-5. **Label budget K.** To simulate scarce labels, we keep the labels of only K % of the training parcels of each crop,
-   K = 100, 20 and 5 % (86,909, 17,390 and 4,354 parcels). Counting per crop keeps the rare crops in the training
-   set. Validation and test stay fully labelled.
-6. **Models.** Each model is an encoder that turns the imagery into features and a decoder that turns the features
-   into a crop per pixel (section 2). **Frozen:** the pretrained encoder is kept as it is and only the decoder is
-   trained. **Fine-tuned:** the encoder is trained too, with a small learning rate so it adapts without forgetting. The
-   **baseline** is a U-Net that learns everything from our labels, with no pretraining.
-7. **Training.** 45 epochs for every model; cross-entropy on the labelled pixels; random flips and rotations; the
+5. To simulate scarce labels, we keep the labels of only K % of the training parcels of each crop, with K = 100, 20
+   and 5 % (86,909, 17,390 and 4,354 parcels). Counting per crop keeps the rare crops in the training set.
+   Validation and test stay fully labelled.
+6. Each model is an encoder, which turns the imagery into features, followed by a decoder, which turns the features
+   into a crop per pixel (section 2). A frozen model keeps its pretrained encoder unchanged and trains only the
+   decoder. A fine-tuned model also trains the encoder, with a small learning rate so that it adapts without losing
+   what it learnt in pretraining. The baseline is a U-Net that learns everything from our labels, without
+   pretraining.
+7. Every model trains for 45 epochs with cross-entropy on the labelled pixels and random flips and rotations; the
    checkpoint with the lowest validation loss is the one tested.
-8. **Scoring, on the test tiles.** *Per pixel:* Macro-F1, the mean of the 20 per-crop F1 scores, so a rare crop counts
-   as much as grassland (the primary metric). *Per parcel:* each parcel takes the crop most of its pixels were
-   predicted as and is right or wrong as a whole, as published EuroCrops studies score; we report Macro-F1, overall
-   accuracy and Cohen's kappa.
+8. Scores are computed on the test tiles. Per pixel, Macro-F1 is the mean of the 20 per-crop F1 scores, so that a
+   rare crop counts as much as grassland; this is the primary metric. Per parcel, each parcel takes the crop that
+   most of its pixels were predicted as and is right or wrong as a whole, as in published EuroCrops studies; we
+   report Macro-F1, overall accuracy and Cohen's kappa.
 
 ## 2. The models
 
@@ -75,16 +76,16 @@ flowchart LR
 | **AlphaEarth Foundations v1** (Google DeepMind, Brown et al. 2025) | Many sources (optical, radar, lidar, climate) | Nothing: Google publishes the result for every pixel on Earth, and we download it | 64 numbers per 10 m pixel for 2021 | The same per-pixel network: 0.2 M | not released |
 | **U-Net from scratch** (baseline) | Nothing | S2 + S1, the 12 months stacked as 168 input channels | (no separate encoder) | A ResNet-18 U-Net, everything trained: 14.8 M | none |
 
-**Two families.** TerraMind, THOR and Prithvi see the tile in squares of 140 to 160 m and look at the whole tile at
-once; their decoder has to rebuild the 10 m detail. TESSERA and AlphaEarth describe each 10 m pixel by its own year
-and know nothing of its neighbours; their decoder judges each pixel alone. That 256-fold difference in starting
-detail is the main reason the two families behave differently, so the decoder is matched within each family, not
-across them.
+The models fall into two families. TerraMind, THOR and Prithvi see the tile in squares of 140 to 160 m and process
+the whole tile at once, so their decoder has to rebuild the 10 m detail. TESSERA and AlphaEarth describe each 10 m
+pixel by its own year without reference to its neighbours, and their decoder classifies each pixel on its own. This
+256-fold difference in starting detail is the main reason the two families behave differently, which is why the
+decoder is matched within each family and not across them.
 
-**Fine-tuned versions.** TerraMind, THOR, Prithvi and TESSERA were also run with their encoders trained (learning
-rate 1e-5 after a one-epoch warm-up; decoder and everything else unchanged). AlphaEarth cannot be fine-tuned, as only
-its outputs are published. Fine-tuned TESSERA is run on the labelled pixels only, since unlabelled pixels carry no
-loss for a per-pixel model.
+TerraMind, THOR, Prithvi and TESSERA were also run with their encoders trained, at a learning rate of 1e-5 after a
+one-epoch warm-up, with the decoder and all other settings unchanged. AlphaEarth cannot be fine-tuned, because only
+its outputs are published. Fine-tuned TESSERA is trained on the labelled pixels only, since unlabelled pixels carry
+no loss for a per-pixel model.
 
 ## 3. Results
 
@@ -105,14 +106,14 @@ loss for a per-pixel model.
 | AlphaEarth v1, frozen | 0.523 / 0.484 | 0.497 / 0.455 | 0.449 / 0.425 |
 | U-Net from scratch (baseline) | 0.616 / 0.553 | 0.564 / 0.520 | 0.467 / 0.446 |
 
-- **Fewer labels cost the token-grid models most.** From 100 % to 5 % of the labels, frozen TerraMind loses 0.23
-  Macro-F1 and THOR 0.20, while TESSERA loses 0.11 and AlphaEarth 0.07. TESSERA also leads the frozen models at 20 %
-  and 5 %.
-- **The baseline is a strong reference.** Without any pretraining, the U-Net beats THOR, Prithvi and AlphaEarth with
-  all labels, and every token-grid model, frozen or fine-tuned, at 5 %. Fine-tuned TESSERA stays clearly above it at
-  every budget; frozen TESSERA ties it with all labels and is above it at 20 and 5 %; TerraMind is above it only
-  with all labels.
-- **AlphaEarth** is the weakest with many labels but the flattest curve: at 5 % it is level with Prithvi.
+- The token-grid models lose most as labels become scarce. From 100 % to 5 % of the labels, frozen TerraMind loses
+  0.23 Macro-F1 and THOR 0.20, against 0.11 for TESSERA and 0.07 for AlphaEarth. TESSERA also leads the frozen models
+  at 20 % and 5 %.
+- The baseline sets a high bar. Without any pretraining, the U-Net beats THOR, Prithvi and AlphaEarth with all
+  labels, and every token-grid model, frozen or fine-tuned, at 5 %. Fine-tuned TESSERA stays clearly above it at
+  every budget; frozen TESSERA ties it with all labels and is above it at 20 and 5 %; TerraMind is above it only with
+  all labels.
+- AlphaEarth is the weakest model with many labels but has the flattest curve: at 5 % it is level with Prithvi.
 
 ### 3.2 Frozen against fine-tuned
 
@@ -125,32 +126,33 @@ loss for a per-pixel model.
 | Prithvi | +0.033 / +0.034 / -0.051 | +0.009 / +0.020 / -0.038 | +0.016 / +0.004 / +0.008 |
 | TESSERA | +0.042 / +0.047 / +0.077 | +0.037 / +0.028 / +0.063 | +0.053 / +0.051 / +0.056 |
 
-- **TESSERA gains clearly**, under all three readouts and most with the fewest labels. Run frozen through the same
+- TESSERA gains clearly under all three readouts, and most with the fewest labels. Run frozen through the same
   fine-tuning code, its validation score moves by less than 0.005, so the gain comes from training the encoder.
-- **TerraMind, THOR and Prithvi gain about +0.01** on the best validation score, the readout that does not depend on
-  which checkpoint is kept. On test, the sign flips from one budget to the next.
-- **The test swings come from the checkpoint rule.** We test the checkpoint of lowest validation loss. With the
-  encoder training, that loss turns up after only 5 to 9 epochs, before the rarer crops are learnt, while
-  validation Macro-F1 keeps rising to epochs 13 to 44. Tested at its best-Macro-F1 epoch instead, fine-tuned
-  TerraMind would score 0.688, 0.627 and 0.523; the frozen models were not tested that way, so that comparison is
-  not yet possible.
-- **Cost.** Fine-tuning takes 4 to 9 times the frozen training time for the token-grid models, and 15 times for
-  TESSERA (26 h for the full-label fit on one RTX PRO 6000).
+- TerraMind, THOR and Prithvi gain about 0.01 on the best validation score, the readout that does not depend on which
+  checkpoint is kept. On test, the sign of the gain changes from one budget to the next.
+- These test swings come from the checkpoint rule. We test the checkpoint of lowest validation loss. When the encoder
+  trains, that loss starts to rise after only 5 to 9 epochs, before the rarer crops are learnt, while validation
+  Macro-F1 keeps rising until epochs 13 to 44. Tested at its epoch of best validation Macro-F1, fine-tuned TerraMind
+  would score 0.688, 0.627 and 0.523. The frozen models were not tested that way, so the comparison cannot be made
+  yet.
+- Fine-tuning takes 4 to 9 times the frozen training time for the token-grid models and 15 times for TESSERA (26 h
+  for the full-label fit on one RTX PRO 6000).
 
 Details: [`experiments/2026-10-15_kshot_finetune/REPORT.md`](../../../experiments/2026-10-15_kshot_finetune/REPORT.md).
 
 ### 3.3 Per pixel against per parcel
 
-- **The parcel score is lower for every model** (section 3.1 table). Each parcel counts once, and 18 % of the test
-  parcels are under 0.64 ha: parcels under 0.16 ha get the right crop only 24 to 38 % of the time, those above
-  0.64 ha 67 to 87 %. (The size and vote figures in this section were measured on the 15-epoch fits; for the frozen
-  token-grid models those are the same fits.)
-- **The token-grid models lose most** (0.02 to 0.08), because their 140 to 160 m squares are larger than these
-  fields. TESSERA loses 0.002 to 0.03, which is why it leads per parcel at every budget.
-- **Potatoes show it most:** they are mostly household plots, with a median test parcel of 0.12 ha. Frozen TerraMind
-  scores 0.75 F1 on potatoes per pixel (mostly the large commercial fields) but 0.18 per parcel.
-- **The vote fixes little:** taking the majority per parcel corrects only 15 to 32 % of the wrong pixels. The rest
-  sit in parcels mapped as the wrong crop as a whole.
+- Every model scores lower per parcel (section 3.1 table). Each parcel counts once, and 18 % of the test parcels are
+  smaller than 0.64 ha: parcels under 0.16 ha get the right crop only 24 to 38 % of the time, those above 0.64 ha 67
+  to 87 %. (The size and vote figures in this section were measured on the 15-epoch fits; for the frozen token-grid
+  models those are the same fits.)
+- The token-grid models lose most (0.02 to 0.08), because their squares of 140 to 160 m are larger than these fields.
+  TESSERA loses 0.002 to 0.03, which is why it leads per parcel at every budget.
+- Potatoes show the effect most clearly. They are grown mostly on household plots, with a median test parcel of
+  0.12 ha, and frozen TerraMind scores 0.75 F1 on potatoes per pixel, mostly on the large commercial fields, but 0.18
+  per parcel.
+- The majority vote corrects little: it fixes only 15 to 32 % of the wrong pixels. The rest lie in parcels that are
+  mapped as the wrong crop as a whole.
 
 Details: [`experiments/2026-10-16_parcel_metric/REPORT.md`](../../../experiments/2026-10-16_parcel_metric/REPORT.md).
 
@@ -160,35 +162,36 @@ Details: [`experiments/2026-10-16_parcel_metric/REPORT.md`](../../../experiments
 
 Rows are sorted by the number of training parcels, given in brackets.
 
-- **Easy crops:** grassland, winter wheat, winter rapeseed, winter barley and maize reach F1 0.87 to 0.97 with all
+- Grassland, winter wheat, winter rapeseed, winter barley and maize are easy: they reach F1 0.87 to 0.97 with all
   labels for almost every model.
-- **Confusable crops:** the forage crops that look like grassland (legumes harvested green, clover, F1 0.41 to
-  0.55) and the spring cereals that look like each other (oats, spring wheat, 0.42 to 0.71).
-- **Four crops are almost never found:** fresh vegetables, orchards, dried pulses and alfalfa score F1 0 to 0.26 for
-  every model, even with all labels. They are mixed or small plots with few parcels. Being 4 of the 20 classes, they
+- Two kinds of crop are confused: the forage crops that resemble grassland (legumes harvested green and clover, F1
+  0.41 to 0.55) and the spring cereals that resemble each other (oats and spring wheat, 0.42 to 0.71).
+- Four crops are almost never found. Fresh vegetables, orchards, dried pulses and alfalfa score F1 0 to 0.26 for
+  every model, even with all labels; they are mixed or small plots with few parcels. As 4 of the 20 classes, they
   alone cap Macro-F1 near 0.80.
-- **With 5 % of the labels the 10 m models keep the small crops** that the token-grid models and the U-Net lose:
-  potatoes drop to F1 0 for TerraMind, THOR, Prithvi and the U-Net but stay at 0.52 for frozen TESSERA and 0.70
-  fine-tuned. Buckwheat behaves alike: 0.70 and 0.81 for TESSERA against 0 to 0.53 for the others. Prithvi misses
-  potatoes even with all labels.
+- With 5 % of the labels, the 10 m models keep the small crops that the token-grid models and the U-Net lose.
+  Potatoes drop to F1 0 for TerraMind, THOR, Prithvi and the U-Net but stay at 0.52 for frozen TESSERA and 0.70
+  fine-tuned. Buckwheat behaves similarly, at 0.70 and 0.81 for TESSERA against 0 to 0.53 for the others. Prithvi
+  misses potatoes even with all labels.
 
 ### 3.5 What the maps look like
 
-A test block is an area the models never saw, 1.6 km from any training parcel, so its map is what a model would
+A test block is an area the models never saw, 1.6 km from any training parcel, so its map shows what a model would
 deliver on a new area. Every fit predicted every 10 m pixel of the test tiles, and the maps below show all ten fits:
-the six models with their encoder frozen (the U-Net, trained end to end, among them) and the four fine-tuned
-encoders. Each appears two ways. **Raw:** every pixel exactly as the model output it. Nothing is masked: wherever
-a raw map looks empty, the model predicted grassland, drawn grey. **Per parcel:** each declared parcel takes the crop
-most of its pixels were predicted as, the vote behind the parcel score, and the parcels mapped wrong are outlined in
-black; land outside the declared parcels is near-white here and in the reference only.
+the six models with their encoder frozen (among them the U-Net, trained end to end) and the four fine-tuned
+encoders. Each fit is drawn twice. The raw map shows every pixel exactly as the model predicted it; nothing is
+masked, so wherever a raw map looks empty, the model predicted grassland, drawn in grey. The per-parcel map gives each
+declared parcel the crop that most of its pixels were predicted as, which is the vote behind the parcel score, and
+outlines in black the parcels mapped wrong; land outside the declared parcels is near-white in this map and in the
+reference only.
 
-The places are three of the 40 complete test blocks (8.96 x 8.96 km), picked for their landscape, and two single
-test tiles (2.24 km) at full resolution, the unit the models predict. The maps at K = 100 % are below; those at
-20 % and 5 % are linked under each. A colour's hue gives the crop group and its lightness the crop within it;
-twenty crops cannot all be told apart by colour, so the reference panel and the outlines carry what is right and
-wrong. [maps.py](maps.py) draws them from the stored test predictions, which reproduce the parcel accuracy of all
-30 fits, and writes [maps_tables.md](maps_tables.md): the share of each place's parcels mapped right for every fit
-and budget, and the table below.
+The places are three of the 40 complete test blocks (8.96 x 8.96 km), chosen for their landscape, and two single test
+tiles (2.24 km) at full resolution, the unit the models predict. The maps at K = 100 % are shown below, and those at
+20 % and 5 % are linked under each. The hue of a colour gives the crop group and its lightness the crop within the
+group. Twenty crops cannot all be told apart by colour, so the reference panel and the outlines show what is right
+and what is wrong. [maps.py](maps.py) draws the maps from the stored test predictions, which reproduce the parcel
+accuracy of all 30 fits, and writes [maps_tables.md](maps_tables.md): the share of each place's parcels mapped right
+for every fit and budget, and the table below.
 
 ![Test block 583_457: large arable fields, K = 100 %](figures/map_block_583_457_K100.png)
 
@@ -220,30 +223,31 @@ K = [20 %](figures/map_tile_EE_02372_01780_K20.png), [5 %](figures/map_tile_EE_0
 | AlphaEarth v1, frozen | 0.24 | 0.32 | 0.27 |
 | U-Net from scratch | 0.32 | 0.38 | 0.24 |
 
-- **Outside the declared parcels, the raw maps are not crop maps.** 73 % of the test pixels lie outside any declared
-  parcel: forest, settlements, roads, water. No model was trained on them, as the loss counts labelled pixels only,
-  and there is no cropland mask yet (stage 1), so every model gives them a class. The token-grid models give 41 to
-  69 % of that land an arable crop, in rounded patches that cover the forest; AlphaEarth and the U-Net 24 to 38 %.
-  Frozen TESSERA gives 13 % with all labels and 48 % with 5 %, as a speckle of every crop over the forest. A map of
-  a new area therefore needs the cropland mask, or the parcel boundaries, before it can be read.
-- **Fine-tuned TESSERA leaves the forest grey, and the training route causes it, not the fine-tuning.** It calls 97
-  to 98 % of that land grassland. So does the frozen control of the fine-tuning experiment, whose MLP was trained
-  on the labelled pixels alone as the fine-tuned one was: 3 % at every budget, against 13 to 48 % for the same frozen
-  encoder trained on whole tiles in the main workflow. Why the route has this effect is not established; that the
-  MLP's batch norm saw only cropland pixels is one candidate. Grassland is still the wrong answer for a forest.
-- **Inside the parcels, the maps follow the declarations.** With all labels, the per-parcel maps of the ten fits
-  look alike on large fields. The differences sit in small and narrow parcels and grow as labels fall.
-- **Detail: TESSERA and AlphaEarth keep the 10 m pattern; the token-grid models draw 160 m blobs.** On tile
-  EE_02372_01780, strips of potatoes and spring barley a few tens of metres wide stay strips for TESSERA and
+- Outside the declared parcels, the raw maps are not crop maps. 73 % of the test pixels lie outside any declared
+  parcel, in forest, settlements, roads or water. No model was trained on them, because the loss counts labelled
+  pixels only, and without a cropland mask (stage 1, not yet built) every model assigns them a class. The token-grid
+  models give 41 to 69 % of that land an arable crop, in rounded patches that cover the forest; AlphaEarth and the
+  U-Net give 24 to 38 %. Frozen TESSERA gives 13 % with all labels and 48 % with 5 %, as a speckle of every crop over
+  the forest. A map of a new area therefore needs the cropland mask, or the parcel boundaries, before it can be read.
+- Fine-tuned TESSERA leaves the forest grey, and the cause is the training route rather than the fine-tuning. It
+  assigns 97 to 98 % of that land to grassland. So does the frozen control of the fine-tuning experiment, whose MLP
+  was trained on the labelled pixels alone, as the fine-tuned one was: 3 % at every budget, against 13 to 48 % for the
+  same frozen encoder trained on whole tiles in the main workflow. Why the route has this effect is not established;
+  one candidate is that the MLP's batch normalisation saw only cropland pixels. Grassland is still the wrong answer
+  for a forest.
+- Inside the parcels, the maps follow the declarations. With all labels, the per-parcel maps of the ten fits look
+  alike on large fields; the differences lie in small and narrow parcels and grow as labels become fewer.
+- TESSERA and AlphaEarth keep the 10 m pattern, whereas the token-grid models draw 160 m blobs. On tile
+  EE_02372_01780, strips of potatoes and spring barley a few tens of metres wide remain strips for TESSERA and
   AlphaEarth. TerraMind, THOR and Prithvi turn them into rounded patches that cross field edges, and the U-Net merges
-  neighbouring strips. At K = 5 % the token-grid models map 0.23 to 0.35 of that tile's parcels right, the U-Net
-  0.40, frozen and fine-tuned TESSERA 0.70 and 0.84. TESSERA's raw map is speckled inside some cereal fields, and
+  neighbouring strips. At K = 5 % the token-grid models map 0.23 to 0.35 of that tile's parcels correctly, the U-Net
+  0.40, and frozen and fine-tuned TESSERA 0.70 and 0.84. TESSERA's raw map is speckled inside some cereal fields, and
   the vote removes the speckle.
-- **Whole fields can flip with few labels.** At K = 5 % on tile EE_02332_01830, fine-tuned TerraMind, THOR and
-  Prithvi, and frozen THOR, map a large maize field as rapeseed or beans. TESSERA, frozen and fine-tuned, frozen
-  TerraMind and Prithvi, AlphaEarth and the U-Net get it right.
-- **Tiles are mapped one at a time.** Each 2.24 km tile is predicted on its own, and the token-grid models' raw maps
-  show straight seams at tile edges (block 594_443).
+- Whole fields can flip when labels are few. At K = 5 % on tile EE_02332_01830, fine-tuned TerraMind, THOR and
+  Prithvi, and frozen THOR, map a large maize field as rapeseed or beans; TESSERA (frozen and fine-tuned), frozen
+  TerraMind and Prithvi, AlphaEarth and the U-Net map it correctly.
+- Each 2.24 km tile is predicted on its own, and the raw maps of the token-grid models show straight seams at tile
+  edges (block 594_443).
 
 The shares in [maps_tables.md](maps_tables.md) come from one place each, mostly grassland parcels, so they
 illustrate the maps and are not test scores.
@@ -251,14 +255,15 @@ illustrate the maps and are not test scores.
 ## 4. Comparison with published results for Estonia
 
 No published study maps Estonian crops per pixel, and none has run TerraMind, THOR, Prithvi, TESSERA or AlphaEarth
-on Estonia. The published Estonian results classify whole parcels, so they are set against our per-parcel score.
-**Only one study reports parcel Macro-F1 for Estonia:** DirPA (Reuss, Gikalo and Körner 2026, Table 6), on
-EuroCropsML 2.0, with 1 to 100 labelled parcels per class and no full-label result. The table puts its models
-trained with plain cross-entropy, as ours are, beside ours.
+on Estonia. The published Estonian results classify whole parcels, so they are compared with our per-parcel score.
+Only one study reports parcel Macro-F1 for Estonia: DirPA (Reuss, Gikalo and Körner 2026, Table 6), on EuroCropsML
+2.0, with 1 to 100 labelled parcels per class and no full-label result. The table sets its models trained with plain
+cross-entropy, as ours are, beside ours.
 
-**Matching the label budgets.** DirPA labels at most k parcels of each class. We label K % of the training parcels of
-each class, so the number per class varies with the crop: 17 to 2,167 at K = 5 % (median 74), 67 to 8,666 at 20 %
-(median 296), 332 to 43,330 with all labels (median 1,477). Our K = 5 % therefore stands beside their 100 per class.
+The label budgets are matched as follows. DirPA labels at most k parcels of each class, whereas we label K % of the
+training parcels of each class, so our number per class varies with the crop: 17 to 2,167 at K = 5 % (median 74),
+67 to 8,666 at 20 % (median 296), and 332 to 43,330 with all labels (median 1,477). Our K = 5 % therefore corresponds
+to their 100 per class.
 
 | Parcel Macro-F1 | Classes | k = 20 per class | k = 100 per class, or K = 5 % (median 74) | K = 20 % (median 296) | K = 100 % (median 1,477) |
 |---|---|---|---|---|---|
@@ -284,22 +289,20 @@ and in [tables.md](tables.md); the fine-tuned TerraMind, THOR and Prithvi are in
 
 The x-axis puts both on labelled parcels per class: at most k for DirPA, the median over our 20 crops for ours.
 
-**How the numbers line up.**
+At a similar number of labels per class, our parcel Macro-F1 is two to three times theirs over the 127 types and
+above their coarse groups: 0.35 to 0.57 at K = 5 %, against 0.174 and 0.307 for their Transformer. The task, rather
+than the models, accounts for most of that difference (table below). Over 127 crop types, Macro-F1 averages in the
+many crops with a handful of parcels, which every model nearly misses, whereas we score only the 20 crops with at
+least 250 parcels. The coarse groups are fewer, but the paper gives neither their number nor their sizes for Estonia,
+so they cannot be placed on our 20-crop scale either.
 
-- **At a similar number of labels per class, our parcel Macro-F1 is two to three times theirs over the 127 types**
-  and above their coarse groups: 0.35 to 0.57 at K = 5 %, against 0.174 and 0.307 for their Transformer.
-- **That gap comes mostly from the task, not the models** (table below). Over 127 crop types, Macro-F1 averages in
-  the many crops with a handful of parcels, which every model nearly misses; we score only the 20 crops with at
-  least 250 parcels. The coarse groups are fewer, but the paper gives neither their number nor their sizes for
-  Estonia, so they cannot be put on our 20-crop scale either.
-- **The ranking does carry over.** In DirPA, Presto from its released weights scores below the Transformer trained
-  from scratch at every budget, by 0.04 to 0.11 over the 127 types and 0.04 to 0.06 over the coarse groups. Here, at
-  K = 5 %, four of the five frozen foundation models fall below our U-Net trained from scratch (0.349 to 0.425
-  against 0.446); only TESSERA is above it, frozen (0.502) and fine-tuned (0.566). With all labels TerraMind passes
-  it too.
+The ranking does carry over. In DirPA, Presto from its released weights scores below the Transformer trained from
+scratch at every budget, by 0.04 to 0.11 over the 127 types and 0.04 to 0.06 over the coarse groups. Here, at K = 5 %,
+four of the five frozen foundation models fall below our U-Net trained from scratch (0.349 to 0.425 against 0.446);
+only TESSERA is above it, frozen (0.502) and fine-tuned (0.566). With all labels, TerraMind passes it too.
 
-**Why the numbers are not on the same scale.** The comparison says our results are plausible, not that our models
-are better:
+The two sets of numbers are not on the same scale, so the comparison shows that our results are plausible, not that
+our models are better:
 
 | | Published (DirPA) | Ours | Effect on our numbers |
 |---|---|---|---|
@@ -310,26 +313,27 @@ are better:
 | Model output | One class per parcel | One class per pixel, then a vote | Lower on small parcels |
 | Runs | Mean of five | One draw, one seed | Ours carry no interval yet |
 
-**Published results in other metrics.** The EuroCropsML benchmark (Reuss et al. 2026) and its follow-up *Mind the
-gap* (Reuss, Gikalo and Körner 2025) report overall accuracy and Cohen's kappa for Estonia, not Macro-F1; *Mind the
-gap* plots Macro-F1 but prints no values. Järveoja (2021) reports weighted F1 over 28 classes, 0.82 and 0.85 for 2018
-and 2019. Overall accuracy is the share of test parcels given the right crop, and weighted F1 weights each crop by
-its number of parcels; with grassland about half of the parcels, both mostly measure grassland, which is why our
-metric is Macro-F1. For the record, with all labels the benchmark's Transformer reaches an overall accuracy of 0.787
-and our models 0.75 to 0.82 ([tables.md](tables.md)).
+Other published Estonian results use other metrics. The EuroCropsML benchmark (Reuss et al. 2026) and its follow-up
+*Mind the gap* (Reuss, Gikalo and Körner 2025) report overall accuracy and Cohen's kappa for Estonia, not Macro-F1;
+*Mind the gap* plots Macro-F1 but prints no values. Järveoja (2021) reports weighted F1 over 28 classes, 0.82 and 0.85
+for 2018 and 2019. Overall accuracy is the share of test parcels given the right crop, and weighted F1 weights each
+crop by its number of parcels; since grassland makes up about half of the parcels, both mostly measure grassland,
+which is why our metric is Macro-F1. With all labels, the benchmark's Transformer reaches an overall accuracy of
+0.787 and our models 0.75 to 0.82 ([tables.md](tables.md)).
 
 ## 5. Caveats and next steps
 
-- **One draw, one seed.** A different random choice of labelled parcels or a different seed can move a cell by a
-  few hundredths, about the size of several gaps above. Repeated draws with intervals are next in the protocol.
-- **The checkpoint rule decides the token-grid results.** Lowest validation loss stops TerraMind, THOR and Prithvi
-  long before their best validation Macro-F1, and training 45 instead of 15 epochs changed none of their frozen
+- Each cell comes from one draw and one seed. A different random choice of labelled parcels or a different seed can
+  move a cell by a few hundredths, which is the size of several of the gaps above. Repeated draws with intervals are
+  the next step in the protocol.
+- The checkpoint rule decides the token-grid results. Lowest validation loss stops TerraMind, THOR and Prithvi long
+  before their best validation Macro-F1, and training for 45 instead of 15 epochs changed none of their frozen
   results. Testing the checkpoint of highest validation Macro-F1 for every model would settle whether fine-tuning
   helps them.
-- **Only three budgets.** The protocol plans 1, 5, 10, 20, 50 and 100 %.
-- **Latvia and Portugal** follow; the comparison to EuroCropsML extends to them.
-- **A per-parcel anchor on our own split.** Training a classifier on per-parcel medians of our tiles, as EuroCropsML
-  does, would put the published numbers and ours on the same split.
+- Only three budgets were run; the protocol plans 1, 5, 10, 20, 50 and 100 %.
+- Latvia and Portugal follow, and the comparison with EuroCropsML extends to them.
+- Training a classifier on per-parcel medians of our tiles, as EuroCropsML does, would put the published numbers and
+  ours on the same split.
 
 ## Sources
 

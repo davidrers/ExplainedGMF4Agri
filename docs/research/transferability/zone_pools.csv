@@ -1,0 +1,55 @@
+country,zone,chips,blocks,pure_blocks,core_blocks,core_chips
+AT,cold,5267,378,241,80,1017
+AT,cool moist,2806,204,174,113,1494
+AT,cool wet,7234,532,415,232,3147
+AT,moderate,190,18,16,6,57
+BE,cool wet,5975,432,432,432,5975
+BG,cold,200,17,6,0,0
+BG,cool moist,3741,302,182,37,514
+BG,cool wet,973,103,58,2,17
+BG,moderate,13832,954,876,730,10538
+BG,subtropics cool,840,87,76,35,351
+BG,subtropics mod. cool,1,1,1,0,0
+CZ,cold,27,4,2,0,0
+CZ,cool moist,7912,520,428,249,3773
+CZ,cool wet,7060,535,446,233,2734
+DE,cool moist,6932,529,498,462,5897
+DE,cool wet,14285,1002,977,885,12503
+DK,cool moist,88,11,5,0,0
+DK,cool wet,8344,659,654,627,7974
+EE,cool moist,231,21,9,0,0
+EE,cool wet,7171,631,626,608,6916
+ES,cold,1156,94,70,10,148
+ES,subtropics cool,52091,3470,3132,2505,37963
+ES,subtropics mod. cool,41751,2864,2538,1917,27641
+FI,cold,27973,2696,2647,2498,26043
+FI,cool wet,17407,1648,1610,1479,15766
+FR,cold,2965,228,146,51,584
+FR,cool moist,14042,896,637,321,5099
+FR,cool wet,54329,3553,3191,2470,37382
+FR,moderate,694,44,21,0,0
+FR,subtropics cool,23922,1587,1301,850,13104
+FR,subtropics mod. cool,9495,763,622,349,4063
+IE,cool wet,13708,962,962,962,13708
+IT,subtropics cool,1210,121,92,41,333
+IT,subtropics mod. cool,2585,198,170,96,1161
+LT,cool moist,1741,117,94,46,690
+LT,cool wet,10403,745,722,655,9085
+LV,cool moist,498,38,25,7,77
+LV,cool wet,11002,852,846,818,10555
+NL,cool wet,6957,523,523,523,6957
+PT,subtropics cool,3523,246,190,96,1298
+PT,subtropics mod. cool,13974,951,904,811,11875
+SE,cold,41258,3741,3723,3654,40617
+SE,cool moist,2707,250,202,143,1383
+SE,cool wet,20696,1766,1697,1492,17702
+SI,cold,96,7,2,0,0
+SI,cool moist,399,35,31,19,215
+SI,cool wet,2734,222,205,154,1944
+SI,moderate,143,16,7,0,0
+SI,subtropics cool,68,6,3,0,0
+SI,subtropics mod. cool,28,4,2,0,0
+SK,cold,186,14,4,0,0
+SK,cool moist,3218,240,179,82,1050
+SK,cool wet,4028,332,286,181,2097
+SK,moderate,1077,78,65,33,442

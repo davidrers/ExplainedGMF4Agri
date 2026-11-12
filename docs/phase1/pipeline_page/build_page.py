@@ -735,15 +735,15 @@ experiments_html = (
 # ----------------------------------------------------------------------------------------------
 
 transfer_text = TRANSFER_MD.read_text(encoding="utf-8")
-TRANSFER_DRAFT = re.search(r"Draft of ([^,.]+)", transfer_text).group(1)
+TRANSFER_DATE = re.search(r"(?:Draft of|Agreed with the user on) ([^,.]+)", transfer_text).group(1)
 transfer_html = (
     '<article class="md">'
     + md_html.convert(transfer_text, asset_prefix="../../research/transferability/",
                       blob_prefix=f"{REPO}/docs/research/transferability/", id_prefix="tr-", heading_shift=2,
                       source_dir=TRANSFER_MD.parent)
     + f'<p class="md-src">Source: the research note '
-      f'{S.external(f"{REPO}/docs/research/transferability/transfer_setup.md", "transfer_setup.md")}, draft of '
-      f'{TRANSFER_DRAFT}; not yet in the protocol.</p></article>')
+      f'{S.external(f"{REPO}/docs/research/transferability/transfer_setup.md", "transfer_setup.md")}, agreed on '
+      f'{TRANSFER_DATE}; not yet in the protocol.</p></article>')
 
 # ----------------------------------------------------------------------------------------------
 # Interactions: step-through, lane focus, live flow, zoom
@@ -921,7 +921,7 @@ section{padding:40px 16px 24px}
 .md-figs figcaption{margin-top:6px;font-size:14px;color:#5b616b}
 .md-table{overflow-x:auto;margin:8px 0 24px;border:1px solid #e3dfd2;border-radius:6px}
 .md-table table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.45;font-variant-numeric:tabular-nums}
-.md-table th,.md-table td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid #ece9df}
+.md-table th,.md-table td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid #ece9df}
 .md-table thead th{background:#f6f3ea;font-weight:600;color:#1f2430;vertical-align:bottom}
 .md-table tbody tr:last-child>*{border-bottom:0}
 .md-table .a-center{text-align:center}.md-table .a-right{text-align:right}
@@ -933,6 +933,7 @@ section{padding:40px 16px 24px}
   padding:5px 12px;white-space:nowrap}
 .md-matrix td{color:#a9a597}
 .md-matrix td.diag{background:#e6f0e8;color:#2e6b3a}
+.md-matrix td.part{background:#f7efd8;color:#8a6a1c}
 .sw{display:inline-block;width:.78em;height:.78em;margin:0 .12em;vertical-align:-.04em;background:var(--c);
   border:1px solid rgba(31,36,48,.45);border-radius:2px}
 .sw.ci{border-radius:50%}
@@ -1291,7 +1292,7 @@ page = S.head("Phase 1 · GFMs Benchmark · ExplainedGFM4Agri",
 <button type="button" role="tab" id="tab-workflow" aria-controls="workflow" aria-selected="true" tabindex="0">
 <span class="t">Pipeline</span><span class="d">Fields and crops under the label budget, interactive</span></button>
 <button type="button" role="tab" id="tab-transferability" aria-controls="transferability" aria-selected="false" tabindex="-1">
-<span class="t">Spatial transferability</span><span class="d">Zero-shot across 19 countries, a draft</span></button>
+<span class="t">Spatial transferability</span><span class="d">19 countries and 12 GAEZ zones, frozen encoders</span></button>
 </div>
 <div role="tabpanel" id="workflow" aria-labelledby="tab-workflow" tabindex="0">
 {toolbar("wf", '<button type="button" data-act="status" aria-pressed="false">Status</button><span class="hint">Hover RQ1.1, RQ1.2 or a fairness rule to see the steps that carry it.</span>')}

@@ -18,12 +18,13 @@ SWATCHES = {
     "🟩": ("#3cb44b", "sq", "agro-climate: temperate oceanic"),
     "🟦": ("#4363d8", "sq", "agro-climate: temperate sub-continental"),
     "🟨": ("#ffe119", "sq", "agro-climate: subtropics with winter rain (Mediterranean)"),
-    "🔵": ("#4363d8", "ci", "AEZ: temperate cool, wet"),
-    "🟢": ("#3cb44b", "ci", "AEZ: temperate cool, moist"),
-    "🟡": ("#ffe119", "ci", "AEZ: temperate moderate"),
-    "🟠": ("#f58231", "ci", "AEZ: subtropics moderately cool"),
-    "🔴": ("#e6194b", "ci", "AEZ: subtropics cool"),
-    "⚪": ("#ffffff", "ci", "AEZ: special class"),
+    "🟣": ("#911eb4", "ci", "zone: cold, wet"),
+    "🔵": ("#4363d8", "ci", "zone: temperate cool, wet"),
+    "🟢": ("#3cb44b", "ci", "zone: temperate cool, moist"),
+    "🟡": ("#ffe119", "ci", "zone: temperate moderate, moist"),
+    "🟠": ("#f58231", "ci", "zone: subtropics, moderately cool"),
+    "🔴": ("#e6194b", "ci", "zone: subtropics, cool"),
+    "⚪": ("#ffffff", "ci", "zone: special class (soil, terrain, irrigation, wetness)"),
 }
 LIST = re.compile(r"^( *)([-*]|\d+\.) +(.*)$")
 HEADING = re.compile(r"^(#{1,6}) +(.*?) *#*$")
@@ -205,6 +206,8 @@ class Converter:
                 cls.append("nw")
             if matrix and tag == "td" and text.strip() == "◆":
                 cls.append("diag")
+            if matrix and tag == "td" and text.strip() == "◐":
+                cls.append("part")
             attr = f' class="{" ".join(cls)}"' if cls else ""
             if matrix and tag == "td" and k == 0:
                 tag = "th"
