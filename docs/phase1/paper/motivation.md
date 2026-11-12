@@ -62,8 +62,7 @@ been compared on the same chips, labels and decoder capacity. The harmonised lab
 The labels are the EuroCrops 2021 declarations, harmonised to 21 crop species in 9 groups. The inputs are twelve
 monthly Sentinel-2 L2A and Sentinel-1 RTC composites on 2.24 km chips at 10 m. The transfer study draws, for each of
 the 19 countries and 12 zones, 250,000 ha of labelled training land and a test set of at least 50 blocks
-([plan](../../research/transferability/transfer_setup.md); the reasoning behind each choice is in the
-[decision record](../../research/transferability/transfer_plan.md)). The label-budget study covers all of Estonia
+([experimental set-up](../../research/transferability/transfer_setup.md)). The label-budget study covers all of Estonia
 (7,402 chips) at 5, 20 and 100 per cent of the parcels per class ([results](../results_estonia/REPORT.md)).
 TerraMind, THOR, Prithvi-EO-2.0 and TESSERA v2 remain frozen while a decoder is trained on their features; the
 baseline is a ResNet-18 U-Net trained from scratch on the same inputs. The zones follow the GAEZ v5 classification
@@ -85,8 +84,8 @@ lose less than the U-Net, and zone models to come close to national models on th
 
 - Crop segmentation in Estonia, every arm frozen and fine-tuned, per pixel and per parcel:
   [docs/phase1/results_estonia/REPORT.md](../results_estonia/REPORT.md).
-- The spatial transferability plan: [docs/research/transferability/transfer_setup.md](../../research/transferability/transfer_setup.md),
-  with the record of its decisions in [transfer_plan.md](../../research/transferability/transfer_plan.md).
+- The spatial transferability experimental set-up:
+  [docs/research/transferability/transfer_setup.md](../../research/transferability/transfer_setup.md).
 
 ## References
 
