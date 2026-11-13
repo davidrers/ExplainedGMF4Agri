@@ -201,16 +201,20 @@ which is neither comparable nor trainable on a 16 GB card.
 
 ### Phase 2 (SO2, RQ2.1 to RQ2.3): explainability and uncertainty
 
-Not active. Pixel-level segmentation makes Integrated Gradients, Occlusion and AttnLRP natively
-per-pixel, per-band and per-date, which is a stronger basis for RQ2.1 than attributing a pooled vector.
-Since the research questions were revised, explanations and confidence are summarised per field, for its crop
-type and for its borders (the border head is explained and calibrated like the crop head).
-The **embedding tier** applies to all four models and the **backbone tier** to the models with open
-weights: TerraMind, THOR and TESSERA v2.
-Uncertainty uses Monte Carlo Dropout as primary and Deep Ensembles as the heavier comparison, both at
-decoder level, reporting per-pixel predictive entropy with reliability diagrams and Expected
-Calibration Error. RQ2.3 is answered by placing the GFM importances, after binding to agronomic
-concepts, on the same axes as the baseline importances.
+Not run yet. **Explainability** has an experimental set-up since 13 November 2026,
+[phase2/explainability_setup.md](phase2/explainability_setup.md). It explains the crop type of each field by
+feature attribution over months and bands, summarised per field: occlusion and accumulated local effects
+(perturbation), SHAP and LIME (distillation), and Expected or Integrated Gradients (backpropagation). The
+explanations are assessed against an agronomic ground truth per crop type and zone, assembled from
+agro-ecological zones, crop calendar maps and theoretical band values, in a loop that returns to that
+assessment after every round. The field borders are not explained in that set-up, and AlphaEarth, of which only
+the embedding is available, is an open point. This replaces the earlier plan of Integrated Gradients, Occlusion
+and AttnLRP with an embedding tier and a backbone tier.
+**Uncertainty** is not designed yet. The earlier plan stands until it is: Monte Carlo Dropout as primary and
+Deep Ensembles as the heavier comparison, both at decoder level, reporting per-pixel predictive entropy with
+reliability diagrams and Expected Calibration Error, with confidence summarised per field, for its crop type
+and for its borders. RQ2.3 is answered by comparing the importances with the agronomic ground truth, and by
+placing the GFM importances on the same axes as the baseline importances.
 
 ### Phase 3 (SO3, RQ3): XAI-grounded LLM reporting
 

@@ -6,8 +6,8 @@ GitHub Pages serves `docs/` from `main`. The site has four pages, all generated 
 |---|---|---|
 | Landing | `docs/index.html` | The thesis title, author and supervisors, the target system, a Sentinel-2 mosaic of Estonian fields with a draggable wipe to its EuroCrops labels, and the three phases as the chain of `phases.png` (satellite, GFM, XAI and uncertainty, LLM, report), each opening its page |
 | Phase 1 · GFMs Benchmark | `docs/phase1/pipeline_page/index.html` | (1) The experimental set-up, as two tabs: **Pipeline**, the interactive experimental workflow under the research questions with its fairness rules, and **Spatial transferability**, `docs/research/transferability/transfer_setup.md` converted to HTML with its maps; (2) the model architecture of the six arms, switchable between the crop-only and the two-head architecture; (3) the experiments, each linked to its `REPORT.md` with a subtitle naming the pipeline it was done on (1 to 6 crop segmentation only, 7 to 9 crop segmentation + border), with the Estonia results reports of both workflows |
-| Phase 2 · XAI + UQ | `docs/phase2/index.html` | The planned experimental set-up and the research questions, as `thesis_design.md` states them |
-| Phase 3 · LLM Report | `docs/phase3/index.html` | The same for Phase 3 |
+| Phase 2 · XAI + UQ | `docs/phase2/index.html` | Two sections. **Explainability**: the experimental set-up of `docs/phase2/explainability_setup.md`, as a flow of three steps (the agronomic questions; the agronomic ground truth with its sample matrix of crop cues; the experimentation, with the method flowchart and its loop back to the assessment). **Uncertainty quantification**: empty. Then the research questions, as `thesis_design.md` states them |
+| Phase 3 · LLM Report | `docs/phase3/index.html` | The planned experimental set-up and the research questions, as `thesis_design.md` states them |
 
 Every page shares a green top bar that switches between the phases, a banner with the phase's status, and a footer.
 
@@ -23,8 +23,8 @@ decided. A link to `#workflow`, `#transferability` or any heading inside the tra
 
 ## Updating the site
 
-The pages show what `thesis_design.md`, `protocol.md`, `pipeline.md`, the transferability note and the experiment
-reports say, and nothing they do not. They change with them, under the same rule: only by agreement with the user
+The pages show what `thesis_design.md`, `protocol.md`, `pipeline.md`, the transferability note, the explainability
+set-up and the experiment reports say, and nothing they do not. They change with them, under the same rule: only by agreement with the user
 (`CLAUDE.md`). The HTML is generated, so never edit it by hand.
 
 1. Edit the source named in the table below.
@@ -36,8 +36,9 @@ reports say, and nothing they do not. They change with them, under the same rule
 
 3. Check in a browser. Landing: drag the line across the image, follow each phase. Phase 1: run Step through on
    both diagrams, hover RQ1 and a fairness rule, click each model name, toggle Status, follow every `REPORT.md` link,
-   switch to the Spatial transferability tab and back, and look for overlapping boxes at Fit and at 100 %. Every page
-   at phone width too.
+   switch to the Spatial transferability tab and back, and look for overlapping boxes at Fit and at 100 %. Phase 2:
+   the sample matrix and the flowchart fit at desktop width; at phone width the tables and the flowchart scroll
+   sideways inside their frames. Every page at phone width too.
 4. Commit the sources and the generated pages together, staged by name, and push. Pages serves the new version a
    few minutes later.
 
@@ -56,7 +57,8 @@ reports say, and nothing they do not. They change with them, under the same rule
 | The transferability set-up | `docs/research/transferability/transfer_setup.md` itself; `md_html.py` converts it at every build. Its colour emoji become swatches in the colours of its maps (`SWATCHES`) |
 | The thesis title, author, supervisors, target system | `TITLE`, `AUTHOR`, `PROGRAMME`, `SUPERVISORS`, `TARGET` in `site_shell.py` |
 | A phase's name, topic, status and research questions | `PHASES` in `site_shell.py` (the landing, the top bar and every banner read it) |
-| The planned set-up of Phase 2 or 3 | `PLANNED` in `site_shell.py` |
+| The explainability set-up of Phase 2 | `XAI` in `site_shell.py`, worded as `docs/phase2/explainability_setup.md`: change both together. The sample matrix is `XAI["matrix"]` (a cell that starts with `*` is drawn as a cue); the method flowchart is `xai_flow()`, in design pixels; the step colours are `XAI_TONES` |
+| The planned set-up of Phase 3 | `PLANNED` in `site_shell.py` |
 | The landing's chain and icons | `CHAIN` and `ICONS` in `site_shell.py` |
 | The landing's images | `make_hero.py`, which needs rasterio and the chips, so it runs on the hub: `poetry run python docs/phase1/pipeline_page/make_hero.py`. It writes `docs/assets/hero_s2.jpg` and `hero_labels.png`; their crop groups are `GROUPS` there and `CROP_GROUPS` in `site_shell.py` |
 

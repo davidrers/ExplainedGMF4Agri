@@ -2,7 +2,8 @@
 page shares (the top bar with the three phases, the phase banner, the footer, the fonts and colours).
 
 `build_page.py` imports this module (`site_shell`), builds the Phase 1 page with its pieces, and calls `write_site()` for the rest.
-Everything the pages say comes from `docs/thesis_design.md` and the documents the Phase 1 page already shows.
+Everything the pages say comes from `docs/thesis_design.md`, `docs/phase2/explainability_setup.md` and the documents
+the Phase 1 page already shows.
 """
 from __future__ import annotations
 
@@ -45,7 +46,7 @@ PHASES = {
                            "for its delineation?"),
                  ("RQ2.3", "Do the explanations and confidence agree with agronomic knowledge, such as crop calendars, "
                            "and with the raw-imagery baseline?")],
-            now="Planned; respecified once Phase 1 lands."),
+            now="Explainability set-up designed; uncertainty quantification not designed yet."),
     3: dict(name="LLM Report", topic="Evidence-grounded LLM reporting", so="SO3", status="planned",
             status_text="Not started", tone="slate",
             rqs=[("RQ3.1", "Given the field map, its explanations and its confidence as structured context, can a large "
@@ -55,22 +56,8 @@ PHASES = {
             now="Planned; the first part reduced if the schedule slips."),
 }
 
-# The planned set-ups of Phases 2 and 3, as docs/thesis_design.md states them
+# The planned set-up of Phase 3, as docs/thesis_design.md states it. Phase 2 is XAI below.
 PLANNED = {
-    2: [
-        dict(title="The panoptic maps of Phase 1", kind="data",
-             body="Fields and their crops from every model: attribution is native per pixel, per band and per date, "
-                  "then summarised per field, for its crop type and for its borders."),
-        [dict(title="Explainability", kind="method", rq="RQ2.1",
-             body="Integrated Gradients, Occlusion and AttnLRP. The embedding tier applies to every model; the backbone "
-                  "tier to the models with open weights: TerraMind, THOR and TESSERA v2."),
-         dict(title="Uncertainty", kind="method", rq="RQ2.2",
-             body="Monte Carlo Dropout as primary and Deep Ensembles as the heavier comparison, both at decoder level. "
-                  "Reported as per-pixel predictive entropy, with reliability diagrams and Expected Calibration Error.")],
-        dict(title="Agreement", kind="eval", rq="RQ2.3",
-             body="The GFM importances, after binding to agronomic concepts, placed on the same axes as the baseline "
-                  "importances."),
-    ],
     3: [
         dict(title="From fields to zones", kind="method",
              body="Pixel-level attribution cannot be passed to an LLM directly; the fields of the panoptic map give the "
@@ -536,6 +523,380 @@ compatible with it; it is respecified once Phase 1 lands.</p>
                 PHASE_CSS) + body
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Phase 2: two sections, Explainability and Uncertainty quantification. The explainability set-up is worded as
+# docs/phase2/explainability_setup.md; change both together.
+# ----------------------------------------------------------------------------------------------------------------------
+
+XAI_DOC = "docs/phase2/explainability_setup.md"
+
+XAI = dict(
+    intro=("The experimental set-up for explaining the crop type of each field: what an agronomist asks of an "
+           "explanation, the ground truth the explanations are judged against, and the methods that produce them. "
+           "Designed, not yet run. The field borders are not explained here."),
+    quote=("Agronomic experts frequently evaluate whether AI-generated explanations are biologically meaningful and "
+           "consistent with established agricultural knowledge."),
+    cite=("Abou Samra and Ali (2026), AgriEngineering 8(7):270", "https://doi.org/10.3390/agriengineering8070270"),
+    lead="An explanation of a field's crop is useful when an agronomist can check it. Three questions do that.",
+    asks=[
+        dict(q="When?", sub="Crop phenology",
+             ask="Does the evidence fall at the right moment of the crop's phenology?",
+             points=["Every crop follows its own calendar of emergence, green-up, peak vegetation growth, flowering, "
+                     "ripening and harvest.",
+                     "Crops differ most around peak vegetation growth and flowering, so that is where an explanation "
+                     "should fall.",
+                     "In our 2021 profiles of Estonia, winter wheat and spring barley reach peak growth in June, peas in "
+                     "early July and potatoes in late August."]),
+        dict(q="Which property?", sub="What tells crops apart",
+             ask="Does the evidence rest on a property of the plant or the soil that tells this crop apart? Each group "
+                 "of bands measures one.",
+             properties=True),
+        dict(q="Against which crop?", sub="The crops it is confused with",
+             ask="Is it the cue that separates this crop from the ones it is confused with?",
+             points=["Winter wheat rather than spring wheat rests on a canopy in April.",
+                     "Spring barley rather than spring wheat rests on a peak two to three weeks earlier."]),
+    ],
+    properties=[
+        ("Greenness and canopy cover", "red, near infrared",
+         "A growing crop against bare soil: winter crops are green in April, spring crops are not."),
+        ("Chlorophyll", "red-edge", "Canopies that look equally green but differ in leaf chlorophyll and density."),
+        ("Canopy water and dry matter", "shortwave infrared",
+         "A green, water-rich canopy against a ripening one: cereals ripen in July while grassland and potatoes stay "
+         "green."),
+        ("Flower colour", "visible", "Rapeseed in yellow flower against cereals."),
+        ("Canopy structure", "radar VH",
+         "Tall, branching, broad-leaved crops against cereals: rapeseed's return in late June is far stronger than the "
+         "cereals'."),
+        ("Soil roughness and moisture", "radar VV",
+         "Bare, tilled or ridged soil before a late crop emerges, as with potatoes."),
+    ],
+    truth=("What established agronomic knowledge says a model should rely on, written down per crop type and zone "
+           "before any explanation is read."),
+    datasets=[
+        dict(title="Agro-ecological zones",
+             gives="The zone of every field, so that one crop can have a different calendar in each zone.",
+             cand="GAEZ v5 agro-ecological zones, already used in the transferability plan.",
+             status="The zoning is still to be determined"),
+        dict(title="Crop calendar maps",
+             gives="Sowing, growing and harvest windows per crop and region.",
+             cand="JRC ASAP crop calendar, WorldCereal crop calendars, national sources.",
+             status="Coverage of Estonia and of the 20 crop types not yet checked"),
+        dict(title="Theoretical band values",
+             gives="The spectral and radar behaviour expected of a crop at each growth stage.",
+             cand="Published Sentinel-2 and Sentinel-1 signatures per stage.",
+             status="Sources to be chosen"),
+    ],
+    reference=("One entry per crop type, zone and growth stage: the months and the bands expected to carry the "
+               "evidence, the direction, and the crop it is told apart from."),
+    months=["April", "May", "June", "July", "August", "September"],
+    # A cell that starts with * is a cue: what an explanation should point to
+    matrix=[
+        ("Winter wheat", ["*green canopy", "growth", "peak growth", "ripening", "stubble", ""],
+         "Greenness in April (red, near infrared)", "spring cereals"),
+        ("Spring barley", ["bare soil", "emergence", "*peak growth", "*ripening", "stubble", ""],
+         "An early peak and early drying (red, near infrared, shortwave infrared)", "spring wheat and oats"),
+        ("Winter rapeseed", ["green canopy", "*flowering", "*tall, branching canopy", "ripening", "stubble", ""],
+         "Yellow flowers (visible); a strong radar return (VH)", "cereals"),
+        ("Grassland", ["green-up", "*green", "*green", "*green, mown", "*green, mown", "*green"],
+         "Never bare soil; greenness dips after mowing", "arable crops"),
+        ("Peas", ["bare soil", "emergence", "*dense canopy", "peak growth, then ripening", "stubble", ""],
+         "A radar return above the cereals' (VH)", "spring cereals"),
+        ("Potatoes", ["bare soil", "bare, ridged soil", "emergence", "*late green-up", "*peak growth", "ripening"],
+         "The latest season of all; ridged soil in spring (radar VV)", "every other spring-sown crop"),
+    ],
+    matrix_notes=[
+        "Estonia 2021, taken as one zone, from our 2021 class profiles (580 parcels) and the monthly composites the "
+        "models read.",
+        "The rapeseed flowering month, the ridged potato soil and the mowing months come from general agronomy and "
+        "are not yet checked for Estonia.",
+        "A sample: the reference will hold every crop type, per zone, with the source of each entry.",
+    ],
+    assess=("The last step of the ground truth. For each crop type, zone and method, the explanation is compared with "
+            "the reference."),
+    assess_points=[
+        "Months and bands: how much of the explanation falls in the expected months and bands, against what an even "
+        "spread would give.",
+        "Direction: whether the crop's score moves the way the theoretical band values say it should.",
+        "Agreement with the ground truth says an explanation is agronomically plausible. Agreement between methods "
+        "says it reflects the model, and not one method's behaviour.",
+    ],
+    experiment=("Feature attribution methods, applied to the trained models, say how much each month and band "
+                "contributed to a field's crop. Their explanations go back to the assessment (2.3), round after round: "
+                "what one round shows sets the next."),
+    methods=[
+        ("Occlusion", "Perturbation",
+         "How much the field's crop score falls when a month or a band group is removed.", "Expected months and bands"),
+        ("ALE, accumulated local effects", "Perturbation",
+         "How a crop's score changes as the level of a band group in a month rises.",
+         "Expected direction, from the theoretical band values"),
+        ("SHAP", "Distillation",
+         "Each month's and band group's share of the score, averaged over combinations of removed groups.",
+         "Expected months and bands"),
+        ("LIME", "Distillation", "The weights of a small linear model fitted around one field.",
+         "Expected months and bands"),
+        ("Expected or Integrated Gradients", "Backpropagation",
+         "The contribution of every band and month, from the gradients of the crop score.",
+         "Expected months and bands"),
+    ],
+    shared=[
+        ("Unit", "The field. The explained quantity is the crop score averaged over the field."),
+        ("Against which crop", "The score of crop A minus the score of crop B, read from the same runs."),
+        ("Input groups", "Months, sensors and band groups."),
+        ("A removed month", "Replaced in two ways, which show different things: interpolated from its neighbours "
+                            "(events, such as a peak) and by the mean of that month over the training set (states, "
+                            "such as green in April)."),
+        ("Models", "The five with image inputs: TerraMind, THOR, Prithvi-EO-2.0, TESSERA v2 and the baseline trained "
+                   "on the raw imagery. AlphaEarth is open: only its embedding is available, so these methods cannot "
+                   "act on its inputs."),
+    ],
+    uq="Empty for now.",
+)
+
+# Step colours: number disc, box fill, box border, hairlines inside the box, secondary text on that fill
+XAI_TONES = {
+    "ask": ("#34485c", "#f2f4f6", "#7d8fa1", "#c9d2db", "#46566a"),
+    "truth": ("#2e6b3a", "#e6f0e8", "#3d8a4f", "#b9d3bf", "#3f5a47"),
+    "method": ("#8a5a14", "#fcf6ec", "#b9862a", "#e6d3ab", "#6b5326"),
+}
+
+XAI_CSS = r"""
+.note a{color:inherit;text-underline-offset:3px}
+.flow{list-style:none;margin:0;padding:0}
+.part{display:flex;gap:18px;align-items:flex-start}
+.part>.num{flex:none;width:42px;height:42px;border-radius:50%;color:#fff;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:18px;margin-top:18px;background:var(--c)}
+.part>.box{flex:1;min-width:0;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:22px 26px 26px}
+.part h3{margin:0 0 8px;font-size:24px;font-weight:600;letter-spacing:-.01em}
+.part h4{margin:30px 0 8px;font-size:18px;font-weight:600;display:flex;align-items:baseline;gap:10px}
+.part h4 b{flex:none;font-weight:700;color:var(--c);font-variant-numeric:tabular-nums}
+.part p{margin:0 0 12px;font-size:16.5px;line-height:1.55;color:var(--ink-2);max-width:75ch}
+.pts{margin:0 0 4px;padding-left:20px;font-size:16px;line-height:1.55;color:var(--ink-2);max-width:78ch}
+.pts li{margin:0 0 5px}
+.pts li::marker{color:var(--c)}
+.quote{margin:4px 0 22px}
+.quote blockquote{margin:0;font-size:21px;line-height:1.45;font-weight:500;color:var(--ink);max-width:38em;text-wrap:balance}
+.quote figcaption{margin-top:8px;font-size:14.5px;color:var(--sub)}
+.quote a{color:inherit;text-underline-offset:3px}
+.asks{margin:18px 0 0;display:grid;grid-template-columns:200px minmax(0,1fr);column-gap:28px}
+.asks dt,.asks dd{margin:0;padding:18px 0 14px;border-top:1.5px solid var(--bd2)}
+.asks dt{font-size:20px;font-weight:600;line-height:1.25}
+.asks dt small{display:block;margin-top:3px;font-size:14.5px;font-weight:500;color:var(--sub)}
+.tw{overflow-x:auto;margin:12px 0 10px;border:1.5px solid var(--bd2);border-radius:6px;background:#fff}
+table.t{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+table.t th,table.t td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid #e3e1d6;color:var(--ink-2)}
+table.t thead th{font-size:13px;font-weight:600;color:var(--sub);background:#fbfaf6;white-space:nowrap}
+table.t tbody th{font-weight:600;color:var(--ink);white-space:nowrap}
+table.t tbody tr:last-child>*{border-bottom:0}
+table.mx th,table.mx td{padding:9px 10px}
+table.mx td{min-width:84px}
+table.mx td.cue{background:#fbefd6;color:#5c3d09;font-weight:600}
+table.mx td.end{min-width:216px}
+table.mx td.end small{display:block;margin-top:4px;font-size:13px;color:var(--sub)}
+.key{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:14.5px;color:var(--sub)}
+.key i{flex:none;width:16px;height:16px;border-radius:3px;background:#fbefd6;border:1.5px solid #d6a54a}
+.srcs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:12px 0 0}
+.src{display:flex;flex-direction:column;background:#e9f0fa;border:2px solid #4a74b5;border-radius:8px;padding:14px 16px 12px}
+.src h5{margin:0 0 6px;font-size:16.5px;font-weight:600}
+.src p{margin:0 0 8px;font-size:15px;line-height:1.5;color:#22324c}
+.src .cand{color:#3a4f73}
+.src .stat{margin:auto 0 0;padding-top:8px;border-top:1.5px solid #b9cbe6;font-size:13.5px;font-weight:600;color:#2f4672}
+.merge{width:2px;height:28px;margin:12px auto 0;background:#5a6270;position:relative}
+.merge::after{content:"";position:absolute;bottom:-1px;left:-4px;border-left:5px solid transparent;
+  border-right:5px solid transparent;border-top:8px solid #5a6270}
+.flowfig{margin:14px 0 14px}
+.flowfig .sc{overflow-x:auto;background:#fff;border:1.5px solid var(--bd2);border-radius:6px;padding:14px 12px}
+.flowfig svg{display:block;width:100%;min-width:720px;height:auto}
+.flowfig svg text{font-family:var(--sans)}
+.flowfig figcaption{margin-top:8px;font-size:14.5px;line-height:1.5;color:var(--sub);max-width:80ch}
+.shared{margin:8px 0 0;display:grid;grid-template-columns:170px minmax(0,1fr);column-gap:22px;font-size:15.5px;line-height:1.5}
+.shared dt,.shared dd{margin:0;padding:9px 0;border-top:1.5px solid var(--bd2)}
+.shared dt{font-weight:600}
+.shared dd{color:var(--ink-2);max-width:72ch}
+.empty{max-width:640px;margin:0 auto;padding:38px 24px;border:2px dashed #c9c6bb;border-radius:8px;text-align:center;
+  font-size:16.5px;color:var(--muted)}
+@media (max-width:700px){.part{gap:10px}.part>.num{width:34px;height:34px;font-size:15px;margin-top:14px}
+  .part>.box{padding:16px 14px 18px}.part h3{font-size:20px}.quote blockquote{font-size:18px}
+  .asks,.shared{grid-template-columns:minmax(0,1fr)}.asks dd,.shared dd{border-top:0;padding-top:0}
+  .asks dt{padding-bottom:6px}.shared dt{padding-bottom:2px}.srcs{grid-template-columns:1fr}
+  table.t{min-width:560px}table.mx{min-width:760px}table.t tbody th{white-space:normal}.quote .ext{white-space:normal}}
+"""
+
+
+def xai_flow() -> str:
+    """The method flowchart: the assessment (last step of the ground truth), the feature attribution tree, the
+    explanations, and the loop back to the assessment. Design pixels, 860 wide."""
+    line, gold = "#5a6270", "#b9862a"
+
+    def rect(x, y, w, h, fill, stroke):
+        return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{fill}" stroke="{stroke}" '
+                f'stroke-width="2"/>')
+
+    def text(x, y, s, size=15.0, weight=600, fill="#1f2430", anchor="middle"):
+        return (f'<text x="{x}" y="{y}" text-anchor="{anchor}" font-size="{size}" font-weight="{weight}" '
+                f'fill="{fill}">{E(s)}</text>')
+
+    def path(d, arrow=True, stroke=line, width=2.0, marker="ah"):
+        end = f' marker-end="url(#{marker})"' if arrow else ""
+        return f'<path d="{d}" fill="none" stroke="{stroke}" stroke-width="{width}"{end}/>'
+
+    amber, amber_bg = "#b9862a", "#fcf6ec"
+    out = [
+        '<defs>'
+        f'<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">'
+        f'<path d="M0 0L10 5L0 10z" fill="{line}"/></marker>'
+        f'<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">'
+        f'<path d="M0 0L10 5L0 10z" fill="{gold}"/></marker></defs>',
+        # the last step of the ground truth
+        rect(194, 14, 440, 70, "#e6f0e8", "#3d8a4f"),
+        text(414, 43, "2.3 · Assessment, the last step of the ground truth"),
+        text(414, 66, "Do the explanations agree with the agronomic reference?", 14, 400, "#2c4a35"),
+        path("M414 84V124"),
+        text(426, 109, "run the methods", 13, 500, "#5b616b", "start"),
+        # the root
+        rect(284, 126, 260, 58, "#173f2c", "#173f2c"),
+        text(414, 151, "Feature attribution", 17, 600, "#ffffff"),
+        text(414, 171, "on the trained models, crop head", 13, 400, "#c3c9b5"),
+        path("M414 184V206", False), path("M158 206H739", False),
+    ]
+    # the three sub-branches and their methods: (centre, [(x, width, name lines, what it does)])
+    branches = [
+        ("Perturbation", 158, [(2, 150, ["Occlusion"], "one group removed"),
+                               (164, 150, ["ALE"], "effect of a band level")]),
+        ("Distillation", 482, [(326, 150, ["SHAP"], "shares of the score"),
+                               (488, 150, ["LIME"], "local linear model")]),
+        ("Backpropagation", 739, [(650, 178, ["Expected or", "Integrated Gradients"], "gradients of the score")]),
+    ]
+    for name, cx, methods in branches:
+        out += [path(f"M{cx} 206V226"), rect(cx - 85, 228, 170, 46, amber_bg, amber), text(cx, 257, name, 16)]
+        centres = [x + w / 2 for x, w, _, _ in methods]
+        if len(methods) > 1:
+            out += [path(f"M{cx} 274V294", False), path(f"M{centres[0]:g} 294H{centres[-1]:g}", False)]
+            out += [path(f"M{c:g} 294V314") for c in centres]
+        else:
+            out.append(path(f"M{cx} 274V314"))
+        for (x, w, lines, what), c in zip(methods, centres):
+            out.append(rect(x, 316, w, 64, "#ffffff", amber))
+            if len(lines) == 1:
+                out += [text(f"{c:g}", 343, lines[0], 16), text(f"{c:g}", 363, what, 12.5, 400, "#5b616b")]
+            else:
+                out += [text(f"{c:g}", 337, lines[0], 15), text(f"{c:g}", 355, lines[1], 15),
+                        text(f"{c:g}", 372, what, 12.5, 400, "#5b616b")]
+            out.append(path(f"M{c:g} 380V402", False))
+    out += [
+        path("M77 402H739", False), path("M414 402V424"),
+        # what the methods return
+        rect(194, 426, 440, 66, "#e9f0fa", "#4a74b5"),
+        text(414, 453, "Explanations per field and per crop", 15.5),
+        text(414, 475, "which months, which bands, in which direction", 13.5, 400, "#22324c"),
+        # the loop back to the assessment
+        path("M634 459H832Q842 459 842 449V59Q842 49 832 49H637", True, gold, 2.5, "ag"),
+        text(738, 40, "iterate", 15, 700, "#8a5a14"),
+    ]
+    label = ("Flowchart. The assessment, last step of the ground truth, starts feature attribution on the trained "
+             "models. It has three branches: perturbation with occlusion and ALE, distillation with SHAP and LIME, and "
+             "backpropagation with Expected or Integrated Gradients. The explanations they return go back to the "
+             "assessment, and the loop repeats.")
+    return (f'<svg viewBox="0 0 860 506" role="img" aria-label="{E(label)}" xmlns="http://www.w3.org/2000/svg">'
+            f'{"".join(out)}</svg>')
+
+
+def _pts(items: list[str]) -> str:
+    return '<ul class="pts">' + "".join(f"<li>{E(i)}</li>" for i in items) + "</ul>"
+
+
+def _table(head: list[str], rows: list[list[str]]) -> str:
+    """A table whose first column is the row header."""
+    th = "".join(f'<th scope="col">{E(h)}</th>' for h in head)
+    body = "".join(f'<tr><th scope="row">{E(r[0])}</th>{"".join(f"<td>{E(c)}</td>" for c in r[1:])}</tr>' for r in rows)
+    return f'<div class="tw"><table class="t"><thead><tr>{th}</tr></thead><tbody>{body}</tbody></table></div>'
+
+
+def _matrix() -> str:
+    """The sample matrix: crop types by month, the cues marked, and what tells each crop apart."""
+    th = "".join(f'<th scope="col">{E(h)}</th>' for h in ["Crop type", *XAI["months"], "What tells it apart"])
+    body = []
+    for crop, cells, prop, apart in XAI["matrix"]:
+        tds = ""
+        for c in cells:
+            cue = ' class="cue"' if c.startswith("*") else ""
+            tds += f"<td{cue}>{E(c.lstrip('*'))}</td>"
+        body.append(f'<tr><th scope="row">{E(crop)}</th>{tds}<td class="end">{E(prop)}'
+                    f'<small>Told apart from {E(apart)}</small></td></tr>')
+    return (f'<div class="tw"><table class="t mx"><thead><tr>{th}</tr></thead><tbody>{"".join(body)}</tbody></table>'
+            f'</div>')
+
+
+def _part(k: int, tone: str, title: str, inner: str) -> str:
+    c, bg, bd, bd2, sub = XAI_TONES[tone]
+    return (f'<li class="part" style="--c:{c};--bg:{bg};--bd:{bd};--bd2:{bd2};--sub:{sub}"><span class="num">{k}</span>'
+            f'<div class="box"><h3>{E(title)}</h3>{inner}</div></li>')
+
+
+def xai_page() -> str:
+    """Phase 2: Explainability (the experimental set-up as a flow of three steps) and Uncertainty quantification."""
+    x, p = XAI, PHASES[2]
+    asks = []
+    for a in x["asks"]:
+        detail = (_table(["Property", "Bands", "How it tells crops apart"], [list(r) for r in x["properties"]])
+                  if a.get("properties") else _pts(a["points"]))
+        asks.append(f'<dt>{E(a["q"])}<small>{E(a["sub"])}</small></dt><dd><p>{E(a["ask"])}</p>{detail}</dd>')
+    cite, href = x["cite"]
+    step1 = (f'<figure class="quote"><blockquote>“{E(x["quote"])}”</blockquote>'
+             f'<figcaption>{external(href, E(cite))}</figcaption></figure>'
+             f'<p>{E(x["lead"])}</p><dl class="asks">{"".join(asks)}</dl>')
+    srcs = "".join(f'<div class="src"><h5>{E(d["title"])}</h5><p>{E(d["gives"])}</p><p class="cand">{E(d["cand"])}</p>'
+                   f'<p class="stat">{E(d["status"])}</p></div>' for d in x["datasets"])
+    matrix = _matrix()
+    step2 = (f'<p>{E(x["truth"])}</p>'
+             f'<h4><b>2.1</b>External datasets to integrate</h4><div class="srcs">{srcs}</div>'
+             f'<div class="merge" aria-hidden="true"></div>'
+             f'<h4><b>2.2</b>The reference per crop type and zone</h4><p>{E(x["reference"])}</p>'
+             f'<p><b>Sample matrix: the “true” cues of six crop types.</b></p>'
+             f'<p class="key"><i></i>A cue: what an explanation should point to</p>{matrix}{_pts(x["matrix_notes"])}'
+             f'<h4><b>2.3</b>The assessment</h4><p>{E(x["assess"])}</p>{_pts(x["assess_points"])}')
+    methods = _table(["Method", "Family", "What it gives", "Compared with"], [list(m) for m in x["methods"]])
+    shared = "".join(f"<dt>{E(t)}</dt><dd>{E(d)}</dd>" for t, d in x["shared"])
+    step3 = (f'<p>{E(x["experiment"])}</p>'
+             f'<figure class="flowfig"><div class="sc">{xai_flow()}</div><figcaption>Every method is a feature '
+             f'attribution method. The gold arrow is the loop: each round of explanations returns to the assessment, '
+             f'the last step of the ground truth.</figcaption></figure>'
+             f'{methods}<h4>What every method shares</h4><dl class="shared">{shared}</dl>')
+    flow = '<li class="join" aria-hidden="true"></li>'.join([
+        _part(1, "ask", "The agronomic questions", step1),
+        _part(2, "truth", "The agronomic ground truth", step2),
+        _part(3, "method", "The experimentation", step3)])
+    rqs = "".join(f"<li><b>{r}</b><span>{E(q)}</span></li>" for r, q in p["rqs"])
+    nav = ('<a href="#explainability">1 · Explainability</a><a href="#uncertainty">2 · Uncertainty quantification</a>'
+           '<a href="#questions">Research questions</a>'
+           + external(f"{REPO}/{XAI_DOC}", "explainability_setup.md")
+           + external(f"{REPO}/docs/thesis_design.md", "thesis_design.md"))
+    body = f"""<body>
+{sitebar(2)}
+{phasebar(2, nav)}
+<main>
+<section id="explainability" aria-labelledby="xai-h">
+<h2 class="sec" id="xai-h">1. Explainability</h2>
+<p class="note">{E(x["intro"])}</p>
+<ol class="flow">{flow}</ol>
+</section>
+<section id="uncertainty" aria-labelledby="uq-h">
+<h2 class="sec" id="uq-h">2. Uncertainty quantification</h2>
+<p class="empty">{E(x["uq"])}</p>
+</section>
+<section id="questions" aria-labelledby="q-h">
+<h2 class="sec" id="q-h">Research questions</h2>
+<p class="note">{p["so"]}: {E(SO_TEXT[2])}</p>
+<ul class="rqlist">{rqs}</ul>
+</section>
+</main>
+{footer(2)}
+</body>
+</html>
+"""
+    return head(f"Phase 2 · {p['name']} · ExplainedGFM4Agri", f"Phase 2 of the thesis: {p['topic']}.",
+                PHASE_CSS + XAI_CSS) + body
+
+
 SO_TEXT = {
     1: "Panoptic crop mapping with geospatial foundation models: the fields of an area and their crop types, from "
        "frozen GFMs, against a network trained on the raw imagery.",
@@ -548,7 +909,7 @@ SO_TEXT = {
 def write_site() -> list[Path]:
     """Write the landing, the Phase 2 and Phase 3 pages, and .nojekyll; the Phase 1 page is build_page.py's."""
     out = []
-    for n, text in [(0, landing()), (2, phase_page(2)), (3, phase_page(3))]:
+    for n, text in [(0, landing()), (2, xai_page()), (3, phase_page(3))]:
         path = DOCS / PAGES[n]
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
