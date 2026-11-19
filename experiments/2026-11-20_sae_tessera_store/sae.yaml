@@ -1,0 +1,55 @@
+# Settings of the sparse-autoencoder study on the precomputed TESSERA embeddings (v1.0 store) of Estonia 2021.
+# Not a K-shot spec: run.py reads it, scripts/run_kshot.py and submit.sh do not.
+name: 2026-11-20_sae_tessera_store
+chips: data/eurocrops_chips/EE_2021_rev
+split: blocks4_buf1600_seed0__6b0eb4cb
+embedding: tessera_v1            # <chip>_tessera.tif, 128 dims, the store's 2021 annual embedding
+# The crop model whose use of the features is tested: frozen store embedding + per-pixel MLP, K = 100 %.
+head_fit: results/2026-10-14_unet_baseline/EE_2021_rev/tessera_v1/P100_draw0_seed0
+
+sample:
+  seed: 0
+  train_pixels_per_chip: 1000    # training chips: uniform over pixels with an embedding, fields or not
+  uniform_pixels_per_chip: 256   # validation and test chips: uniform, for reconstruction and the threshold
+  class_pixels_per_chip: 400     # validation and test chips: per class present, field interiors only
+  nonfield_pixels_per_chip: 200  # validation and test chips: pixels outside every declared field
+  eval_pixels_per_class: 5000    # the scoring sets drawn from those, per class, weighted to the population
+  workers: 24
+
+sae:                             # geosae's BatchTopK recipe (configs/batchtopk.yaml), sized for 4.9 M pixels
+  latent_dim: 1024
+  steps: 8000
+  batch: 8192
+  lr: 1.0e-3
+  warmup: 500
+  beta1: 0.0
+  beta2: 0.999
+  clip_grad_norm: 1.0
+  aux_penalty: 0.03125
+  top_k_aux: 32
+  n_batches_to_dead: 25
+  row_cap: 128                   # candidates per pixel in the two-stage batch top-k
+  val_every: 500
+  threads: 16
+
+runs:                            # name -> variant, k, seed
+  batchtopk_k16_s0: {variant: batchtopk, k: 16, seed: 0}
+  batchtopk_k16_s1: {variant: batchtopk, k: 16, seed: 1}
+  batchtopk_k16_s2: {variant: batchtopk, k: 16, seed: 2}
+  batchtopk_k8_s0: {variant: batchtopk, k: 8, seed: 0}
+  batchtopk_k32_s0: {variant: batchtopk, k: 32, seed: 0}
+  frozen_k16_s0: {variant: frozen, k: 16, seed: 0}
+  frozen_k8_s0: {variant: frozen, k: 8, seed: 0}
+  frozen_k32_s0: {variant: frozen, k: 32, seed: 0}
+main: batchtopk_k16_s0
+control: frozen_k16_s0
+seeds: [batchtopk_k16_s1, batchtopk_k16_s2]
+
+evaluate:
+  align_auroc: 0.65              # folded AUROC at which a unit is aligned with a concept (paper 1)
+  live_auroc: 0.51
+  family_selectivity: 2.0        # a feature joins the family of its top class when its mean there is >= 2x its field mean
+  min_class_pixels: 200          # classes with fewer test interior pixels in the sample are not scored
+  n_null: 200                    # random families for the classification null
+  n_null_ablation: 100           # random sets per class for the ablation null
+  threads: 32
