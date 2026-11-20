@@ -1,8 +1,7 @@
 # Sparse autoencoders on the precomputed TESSERA embeddings of Estonia 2021, 20 November 2026
 
-**Status: in progress.** The extraction was started on 20 November 2026 (`run.py extract`, log in
-`results/2026-11-20_sae_tessera_store/EE_2021_rev/logs/`). `stages.py` (train, evaluate) is written but not yet
-run. `report.py` and `REPORT.md` are still to be written.
+**Status: done, 20 November 2026.** All eight SAEs trained and evaluated on the hub (CPU). Report:
+[REPORT.md](REPORT.md).
 
 **Question.** Does a sparse autoencoder (SAE) on the precomputed TESSERA embeddings (the v1.0 store, 128
 dimensions, `<chip>_tessera.tif`) of all of Estonia 2021 find features that each mark one crop? Do they do so more
@@ -38,7 +37,16 @@ embedding with a per-pixel MLP, K = 100 %, test pixel Macro-F1 0.623.
     poetry run python experiments/2026-11-20_sae_tessera_store/run.py head
     poetry run python experiments/2026-11-20_sae_tessera_store/run.py train --run batchtopk_k16_s0   # one process per run
     poetry run python experiments/2026-11-20_sae_tessera_store/run.py evaluate
+    poetry run python experiments/2026-11-20_sae_tessera_store/report.py
 
 **Results.** `results/2026-11-20_sae_tessera_store/EE_2021_rev/`.
 
-**Outcome.** Not yet.
+**Outcome.** Partly yes, for the crops with a season of their own. With 16 of 1,024 features per pixel the SAE keeps
+90 % of the embedding's variance, and the crop head on its reconstruction scores 0.558 against 0.623. Single
+features mark winter rapeseed (F1 0.93), grassland, maize, winter barley, winter wheat and buckwheat (0.54 to 0.77).
+Removing a crop's 7 to 22 features takes 60 to 96 points off its recall for 7 crops, while random features of the
+same number take 0 to 8 points off. These features return with other seeds. But a frozen random dictionary scores
+as well on the single-feature and alignment tests (mean F1 0.36 against 0.38), so those tests reward sparsity, not
+learning. The spring cereals, legumes, clover and oats have no feature of their own. Useful as an explanation tool
+(ablation plus seasonal profiles), not as proof that the embedding is organised by crop. Details in
+[REPORT.md](REPORT.md).

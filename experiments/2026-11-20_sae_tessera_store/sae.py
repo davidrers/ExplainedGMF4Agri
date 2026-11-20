@@ -140,7 +140,7 @@ def sae_loss(model: BatchTopKSAE, x, recon, zd, *, aux_penalty: float, top_k_aux
         z_aux = torch.zeros_like(zd)
         z_aux[:, dead] = torch.zeros_like(zdd).scatter(-1, i, v)
         aux = F.mse_loss(model.decoder(z_aux), (x - recon).detach())
-    return rec + aux_penalty * aux, {"recon_mse": float(rec), "aux": float(aux), "n_dead": n_dead}
+    return rec + aux_penalty * aux, {"recon_mse": float(rec.detach()), "aux": float(aux.detach()), "n_dead": n_dead}
 
 
 @torch.no_grad()

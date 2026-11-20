@@ -275,7 +275,7 @@ def full_test_pass(head, ns, models: dict, bases: Bases) -> dict:
     from concurrent.futures import ThreadPoolExecutor
 
     stored = np.load(REPO / CFG["head_fit"] / "predictions_test.npz")
-    ids = list(stored["ids"])
+    ids = list(stored["ids"])[: EV.get("full_test_limit")]  # a limit only for dry runs
     mean, std, scale = (np.array(ns["means"], np.float32), np.array(ns["stds"], np.float32), ns["scale"])
     variants = ["embedding"] + list(models) + ["pca16"]
     cms = {v: {"all": np.zeros((20, 20)), "interior": np.zeros((20, 20))} for v in variants}
@@ -332,6 +332,7 @@ def full_test_pass(head, ns, models: dict, bases: Bases) -> dict:
 # --------------------------------------------------------------------------------------------------- evaluate
 def stage_evaluate(force: bool) -> None:
     torch.set_num_threads(EV["threads"])
+    torch.set_grad_enabled(False)
     d = OUT / "eval"
     d.mkdir(parents=True, exist_ok=True)
     if (d / "summary.json").exists() and not force:
@@ -368,7 +369,9 @@ def stage_evaluate(force: bool) -> None:
     counts = {c: int(((et["label"] == c) & et["field"]).sum()) for c in range(20)}
     vcounts = {c: int(((ev["label"] == c) & ev["field"]).sum()) for c in range(20)}
     supported = [c for c in range(20) if counts[c] >= EV["min_class_pixels"] and vcounts[c] >= EV["min_class_pixels"]]
+    parcels = {c: int(len(np.unique(et["parcel"][(et["label"] == c) & et["field"]]))) for c in range(20)}
     summary["scoring_sets"] = {"test_pixels_per_class": {names[c]: counts[c] for c in range(20)},
+                               "test_fields_per_class": {names[c]: parcels[c] for c in range(20)},
                                "val_pixels_per_class": {names[c]: vcounts[c] for c in range(20)},
                                "supported": [names[c] for c in supported],
                                "test_outside_fields": int((et["kind"] == 2).sum())}
