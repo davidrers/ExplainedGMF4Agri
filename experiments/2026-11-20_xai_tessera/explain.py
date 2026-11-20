@@ -230,7 +230,7 @@ def integrated_gradients(ev: chain.Evaluator, net, mean, targets: np.ndarray, st
                 sc_all.append(sc.detach())
                 if want_grad:
                     for t in range(nt):
-                        obj = sc[torch.arange(len(idx)), tg[idx, t]].sum()
+                        obj = sc[torch.arange(len(idx), device=dev), tg[idx, t]].sum()
                         g_emb[t] += torch.autograd.grad(obj, emb, retain_graph=t < nt - 1)[0]
         sc_all = torch.cat(sc_all).cpu().numpy()
         if not want_grad:
