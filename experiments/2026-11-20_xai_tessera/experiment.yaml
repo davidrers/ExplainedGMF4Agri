@@ -1,0 +1,18 @@
+# XAI on TESSERA v2 Medium + the two-head network (K = 100 %, Estonia 2021): occlusion, SHAP and Integrated
+# Gradients. Not a K-shot spec: "arms" are the steps run.py runs, one Slurm job each (scripts/cluster/submit.sh).
+name: 2026-11-20_xai_tessera
+arms: [step0, sample, explain0, explain1, explain2, explain3, sanity]
+shards: 4                      # explain0 ... explain3 split the sampled chips
+
+sample:
+  quota: 40                    # fields per class (the 20 Estonian classes), interior >= 20 pixels
+  max_chips: 80
+
+methods:
+  shap_permutations: 32        # months game: 16 antithetic pairs; the band-group game is exact (64 coalitions)
+  ig_steps: 32                 # Integrated Gradients, midpoint rule, from the mean field
+  ig_steps_check: 64           # on the first chips of shard 0, for the convergence check
+  deletion_steps: 6            # months removed cumulatively, of 12
+  deletion_random: 2           # random orders per operator
+  net_batch: 8                 # field maps per network pass
+  sanity_chips: 8
