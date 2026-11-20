@@ -59,7 +59,7 @@ def main() -> None:
                 out = root / "step0_test"
             if not (out / "embedding_stats.json").exists():
                 step0.prep(chips, split_dir, out, batch, args.limit)
-            step0.verify(chips, split_dir, out, batch, args.limit)
+            step0.verify(chips, split_dir, out, batch, args.limit or spec.get("verify_chips"))
         elif step == "sample":
             import sample
 

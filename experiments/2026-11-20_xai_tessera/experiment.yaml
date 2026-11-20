@@ -1,8 +1,9 @@
 # XAI on TESSERA v2 Medium + the two-head network (K = 100 %, Estonia 2021): occlusion, SHAP and Integrated
 # Gradients. Not a K-shot spec: "arms" are the steps run.py runs, one Slurm job each (scripts/cluster/submit.sh).
 name: 2026-11-20_xai_tessera
-arms: [step0, sample, explain0, explain1, explain2, explain3, sanity]
-shards: 4                      # explain0 ... explain3 split the sampled chips
+arms: [step0, sample, pilot, explain0, explain1, explain2, explain3, explain4, explain5, explain6, explain7, sanity]
+shards: 8                      # explain0 ... explain7 split the sampled chips
+verify_chips: 300              # test chips the chain is checked on (the statistics use every training chip)
 
 sample:
   quota: 40                    # fields per class (the 20 Estonian classes), interior >= 20 pixels
