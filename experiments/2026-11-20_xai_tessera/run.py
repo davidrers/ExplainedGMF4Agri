@@ -9,6 +9,7 @@ Steps (``experiment.yaml`` lists them):
 
 * ``step0``: training-chip statistics, mean field, chain check against ``predictions_test.npz`` (``step0.py``);
 * ``sample``: the test fields explained (``sample.py``);
+* ``pilot``: the first chip of shard 0, for the timing;
 * ``explain<i>``: shard ``i`` of the sampled chips through the three methods (``explain.py``);
 * ``sanity``: the randomised-model check (``explain.py``).
 
@@ -62,7 +63,11 @@ def main() -> None:
         elif step == "sample":
             import sample
 
-            sample.run(chips, split_dir, root / "sample", spec["sample"])
+            sample.run(chips, split_dir, HERE / "sample", spec["sample"], root / "sample")
+        elif step == "pilot":
+            import explain
+
+            explain.run("explain0", chips, root, spec, batch, 1)
         elif step.startswith("explain") or step == "sanity":
             import explain
 

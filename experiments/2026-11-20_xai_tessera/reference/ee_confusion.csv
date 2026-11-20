@@ -1,0 +1,197 @@
+zone,true,predicted,share
+EE,barley,barley,0.7205
+EE,barley,buckwheat,0.0040
+EE,barley,dry pulses,0.0220
+EE,barley,fallow,0.0045
+EE,barley,forage legumes,0.0170
+EE,barley,grassland,0.0070
+EE,barley,maize,0.0020
+EE,barley,oats,0.1600
+EE,barley,orchards,0.0000
+EE,barley,rapeseed,0.0005
+EE,barley,rye,0.0075
+EE,barley,triticale,0.0000
+EE,barley,vegetables,0.0000
+EE,barley,wheat,0.0550
+EE,buckwheat,barley,0.0049
+EE,buckwheat,buckwheat,0.8107
+EE,buckwheat,dry pulses,0.0558
+EE,buckwheat,fallow,0.0170
+EE,buckwheat,forage legumes,0.0316
+EE,buckwheat,grassland,0.0146
+EE,buckwheat,maize,0.0097
+EE,buckwheat,oats,0.0291
+EE,buckwheat,orchards,0.0000
+EE,buckwheat,rapeseed,0.0097
+EE,buckwheat,rye,0.0024
+EE,buckwheat,triticale,0.0000
+EE,buckwheat,vegetables,0.0121
+EE,buckwheat,wheat,0.0024
+EE,dry pulses,barley,0.0115
+EE,dry pulses,buckwheat,0.0095
+EE,dry pulses,dry pulses,0.8660
+EE,dry pulses,fallow,0.0100
+EE,dry pulses,forage legumes,0.0335
+EE,dry pulses,grassland,0.0250
+EE,dry pulses,maize,0.0050
+EE,dry pulses,oats,0.0260
+EE,dry pulses,orchards,0.0015
+EE,dry pulses,rapeseed,0.0055
+EE,dry pulses,rye,0.0010
+EE,dry pulses,triticale,0.0000
+EE,dry pulses,vegetables,0.0005
+EE,dry pulses,wheat,0.0050
+EE,fallow,barley,0.0416
+EE,fallow,buckwheat,0.0083
+EE,fallow,dry pulses,0.1642
+EE,fallow,fallow,0.2495
+EE,fallow,forage legumes,0.2432
+EE,fallow,grassland,0.1684
+EE,fallow,maize,0.0062
+EE,fallow,oats,0.0873
+EE,fallow,orchards,0.0042
+EE,fallow,rapeseed,0.0021
+EE,fallow,rye,0.0042
+EE,fallow,triticale,0.0000
+EE,fallow,vegetables,0.0062
+EE,fallow,wheat,0.0146
+EE,forage legumes,barley,0.0095
+EE,forage legumes,buckwheat,0.0095
+EE,forage legumes,dry pulses,0.0285
+EE,forage legumes,fallow,0.0140
+EE,forage legumes,forage legumes,0.6490
+EE,forage legumes,grassland,0.2090
+EE,forage legumes,maize,0.0025
+EE,forage legumes,oats,0.0530
+EE,forage legumes,orchards,0.0055
+EE,forage legumes,rapeseed,0.0005
+EE,forage legumes,rye,0.0020
+EE,forage legumes,triticale,0.0005
+EE,forage legumes,vegetables,0.0020
+EE,forage legumes,wheat,0.0145
+EE,grassland,barley,0.0020
+EE,grassland,buckwheat,0.0010
+EE,grassland,dry pulses,0.0035
+EE,grassland,fallow,0.0060
+EE,grassland,forage legumes,0.1920
+EE,grassland,grassland,0.7510
+EE,grassland,maize,0.0000
+EE,grassland,oats,0.0230
+EE,grassland,orchards,0.0140
+EE,grassland,rapeseed,0.0005
+EE,grassland,rye,0.0010
+EE,grassland,triticale,0.0000
+EE,grassland,vegetables,0.0005
+EE,grassland,wheat,0.0055
+EE,maize,barley,0.0065
+EE,maize,buckwheat,0.0097
+EE,maize,dry pulses,0.0519
+EE,maize,fallow,0.0195
+EE,maize,forage legumes,0.0065
+EE,maize,grassland,0.0000
+EE,maize,maize,0.8734
+EE,maize,oats,0.0227
+EE,maize,orchards,0.0000
+EE,maize,rapeseed,0.0032
+EE,maize,rye,0.0032
+EE,maize,triticale,0.0000
+EE,maize,vegetables,0.0032
+EE,maize,wheat,0.0000
+EE,oats,barley,0.1115
+EE,oats,buckwheat,0.0085
+EE,oats,dry pulses,0.0195
+EE,oats,fallow,0.0075
+EE,oats,forage legumes,0.0315
+EE,oats,grassland,0.0210
+EE,oats,maize,0.0040
+EE,oats,oats,0.7470
+EE,oats,orchards,0.0025
+EE,oats,rapeseed,0.0005
+EE,oats,rye,0.0005
+EE,oats,triticale,0.0000
+EE,oats,vegetables,0.0025
+EE,oats,wheat,0.0435
+EE,orchards,barley,0.0032
+EE,orchards,buckwheat,0.0000
+EE,orchards,dry pulses,0.0225
+EE,orchards,fallow,0.0193
+EE,orchards,forage legumes,0.2315
+EE,orchards,grassland,0.2894
+EE,orchards,maize,0.0032
+EE,orchards,oats,0.0257
+EE,orchards,orchards,0.3923
+EE,orchards,rapeseed,0.0000
+EE,orchards,rye,0.0000
+EE,orchards,triticale,0.0000
+EE,orchards,vegetables,0.0129
+EE,orchards,wheat,0.0000
+EE,rapeseed,barley,0.0015
+EE,rapeseed,buckwheat,0.0155
+EE,rapeseed,dry pulses,0.0360
+EE,rapeseed,fallow,0.0015
+EE,rapeseed,forage legumes,0.0115
+EE,rapeseed,grassland,0.0040
+EE,rapeseed,maize,0.0035
+EE,rapeseed,oats,0.0070
+EE,rapeseed,orchards,0.0000
+EE,rapeseed,rapeseed,0.9105
+EE,rapeseed,rye,0.0015
+EE,rapeseed,triticale,0.0000
+EE,rapeseed,vegetables,0.0030
+EE,rapeseed,wheat,0.0045
+EE,rye,barley,0.0431
+EE,rye,buckwheat,0.0019
+EE,rye,dry pulses,0.0412
+EE,rye,fallow,0.0019
+EE,rye,forage legumes,0.0581
+EE,rye,grassland,0.0056
+EE,rye,maize,0.0037
+EE,rye,oats,0.0337
+EE,rye,orchards,0.0000
+EE,rye,rapeseed,0.0000
+EE,rye,rye,0.6835
+EE,rye,triticale,0.0112
+EE,rye,vegetables,0.0019
+EE,rye,wheat,0.1142
+EE,triticale,barley,0.1019
+EE,triticale,buckwheat,0.0000
+EE,triticale,dry pulses,0.0764
+EE,triticale,fallow,0.0000
+EE,triticale,forage legumes,0.0255
+EE,triticale,grassland,0.0000
+EE,triticale,maize,0.0000
+EE,triticale,oats,0.0924
+EE,triticale,orchards,0.0032
+EE,triticale,rapeseed,0.0032
+EE,triticale,rye,0.1115
+EE,triticale,triticale,0.1943
+EE,triticale,vegetables,0.0000
+EE,triticale,wheat,0.3917
+EE,vegetables,barley,0.0130
+EE,vegetables,buckwheat,0.0913
+EE,vegetables,dry pulses,0.2261
+EE,vegetables,fallow,0.0609
+EE,vegetables,forage legumes,0.1565
+EE,vegetables,grassland,0.0348
+EE,vegetables,maize,0.0217
+EE,vegetables,oats,0.0609
+EE,vegetables,orchards,0.0043
+EE,vegetables,rapeseed,0.0130
+EE,vegetables,rye,0.0043
+EE,vegetables,triticale,0.0000
+EE,vegetables,vegetables,0.3000
+EE,vegetables,wheat,0.0130
+EE,wheat,barley,0.0925
+EE,wheat,buckwheat,0.0000
+EE,wheat,dry pulses,0.0085
+EE,wheat,fallow,0.0005
+EE,wheat,forage legumes,0.0215
+EE,wheat,grassland,0.0015
+EE,wheat,maize,0.0005
+EE,wheat,oats,0.1565
+EE,wheat,orchards,0.0005
+EE,wheat,rapeseed,0.0005
+EE,wheat,rye,0.0110
+EE,wheat,triticale,0.0005
+EE,wheat,vegetables,0.0000
+EE,wheat,wheat,0.7060

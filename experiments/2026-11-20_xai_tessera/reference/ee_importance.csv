@@ -1,0 +1,1726 @@
+zone,species,unit,month,group,recall_drop
+EE,barley,month x group,M01,Visible,0.002
+EE,buckwheat,month x group,M01,Visible,0.0
+EE,dry pulses,month x group,M01,Visible,0.0
+EE,fallow,month x group,M01,Visible,-0.0062
+EE,forage legumes,month x group,M01,Visible,-0.004
+EE,grassland,month x group,M01,Visible,0.0085
+EE,maize,month x group,M01,Visible,-0.0032
+EE,oats,month x group,M01,Visible,-0.0005
+EE,orchards,month x group,M01,Visible,-0.0096
+EE,rapeseed,month x group,M01,Visible,-0.0005
+EE,rye,month x group,M01,Visible,0.0019
+EE,triticale,month x group,M01,Visible,0.0096
+EE,vegetables,month x group,M01,Visible,0.013
+EE,wheat,month x group,M01,Visible,0.0005
+EE,all species,month x group,M01,Visible,0.0008
+EE,barley,month x group,M01,Red-edge,0.004
+EE,buckwheat,month x group,M01,Red-edge,-0.0024
+EE,dry pulses,month x group,M01,Red-edge,-0.001
+EE,fallow,month x group,M01,Red-edge,-0.0042
+EE,forage legumes,month x group,M01,Red-edge,-0.0005
+EE,grassland,month x group,M01,Red-edge,0.0045
+EE,maize,month x group,M01,Red-edge,0.0
+EE,oats,month x group,M01,Red-edge,0.0025
+EE,orchards,month x group,M01,Red-edge,0.0
+EE,rapeseed,month x group,M01,Red-edge,0.0
+EE,rye,month x group,M01,Red-edge,-0.0019
+EE,triticale,month x group,M01,Red-edge,0.0096
+EE,vegetables,month x group,M01,Red-edge,0.0087
+EE,wheat,month x group,M01,Red-edge,-0.002
+EE,all species,month x group,M01,Red-edge,0.0012
+EE,barley,month x group,M01,NIR,0.002
+EE,buckwheat,month x group,M01,NIR,0.0049
+EE,dry pulses,month x group,M01,NIR,0.0005
+EE,fallow,month x group,M01,NIR,-0.0062
+EE,forage legumes,month x group,M01,NIR,-0.0045
+EE,grassland,month x group,M01,NIR,0.0025
+EE,maize,month x group,M01,NIR,-0.0032
+EE,oats,month x group,M01,NIR,0.0
+EE,orchards,month x group,M01,NIR,-0.0032
+EE,rapeseed,month x group,M01,NIR,-0.001
+EE,rye,month x group,M01,NIR,-0.0019
+EE,triticale,month x group,M01,NIR,-0.0032
+EE,vegetables,month x group,M01,NIR,0.013
+EE,wheat,month x group,M01,NIR,-0.001
+EE,all species,month x group,M01,NIR,-0.0001
+EE,barley,month x group,M01,SWIR,0.001
+EE,buckwheat,month x group,M01,SWIR,-0.0049
+EE,dry pulses,month x group,M01,SWIR,0.001
+EE,fallow,month x group,M01,SWIR,-0.0042
+EE,forage legumes,month x group,M01,SWIR,0.0
+EE,grassland,month x group,M01,SWIR,0.0015
+EE,maize,month x group,M01,SWIR,0.0032
+EE,oats,month x group,M01,SWIR,0.0005
+EE,orchards,month x group,M01,SWIR,0.0
+EE,rapeseed,month x group,M01,SWIR,0.0
+EE,rye,month x group,M01,SWIR,0.0037
+EE,triticale,month x group,M01,SWIR,0.0127
+EE,vegetables,month x group,M01,SWIR,0.0087
+EE,wheat,month x group,M01,SWIR,-0.0025
+EE,all species,month x group,M01,SWIR,0.0015
+EE,barley,month x group,M01,Atmospheric,-0.0005
+EE,buckwheat,month x group,M01,Atmospheric,0.0024
+EE,dry pulses,month x group,M01,Atmospheric,0.001
+EE,fallow,month x group,M01,Atmospheric,0.0021
+EE,forage legumes,month x group,M01,Atmospheric,0.0
+EE,grassland,month x group,M01,Atmospheric,-0.0005
+EE,maize,month x group,M01,Atmospheric,0.0
+EE,oats,month x group,M01,Atmospheric,-0.003
+EE,orchards,month x group,M01,Atmospheric,-0.0032
+EE,rapeseed,month x group,M01,Atmospheric,0.0
+EE,rye,month x group,M01,Atmospheric,0.0
+EE,triticale,month x group,M01,Atmospheric,0.0064
+EE,vegetables,month x group,M01,Atmospheric,0.0087
+EE,wheat,month x group,M01,Atmospheric,0.0005
+EE,all species,month x group,M01,Atmospheric,0.001
+EE,barley,month x group,M01,VV,0.0015
+EE,buckwheat,month x group,M01,VV,-0.0024
+EE,dry pulses,month x group,M01,VV,-0.0005
+EE,fallow,month x group,M01,VV,0.0
+EE,forage legumes,month x group,M01,VV,-0.0015
+EE,grassland,month x group,M01,VV,0.001
+EE,maize,month x group,M01,VV,0.0
+EE,oats,month x group,M01,VV,-0.0005
+EE,orchards,month x group,M01,VV,0.0
+EE,rapeseed,month x group,M01,VV,0.0
+EE,rye,month x group,M01,VV,0.0037
+EE,triticale,month x group,M01,VV,0.0191
+EE,vegetables,month x group,M01,VV,0.0043
+EE,wheat,month x group,M01,VV,-0.0025
+EE,all species,month x group,M01,VV,0.0016
+EE,barley,month x group,M01,VH,-0.002
+EE,buckwheat,month x group,M01,VH,0.0
+EE,dry pulses,month x group,M01,VH,-0.0005
+EE,fallow,month x group,M01,VH,-0.0062
+EE,forage legumes,month x group,M01,VH,-0.002
+EE,grassland,month x group,M01,VH,0.005
+EE,maize,month x group,M01,VH,0.0032
+EE,oats,month x group,M01,VH,0.0035
+EE,orchards,month x group,M01,VH,0.0
+EE,rapeseed,month x group,M01,VH,0.0005
+EE,rye,month x group,M01,VH,0.0075
+EE,triticale,month x group,M01,VH,0.0032
+EE,vegetables,month x group,M01,VH,0.013
+EE,wheat,month x group,M01,VH,-0.0005
+EE,all species,month x group,M01,VH,0.0018
+EE,barley,month,M01,all,0.006
+EE,buckwheat,month,M01,all,-0.0024
+EE,dry pulses,month,M01,all,0.002
+EE,fallow,month,M01,all,0.0
+EE,forage legumes,month,M01,all,-0.019
+EE,grassland,month,M01,all,0.031
+EE,maize,month,M01,all,-0.0065
+EE,oats,month,M01,all,-0.004
+EE,orchards,month,M01,all,0.0
+EE,rapeseed,month,M01,all,0.0005
+EE,rye,month,M01,all,0.0075
+EE,triticale,month,M01,all,0.035
+EE,vegetables,month,M01,all,0.0174
+EE,wheat,month,M01,all,0.001
+EE,all species,month,M01,all,0.0049
+EE,barley,month x group,M02,Visible,0.005
+EE,buckwheat,month x group,M02,Visible,0.0
+EE,dry pulses,month x group,M02,Visible,-0.0005
+EE,fallow,month x group,M02,Visible,0.0042
+EE,forage legumes,month x group,M02,Visible,-0.001
+EE,grassland,month x group,M02,Visible,0.0125
+EE,maize,month x group,M02,Visible,0.0
+EE,oats,month x group,M02,Visible,-0.001
+EE,orchards,month x group,M02,Visible,-0.0032
+EE,rapeseed,month x group,M02,Visible,0.0
+EE,rye,month x group,M02,Visible,0.0
+EE,triticale,month x group,M02,Visible,0.0064
+EE,vegetables,month x group,M02,Visible,0.0217
+EE,wheat,month x group,M02,Visible,-0.0025
+EE,all species,month x group,M02,Visible,0.003
+EE,barley,month x group,M02,Red-edge,0.003
+EE,buckwheat,month x group,M02,Red-edge,0.0
+EE,dry pulses,month x group,M02,Red-edge,0.0005
+EE,fallow,month x group,M02,Red-edge,0.0021
+EE,forage legumes,month x group,M02,Red-edge,-0.005
+EE,grassland,month x group,M02,Red-edge,0.0065
+EE,maize,month x group,M02,Red-edge,-0.0032
+EE,oats,month x group,M02,Red-edge,0.002
+EE,orchards,month x group,M02,Red-edge,-0.0032
+EE,rapeseed,month x group,M02,Red-edge,0.0
+EE,rye,month x group,M02,Red-edge,-0.0075
+EE,triticale,month x group,M02,Red-edge,0.0159
+EE,vegetables,month x group,M02,Red-edge,0.0043
+EE,wheat,month x group,M02,Red-edge,-0.001
+EE,all species,month x group,M02,Red-edge,0.001
+EE,barley,month x group,M02,NIR,-0.0005
+EE,buckwheat,month x group,M02,NIR,0.0049
+EE,dry pulses,month x group,M02,NIR,0.0
+EE,fallow,month x group,M02,NIR,-0.0021
+EE,forage legumes,month x group,M02,NIR,-0.0005
+EE,grassland,month x group,M02,NIR,0.002
+EE,maize,month x group,M02,NIR,0.0
+EE,oats,month x group,M02,NIR,-0.0025
+EE,orchards,month x group,M02,NIR,0.0
+EE,rapeseed,month x group,M02,NIR,0.0005
+EE,rye,month x group,M02,NIR,-0.0037
+EE,triticale,month x group,M02,NIR,0.0
+EE,vegetables,month x group,M02,NIR,0.0087
+EE,wheat,month x group,M02,NIR,-0.001
+EE,all species,month x group,M02,NIR,0.0004
+EE,barley,month x group,M02,SWIR,-0.002
+EE,buckwheat,month x group,M02,SWIR,0.0
+EE,dry pulses,month x group,M02,SWIR,-0.0005
+EE,fallow,month x group,M02,SWIR,0.0083
+EE,forage legumes,month x group,M02,SWIR,0.002
+EE,grassland,month x group,M02,SWIR,0.0
+EE,maize,month x group,M02,SWIR,-0.0032
+EE,oats,month x group,M02,SWIR,0.002
+EE,orchards,month x group,M02,SWIR,0.0
+EE,rapeseed,month x group,M02,SWIR,0.0005
+EE,rye,month x group,M02,SWIR,0.0094
+EE,triticale,month x group,M02,SWIR,-0.0032
+EE,vegetables,month x group,M02,SWIR,-0.0043
+EE,wheat,month x group,M02,SWIR,0.0005
+EE,all species,month x group,M02,SWIR,0.0007
+EE,barley,month x group,M02,Atmospheric,0.002
+EE,buckwheat,month x group,M02,Atmospheric,0.0024
+EE,dry pulses,month x group,M02,Atmospheric,0.0
+EE,fallow,month x group,M02,Atmospheric,0.0
+EE,forage legumes,month x group,M02,Atmospheric,0.0
+EE,grassland,month x group,M02,Atmospheric,-0.001
+EE,maize,month x group,M02,Atmospheric,-0.0032
+EE,oats,month x group,M02,Atmospheric,-0.0005
+EE,orchards,month x group,M02,Atmospheric,0.0064
+EE,rapeseed,month x group,M02,Atmospheric,0.0
+EE,rye,month x group,M02,Atmospheric,-0.0056
+EE,triticale,month x group,M02,Atmospheric,0.0096
+EE,vegetables,month x group,M02,Atmospheric,0.0217
+EE,wheat,month x group,M02,Atmospheric,-0.003
+EE,all species,month x group,M02,Atmospheric,0.0021
+EE,barley,month x group,M02,VV,-0.0025
+EE,buckwheat,month x group,M02,VV,-0.0049
+EE,dry pulses,month x group,M02,VV,0.0005
+EE,fallow,month x group,M02,VV,-0.0042
+EE,forage legumes,month x group,M02,VV,-0.0025
+EE,grassland,month x group,M02,VV,0.0095
+EE,maize,month x group,M02,VV,0.0
+EE,oats,month x group,M02,VV,0.001
+EE,orchards,month x group,M02,VV,-0.0064
+EE,rapeseed,month x group,M02,VV,-0.0005
+EE,rye,month x group,M02,VV,0.0
+EE,triticale,month x group,M02,VV,0.0032
+EE,vegetables,month x group,M02,VV,0.0043
+EE,wheat,month x group,M02,VV,0.001
+EE,all species,month x group,M02,VV,-0.0001
+EE,barley,month x group,M02,VH,-0.002
+EE,buckwheat,month x group,M02,VH,0.0
+EE,dry pulses,month x group,M02,VH,-0.0005
+EE,fallow,month x group,M02,VH,-0.0042
+EE,forage legumes,month x group,M02,VH,0.0
+EE,grassland,month x group,M02,VH,0.006
+EE,maize,month x group,M02,VH,0.0
+EE,oats,month x group,M02,VH,0.001
+EE,orchards,month x group,M02,VH,0.0096
+EE,rapeseed,month x group,M02,VH,0.0
+EE,rye,month x group,M02,VH,0.0056
+EE,triticale,month x group,M02,VH,-0.0032
+EE,vegetables,month x group,M02,VH,0.0
+EE,wheat,month x group,M02,VH,0.0005
+EE,all species,month x group,M02,VH,0.0009
+EE,barley,month,M02,all,0.0075
+EE,buckwheat,month,M02,all,-0.0024
+EE,dry pulses,month,M02,all,0.0015
+EE,fallow,month,M02,all,-0.0021
+EE,forage legumes,month,M02,all,-0.025
+EE,grassland,month,M02,all,0.0485
+EE,maize,month,M02,all,0.0032
+EE,oats,month,M02,all,-0.0035
+EE,orchards,month,M02,all,0.0
+EE,rapeseed,month,M02,all,0.0005
+EE,rye,month,M02,all,-0.0075
+EE,triticale,month,M02,all,0.0223
+EE,vegetables,month,M02,all,0.0087
+EE,wheat,month,M02,all,0.0
+EE,all species,month,M02,all,0.0037
+EE,barley,month x group,M03,Visible,0.004
+EE,buckwheat,month x group,M03,Visible,0.0049
+EE,dry pulses,month x group,M03,Visible,0.0
+EE,fallow,month x group,M03,Visible,-0.0083
+EE,forage legumes,month x group,M03,Visible,-0.005
+EE,grassland,month x group,M03,Visible,0.0125
+EE,maize,month x group,M03,Visible,0.0032
+EE,oats,month x group,M03,Visible,-0.001
+EE,orchards,month x group,M03,Visible,-0.0064
+EE,rapeseed,month x group,M03,Visible,0.0
+EE,rye,month x group,M03,Visible,-0.0075
+EE,triticale,month x group,M03,Visible,-0.0032
+EE,vegetables,month x group,M03,Visible,0.013
+EE,wheat,month x group,M03,Visible,-0.0005
+EE,all species,month x group,M03,Visible,0.0004
+EE,barley,month x group,M03,Red-edge,0.0045
+EE,buckwheat,month x group,M03,Red-edge,0.0
+EE,dry pulses,month x group,M03,Red-edge,0.0025
+EE,fallow,month x group,M03,Red-edge,0.0042
+EE,forage legumes,month x group,M03,Red-edge,-0.004
+EE,grassland,month x group,M03,Red-edge,0.0055
+EE,maize,month x group,M03,Red-edge,0.0
+EE,oats,month x group,M03,Red-edge,-0.002
+EE,orchards,month x group,M03,Red-edge,-0.0096
+EE,rapeseed,month x group,M03,Red-edge,-0.0015
+EE,rye,month x group,M03,Red-edge,-0.0056
+EE,triticale,month x group,M03,Red-edge,0.0032
+EE,vegetables,month x group,M03,Red-edge,0.0087
+EE,wheat,month x group,M03,Red-edge,0.0005
+EE,all species,month x group,M03,Red-edge,0.0004
+EE,barley,month x group,M03,NIR,0.005
+EE,buckwheat,month x group,M03,NIR,0.0
+EE,dry pulses,month x group,M03,NIR,0.0
+EE,fallow,month x group,M03,NIR,-0.0042
+EE,forage legumes,month x group,M03,NIR,-0.0035
+EE,grassland,month x group,M03,NIR,0.0045
+EE,maize,month x group,M03,NIR,-0.0065
+EE,oats,month x group,M03,NIR,-0.0005
+EE,orchards,month x group,M03,NIR,-0.0064
+EE,rapeseed,month x group,M03,NIR,-0.0005
+EE,rye,month x group,M03,NIR,-0.0037
+EE,triticale,month x group,M03,NIR,0.0127
+EE,vegetables,month x group,M03,NIR,0.0087
+EE,wheat,month x group,M03,NIR,-0.003
+EE,all species,month x group,M03,NIR,0.0002
+EE,barley,month x group,M03,SWIR,-0.003
+EE,buckwheat,month x group,M03,SWIR,0.0
+EE,dry pulses,month x group,M03,SWIR,0.0
+EE,fallow,month x group,M03,SWIR,0.0021
+EE,forage legumes,month x group,M03,SWIR,0.0015
+EE,grassland,month x group,M03,SWIR,-0.001
+EE,maize,month x group,M03,SWIR,0.0
+EE,oats,month x group,M03,SWIR,0.0005
+EE,orchards,month x group,M03,SWIR,0.0
+EE,rapeseed,month x group,M03,SWIR,0.0
+EE,rye,month x group,M03,SWIR,-0.0037
+EE,triticale,month x group,M03,SWIR,0.0064
+EE,vegetables,month x group,M03,SWIR,-0.0043
+EE,wheat,month x group,M03,SWIR,0.0
+EE,all species,month x group,M03,SWIR,-0.0001
+EE,barley,month x group,M03,Atmospheric,0.0
+EE,buckwheat,month x group,M03,Atmospheric,0.0
+EE,dry pulses,month x group,M03,Atmospheric,0.001
+EE,fallow,month x group,M03,Atmospheric,-0.0042
+EE,forage legumes,month x group,M03,Atmospheric,0.002
+EE,grassland,month x group,M03,Atmospheric,-0.002
+EE,maize,month x group,M03,Atmospheric,0.0032
+EE,oats,month x group,M03,Atmospheric,0.001
+EE,orchards,month x group,M03,Atmospheric,0.0032
+EE,rapeseed,month x group,M03,Atmospheric,0.0
+EE,rye,month x group,M03,Atmospheric,0.0
+EE,triticale,month x group,M03,Atmospheric,0.0
+EE,vegetables,month x group,M03,Atmospheric,0.013
+EE,wheat,month x group,M03,Atmospheric,0.0005
+EE,all species,month x group,M03,Atmospheric,0.0013
+EE,barley,month x group,M03,VV,-0.001
+EE,buckwheat,month x group,M03,VV,0.0
+EE,dry pulses,month x group,M03,VV,0.0015
+EE,fallow,month x group,M03,VV,-0.0021
+EE,forage legumes,month x group,M03,VV,-0.0025
+EE,grassland,month x group,M03,VV,0.0035
+EE,maize,month x group,M03,VV,-0.0032
+EE,oats,month x group,M03,VV,-0.0015
+EE,orchards,month x group,M03,VV,0.0
+EE,rapeseed,month x group,M03,VV,-0.0005
+EE,rye,month x group,M03,VV,-0.0056
+EE,triticale,month x group,M03,VV,0.0032
+EE,vegetables,month x group,M03,VV,0.0087
+EE,wheat,month x group,M03,VV,0.0005
+EE,all species,month x group,M03,VV,0.0001
+EE,barley,month x group,M03,VH,-0.002
+EE,buckwheat,month x group,M03,VH,0.0049
+EE,dry pulses,month x group,M03,VH,0.0005
+EE,fallow,month x group,M03,VH,-0.0021
+EE,forage legumes,month x group,M03,VH,-0.0015
+EE,grassland,month x group,M03,VH,0.0005
+EE,maize,month x group,M03,VH,0.0
+EE,oats,month x group,M03,VH,0.0005
+EE,orchards,month x group,M03,VH,0.0096
+EE,rapeseed,month x group,M03,VH,0.0
+EE,rye,month x group,M03,VH,0.0019
+EE,triticale,month x group,M03,VH,0.0032
+EE,vegetables,month x group,M03,VH,0.013
+EE,wheat,month x group,M03,VH,-0.0005
+EE,all species,month x group,M03,VH,0.002
+EE,barley,month,M03,all,0.012
+EE,buckwheat,month,M03,all,0.0
+EE,dry pulses,month,M03,all,-0.0015
+EE,fallow,month,M03,all,0.0021
+EE,forage legumes,month,M03,all,-0.0175
+EE,grassland,month,M03,all,0.028
+EE,maize,month,M03,all,-0.0032
+EE,oats,month,M03,all,-0.0035
+EE,orchards,month,M03,all,0.0096
+EE,rapeseed,month,M03,all,0.0
+EE,rye,month,M03,all,0.0094
+EE,triticale,month,M03,all,0.0127
+EE,vegetables,month,M03,all,0.0261
+EE,wheat,month,M03,all,0.0
+EE,all species,month,M03,all,0.0053
+EE,barley,month x group,M04,Visible,0.005
+EE,buckwheat,month x group,M04,Visible,0.0
+EE,dry pulses,month x group,M04,Visible,0.0015
+EE,fallow,month x group,M04,Visible,-0.0021
+EE,forage legumes,month x group,M04,Visible,-0.0055
+EE,grassland,month x group,M04,Visible,0.005
+EE,maize,month x group,M04,Visible,-0.0032
+EE,oats,month x group,M04,Visible,0.0015
+EE,orchards,month x group,M04,Visible,0.0
+EE,rapeseed,month x group,M04,Visible,0.0
+EE,rye,month x group,M04,Visible,0.0019
+EE,triticale,month x group,M04,Visible,0.0032
+EE,vegetables,month x group,M04,Visible,0.013
+EE,wheat,month x group,M04,Visible,-0.0005
+EE,all species,month x group,M04,Visible,0.0014
+EE,barley,month x group,M04,Red-edge,0.0055
+EE,buckwheat,month x group,M04,Red-edge,0.0024
+EE,dry pulses,month x group,M04,Red-edge,0.0015
+EE,fallow,month x group,M04,Red-edge,-0.0042
+EE,forage legumes,month x group,M04,Red-edge,-0.0085
+EE,grassland,month x group,M04,Red-edge,0.0035
+EE,maize,month x group,M04,Red-edge,0.0
+EE,oats,month x group,M04,Red-edge,0.0005
+EE,orchards,month x group,M04,Red-edge,0.0
+EE,rapeseed,month x group,M04,Red-edge,0.0005
+EE,rye,month x group,M04,Red-edge,-0.0037
+EE,triticale,month x group,M04,Red-edge,0.0
+EE,vegetables,month x group,M04,Red-edge,0.0
+EE,wheat,month x group,M04,Red-edge,0.0025
+EE,all species,month x group,M04,Red-edge,0.0
+EE,barley,month x group,M04,NIR,0.0
+EE,buckwheat,month x group,M04,NIR,-0.0024
+EE,dry pulses,month x group,M04,NIR,0.0
+EE,fallow,month x group,M04,NIR,0.0
+EE,forage legumes,month x group,M04,NIR,-0.009
+EE,grassland,month x group,M04,NIR,0.02
+EE,maize,month x group,M04,NIR,-0.0032
+EE,oats,month x group,M04,NIR,0.002
+EE,orchards,month x group,M04,NIR,0.0096
+EE,rapeseed,month x group,M04,NIR,0.0005
+EE,rye,month x group,M04,NIR,0.0019
+EE,triticale,month x group,M04,NIR,0.0096
+EE,vegetables,month x group,M04,NIR,0.0087
+EE,wheat,month x group,M04,NIR,0.0015
+EE,all species,month x group,M04,NIR,0.0028
+EE,barley,month x group,M04,SWIR,-0.0025
+EE,buckwheat,month x group,M04,SWIR,0.0049
+EE,dry pulses,month x group,M04,SWIR,0.001
+EE,fallow,month x group,M04,SWIR,0.0
+EE,forage legumes,month x group,M04,SWIR,0.0045
+EE,grassland,month x group,M04,SWIR,0.0015
+EE,maize,month x group,M04,SWIR,0.0
+EE,oats,month x group,M04,SWIR,-0.001
+EE,orchards,month x group,M04,SWIR,0.0
+EE,rapeseed,month x group,M04,SWIR,0.001
+EE,rye,month x group,M04,SWIR,0.0037
+EE,triticale,month x group,M04,SWIR,0.0064
+EE,vegetables,month x group,M04,SWIR,0.0174
+EE,wheat,month x group,M04,SWIR,0.0015
+EE,all species,month x group,M04,SWIR,0.0027
+EE,barley,month x group,M04,Atmospheric,0.002
+EE,buckwheat,month x group,M04,Atmospheric,-0.0024
+EE,dry pulses,month x group,M04,Atmospheric,0.001
+EE,fallow,month x group,M04,Atmospheric,-0.0021
+EE,forage legumes,month x group,M04,Atmospheric,0.003
+EE,grassland,month x group,M04,Atmospheric,-0.002
+EE,maize,month x group,M04,Atmospheric,-0.0032
+EE,oats,month x group,M04,Atmospheric,-0.0015
+EE,orchards,month x group,M04,Atmospheric,0.0064
+EE,rapeseed,month x group,M04,Atmospheric,0.0
+EE,rye,month x group,M04,Atmospheric,0.0019
+EE,triticale,month x group,M04,Atmospheric,-0.0032
+EE,vegetables,month x group,M04,Atmospheric,0.0043
+EE,wheat,month x group,M04,Atmospheric,0.0005
+EE,all species,month x group,M04,Atmospheric,0.0003
+EE,barley,month x group,M04,VV,0.0
+EE,buckwheat,month x group,M04,VV,-0.0049
+EE,dry pulses,month x group,M04,VV,0.0005
+EE,fallow,month x group,M04,VV,-0.0042
+EE,forage legumes,month x group,M04,VV,-0.0005
+EE,grassland,month x group,M04,VV,0.003
+EE,maize,month x group,M04,VV,0.0
+EE,oats,month x group,M04,VV,0.0
+EE,orchards,month x group,M04,VV,0.0
+EE,rapeseed,month x group,M04,VV,0.0
+EE,rye,month x group,M04,VV,-0.0037
+EE,triticale,month x group,M04,VV,-0.0032
+EE,vegetables,month x group,M04,VV,0.0087
+EE,wheat,month x group,M04,VV,-0.0035
+EE,all species,month x group,M04,VV,-0.0006
+EE,barley,month x group,M04,VH,0.0015
+EE,buckwheat,month x group,M04,VH,-0.0024
+EE,dry pulses,month x group,M04,VH,0.0
+EE,fallow,month x group,M04,VH,-0.0083
+EE,forage legumes,month x group,M04,VH,-0.001
+EE,grassland,month x group,M04,VH,0.0055
+EE,maize,month x group,M04,VH,0.0
+EE,oats,month x group,M04,VH,-0.0015
+EE,orchards,month x group,M04,VH,0.0225
+EE,rapeseed,month x group,M04,VH,0.0005
+EE,rye,month x group,M04,VH,0.0037
+EE,triticale,month x group,M04,VH,0.0
+EE,vegetables,month x group,M04,VH,0.0043
+EE,wheat,month x group,M04,VH,-0.0015
+EE,all species,month x group,M04,VH,0.0017
+EE,barley,month,M04,all,0.0215
+EE,buckwheat,month,M04,all,-0.0097
+EE,dry pulses,month,M04,all,0.004
+EE,fallow,month,M04,all,0.0104
+EE,forage legumes,month,M04,all,-0.0315
+EE,grassland,month,M04,all,0.0565
+EE,maize,month,M04,all,0.0
+EE,oats,month,M04,all,0.002
+EE,orchards,month,M04,all,0.0386
+EE,rapeseed,month,M04,all,0.0
+EE,rye,month,M04,all,0.0506
+EE,triticale,month,M04,all,0.0096
+EE,vegetables,month,M04,all,0.0348
+EE,wheat,month,M04,all,0.005
+EE,all species,month,M04,all,0.0137
+EE,barley,month x group,M05,Visible,0.0055
+EE,buckwheat,month x group,M05,Visible,0.0
+EE,dry pulses,month x group,M05,Visible,0.0035
+EE,fallow,month x group,M05,Visible,0.0062
+EE,forage legumes,month x group,M05,Visible,0.0085
+EE,grassland,month x group,M05,Visible,-0.004
+EE,maize,month x group,M05,Visible,-0.0032
+EE,oats,month x group,M05,Visible,0.0395
+EE,orchards,month x group,M05,Visible,0.0096
+EE,rapeseed,month x group,M05,Visible,0.0015
+EE,rye,month x group,M05,Visible,0.0468
+EE,triticale,month x group,M05,Visible,0.0032
+EE,vegetables,month x group,M05,Visible,0.0174
+EE,wheat,month x group,M05,Visible,-0.013
+EE,all species,month x group,M05,Visible,0.0087
+EE,barley,month x group,M05,Red-edge,0.005
+EE,buckwheat,month x group,M05,Red-edge,-0.0073
+EE,dry pulses,month x group,M05,Red-edge,0.006
+EE,fallow,month x group,M05,Red-edge,-0.0021
+EE,forage legumes,month x group,M05,Red-edge,-0.004
+EE,grassland,month x group,M05,Red-edge,0.0065
+EE,maize,month x group,M05,Red-edge,0.0
+EE,oats,month x group,M05,Red-edge,0.0125
+EE,orchards,month x group,M05,Red-edge,0.0096
+EE,rapeseed,month x group,M05,Red-edge,0.001
+EE,rye,month x group,M05,Red-edge,0.0056
+EE,triticale,month x group,M05,Red-edge,-0.0032
+EE,vegetables,month x group,M05,Red-edge,0.0
+EE,wheat,month x group,M05,Red-edge,-0.01
+EE,all species,month x group,M05,Red-edge,0.0014
+EE,barley,month x group,M05,NIR,0.012
+EE,buckwheat,month x group,M05,NIR,-0.0121
+EE,dry pulses,month x group,M05,NIR,0.007
+EE,fallow,month x group,M05,NIR,-0.0062
+EE,forage legumes,month x group,M05,NIR,-0.011
+EE,grassland,month x group,M05,NIR,0.027
+EE,maize,month x group,M05,NIR,0.0097
+EE,oats,month x group,M05,NIR,0.0395
+EE,orchards,month x group,M05,NIR,0.0032
+EE,rapeseed,month x group,M05,NIR,0.001
+EE,rye,month x group,M05,NIR,0.0131
+EE,triticale,month x group,M05,NIR,-0.0064
+EE,vegetables,month x group,M05,NIR,0.0043
+EE,wheat,month x group,M05,NIR,-0.017
+EE,all species,month x group,M05,NIR,0.0046
+EE,barley,month x group,M05,SWIR,0.0035
+EE,buckwheat,month x group,M05,SWIR,0.0
+EE,dry pulses,month x group,M05,SWIR,0.0045
+EE,fallow,month x group,M05,SWIR,-0.0042
+EE,forage legumes,month x group,M05,SWIR,0.0125
+EE,grassland,month x group,M05,SWIR,-0.005
+EE,maize,month x group,M05,SWIR,0.0032
+EE,oats,month x group,M05,SWIR,0.0
+EE,orchards,month x group,M05,SWIR,0.0032
+EE,rapeseed,month x group,M05,SWIR,0.0015
+EE,rye,month x group,M05,SWIR,0.0243
+EE,triticale,month x group,M05,SWIR,-0.0096
+EE,vegetables,month x group,M05,SWIR,0.0217
+EE,wheat,month x group,M05,SWIR,-0.0015
+EE,all species,month x group,M05,SWIR,0.0039
+EE,barley,month x group,M05,Atmospheric,0.005
+EE,buckwheat,month x group,M05,Atmospheric,0.0
+EE,dry pulses,month x group,M05,Atmospheric,0.002
+EE,fallow,month x group,M05,Atmospheric,-0.0042
+EE,forage legumes,month x group,M05,Atmospheric,-0.0015
+EE,grassland,month x group,M05,Atmospheric,-0.0005
+EE,maize,month x group,M05,Atmospheric,-0.0032
+EE,oats,month x group,M05,Atmospheric,0.002
+EE,orchards,month x group,M05,Atmospheric,0.0096
+EE,rapeseed,month x group,M05,Atmospheric,0.001
+EE,rye,month x group,M05,Atmospheric,0.0075
+EE,triticale,month x group,M05,Atmospheric,0.0
+EE,vegetables,month x group,M05,Atmospheric,0.0043
+EE,wheat,month x group,M05,Atmospheric,-0.009
+EE,all species,month x group,M05,Atmospheric,0.0009
+EE,barley,month x group,M05,VV,0.001
+EE,buckwheat,month x group,M05,VV,-0.0024
+EE,dry pulses,month x group,M05,VV,-0.0005
+EE,fallow,month x group,M05,VV,-0.0083
+EE,forage legumes,month x group,M05,VV,0.0075
+EE,grassland,month x group,M05,VV,-0.0035
+EE,maize,month x group,M05,VV,0.0032
+EE,oats,month x group,M05,VV,0.008
+EE,orchards,month x group,M05,VV,0.0193
+EE,rapeseed,month x group,M05,VV,-0.0005
+EE,rye,month x group,M05,VV,-0.0019
+EE,triticale,month x group,M05,VV,-0.0032
+EE,vegetables,month x group,M05,VV,0.0174
+EE,wheat,month x group,M05,VV,-0.001
+EE,all species,month x group,M05,VV,0.0025
+EE,barley,month x group,M05,VH,0.0035
+EE,buckwheat,month x group,M05,VH,-0.0024
+EE,dry pulses,month x group,M05,VH,0.0015
+EE,fallow,month x group,M05,VH,-0.0042
+EE,forage legumes,month x group,M05,VH,-0.004
+EE,grassland,month x group,M05,VH,0.0015
+EE,maize,month x group,M05,VH,-0.0032
+EE,oats,month x group,M05,VH,0.0015
+EE,orchards,month x group,M05,VH,0.0322
+EE,rapeseed,month x group,M05,VH,0.0015
+EE,rye,month x group,M05,VH,0.0075
+EE,triticale,month x group,M05,VH,0.0191
+EE,vegetables,month x group,M05,VH,0.0043
+EE,wheat,month x group,M05,VH,-0.0015
+EE,all species,month x group,M05,VH,0.0041
+EE,barley,month,M05,all,0.19
+EE,buckwheat,month,M05,all,-0.0121
+EE,dry pulses,month,M05,all,0.165
+EE,fallow,month,M05,all,0.0208
+EE,forage legumes,month,M05,all,0.2035
+EE,grassland,month,M05,all,0.276
+EE,maize,month,M05,all,0.0292
+EE,oats,month,M05,all,0.277
+EE,orchards,month,M05,all,0.1318
+EE,rapeseed,month,M05,all,0.049
+EE,rye,month,M05,all,0.3202
+EE,triticale,month,M05,all,0.0573
+EE,vegetables,month,M05,all,0.0826
+EE,wheat,month,M05,all,0.0565
+EE,all species,month,M05,all,0.1319
+EE,barley,month x group,M06,Visible,-0.0035
+EE,buckwheat,month x group,M06,Visible,0.0097
+EE,dry pulses,month x group,M06,Visible,0.009
+EE,fallow,month x group,M06,Visible,0.0353
+EE,forage legumes,month x group,M06,Visible,0.003
+EE,grassland,month x group,M06,Visible,0.0185
+EE,maize,month x group,M06,Visible,0.0487
+EE,oats,month x group,M06,Visible,0.009
+EE,orchards,month x group,M06,Visible,0.0289
+EE,rapeseed,month x group,M06,Visible,0.0015
+EE,rye,month x group,M06,Visible,0.0169
+EE,triticale,month x group,M06,Visible,0.0318
+EE,vegetables,month x group,M06,Visible,0.0304
+EE,wheat,month x group,M06,Visible,0.0195
+EE,all species,month x group,M06,Visible,0.0185
+EE,barley,month x group,M06,Red-edge,0.003
+EE,buckwheat,month x group,M06,Red-edge,0.0049
+EE,dry pulses,month x group,M06,Red-edge,0.0015
+EE,fallow,month x group,M06,Red-edge,0.0249
+EE,forage legumes,month x group,M06,Red-edge,0.001
+EE,grassland,month x group,M06,Red-edge,0.008
+EE,maize,month x group,M06,Red-edge,0.0065
+EE,oats,month x group,M06,Red-edge,0.0065
+EE,orchards,month x group,M06,Red-edge,0.0032
+EE,rapeseed,month x group,M06,Red-edge,0.0005
+EE,rye,month x group,M06,Red-edge,0.0393
+EE,triticale,month x group,M06,Red-edge,0.0892
+EE,vegetables,month x group,M06,Red-edge,0.0217
+EE,wheat,month x group,M06,Red-edge,0.027
+EE,all species,month x group,M06,Red-edge,0.0169
+EE,barley,month x group,M06,NIR,-0.0005
+EE,buckwheat,month x group,M06,NIR,0.0049
+EE,dry pulses,month x group,M06,NIR,0.0
+EE,fallow,month x group,M06,NIR,0.0166
+EE,forage legumes,month x group,M06,NIR,-0.0105
+EE,grassland,month x group,M06,NIR,0.0085
+EE,maize,month x group,M06,NIR,-0.0065
+EE,oats,month x group,M06,NIR,0.017
+EE,orchards,month x group,M06,NIR,-0.0032
+EE,rapeseed,month x group,M06,NIR,-0.002
+EE,rye,month x group,M06,NIR,0.0618
+EE,triticale,month x group,M06,NIR,0.0159
+EE,vegetables,month x group,M06,NIR,0.013
+EE,wheat,month x group,M06,NIR,-0.0005
+EE,all species,month x group,M06,NIR,0.0082
+EE,barley,month x group,M06,SWIR,0.0135
+EE,buckwheat,month x group,M06,SWIR,0.0218
+EE,dry pulses,month x group,M06,SWIR,-0.0005
+EE,fallow,month x group,M06,SWIR,0.0416
+EE,forage legumes,month x group,M06,SWIR,0.011
+EE,grassland,month x group,M06,SWIR,0.004
+EE,maize,month x group,M06,SWIR,0.0325
+EE,oats,month x group,M06,SWIR,-0.0015
+EE,orchards,month x group,M06,SWIR,0.0
+EE,rapeseed,month x group,M06,SWIR,0.004
+EE,rye,month x group,M06,SWIR,0.0674
+EE,triticale,month x group,M06,SWIR,0.051
+EE,vegetables,month x group,M06,SWIR,0.0435
+EE,wheat,month x group,M06,SWIR,0.003
+EE,all species,month x group,M06,SWIR,0.0208
+EE,barley,month x group,M06,Atmospheric,-0.0055
+EE,buckwheat,month x group,M06,Atmospheric,0.0049
+EE,dry pulses,month x group,M06,Atmospheric,0.003
+EE,fallow,month x group,M06,Atmospheric,0.0021
+EE,forage legumes,month x group,M06,Atmospheric,-0.004
+EE,grassland,month x group,M06,Atmospheric,0.008
+EE,maize,month x group,M06,Atmospheric,0.0065
+EE,oats,month x group,M06,Atmospheric,0.0035
+EE,orchards,month x group,M06,Atmospheric,0.0
+EE,rapeseed,month x group,M06,Atmospheric,-0.0025
+EE,rye,month x group,M06,Atmospheric,0.0225
+EE,triticale,month x group,M06,Atmospheric,-0.0032
+EE,vegetables,month x group,M06,Atmospheric,0.0217
+EE,wheat,month x group,M06,Atmospheric,-0.004
+EE,all species,month x group,M06,Atmospheric,0.0038
+EE,barley,month x group,M06,VV,0.027
+EE,buckwheat,month x group,M06,VV,0.0097
+EE,dry pulses,month x group,M06,VV,0.0225
+EE,fallow,month x group,M06,VV,-0.0042
+EE,forage legumes,month x group,M06,VV,0.0005
+EE,grassland,month x group,M06,VV,0.002
+EE,maize,month x group,M06,VV,-0.0097
+EE,oats,month x group,M06,VV,0.003
+EE,orchards,month x group,M06,VV,0.0193
+EE,rapeseed,month x group,M06,VV,0.004
+EE,rye,month x group,M06,VV,0.0094
+EE,triticale,month x group,M06,VV,0.0382
+EE,vegetables,month x group,M06,VV,0.0348
+EE,wheat,month x group,M06,VV,0.003
+EE,all species,month x group,M06,VV,0.0114
+EE,barley,month x group,M06,VH,0.0505
+EE,buckwheat,month x group,M06,VH,0.0194
+EE,dry pulses,month x group,M06,VH,0.0265
+EE,fallow,month x group,M06,VH,0.0208
+EE,forage legumes,month x group,M06,VH,0.0065
+EE,grassland,month x group,M06,VH,0.003
+EE,maize,month x group,M06,VH,0.0162
+EE,oats,month x group,M06,VH,0.0335
+EE,orchards,month x group,M06,VH,0.0161
+EE,rapeseed,month x group,M06,VH,0.0075
+EE,rye,month x group,M06,VH,0.0019
+EE,triticale,month x group,M06,VH,0.0255
+EE,vegetables,month x group,M06,VH,0.013
+EE,wheat,month x group,M06,VH,0.0055
+EE,all species,month x group,M06,VH,0.0176
+EE,barley,month,M06,all,0.26
+EE,buckwheat,month,M06,all,0.3374
+EE,dry pulses,month,M06,all,0.469
+EE,fallow,month,M06,all,0.1726
+EE,forage legumes,month,M06,all,0.115
+EE,grassland,month,M06,all,0.117
+EE,maize,month,M06,all,0.5487
+EE,oats,month,M06,all,0.19
+EE,orchards,month,M06,all,0.1576
+EE,rapeseed,month,M06,all,0.232
+EE,rye,month,M06,all,0.4682
+EE,triticale,month,M06,all,0.1815
+EE,vegetables,month,M06,all,0.213
+EE,wheat,month,M06,all,0.362
+EE,all species,month,M06,all,0.2731
+EE,barley,month x group,M07,Visible,0.015
+EE,buckwheat,month x group,M07,Visible,0.0
+EE,dry pulses,month x group,M07,Visible,0.001
+EE,fallow,month x group,M07,Visible,0.0395
+EE,forage legumes,month x group,M07,Visible,-0.001
+EE,grassland,month x group,M07,Visible,0.001
+EE,maize,month x group,M07,Visible,0.0032
+EE,oats,month x group,M07,Visible,0.0365
+EE,orchards,month x group,M07,Visible,0.0257
+EE,rapeseed,month x group,M07,Visible,0.003
+EE,rye,month x group,M07,Visible,0.0037
+EE,triticale,month x group,M07,Visible,0.0255
+EE,vegetables,month x group,M07,Visible,0.013
+EE,wheat,month x group,M07,Visible,0.0135
+EE,all species,month x group,M07,Visible,0.0128
+EE,barley,month x group,M07,Red-edge,0.0025
+EE,buckwheat,month x group,M07,Red-edge,0.0364
+EE,dry pulses,month x group,M07,Red-edge,0.0
+EE,fallow,month x group,M07,Red-edge,0.0374
+EE,forage legumes,month x group,M07,Red-edge,0.003
+EE,grassland,month x group,M07,Red-edge,0.005
+EE,maize,month x group,M07,Red-edge,0.0162
+EE,oats,month x group,M07,Red-edge,0.006
+EE,orchards,month x group,M07,Red-edge,0.0032
+EE,rapeseed,month x group,M07,Red-edge,0.0035
+EE,rye,month x group,M07,Red-edge,0.0
+EE,triticale,month x group,M07,Red-edge,0.0159
+EE,vegetables,month x group,M07,Red-edge,0.013
+EE,wheat,month x group,M07,Red-edge,0.0235
+EE,all species,month x group,M07,Red-edge,0.0118
+EE,barley,month x group,M07,NIR,0.0035
+EE,buckwheat,month x group,M07,NIR,0.0146
+EE,dry pulses,month x group,M07,NIR,0.0015
+EE,fallow,month x group,M07,NIR,0.0333
+EE,forage legumes,month x group,M07,NIR,0.003
+EE,grassland,month x group,M07,NIR,0.0025
+EE,maize,month x group,M07,NIR,0.0
+EE,oats,month x group,M07,NIR,0.001
+EE,orchards,month x group,M07,NIR,0.0
+EE,rapeseed,month x group,M07,NIR,-0.0005
+EE,rye,month x group,M07,NIR,0.0
+EE,triticale,month x group,M07,NIR,0.0478
+EE,vegetables,month x group,M07,NIR,0.0087
+EE,wheat,month x group,M07,NIR,0.0045
+EE,all species,month x group,M07,NIR,0.0086
+EE,barley,month x group,M07,SWIR,0.022
+EE,buckwheat,month x group,M07,SWIR,0.0097
+EE,dry pulses,month x group,M07,SWIR,0.002
+EE,fallow,month x group,M07,SWIR,0.0832
+EE,forage legumes,month x group,M07,SWIR,0.0025
+EE,grassland,month x group,M07,SWIR,0.0
+EE,maize,month x group,M07,SWIR,0.0065
+EE,oats,month x group,M07,SWIR,0.0085
+EE,orchards,month x group,M07,SWIR,-0.0032
+EE,rapeseed,month x group,M07,SWIR,0.004
+EE,rye,month x group,M07,SWIR,0.0075
+EE,triticale,month x group,M07,SWIR,0.0255
+EE,vegetables,month x group,M07,SWIR,0.0261
+EE,wheat,month x group,M07,SWIR,0.0015
+EE,all species,month x group,M07,SWIR,0.014
+EE,barley,month x group,M07,Atmospheric,0.003
+EE,buckwheat,month x group,M07,Atmospheric,0.0024
+EE,dry pulses,month x group,M07,Atmospheric,0.0015
+EE,fallow,month x group,M07,Atmospheric,0.0104
+EE,forage legumes,month x group,M07,Atmospheric,0.0
+EE,grassland,month x group,M07,Atmospheric,0.001
+EE,maize,month x group,M07,Atmospheric,0.0032
+EE,oats,month x group,M07,Atmospheric,-0.0015
+EE,orchards,month x group,M07,Atmospheric,0.0
+EE,rapeseed,month x group,M07,Atmospheric,0.001
+EE,rye,month x group,M07,Atmospheric,-0.0056
+EE,triticale,month x group,M07,Atmospheric,0.0287
+EE,vegetables,month x group,M07,Atmospheric,-0.0043
+EE,wheat,month x group,M07,Atmospheric,0.0005
+EE,all species,month x group,M07,Atmospheric,0.0029
+EE,barley,month x group,M07,VV,0.0055
+EE,buckwheat,month x group,M07,VV,0.0121
+EE,dry pulses,month x group,M07,VV,0.009
+EE,fallow,month x group,M07,VV,-0.0042
+EE,forage legumes,month x group,M07,VV,-0.004
+EE,grassland,month x group,M07,VV,0.01
+EE,maize,month x group,M07,VV,0.026
+EE,oats,month x group,M07,VV,0.1165
+EE,orchards,month x group,M07,VV,0.0257
+EE,rapeseed,month x group,M07,VV,0.018
+EE,rye,month x group,M07,VV,0.0356
+EE,triticale,month x group,M07,VV,0.0764
+EE,vegetables,month x group,M07,VV,0.0348
+EE,wheat,month x group,M07,VV,0.038
+EE,all species,month x group,M07,VV,0.0285
+EE,barley,month x group,M07,VH,-0.0075
+EE,buckwheat,month x group,M07,VH,0.0024
+EE,dry pulses,month x group,M07,VH,0.008
+EE,fallow,month x group,M07,VH,0.0062
+EE,forage legumes,month x group,M07,VH,-0.004
+EE,grassland,month x group,M07,VH,0.0035
+EE,maize,month x group,M07,VH,-0.0032
+EE,oats,month x group,M07,VH,0.03
+EE,orchards,month x group,M07,VH,0.0096
+EE,rapeseed,month x group,M07,VH,0.041
+EE,rye,month x group,M07,VH,0.0674
+EE,triticale,month x group,M07,VH,0.0892
+EE,vegetables,month x group,M07,VH,0.013
+EE,wheat,month x group,M07,VH,0.0175
+EE,all species,month x group,M07,VH,0.0195
+EE,barley,month,M07,all,0.1225
+EE,buckwheat,month,M07,all,0.2306
+EE,dry pulses,month,M07,all,0.0785
+EE,fallow,month,M07,all,0.1871
+EE,forage legumes,month,M07,all,0.013
+EE,grassland,month,M07,all,0.03
+EE,maize,month,M07,all,0.039
+EE,oats,month,M07,all,0.271
+EE,orchards,month,M07,all,0.0965
+EE,rapeseed,month,M07,all,0.091
+EE,rye,month,M07,all,0.2303
+EE,triticale,month,M07,all,0.1656
+EE,vegetables,month,M07,all,0.1696
+EE,wheat,month,M07,all,0.094
+EE,all species,month,M07,all,0.1299
+EE,barley,month x group,M08,Visible,0.007
+EE,buckwheat,month x group,M08,Visible,-0.0073
+EE,dry pulses,month x group,M08,Visible,0.001
+EE,fallow,month x group,M08,Visible,-0.0021
+EE,forage legumes,month x group,M08,Visible,0.006
+EE,grassland,month x group,M08,Visible,0.0075
+EE,maize,month x group,M08,Visible,0.013
+EE,oats,month x group,M08,Visible,-0.006
+EE,orchards,month x group,M08,Visible,0.0096
+EE,rapeseed,month x group,M08,Visible,-0.0015
+EE,rye,month x group,M08,Visible,0.0094
+EE,triticale,month x group,M08,Visible,0.0
+EE,vegetables,month x group,M08,Visible,0.0087
+EE,wheat,month x group,M08,Visible,0.0015
+EE,all species,month x group,M08,Visible,0.0033
+EE,barley,month x group,M08,Red-edge,-0.0005
+EE,buckwheat,month x group,M08,Red-edge,0.0097
+EE,dry pulses,month x group,M08,Red-edge,0.0025
+EE,fallow,month x group,M08,Red-edge,-0.0104
+EE,forage legumes,month x group,M08,Red-edge,0.011
+EE,grassland,month x group,M08,Red-edge,-0.004
+EE,maize,month x group,M08,Red-edge,0.0519
+EE,oats,month x group,M08,Red-edge,-0.0185
+EE,orchards,month x group,M08,Red-edge,0.0
+EE,rapeseed,month x group,M08,Red-edge,-0.001
+EE,rye,month x group,M08,Red-edge,-0.0075
+EE,triticale,month x group,M08,Red-edge,0.0096
+EE,vegetables,month x group,M08,Red-edge,0.0087
+EE,wheat,month x group,M08,Red-edge,0.014
+EE,all species,month x group,M08,Red-edge,0.0047
+EE,barley,month x group,M08,NIR,0.0045
+EE,buckwheat,month x group,M08,NIR,0.0024
+EE,dry pulses,month x group,M08,NIR,0.0
+EE,fallow,month x group,M08,NIR,-0.0021
+EE,forage legumes,month x group,M08,NIR,0.008
+EE,grassland,month x group,M08,NIR,0.004
+EE,maize,month x group,M08,NIR,0.0097
+EE,oats,month x group,M08,NIR,-0.011
+EE,orchards,month x group,M08,NIR,0.0032
+EE,rapeseed,month x group,M08,NIR,-0.001
+EE,rye,month x group,M08,NIR,-0.0075
+EE,triticale,month x group,M08,NIR,0.035
+EE,vegetables,month x group,M08,NIR,0.013
+EE,wheat,month x group,M08,NIR,0.0215
+EE,all species,month x group,M08,NIR,0.0057
+EE,barley,month x group,M08,SWIR,0.007
+EE,buckwheat,month x group,M08,SWIR,0.0267
+EE,dry pulses,month x group,M08,SWIR,-0.003
+EE,fallow,month x group,M08,SWIR,0.0
+EE,forage legumes,month x group,M08,SWIR,0.001
+EE,grassland,month x group,M08,SWIR,0.0
+EE,maize,month x group,M08,SWIR,0.0097
+EE,oats,month x group,M08,SWIR,-0.0085
+EE,orchards,month x group,M08,SWIR,0.0096
+EE,rapeseed,month x group,M08,SWIR,0.0
+EE,rye,month x group,M08,SWIR,0.0056
+EE,triticale,month x group,M08,SWIR,0.0
+EE,vegetables,month x group,M08,SWIR,0.0087
+EE,wheat,month x group,M08,SWIR,0.002
+EE,all species,month x group,M08,SWIR,0.0042
+EE,barley,month x group,M08,Atmospheric,0.002
+EE,buckwheat,month x group,M08,Atmospheric,0.0
+EE,dry pulses,month x group,M08,Atmospheric,0.0
+EE,fallow,month x group,M08,Atmospheric,-0.0021
+EE,forage legumes,month x group,M08,Atmospheric,0.0015
+EE,grassland,month x group,M08,Atmospheric,0.002
+EE,maize,month x group,M08,Atmospheric,0.0
+EE,oats,month x group,M08,Atmospheric,-0.007
+EE,orchards,month x group,M08,Atmospheric,0.0
+EE,rapeseed,month x group,M08,Atmospheric,0.0005
+EE,rye,month x group,M08,Atmospheric,0.0019
+EE,triticale,month x group,M08,Atmospheric,0.0127
+EE,vegetables,month x group,M08,Atmospheric,0.013
+EE,wheat,month x group,M08,Atmospheric,0.0075
+EE,all species,month x group,M08,Atmospheric,0.0023
+EE,barley,month x group,M08,VV,0.002
+EE,buckwheat,month x group,M08,VV,0.0097
+EE,dry pulses,month x group,M08,VV,0.0
+EE,fallow,month x group,M08,VV,0.0042
+EE,forage legumes,month x group,M08,VV,-0.008
+EE,grassland,month x group,M08,VV,0.009
+EE,maize,month x group,M08,VV,0.013
+EE,oats,month x group,M08,VV,-0.0015
+EE,orchards,month x group,M08,VV,0.0161
+EE,rapeseed,month x group,M08,VV,0.0005
+EE,rye,month x group,M08,VV,0.0019
+EE,triticale,month x group,M08,VV,0.0064
+EE,vegetables,month x group,M08,VV,0.0174
+EE,wheat,month x group,M08,VV,0.002
+EE,all species,month x group,M08,VV,0.0052
+EE,barley,month x group,M08,VH,-0.001
+EE,buckwheat,month x group,M08,VH,0.0316
+EE,dry pulses,month x group,M08,VH,-0.002
+EE,fallow,month x group,M08,VH,0.0
+EE,forage legumes,month x group,M08,VH,-0.0035
+EE,grassland,month x group,M08,VH,0.007
+EE,maize,month x group,M08,VH,0.0195
+EE,oats,month x group,M08,VH,-0.0005
+EE,orchards,month x group,M08,VH,0.0193
+EE,rapeseed,month x group,M08,VH,0.011
+EE,rye,month x group,M08,VH,0.0075
+EE,triticale,month x group,M08,VH,0.0032
+EE,vegetables,month x group,M08,VH,0.0261
+EE,wheat,month x group,M08,VH,0.0005
+EE,all species,month x group,M08,VH,0.0085
+EE,barley,month,M08,all,0.0475
+EE,buckwheat,month,M08,all,0.1165
+EE,dry pulses,month,M08,all,0.0035
+EE,fallow,month,M08,all,0.0166
+EE,forage legumes,month,M08,all,0.002
+EE,grassland,month,M08,all,0.0375
+EE,maize,month,M08,all,0.1396
+EE,oats,month,M08,all,-0.003
+EE,orchards,month,M08,all,0.0675
+EE,rapeseed,month,M08,all,0.017
+EE,rye,month,M08,all,0.0187
+EE,triticale,month,M08,all,0.0605
+EE,vegetables,month,M08,all,0.0783
+EE,wheat,month,M08,all,0.0335
+EE,all species,month,M08,all,0.0454
+EE,barley,month x group,M09,Visible,0.009
+EE,buckwheat,month x group,M09,Visible,0.0049
+EE,dry pulses,month x group,M09,Visible,-0.0005
+EE,fallow,month x group,M09,Visible,-0.0042
+EE,forage legumes,month x group,M09,Visible,0.0105
+EE,grassland,month x group,M09,Visible,0.005
+EE,maize,month x group,M09,Visible,0.0032
+EE,oats,month x group,M09,Visible,-0.005
+EE,orchards,month x group,M09,Visible,0.0257
+EE,rapeseed,month x group,M09,Visible,-0.001
+EE,rye,month x group,M09,Visible,-0.0094
+EE,triticale,month x group,M09,Visible,0.0159
+EE,vegetables,month x group,M09,Visible,0.0174
+EE,wheat,month x group,M09,Visible,0.0005
+EE,all species,month x group,M09,Visible,0.0052
+EE,barley,month x group,M09,Red-edge,0.002
+EE,buckwheat,month x group,M09,Red-edge,0.0097
+EE,dry pulses,month x group,M09,Red-edge,0.001
+EE,fallow,month x group,M09,Red-edge,0.0
+EE,forage legumes,month x group,M09,Red-edge,-0.003
+EE,grassland,month x group,M09,Red-edge,0.008
+EE,maize,month x group,M09,Red-edge,0.0584
+EE,oats,month x group,M09,Red-edge,-0.008
+EE,orchards,month x group,M09,Red-edge,0.0
+EE,rapeseed,month x group,M09,Red-edge,0.0
+EE,rye,month x group,M09,Red-edge,0.0037
+EE,triticale,month x group,M09,Red-edge,0.0127
+EE,vegetables,month x group,M09,Red-edge,0.013
+EE,wheat,month x group,M09,Red-edge,0.006
+EE,all species,month x group,M09,Red-edge,0.0074
+EE,barley,month x group,M09,NIR,0.003
+EE,buckwheat,month x group,M09,NIR,0.0
+EE,dry pulses,month x group,M09,NIR,0.0025
+EE,fallow,month x group,M09,NIR,0.0
+EE,forage legumes,month x group,M09,NIR,-0.0105
+EE,grassland,month x group,M09,NIR,0.016
+EE,maize,month x group,M09,NIR,-0.0065
+EE,oats,month x group,M09,NIR,-0.005
+EE,orchards,month x group,M09,NIR,0.0096
+EE,rapeseed,month x group,M09,NIR,-0.001
+EE,rye,month x group,M09,NIR,-0.0056
+EE,triticale,month x group,M09,NIR,0.0159
+EE,vegetables,month x group,M09,NIR,0.0087
+EE,wheat,month x group,M09,NIR,0.004
+EE,all species,month x group,M09,NIR,0.0022
+EE,barley,month x group,M09,SWIR,0.0125
+EE,buckwheat,month x group,M09,SWIR,0.0607
+EE,dry pulses,month x group,M09,SWIR,0.0005
+EE,fallow,month x group,M09,SWIR,-0.0062
+EE,forage legumes,month x group,M09,SWIR,-0.0015
+EE,grassland,month x group,M09,SWIR,0.004
+EE,maize,month x group,M09,SWIR,0.0487
+EE,oats,month x group,M09,SWIR,-0.0155
+EE,orchards,month x group,M09,SWIR,0.0322
+EE,rapeseed,month x group,M09,SWIR,-0.0025
+EE,rye,month x group,M09,SWIR,0.0019
+EE,triticale,month x group,M09,SWIR,0.0064
+EE,vegetables,month x group,M09,SWIR,0.0087
+EE,wheat,month x group,M09,SWIR,0.0155
+EE,all species,month x group,M09,SWIR,0.0118
+EE,barley,month x group,M09,Atmospheric,-0.001
+EE,buckwheat,month x group,M09,Atmospheric,-0.0049
+EE,dry pulses,month x group,M09,Atmospheric,0.0015
+EE,fallow,month x group,M09,Atmospheric,-0.0042
+EE,forage legumes,month x group,M09,Atmospheric,0.003
+EE,grassland,month x group,M09,Atmospheric,0.0085
+EE,maize,month x group,M09,Atmospheric,0.0
+EE,oats,month x group,M09,Atmospheric,-0.002
+EE,orchards,month x group,M09,Atmospheric,-0.0064
+EE,rapeseed,month x group,M09,Atmospheric,-0.0005
+EE,rye,month x group,M09,Atmospheric,0.0019
+EE,triticale,month x group,M09,Atmospheric,0.0096
+EE,vegetables,month x group,M09,Atmospheric,0.013
+EE,wheat,month x group,M09,Atmospheric,0.003
+EE,all species,month x group,M09,Atmospheric,0.0015
+EE,barley,month x group,M09,VV,0.004
+EE,buckwheat,month x group,M09,VV,-0.0049
+EE,dry pulses,month x group,M09,VV,0.001
+EE,fallow,month x group,M09,VV,-0.0021
+EE,forage legumes,month x group,M09,VV,-0.0045
+EE,grassland,month x group,M09,VV,0.007
+EE,maize,month x group,M09,VV,0.0195
+EE,oats,month x group,M09,VV,-0.001
+EE,orchards,month x group,M09,VV,0.0064
+EE,rapeseed,month x group,M09,VV,0.0005
+EE,rye,month x group,M09,VV,-0.0019
+EE,triticale,month x group,M09,VV,-0.0064
+EE,vegetables,month x group,M09,VV,0.0087
+EE,wheat,month x group,M09,VV,0.0005
+EE,all species,month x group,M09,VV,0.0019
+EE,barley,month x group,M09,VH,0.0035
+EE,buckwheat,month x group,M09,VH,0.0461
+EE,dry pulses,month x group,M09,VH,-0.003
+EE,fallow,month x group,M09,VH,-0.0062
+EE,forage legumes,month x group,M09,VH,-0.0065
+EE,grassland,month x group,M09,VH,0.0015
+EE,maize,month x group,M09,VH,0.0552
+EE,oats,month x group,M09,VH,-0.0005
+EE,orchards,month x group,M09,VH,0.0322
+EE,rapeseed,month x group,M09,VH,0.0005
+EE,rye,month x group,M09,VH,0.0056
+EE,triticale,month x group,M09,VH,0.0032
+EE,vegetables,month x group,M09,VH,0.0565
+EE,wheat,month x group,M09,VH,0.0005
+EE,all species,month x group,M09,VH,0.0135
+EE,barley,month,M09,all,0.0385
+EE,buckwheat,month,M09,all,0.3374
+EE,dry pulses,month,M09,all,-0.0015
+EE,fallow,month,M09,all,0.0042
+EE,forage legumes,month,M09,all,-0.0265
+EE,grassland,month,M09,all,0.116
+EE,maize,month,M09,all,0.4643
+EE,oats,month,M09,all,-0.008
+EE,orchards,month,M09,all,0.1576
+EE,rapeseed,month,M09,all,0.0015
+EE,rye,month,M09,all,-0.0094
+EE,triticale,month,M09,all,0.0223
+EE,vegetables,month,M09,all,0.1391
+EE,wheat,month,M09,all,0.0275
+EE,all species,month,M09,all,0.0902
+EE,barley,month x group,M10,Visible,0.005
+EE,buckwheat,month x group,M10,Visible,0.0024
+EE,dry pulses,month x group,M10,Visible,-0.001
+EE,fallow,month x group,M10,Visible,-0.0083
+EE,forage legumes,month x group,M10,Visible,0.006
+EE,grassland,month x group,M10,Visible,0.001
+EE,maize,month x group,M10,Visible,0.0032
+EE,oats,month x group,M10,Visible,-0.008
+EE,orchards,month x group,M10,Visible,0.0096
+EE,rapeseed,month x group,M10,Visible,0.0015
+EE,rye,month x group,M10,Visible,0.0019
+EE,triticale,month x group,M10,Visible,0.0032
+EE,vegetables,month x group,M10,Visible,-0.0043
+EE,wheat,month x group,M10,Visible,0.005
+EE,all species,month x group,M10,Visible,0.0012
+EE,barley,month x group,M10,Red-edge,0.0015
+EE,buckwheat,month x group,M10,Red-edge,-0.0024
+EE,dry pulses,month x group,M10,Red-edge,0.0015
+EE,fallow,month x group,M10,Red-edge,-0.0062
+EE,forage legumes,month x group,M10,Red-edge,0.002
+EE,grassland,month x group,M10,Red-edge,0.002
+EE,maize,month x group,M10,Red-edge,0.0032
+EE,oats,month x group,M10,Red-edge,-0.0005
+EE,orchards,month x group,M10,Red-edge,0.0096
+EE,rapeseed,month x group,M10,Red-edge,-0.0005
+EE,rye,month x group,M10,Red-edge,0.0
+EE,triticale,month x group,M10,Red-edge,-0.0096
+EE,vegetables,month x group,M10,Red-edge,0.0
+EE,wheat,month x group,M10,Red-edge,-0.0005
+EE,all species,month x group,M10,Red-edge,0.0
+EE,barley,month x group,M10,NIR,0.003
+EE,buckwheat,month x group,M10,NIR,0.0049
+EE,dry pulses,month x group,M10,NIR,0.0015
+EE,fallow,month x group,M10,NIR,-0.0042
+EE,forage legumes,month x group,M10,NIR,-0.001
+EE,grassland,month x group,M10,NIR,0.0035
+EE,maize,month x group,M10,NIR,0.0
+EE,oats,month x group,M10,NIR,0.0015
+EE,orchards,month x group,M10,NIR,0.0064
+EE,rapeseed,month x group,M10,NIR,-0.0005
+EE,rye,month x group,M10,NIR,0.0019
+EE,triticale,month x group,M10,NIR,0.0032
+EE,vegetables,month x group,M10,NIR,0.0043
+EE,wheat,month x group,M10,NIR,0.003
+EE,all species,month x group,M10,NIR,0.002
+EE,barley,month x group,M10,SWIR,0.0005
+EE,buckwheat,month x group,M10,SWIR,0.0024
+EE,dry pulses,month x group,M10,SWIR,0.0
+EE,fallow,month x group,M10,SWIR,-0.0062
+EE,forage legumes,month x group,M10,SWIR,0.0015
+EE,grassland,month x group,M10,SWIR,0.0005
+EE,maize,month x group,M10,SWIR,0.0032
+EE,oats,month x group,M10,SWIR,-0.0015
+EE,orchards,month x group,M10,SWIR,0.0064
+EE,rapeseed,month x group,M10,SWIR,0.0005
+EE,rye,month x group,M10,SWIR,0.0056
+EE,triticale,month x group,M10,SWIR,0.0032
+EE,vegetables,month x group,M10,SWIR,0.0
+EE,wheat,month x group,M10,SWIR,0.004
+EE,all species,month x group,M10,SWIR,0.0014
+EE,barley,month x group,M10,Atmospheric,-0.002
+EE,buckwheat,month x group,M10,Atmospheric,0.0
+EE,dry pulses,month x group,M10,Atmospheric,0.0035
+EE,fallow,month x group,M10,Atmospheric,-0.0021
+EE,forage legumes,month x group,M10,Atmospheric,-0.001
+EE,grassland,month x group,M10,Atmospheric,-0.0015
+EE,maize,month x group,M10,Atmospheric,0.0
+EE,oats,month x group,M10,Atmospheric,0.0
+EE,orchards,month x group,M10,Atmospheric,0.0032
+EE,rapeseed,month x group,M10,Atmospheric,-0.0015
+EE,rye,month x group,M10,Atmospheric,-0.0037
+EE,triticale,month x group,M10,Atmospheric,0.0032
+EE,vegetables,month x group,M10,Atmospheric,0.0
+EE,wheat,month x group,M10,Atmospheric,0.001
+EE,all species,month x group,M10,Atmospheric,-0.0001
+EE,barley,month x group,M10,VV,-0.001
+EE,buckwheat,month x group,M10,VV,0.0049
+EE,dry pulses,month x group,M10,VV,0.001
+EE,fallow,month x group,M10,VV,0.0
+EE,forage legumes,month x group,M10,VV,0.0025
+EE,grassland,month x group,M10,VV,0.007
+EE,maize,month x group,M10,VV,0.0065
+EE,oats,month x group,M10,VV,-0.0025
+EE,orchards,month x group,M10,VV,0.0064
+EE,rapeseed,month x group,M10,VV,0.0
+EE,rye,month x group,M10,VV,-0.0056
+EE,triticale,month x group,M10,VV,-0.0064
+EE,vegetables,month x group,M10,VV,-0.0043
+EE,wheat,month x group,M10,VV,-0.0015
+EE,all species,month x group,M10,VV,0.0005
+EE,barley,month x group,M10,VH,0.002
+EE,buckwheat,month x group,M10,VH,0.0049
+EE,dry pulses,month x group,M10,VH,0.0025
+EE,fallow,month x group,M10,VH,-0.0021
+EE,forage legumes,month x group,M10,VH,-0.0005
+EE,grassland,month x group,M10,VH,0.0005
+EE,maize,month x group,M10,VH,-0.0032
+EE,oats,month x group,M10,VH,-0.001
+EE,orchards,month x group,M10,VH,0.0193
+EE,rapeseed,month x group,M10,VH,-0.0005
+EE,rye,month x group,M10,VH,-0.0056
+EE,triticale,month x group,M10,VH,-0.0032
+EE,vegetables,month x group,M10,VH,0.0087
+EE,wheat,month x group,M10,VH,-0.0005
+EE,all species,month x group,M10,VH,0.0015
+EE,barley,month,M10,all,0.012
+EE,buckwheat,month,M10,all,0.0243
+EE,dry pulses,month,M10,all,0.003
+EE,fallow,month,M10,all,-0.0021
+EE,forage legumes,month,M10,all,-0.01
+EE,grassland,month,M10,all,0.015
+EE,maize,month,M10,all,0.0162
+EE,oats,month,M10,all,-0.007
+EE,orchards,month,M10,all,0.0579
+EE,rapeseed,month,M10,all,0.0015
+EE,rye,month,M10,all,-0.0075
+EE,triticale,month,M10,all,0.0
+EE,vegetables,month,M10,all,0.0435
+EE,wheat,month,M10,all,0.0115
+EE,all species,month,M10,all,0.0113
+EE,barley,month x group,M11,Visible,-0.0015
+EE,buckwheat,month x group,M11,Visible,0.0024
+EE,dry pulses,month x group,M11,Visible,0.0005
+EE,fallow,month x group,M11,Visible,-0.0042
+EE,forage legumes,month x group,M11,Visible,0.005
+EE,grassland,month x group,M11,Visible,0.0
+EE,maize,month x group,M11,Visible,0.0
+EE,oats,month x group,M11,Visible,0.001
+EE,orchards,month x group,M11,Visible,-0.0129
+EE,rapeseed,month x group,M11,Visible,-0.0005
+EE,rye,month x group,M11,Visible,-0.0019
+EE,triticale,month x group,M11,Visible,-0.0096
+EE,vegetables,month x group,M11,Visible,0.0087
+EE,wheat,month x group,M11,Visible,-0.0015
+EE,all species,month x group,M11,Visible,-0.001
+EE,barley,month x group,M11,Red-edge,0.002
+EE,buckwheat,month x group,M11,Red-edge,0.0024
+EE,dry pulses,month x group,M11,Red-edge,0.0
+EE,fallow,month x group,M11,Red-edge,-0.0042
+EE,forage legumes,month x group,M11,Red-edge,0.0005
+EE,grassland,month x group,M11,Red-edge,-0.002
+EE,maize,month x group,M11,Red-edge,0.0032
+EE,oats,month x group,M11,Red-edge,-0.0015
+EE,orchards,month x group,M11,Red-edge,0.0
+EE,rapeseed,month x group,M11,Red-edge,-0.001
+EE,rye,month x group,M11,Red-edge,0.0
+EE,triticale,month x group,M11,Red-edge,-0.0064
+EE,vegetables,month x group,M11,Red-edge,0.0
+EE,wheat,month x group,M11,Red-edge,0.0
+EE,all species,month x group,M11,Red-edge,-0.0005
+EE,barley,month x group,M11,NIR,-0.0005
+EE,buckwheat,month x group,M11,NIR,0.0
+EE,dry pulses,month x group,M11,NIR,0.0005
+EE,fallow,month x group,M11,NIR,-0.0062
+EE,forage legumes,month x group,M11,NIR,0.0015
+EE,grassland,month x group,M11,NIR,-0.001
+EE,maize,month x group,M11,NIR,-0.0032
+EE,oats,month x group,M11,NIR,-0.0035
+EE,orchards,month x group,M11,NIR,0.0
+EE,rapeseed,month x group,M11,NIR,0.0
+EE,rye,month x group,M11,NIR,0.0019
+EE,triticale,month x group,M11,NIR,-0.0032
+EE,vegetables,month x group,M11,NIR,0.0087
+EE,wheat,month x group,M11,NIR,0.002
+EE,all species,month x group,M11,NIR,-0.0002
+EE,barley,month x group,M11,SWIR,0.002
+EE,buckwheat,month x group,M11,SWIR,0.0024
+EE,dry pulses,month x group,M11,SWIR,0.0005
+EE,fallow,month x group,M11,SWIR,0.0
+EE,forage legumes,month x group,M11,SWIR,0.002
+EE,grassland,month x group,M11,SWIR,0.001
+EE,maize,month x group,M11,SWIR,0.0032
+EE,oats,month x group,M11,SWIR,0.0025
+EE,orchards,month x group,M11,SWIR,-0.0032
+EE,rapeseed,month x group,M11,SWIR,-0.0005
+EE,rye,month x group,M11,SWIR,0.0
+EE,triticale,month x group,M11,SWIR,0.0032
+EE,vegetables,month x group,M11,SWIR,0.0
+EE,wheat,month x group,M11,SWIR,-0.0025
+EE,all species,month x group,M11,SWIR,0.0008
+EE,barley,month x group,M11,Atmospheric,-0.0015
+EE,buckwheat,month x group,M11,Atmospheric,0.0
+EE,dry pulses,month x group,M11,Atmospheric,0.0015
+EE,fallow,month x group,M11,Atmospheric,-0.0042
+EE,forage legumes,month x group,M11,Atmospheric,0.0035
+EE,grassland,month x group,M11,Atmospheric,-0.0015
+EE,maize,month x group,M11,Atmospheric,0.0032
+EE,oats,month x group,M11,Atmospheric,-0.002
+EE,orchards,month x group,M11,Atmospheric,0.0064
+EE,rapeseed,month x group,M11,Atmospheric,0.0005
+EE,rye,month x group,M11,Atmospheric,0.0037
+EE,triticale,month x group,M11,Atmospheric,0.0
+EE,vegetables,month x group,M11,Atmospheric,0.0043
+EE,wheat,month x group,M11,Atmospheric,0.0
+EE,all species,month x group,M11,Atmospheric,0.001
+EE,barley,month x group,M11,VV,0.002
+EE,buckwheat,month x group,M11,VV,0.0
+EE,dry pulses,month x group,M11,VV,0.001
+EE,fallow,month x group,M11,VV,-0.0021
+EE,forage legumes,month x group,M11,VV,-0.0015
+EE,grassland,month x group,M11,VV,0.01
+EE,maize,month x group,M11,VV,0.0162
+EE,oats,month x group,M11,VV,0.003
+EE,orchards,month x group,M11,VV,0.0
+EE,rapeseed,month x group,M11,VV,0.0
+EE,rye,month x group,M11,VV,0.0056
+EE,triticale,month x group,M11,VV,0.0
+EE,vegetables,month x group,M11,VV,0.0043
+EE,wheat,month x group,M11,VV,0.0
+EE,all species,month x group,M11,VV,0.0028
+EE,barley,month x group,M11,VH,0.001
+EE,buckwheat,month x group,M11,VH,0.0
+EE,dry pulses,month x group,M11,VH,0.0005
+EE,fallow,month x group,M11,VH,-0.0083
+EE,forage legumes,month x group,M11,VH,-0.0035
+EE,grassland,month x group,M11,VH,-0.0015
+EE,maize,month x group,M11,VH,0.0032
+EE,oats,month x group,M11,VH,-0.001
+EE,orchards,month x group,M11,VH,0.0096
+EE,rapeseed,month x group,M11,VH,0.0005
+EE,rye,month x group,M11,VH,0.0
+EE,triticale,month x group,M11,VH,-0.0064
+EE,vegetables,month x group,M11,VH,0.0043
+EE,wheat,month x group,M11,VH,0.0
+EE,all species,month x group,M11,VH,-0.0001
+EE,barley,month,M11,all,0.002
+EE,buckwheat,month,M11,all,0.0024
+EE,dry pulses,month,M11,all,0.0005
+EE,fallow,month,M11,all,-0.0021
+EE,forage legumes,month,M11,all,0.0045
+EE,grassland,month,M11,all,0.0155
+EE,maize,month,M11,all,0.0162
+EE,oats,month,M11,all,-0.0015
+EE,orchards,month,M11,all,0.0161
+EE,rapeseed,month,M11,all,-0.001
+EE,rye,month,M11,all,0.0019
+EE,triticale,month,M11,all,0.0032
+EE,vegetables,month,M11,all,0.0
+EE,wheat,month,M11,all,0.009
+EE,all species,month,M11,all,0.0048
+EE,barley,month x group,M12,Visible,0.0015
+EE,buckwheat,month x group,M12,Visible,0.0
+EE,dry pulses,month x group,M12,Visible,0.0015
+EE,fallow,month x group,M12,Visible,-0.0062
+EE,forage legumes,month x group,M12,Visible,0.0025
+EE,grassland,month x group,M12,Visible,0.003
+EE,maize,month x group,M12,Visible,-0.0032
+EE,oats,month x group,M12,Visible,-0.0025
+EE,orchards,month x group,M12,Visible,-0.0064
+EE,rapeseed,month x group,M12,Visible,0.0005
+EE,rye,month x group,M12,Visible,0.0
+EE,triticale,month x group,M12,Visible,-0.0064
+EE,vegetables,month x group,M12,Visible,0.0087
+EE,wheat,month x group,M12,Visible,0.0
+EE,all species,month x group,M12,Visible,-0.0005
+EE,barley,month x group,M12,Red-edge,-0.0025
+EE,buckwheat,month x group,M12,Red-edge,-0.0049
+EE,dry pulses,month x group,M12,Red-edge,0.0015
+EE,fallow,month x group,M12,Red-edge,0.0042
+EE,forage legumes,month x group,M12,Red-edge,0.0025
+EE,grassland,month x group,M12,Red-edge,0.0035
+EE,maize,month x group,M12,Red-edge,0.0032
+EE,oats,month x group,M12,Red-edge,-0.0005
+EE,orchards,month x group,M12,Red-edge,-0.0064
+EE,rapeseed,month x group,M12,Red-edge,0.0
+EE,rye,month x group,M12,Red-edge,0.0037
+EE,triticale,month x group,M12,Red-edge,0.0064
+EE,vegetables,month x group,M12,Red-edge,0.0
+EE,wheat,month x group,M12,Red-edge,0.001
+EE,all species,month x group,M12,Red-edge,0.0008
+EE,barley,month x group,M12,NIR,0.0005
+EE,buckwheat,month x group,M12,NIR,-0.0024
+EE,dry pulses,month x group,M12,NIR,-0.0005
+EE,fallow,month x group,M12,NIR,0.0
+EE,forage legumes,month x group,M12,NIR,0.001
+EE,grassland,month x group,M12,NIR,-0.001
+EE,maize,month x group,M12,NIR,0.0
+EE,oats,month x group,M12,NIR,0.0005
+EE,orchards,month x group,M12,NIR,0.0
+EE,rapeseed,month x group,M12,NIR,0.0005
+EE,rye,month x group,M12,NIR,0.0
+EE,triticale,month x group,M12,NIR,0.0
+EE,vegetables,month x group,M12,NIR,-0.0087
+EE,wheat,month x group,M12,NIR,0.0005
+EE,all species,month x group,M12,NIR,-0.0007
+EE,barley,month x group,M12,SWIR,0.0
+EE,buckwheat,month x group,M12,SWIR,0.0
+EE,dry pulses,month x group,M12,SWIR,-0.0005
+EE,fallow,month x group,M12,SWIR,-0.0042
+EE,forage legumes,month x group,M12,SWIR,-0.0015
+EE,grassland,month x group,M12,SWIR,0.002
+EE,maize,month x group,M12,SWIR,0.0032
+EE,oats,month x group,M12,SWIR,-0.0015
+EE,orchards,month x group,M12,SWIR,0.0032
+EE,rapeseed,month x group,M12,SWIR,-0.0005
+EE,rye,month x group,M12,SWIR,0.0
+EE,triticale,month x group,M12,SWIR,0.0
+EE,vegetables,month x group,M12,SWIR,-0.0087
+EE,wheat,month x group,M12,SWIR,0.0015
+EE,all species,month x group,M12,SWIR,-0.0005
+EE,barley,month x group,M12,Atmospheric,0.0
+EE,buckwheat,month x group,M12,Atmospheric,0.0024
+EE,dry pulses,month x group,M12,Atmospheric,0.0015
+EE,fallow,month x group,M12,Atmospheric,-0.0062
+EE,forage legumes,month x group,M12,Atmospheric,0.0025
+EE,grassland,month x group,M12,Atmospheric,0.0005
+EE,maize,month x group,M12,Atmospheric,-0.0065
+EE,oats,month x group,M12,Atmospheric,0.0
+EE,orchards,month x group,M12,Atmospheric,0.0032
+EE,rapeseed,month x group,M12,Atmospheric,0.0
+EE,rye,month x group,M12,Atmospheric,0.0037
+EE,triticale,month x group,M12,Atmospheric,-0.0032
+EE,vegetables,month x group,M12,Atmospheric,0.0043
+EE,wheat,month x group,M12,Atmospheric,-0.0015
+EE,all species,month x group,M12,Atmospheric,0.0001
+EE,barley,month x group,M12,VV,0.0
+EE,buckwheat,month x group,M12,VV,0.0
+EE,dry pulses,month x group,M12,VV,0.0005
+EE,fallow,month x group,M12,VV,-0.0021
+EE,forage legumes,month x group,M12,VV,-0.003
+EE,grassland,month x group,M12,VV,0.0035
+EE,maize,month x group,M12,VV,0.0
+EE,oats,month x group,M12,VV,0.001
+EE,orchards,month x group,M12,VV,-0.0032
+EE,rapeseed,month x group,M12,VV,0.0005
+EE,rye,month x group,M12,VV,0.0019
+EE,triticale,month x group,M12,VV,-0.0032
+EE,vegetables,month x group,M12,VV,0.0043
+EE,wheat,month x group,M12,VV,-0.0005
+EE,all species,month x group,M12,VV,-0.0
+EE,barley,month x group,M12,VH,-0.0015
+EE,buckwheat,month x group,M12,VH,-0.0024
+EE,dry pulses,month x group,M12,VH,-0.0005
+EE,fallow,month x group,M12,VH,-0.0021
+EE,forage legumes,month x group,M12,VH,0.0005
+EE,grassland,month x group,M12,VH,0.002
+EE,maize,month x group,M12,VH,0.0032
+EE,oats,month x group,M12,VH,0.0025
+EE,orchards,month x group,M12,VH,0.0193
+EE,rapeseed,month x group,M12,VH,0.0005
+EE,rye,month x group,M12,VH,-0.0037
+EE,triticale,month x group,M12,VH,0.0
+EE,vegetables,month x group,M12,VH,0.0
+EE,wheat,month x group,M12,VH,-0.0035
+EE,all species,month x group,M12,VH,0.001
+EE,barley,month,M12,all,0.001
+EE,buckwheat,month,M12,all,0.0073
+EE,dry pulses,month,M12,all,0.0015
+EE,fallow,month,M12,all,-0.0062
+EE,forage legumes,month,M12,all,0.002
+EE,grassland,month,M12,all,0.016
+EE,maize,month,M12,all,0.013
+EE,oats,month,M12,all,0.0005
+EE,orchards,month,M12,all,0.0322
+EE,rapeseed,month,M12,all,0.0005
+EE,rye,month,M12,all,0.0037
+EE,triticale,month,M12,all,0.0
+EE,vegetables,month,M12,all,0.0087
+EE,wheat,month,M12,all,0.005
+EE,all species,month,M12,all,0.0061
+EE,barley,group,all,Visible,0.0915
+EE,buckwheat,group,all,Visible,0.0364
+EE,dry pulses,group,all,Visible,0.009
+EE,fallow,group,all,Visible,0.1019
+EE,forage legumes,group,all,Visible,0.015
+EE,grassland,group,all,Visible,0.153
+EE,maize,group,all,Visible,0.0779
+EE,oats,group,all,Visible,0.0865
+EE,orchards,group,all,Visible,0.1029
+EE,rapeseed,group,all,Visible,0.004
+EE,rye,group,all,Visible,0.0506
+EE,triticale,group,all,Visible,0.0892
+EE,vegetables,group,all,Visible,0.0609
+EE,wheat,group,all,Visible,0.0305
+EE,all species,group,all,Visible,0.0649
+EE,barley,group,all,Red-edge,0.0485
+EE,buckwheat,group,all,Red-edge,0.0922
+EE,dry pulses,group,all,Red-edge,0.0
+EE,fallow,group,all,Red-edge,0.0686
+EE,forage legumes,group,all,Red-edge,-0.0315
+EE,grassland,group,all,Red-edge,0.105
+EE,maize,group,all,Red-edge,0.3571
+EE,oats,group,all,Red-edge,0.029
+EE,orchards,group,all,Red-edge,0.0386
+EE,rapeseed,group,all,Red-edge,0.0045
+EE,rye,group,all,Red-edge,0.0618
+EE,triticale,group,all,Red-edge,0.1401
+EE,vegetables,group,all,Red-edge,0.1
+EE,wheat,group,all,Red-edge,0.055
+EE,all species,group,all,Red-edge,0.0764
+EE,barley,group,all,NIR,0.032
+EE,buckwheat,group,all,NIR,0.0194
+EE,dry pulses,group,all,NIR,0.0095
+EE,fallow,group,all,NIR,0.052
+EE,forage legumes,group,all,NIR,-0.038
+EE,grassland,group,all,NIR,0.174
+EE,maize,group,all,NIR,0.0422
+EE,oats,group,all,NIR,0.0565
+EE,orchards,group,all,NIR,0.0514
+EE,rapeseed,group,all,NIR,0.0005
+EE,rye,group,all,NIR,0.103
+EE,triticale,group,all,NIR,0.0987
+EE,vegetables,group,all,NIR,0.0478
+EE,wheat,group,all,NIR,0.0105
+EE,all species,group,all,NIR,0.0471
+EE,barley,group,all,SWIR,0.069
+EE,buckwheat,group,all,SWIR,0.1529
+EE,dry pulses,group,all,SWIR,-0.0015
+EE,fallow,group,all,SWIR,0.1622
+EE,forage legumes,group,all,SWIR,0.059
+EE,grassland,group,all,SWIR,0.0175
+EE,maize,group,all,SWIR,0.2045
+EE,oats,group,all,SWIR,0.0105
+EE,orchards,group,all,SWIR,0.0643
+EE,rapeseed,group,all,SWIR,0.024
+EE,rye,group,all,SWIR,0.221
+EE,triticale,group,all,SWIR,0.0987
+EE,vegetables,group,all,SWIR,0.1
+EE,wheat,group,all,SWIR,0.0345
+EE,all species,group,all,SWIR,0.0869
+EE,barley,group,all,Atmospheric,0.008
+EE,buckwheat,group,all,Atmospheric,-0.0049
+EE,dry pulses,group,all,Atmospheric,0.0015
+EE,fallow,group,all,Atmospheric,0.0166
+EE,forage legumes,group,all,Atmospheric,0.0045
+EE,grassland,group,all,Atmospheric,0.011
+EE,maize,group,all,Atmospheric,0.0162
+EE,oats,group,all,Atmospheric,-0.001
+EE,orchards,group,all,Atmospheric,0.0289
+EE,rapeseed,group,all,Atmospheric,-0.003
+EE,rye,group,all,Atmospheric,0.0187
+EE,triticale,group,all,Atmospheric,0.035
+EE,vegetables,group,all,Atmospheric,0.0217
+EE,wheat,group,all,Atmospheric,0.0065
+EE,all species,group,all,Atmospheric,0.0114
+EE,barley,group,all,VV,0.0765
+EE,buckwheat,group,all,VV,0.034
+EE,dry pulses,group,all,VV,0.0515
+EE,fallow,group,all,VV,0.0042
+EE,forage legumes,group,all,VV,-0.018
+EE,grassland,group,all,VV,0.089
+EE,maize,group,all,VV,0.1136
+EE,oats,group,all,VV,0.1425
+EE,orchards,group,all,VV,0.0965
+EE,rapeseed,group,all,VV,0.0225
+EE,rye,group,all,VV,0.0955
+EE,triticale,group,all,VV,0.0987
+EE,vegetables,group,all,VV,0.1348
+EE,wheat,group,all,VV,0.0385
+EE,all species,group,all,VV,0.07
+EE,barley,group,all,VH,0.0575
+EE,buckwheat,group,all,VH,0.1845
+EE,dry pulses,group,all,VH,0.0455
+EE,fallow,group,all,VH,0.027
+EE,forage legumes,group,all,VH,0.004
+EE,grassland,group,all,VH,0.0525
+EE,maize,group,all,VH,0.1591
+EE,oats,group,all,VH,0.094
+EE,orchards,group,all,VH,0.3344
+EE,rapeseed,group,all,VH,0.086
+EE,rye,group,all,VH,0.1124
+EE,triticale,group,all,VH,0.1051
+EE,vegetables,group,all,VH,0.1826
+EE,wheat,group,all,VH,0.037
+EE,all species,group,all,VH,0.1058
+EE,barley,window,M01-M03,all,0.026
+EE,buckwheat,window,M01-M03,all,0.0024
+EE,dry pulses,window,M01-M03,all,0.0005
+EE,fallow,window,M01-M03,all,0.027
+EE,forage legumes,window,M01-M03,all,-0.045
+EE,grassland,window,M01-M03,all,0.2905
+EE,maize,window,M01-M03,all,0.0032
+EE,oats,window,M01-M03,all,-0.002
+EE,orchards,window,M01-M03,all,0.0289
+EE,rapeseed,window,M01-M03,all,0.003
+EE,rye,window,M01-M03,all,0.0787
+EE,triticale,window,M01-M03,all,0.0637
+EE,vegetables,window,M01-M03,all,0.0348
+EE,wheat,window,M01-M03,all,0.019
+EE,all species,window,M01-M03,all,0.0379
+EE,barley,window,M02-M04,all,0.021
+EE,buckwheat,window,M02-M04,all,-0.0049
+EE,dry pulses,window,M02-M04,all,0.0045
+EE,fallow,window,M02-M04,all,0.0166
+EE,forage legumes,window,M02-M04,all,-0.0595
+EE,grassland,window,M02-M04,all,0.298
+EE,maize,window,M02-M04,all,0.0
+EE,oats,window,M02-M04,all,0.0065
+EE,orchards,window,M02-M04,all,0.0547
+EE,rapeseed,window,M02-M04,all,0.0025
+EE,rye,window,M02-M04,all,0.0843
+EE,triticale,window,M02-M04,all,0.0414
+EE,vegetables,window,M02-M04,all,0.0522
+EE,wheat,window,M02-M04,all,0.0215
+EE,all species,window,M02-M04,all,0.0385
+EE,barley,window,M03-M05,all,0.259
+EE,buckwheat,window,M03-M05,all,-0.0024
+EE,dry pulses,window,M03-M05,all,0.22
+EE,fallow,window,M03-M05,all,0.0353
+EE,forage legumes,window,M03-M05,all,0.222
+EE,grassland,window,M03-M05,all,0.418
+EE,maize,window,M03-M05,all,0.0195
+EE,oats,window,M03-M05,all,0.31
+EE,orchards,window,M03-M05,all,0.2508
+EE,rapeseed,window,M03-M05,all,0.0745
+EE,rye,window,M03-M05,all,0.3745
+EE,triticale,window,M03-M05,all,0.121
+EE,vegetables,window,M03-M05,all,0.1783
+EE,wheat,window,M03-M05,all,0.14
+EE,all species,window,M03-M05,all,0.1872
+EE,barley,window,M04-M06,all,0.4225
+EE,buckwheat,window,M04-M06,all,0.4175
+EE,dry pulses,window,M04-M06,all,0.5935
+EE,fallow,window,M04-M06,all,0.1871
+EE,forage legumes,window,M04-M06,all,0.3265
+EE,grassland,window,M04-M06,all,0.462
+EE,maize,window,M04-M06,all,0.6494
+EE,oats,window,M04-M06,all,0.417
+EE,orchards,window,M04-M06,all,0.3505
+EE,rapeseed,window,M04-M06,all,0.5035
+EE,rye,window,M04-M06,all,0.6255
+EE,triticale,window,M04-M06,all,0.1783
+EE,vegetables,window,M04-M06,all,0.2304
+EE,wheat,window,M04-M06,all,0.4855
+EE,all species,window,M04-M06,all,0.4178
+EE,barley,window,M05-M07,all,0.524
+EE,buckwheat,window,M05-M07,all,0.6699
+EE,dry pulses,window,M05-M07,all,0.667
+EE,fallow,window,M05-M07,all,0.2328
+EE,forage legumes,window,M05-M07,all,0.328
+EE,grassland,window,M05-M07,all,0.4355
+EE,maize,window,M05-M07,all,0.7045
+EE,oats,window,M05-M07,all,0.5275
+EE,orchards,window,M05-M07,all,0.3601
+EE,rapeseed,window,M05-M07,all,0.787
+EE,rye,window,M05-M07,all,0.6442
+EE,triticale,window,M05-M07,all,0.1911
+EE,vegetables,window,M05-M07,all,0.2783
+EE,wheat,window,M05-M07,all,0.5135
+EE,all species,window,M05-M07,all,0.4902
+EE,barley,window,M06-M08,all,0.4615
+EE,buckwheat,window,M06-M08,all,0.7767
+EE,dry pulses,window,M06-M08,all,0.6195
+EE,fallow,window,M06-M08,all,0.21
+EE,forage legumes,window,M06-M08,all,0.176
+EE,grassland,window,M06-M08,all,0.229
+EE,maize,window,M06-M08,all,0.7955
+EE,oats,window,M06-M08,all,0.4105
+EE,orchards,window,M06-M08,all,0.2894
+EE,rapeseed,window,M06-M08,all,0.654
+EE,rye,window,M06-M08,all,0.6311
+EE,triticale,window,M06-M08,all,0.1911
+EE,vegetables,window,M06-M08,all,0.3
+EE,wheat,window,M06-M08,all,0.504
+EE,all species,window,M06-M08,all,0.4463
+EE,barley,window,M07-M09,all,0.2795
+EE,buckwheat,window,M07-M09,all,0.7646
+EE,dry pulses,window,M07-M09,all,0.1715
+EE,fallow,window,M07-M09,all,0.1975
+EE,forage legumes,window,M07-M09,all,0.016
+EE,grassland,window,M07-M09,all,0.252
+EE,maize,window,M07-M09,all,0.7792
+EE,oats,window,M07-M09,all,0.3425
+EE,orchards,window,M07-M09,all,0.3151
+EE,rapeseed,window,M07-M09,all,0.092
+EE,rye,window,M07-M09,all,0.2828
+EE,triticale,window,M07-M09,all,0.1656
+EE,vegetables,window,M07-M09,all,0.2783
+EE,wheat,window,M07-M09,all,0.161
+EE,all species,window,M07-M09,all,0.2927
+EE,barley,window,M08-M10,all,0.1495
+EE,buckwheat,window,M08-M10,all,0.6626
+EE,dry pulses,window,M08-M10,all,0.0395
+EE,fallow,window,M08-M10,all,0.0665
+EE,forage legumes,window,M08-M10,all,-0.0445
+EE,grassland,window,M08-M10,all,0.3395
+EE,maize,window,M08-M10,all,0.7305
+EE,oats,window,M08-M10,all,0.062
+EE,orchards,window,M08-M10,all,0.3055
+EE,rapeseed,window,M08-M10,all,0.031
+EE,rye,window,M08-M10,all,0.0187
+EE,triticale,window,M08-M10,all,0.086
+EE,vegetables,window,M08-M10,all,0.1957
+EE,wheat,window,M08-M10,all,0.095
+EE,all species,window,M08-M10,all,0.1955
+EE,barley,window,M09-M11,all,0.0745
+EE,buckwheat,window,M09-M11,all,0.4442
+EE,dry pulses,window,M09-M11,all,0.01
+EE,fallow,window,M09-M11,all,0.0395
+EE,forage legumes,window,M09-M11,all,-0.068
+EE,grassland,window,M09-M11,all,0.3055
+EE,maize,window,M09-M11,all,0.6916
+EE,oats,window,M09-M11,all,0.0
+EE,orchards,window,M09-M11,all,0.2733
+EE,rapeseed,window,M09-M11,all,0.0045
+EE,rye,window,M09-M11,all,-0.0019
+EE,triticale,window,M09-M11,all,0.0382
+EE,vegetables,window,M09-M11,all,0.1522
+EE,wheat,window,M09-M11,all,0.041
+EE,all species,window,M09-M11,all,0.1432
+EE,barley,window,M10-M12,all,0.0165
+EE,buckwheat,window,M10-M12,all,0.034
+EE,dry pulses,window,M10-M12,all,0.007
+EE,fallow,window,M10-M12,all,-0.0062
+EE,forage legumes,window,M10-M12,all,-0.0115
+EE,grassland,window,M10-M12,all,0.0715
+EE,maize,window,M10-M12,all,0.1136
+EE,oats,window,M10-M12,all,-0.0085
+EE,orchards,window,M10-M12,all,0.119
+EE,rapeseed,window,M10-M12,all,-0.001
+EE,rye,window,M10-M12,all,-0.0094
+EE,triticale,window,M10-M12,all,0.0096
+EE,vegetables,window,M10-M12,all,0.0478
+EE,wheat,window,M10-M12,all,0.0195
+EE,all species,window,M10-M12,all,0.0287
+EE,barley,sensor,all,Sentinel-2,0.4995
+EE,buckwheat,sensor,all,Sentinel-2,0.7694
+EE,dry pulses,sensor,all,Sentinel-2,0.472
+EE,fallow,sensor,all,Sentinel-2,0.2391
+EE,forage legumes,sensor,all,Sentinel-2,0.481
+EE,grassland,sensor,all,Sentinel-2,0.612
+EE,maize,sensor,all,Sentinel-2,0.8474
+EE,oats,sensor,all,Sentinel-2,0.4865
+EE,orchards,sensor,all,Sentinel-2,0.3119
+EE,rapeseed,sensor,all,Sentinel-2,0.24
+EE,rye,sensor,all,Sentinel-2,0.6311
+EE,triticale,sensor,all,Sentinel-2,0.1752
+EE,vegetables,sensor,all,Sentinel-2,0.2913
+EE,wheat,sensor,all,Sentinel-2,0.569
+EE,all species,sensor,all,Sentinel-2,0.4732
+EE,barley,sensor,all,Sentinel-1,0.228
+EE,buckwheat,sensor,all,Sentinel-1,0.3811
+EE,dry pulses,sensor,all,Sentinel-1,0.542
+EE,fallow,sensor,all,Sentinel-1,0.0644
+EE,forage legumes,sensor,all,Sentinel-1,0.0525
+EE,grassland,sensor,all,Sentinel-1,0.224
+EE,maize,sensor,all,Sentinel-1,0.487
+EE,oats,sensor,all,Sentinel-1,0.3015
+EE,orchards,sensor,all,Sentinel-1,0.3408
+EE,rapeseed,sensor,all,Sentinel-1,0.149
+EE,rye,sensor,all,Sentinel-1,0.2959
+EE,triticale,sensor,all,Sentinel-1,0.121
+EE,vegetables,sensor,all,Sentinel-1,0.2696
+EE,wheat,sensor,all,Sentinel-1,0.148
+EE,all species,sensor,all,Sentinel-1,0.2575

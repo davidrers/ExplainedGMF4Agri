@@ -1,0 +1,15 @@
+species,fields,sowing_mix,peak,cue_month,cue_group,cue_band,cue_auc,cue_direction,verdict,strong_cells,null_cells,hide_window,hide_window_drop,hide_month,hide_month_drop,hide_band_group,hide_band_group_drop,hide_sentinel2_drop,hide_sentinel1_drop,recall,confused_with,confused_share
+barley,5010,"winter 18%, spring 82%",Jun,Aug,SWIR,SWIR_2,0.742,higher,no single cue,0,14,May-Jul,0.524,Jun,0.26,Visible,0.091,0.499,0.228,0.72,oats,0.16
+buckwheat,412,unspecified 100%,Jul,Sep,VH,VH,0.895,higher,partial,16,18,Jun-Aug,0.777,Sep,0.337,VH,0.184,0.769,0.381,0.811,dry pulses,0.056
+dry pulses,2456,unspecified 100%,Jun,Jun,VH,VH,0.817,higher,partial,4,11,May-Jul,0.667,Jun,0.469,VV,0.051,0.472,0.542,0.866,forage legumes,0.034
+fallow,481,unspecified 100%,Jun,Jul,SWIR,SWIR_1,0.713,higher,no single cue,0,34,May-Jul,0.233,Jul,0.187,SWIR,0.162,0.239,0.064,0.249,forage legumes,0.243
+forage legumes,7820,unspecified 100%,Jun,May,VV,VV,0.74,lower,no single cue,0,8,May-Jul,0.328,May,0.203,SWIR,0.059,0.481,0.052,0.649,grassland,0.209
+grassland,24751,unspecified 100%,Jun,Oct,VV,VV,0.891,lower,partial,38,1,Apr-Jun,0.462,May,0.276,NIR,0.174,0.612,0.224,0.751,forage legumes,0.192
+maize,308,unspecified 100%,Sep,Sep,Red-edge,RED_EDGE_1,0.924,lower,clear,26,2,Jun-Aug,0.795,Jun,0.549,Red-edge,0.357,0.847,0.487,0.873,dry pulses,0.052
+oats,2715,unspecified 100%,Jun,Jul,VV,VV,0.806,lower,partial,2,24,May-Jul,0.527,May,0.277,VV,0.142,0.486,0.301,0.747,barley,0.112
+orchards,311,unspecified 100%,Jun,Sep,Visible,RED,0.806,lower,partial,11,4,May-Jul,0.36,Sep,0.158,VH,0.334,0.312,0.341,0.392,grassland,0.289
+rapeseed,2881,"winter 83%, spring 17%",Jun,Jun,VV,VV,0.952,higher,clear,25,1,May-Jul,0.787,Jun,0.232,VH,0.086,0.24,0.149,0.91,dry pulses,0.036
+rye,534,unspecified 100%,Jun,Jun,SWIR,SWIR_1,0.818,lower,partial,6,12,May-Jul,0.644,Jun,0.468,SWIR,0.221,0.631,0.296,0.684,wheat,0.114
+triticale,314,winter 81%,Jun,Jun,Red-edge,RED_EDGE_1,0.793,lower,partial,6,23,Jun-Aug,0.191,Jun,0.181,Red-edge,0.14,0.175,0.121,0.194,wheat,0.392
+vegetables,230,unspecified 100%,Sep,Sep,VH,VH,0.731,higher,no single cue,0,13,Jun-Aug,0.3,Jun,0.213,VH,0.183,0.291,0.27,0.3,dry pulses,0.226
+wheat,7716,"winter 71%, spring 28%",Jun,Jun,Red-edge,RED_EDGE_1,0.833,lower,partial,6,8,May-Jul,0.513,Jun,0.362,Red-edge,0.055,0.569,0.148,0.706,oats,0.157
