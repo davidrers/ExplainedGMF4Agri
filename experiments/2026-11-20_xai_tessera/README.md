@@ -26,6 +26,7 @@ retrained (user, 20 November 2026). The core is not touched: `chain.py` imports 
 | Step | What | Where |
 |---|---|---|
 | 0 | the embedding statistics of the fit, recomputed (the job deleted its cache, `best.pt` and `results.json` do not hold them); the mean field; the chain checked against `predictions_test.npz` in bf16 and fp32 | `step0.py`, cluster |
+| 0, pass | set on 24 November 2026, before any check ran: in fp32, the precision the explanations use, **pixel agreement ≥ 99.0 % and parcel-majority agreement ≥ 99.5 %** with `predictions_test.npz` on the 300 test chips. Below that, nothing is explained until the cause is found. bf16 is reported, not gated | `verify.json` |
 | R | the Estonian reference: the crop-signature analysis on the Estonian fields only, at species level | `reference_ee.py`, hub |
 | S | the sample: test chips chosen so that every class has its quota of fields with 20 interior pixels or more; every such field of those chips is explained | `sample.py`, hub |
 | 1 | occlusion: windows, months, month × sensor and sensors under drop; windows, months, band groups, sensors and cells under the mean; windows, band groups and sensors on the whole chip | `explain.py`, cluster |
