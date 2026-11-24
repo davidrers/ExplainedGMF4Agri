@@ -7,6 +7,7 @@
 set -u
 cd "$(dirname "$0")/../.."
 export PATH="$HOME/.local/bin:$PATH"
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True     # 16 GB: less fragmentation; memory only
 EXP=experiments/2026-11-20_xai_tessera
 OUT=results/2026-11-20_xai_tessera/EE_2021_rev
 LOGS=$OUT/logs

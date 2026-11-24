@@ -392,6 +392,7 @@ def run(step: str, chips: Path, root: Path, spec: dict, batch: int, limit: int |
     import torch
 
     cfg = spec["methods"]
+    chain.ENCODE_BATCH = int(batch)
     sample = pd.read_parquet(chain.HERE / "sample" / "fields.parquet")
     order = json.loads((chain.HERE / "sample" / "chips.json").read_text())
     have = set((chips / "chips").glob("*.mask.tif"))

@@ -152,11 +152,17 @@ def load_model(device=None, stats: Path | None = None) -> Model:
                  names, species, sidx, tv.month_doy(YEAR))
 
 
-def encode(model: Model, X: np.ndarray, precision: str = "32", batch: int = 65536) -> np.ndarray:
+#: Pixels per TESSERA batch when a caller names none: the machine's ``encode_batch_size`` (``explain.run`` sets it;
+#: 65536 fits the cluster's 96 GB, not the hub's 16 GB). Memory only, not the result.
+ENCODE_BATCH = 65536
+
+
+def encode(model: Model, X: np.ndarray, precision: str = "32", batch: int | None = None) -> np.ndarray:
     """``(P, 128)`` standardised embeddings of ``X`` ``(P, 12, 12)``; a pixel without any input enters as 0."""
     from gfm4agri.embeddings import tessera_v2 as tv
 
-    emb = tv.encode_pixels(model.student, X[..., S2], X[..., S1], model.doy, model.device, precision, batch)
+    emb = tv.encode_pixels(model.student, X[..., S2], X[..., S1], model.doy, model.device, precision,
+                           batch or ENCODE_BATCH)
     return ((np.nan_to_num(emb, nan=0.0) - model.means) / model.stds).astype(np.float32)
 
 
