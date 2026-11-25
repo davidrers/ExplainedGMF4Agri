@@ -114,6 +114,8 @@ def main() -> None:
                              "main driver": unit_name(level, int(np.argmax(v[i]))),
                              **{f"{k}": own[k] for k in own}, **{f"{k} (other species)": oth[k] for k in own}})
     F = pd.DataFrame(rows)
+    conf = np.exp(np.asarray(A["base_a"]))           # the field's species probability (geometric mean over its interior)
+    F["p"] = conf[F.field.to_numpy()]
 
     def summary(g):
         return pd.Series({"fields": len(g), "hit": g.hit.mean(), "hit, other species' maps": g["hit (other species)"].mean(),
@@ -210,6 +212,60 @@ def main() -> None:
     fig.savefig(R.FIG / "drivers_species.png")
     plt.close(fig)
 
+    # ---- confidence: only the most confident correct predictions
+    KEY = [("cell", "IG"), ("month", "SHAP"), ("band group", "SHAP")]
+    q95 = float(np.quantile(conf[keep], 0.95))
+    rank_in_sp = F.drop_duplicates("field").set_index("field").groupby("species").p.rank(pct=True)
+    F["top half of its species"] = F.field.map(rank_in_sp) > 0.5
+    subsets = [("all correct", F.p >= 0), ("p >= 0.9", F.p >= 0.9), ("p >= 0.95", F.p >= 0.95),
+               ("p >= 0.99", F.p >= 0.99), (f"top 5 % (p >= {q95:.3f})", F.p >= q95)]
+    crow = []
+    for name, sel in subsets:
+        for level, meth in KEY:
+            g = F[sel & (F.level == level) & (F.method == meth)]
+            crow.append({"fields": name, "n": len(g), "species (5 fields or more)": int((g.species.value_counts() >= 5).sum()),
+                         "level": level, "method": meth, "hit": g.hit.mean(), "hit, other species' maps": g["hit (other species)"].mean(),
+                         "chance": K[level] / N[level], "AUC gap, median": g.gap.median()})
+    Cf = pd.DataFrame(crow)
+    srow = []
+    for s in sp:
+        for level, meth in KEY:
+            g = F[(F.species == s) & (F.level == level) & (F.method == meth)]
+            hi, lo = g[g["top half of its species"]], g[~g["top half of its species"]]
+            c = g[g.p >= 0.95]
+            srow.append({"species": s, "level": level, "method": meth, "fields": len(g), "hit, all correct": g.hit.mean(),
+                         "fields p >= 0.95": len(c), "hit, p >= 0.95": c.hit.mean() if len(c) >= 5 else np.nan,
+                         "hit, other maps, p >= 0.95": c["hit (other species)"].mean() if len(c) >= 5 else np.nan,
+                         "hit, most confident half": hi.hit.mean(), "hit, least confident half": lo.hit.mean()})
+    Sc = pd.DataFrame(srow)
+    macro = Sc.groupby(["level", "method"], sort=False)[["hit, all correct", "hit, p >= 0.95", "hit, most confident half",
+                                                         "hit, least confident half"]].mean().reset_index()
+
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 0.33 * len(sp) + 1.8), sharey=True)
+    for ax, (level, meth) in zip(axes, KEY):
+        g = Sc[(Sc.level == level) & (Sc.method == meth)].reset_index(drop=True)
+        y = np.arange(len(g))[::-1]
+        for yy, a, b in zip(y, g["hit, all correct"], g["hit, p >= 0.95"]):
+            if np.isfinite(b):
+                ax.plot([a, b], [yy, yy], color="#c3c2b7", lw=2, zorder=1)
+        ax.scatter(g["hit, all correct"], y, s=40, facecolor="#fcfcfb", edgecolor="#3a3a37", lw=1.2, zorder=2,
+                   label="all correct fields")
+        ax.scatter(g["hit, p >= 0.95"], y, s=40, color="#2a78d6", zorder=3, label="correct with p >= 0.95")
+        ax.scatter(g["hit, other maps, p >= 0.95"], y, marker="|", s=90, color="#8a8a83", zorder=2,
+                   label="p >= 0.95 against the other species' maps")
+        ax.axvline(K[level] / N[level], color="#8a8a83", ls="--", lw=1)
+        ax.set_yticks(y, [f"{s} ({n})" for s, n in zip(g.species, g["fields p >= 0.95"])])
+        ax.set_xlim(-0.03, 1.03)
+        ax.set_xticks([0, 0.25, 0.5, 0.75, 1], ["0", "25%", "50%", "75%", "100%"])
+        ax.set_title(f"{meth}, {level}s (AUC top {K[level]})", loc="left")
+    axes[1].set_xlabel("share of fields whose main driver is one of their species' main AUC cues")
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, frameon=False, fontsize=8, loc="lower center", ncol=3, bbox_to_anchor=(0.5, -0.12))
+    fig.suptitle("Confident predictions only: all correct fields against those with p >= 0.95 (in brackets: how many; "
+                 "fewer than 5 = no filled dot)", x=0.01, ha="left", y=1.04, fontsize=10)
+    fig.savefig(R.FIG / "drivers_confidence.png")
+    plt.close(fig)
+
     # ---- tables
     T = [("Inference level: every correctly predicted field, pooled over species (hit and overlap: shares; "
           "chance = K / N)", R.md(pooled)),
@@ -220,7 +276,12 @@ def main() -> None:
                                                         "AUC gap, other species' maps", "Spearman, median"]])),
          ("The species' AUC main drivers (AUC in brackets)", R.md(pd.DataFrame(ref_rows))),
          ("The fields' most frequent main drivers", R.md(pd.DataFrame(freq_rows))),
-         ("Model level per species", R.md(Mo[["species", "level", "method", "main driver", "hit", "overlap", "gap", "rho"]]))]
+         ("Model level per species", R.md(Mo[["species", "level", "method", "main driver", "hit", "overlap", "gap", "rho"]])),
+         ("Confidence: only the most confident correct predictions, pooled (p = the field's species probability, "
+          "geometric mean over its interior pixels)", R.md(Cf)),
+         ("Confidence per species: all correct, p >= 0.95 (5 fields or more), and the most against the least "
+          "confident half of each species' correct fields", R.md(Sc)),
+         ("Confidence, the mean over species (each species weighs the same)", R.md(macro))]
     text = (f"Main drivers against the AUC map. {keep.sum()} correctly predicted fields of {len(sp)} species; "
             f"K = {K}.\n\n" + "\n\n".join(f"### {t}\n\n{b}" for t, b in T) + "\n")
     (R.FIG / "drivers.md").write_text(text)

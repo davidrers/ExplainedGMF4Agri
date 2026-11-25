@@ -267,3 +267,66 @@ Main drivers against the AUC map. 544 correctly predicted fields of 10 species; 
 | maize | band group | SHAP | Red-edge | 1.00 | 0.50 | 0.00 | 0.26 |
 | maize | band group | IG | Red-edge | 1.00 | 0.50 | 0.00 | 0.09 |
 | maize | band group | Occlusion (mean) | Red-edge | 1.00 | 1.00 | 0.00 | 0.71 |
+
+### Confidence: only the most confident correct predictions, pooled (p = the field's species probability, geometric mean over its interior pixels)
+
+| fields | n | species (5 fields or more) | level | method | hit | hit, other species' maps | chance | AUC gap, median |
+|---|---|---|---|---|---|---|---|---|
+| all correct | 544 | 10 | cell | IG | 0.20 | 0.14 | 0.07 | 0.10 |
+| all correct | 544 | 10 | month | SHAP | 0.50 | 0.54 | 0.25 | 0.05 |
+| all correct | 544 | 10 | band group | SHAP | 0.37 | 0.30 | 0.33 | 0.04 |
+| p >= 0.9 | 305 | 8 | cell | IG | 0.22 | 0.14 | 0.07 | 0.10 |
+| p >= 0.9 | 305 | 8 | month | SHAP | 0.49 | 0.56 | 0.25 | 0.04 |
+| p >= 0.9 | 305 | 8 | band group | SHAP | 0.42 | 0.30 | 0.33 | 0.04 |
+| p >= 0.95 | 249 | 8 | cell | IG | 0.23 | 0.14 | 0.07 | 0.10 |
+| p >= 0.95 | 249 | 8 | month | SHAP | 0.50 | 0.56 | 0.25 | 0.04 |
+| p >= 0.95 | 249 | 8 | band group | SHAP | 0.43 | 0.31 | 0.33 | 0.04 |
+| p >= 0.99 | 118 | 6 | cell | IG | 0.28 | 0.14 | 0.07 | 0.10 |
+| p >= 0.99 | 118 | 6 | month | SHAP | 0.65 | 0.58 | 0.25 | 0.00 |
+| p >= 0.99 | 118 | 6 | band group | SHAP | 0.42 | 0.35 | 0.33 | 0.03 |
+| top 5 % (p >= 0.998) | 28 | 3 | cell | IG | 0.36 | 0.11 | 0.07 | 0.07 |
+| top 5 % (p >= 0.998) | 28 | 3 | month | SHAP | 0.43 | 0.53 | 0.25 | 0.02 |
+| top 5 % (p >= 0.998) | 28 | 3 | band group | SHAP | 0.68 | 0.41 | 0.33 | 0.00 |
+
+### Confidence per species: all correct, p >= 0.95 (5 fields or more), and the most against the least confident half of each species' correct fields
+
+| species | level | method | fields | hit, all correct | fields p >= 0.95 | hit, p >= 0.95 | hit, other maps, p >= 0.95 | hit, most confident half | hit, least confident half |
+|---|---|---|---|---|---|---|---|---|---|
+| grassland | cell | IG | 57 | 0.00 | 39 | 0.00 | 0.09 | 0.00 | 0.00 |
+| grassland | month | SHAP | 57 | 0.05 | 39 | 0.08 | 0.61 | 0.07 | 0.04 |
+| grassland | band group | SHAP | 57 | 0.51 | 39 | 0.51 | 0.18 | 0.55 | 0.46 |
+| forage legumes | cell | IG | 66 | 0.00 | 15 | 0.00 | 0.27 | 0.00 | 0.00 |
+| forage legumes | month | SHAP | 66 | 0.09 | 15 | 0.00 | 0.60 | 0.09 | 0.09 |
+| forage legumes | band group | SHAP | 66 | 0.23 | 15 | 0.13 | 0.33 | 0.15 | 0.30 |
+| wheat | cell | IG | 60 | 0.60 | 26 | 0.92 | 0.21 | 0.87 | 0.33 |
+| wheat | month | SHAP | 60 | 0.92 | 26 | 0.92 | 0.59 | 0.93 | 0.90 |
+| wheat | band group | SHAP | 60 | 0.78 | 26 | 0.88 | 0.41 | 0.90 | 0.67 |
+| barley | cell | IG | 72 | 0.00 | 40 | 0.00 | 0.09 | 0.00 | 0.00 |
+| barley | month | SHAP | 72 | 0.40 | 40 | 0.38 | 0.56 | 0.36 | 0.44 |
+| barley | band group | SHAP | 72 | 0.00 | 40 | 0.00 | 0.27 | 0.00 | 0.00 |
+| rye | cell | IG | 27 | 0.19 | 1 |  |  | 0.21 | 0.15 |
+| rye | month | SHAP | 27 | 0.15 | 1 |  |  | 0.07 | 0.23 |
+| rye | band group | SHAP | 27 | 0.56 | 1 |  |  | 0.57 | 0.54 |
+| oats | cell | IG | 28 | 0.29 | 0 |  |  | 0.29 | 0.29 |
+| oats | month | SHAP | 28 | 1.00 | 0 |  |  | 1.00 | 1.00 |
+| oats | band group | SHAP | 28 | 0.14 | 0 |  |  | 0.14 | 0.14 |
+| rapeseed | cell | IG | 64 | 0.25 | 45 | 0.24 | 0.14 | 0.22 | 0.28 |
+| rapeseed | month | SHAP | 64 | 0.98 | 45 | 1.00 | 0.59 | 1.00 | 0.97 |
+| rapeseed | band group | SHAP | 64 | 0.38 | 45 | 0.42 | 0.35 | 0.41 | 0.34 |
+| dry pulses | cell | IG | 90 | 0.00 | 40 | 0.00 | 0.23 | 0.00 | 0.00 |
+| dry pulses | month | SHAP | 90 | 0.47 | 40 | 0.45 | 0.53 | 0.42 | 0.51 |
+| dry pulses | band group | SHAP | 90 | 0.00 | 40 | 0.00 | 0.20 | 0.00 | 0.00 |
+| buckwheat | cell | IG | 40 | 0.88 | 20 | 0.90 | 0.01 | 0.90 | 0.85 |
+| buckwheat | month | SHAP | 40 | 0.55 | 20 | 0.50 | 0.56 | 0.50 | 0.60 |
+| buckwheat | band group | SHAP | 40 | 0.72 | 20 | 0.90 | 0.42 | 0.90 | 0.55 |
+| maize | cell | IG | 40 | 0.23 | 23 | 0.17 | 0.17 | 0.20 | 0.25 |
+| maize | month | SHAP | 40 | 0.50 | 23 | 0.43 | 0.44 | 0.40 | 0.60 |
+| maize | band group | SHAP | 40 | 1.00 | 23 | 1.00 | 0.44 | 1.00 | 1.00 |
+
+### Confidence, the mean over species (each species weighs the same)
+
+| level | method | hit, all correct | hit, p >= 0.95 | hit, most confident half | hit, least confident half |
+|---|---|---|---|---|---|
+| cell | IG | 0.24 | 0.28 | 0.27 | 0.22 |
+| month | SHAP | 0.51 | 0.47 | 0.48 | 0.54 |
+| band group | SHAP | 0.43 | 0.48 | 0.46 | 0.40 |

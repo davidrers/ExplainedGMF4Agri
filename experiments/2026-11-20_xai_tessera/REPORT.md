@@ -294,6 +294,33 @@ rapeseed, buckwheat, maize; 14 % against the other species' maps), against 20 % 
 fields scatter around the species' main cell, so a per-field explanation is less likely to name the data's cue than
 the species summary is.
 
+**Only the confident predictions.** Asked on 25 November 2026: does the picture change for the predictions the
+model is surest of? The field's probability is the geometric mean of its species probability over its interior
+pixels. The literal top 5 % (p ≥ 0.998) holds 28 fields of 3 species, too few, so the main subset is p ≥ 0.95: 249
+of the 544 correct fields, in 8 species (none of oats' correct fields and one of rye's reach it). Because the mix
+of species changes with the threshold, each species' most confident half is also set against its least confident
+half.
+
+![Confident predictions](figures/drivers_confidence.png)
+
+**What it tells us.** Confidence sharpens the agreement where there is one and creates none where there is not.
+Wheat's main cell is a main AUC cue for 92 % of its fields with p ≥ 0.95 against 60 % of all its correct fields (87 %
+in its most confident half, 33 % in its least), and buckwheat's band group for 90 % against 72 %. Grassland, forage
+legumes, barley and dry pulses stay at 0 % on the cells, and barley and dry pulses at 0 % on the band groups, among
+their surest fields too. Pooled, the main cell agrees for 20 % of all correct fields, 23 % at p ≥ 0.95 and 28 % at
+p ≥ 0.99 (other species' maps 14 % throughout); averaged over species, the most and the least confident halves
+differ by 5 to 6 points at most (cells 27 % against 22 %, band groups 46 % against 40 %, months 48 % against 54 %).
+The split between the crops is therefore not a matter of uncertain predictions.
+
+**Conclusion of the comparison.** The XAI main drivers agree with the AUC map's main cues for some crops, not in
+general. They agree for crops whose strongest cue in the data is optical and in the growing season: clearly for
+wheat, and at one level for rapeseed and oats (the month), buckwheat (the cell) and maize (the band group). They do
+not agree for grassland, forage legumes, barley and dry pulses, even when the model is sure: there the data's
+strongest single cues are radar or late season, and weak for forage legumes and barley (best cell 0.74), while the
+model recognises the crop from May to July optical evidence. Disagreement does not mean the model is wrong, since
+these fields are classified correctly; it means that for these crops the explanation will not point to the cue a
+single-band check of the data would name.
+
 ## Analysis
 
 **The explanations are usable.** All three methods pass completeness, convergence, deletion and randomisation, on
