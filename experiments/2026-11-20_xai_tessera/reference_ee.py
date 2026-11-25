@@ -83,11 +83,11 @@ def main() -> None:
     # the maps: species against the rest, per month and band group TESSERA reads
     g = rest[(rest.kind == "group") & rest.name.isin(TESSERA_GROUPS)].copy()
     g["month"] = g.month.map(month_name)
-    g = g.rename(columns={"name": "group"})[["species", "month", "group", "auc", "best_band", "auc_signed"]]
+    g = g.rename(columns={"name": "group"})[["species", "month", "group", "auc", "best_band", "auc_signed"]].reset_index(drop=True)
     g.to_csv(OUT / "ee_auc_map.csv", index=False)
     p = pair[(pair.kind == "group") & pair.name.isin(TESSERA_GROUPS)].copy()
     p["month"] = p.month.map(month_name)
-    p = p.rename(columns={"name": "group"})
+    p = p.rename(columns={"name": "group"}).reset_index(drop=True)      # the pair frame repeats its index per pair
     best_pair = p.loc[p.groupby(["a", "b"]).auc.idxmax(), ["a", "b", "month", "group", "best_band", "auc",
                                                            "auc_signed"]]
     best_pair["a_is"] = np.where(best_pair.auc_signed > 0.5, "higher", "lower")

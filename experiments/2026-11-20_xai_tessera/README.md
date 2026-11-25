@@ -43,4 +43,11 @@ retrained (user, 20 November 2026). The core is not touched: `chain.py` imports 
 
 `--limit <n>` runs a step on `n` chips, for a test. **Results:** `results/2026-11-20_xai_tessera/EE_2021_rev/<step>/`.
 
-**Outcome.** Not run yet.
+**Outcome (25 November 2026, [REPORT.md](REPORT.md)).** Run on the hub GPU (the cluster had none free before
+1 December). The rebuilt chain matches the stored predictions (fp32: 99.65 % of pixels, 99.91 % of parcels), and
+the three methods pass completeness, convergence, deletion and randomisation. **When** agrees with the crop
+signatures: the costliest window is the reference's or its neighbour in 21 of 22 species × method cases, mostly a
+month later. **Which property** agrees in part: the model rests on red-edge and NIR and leaves most radar cues
+unused (rapeseed excepted); SHAP's band group is the reference's for 5 of 11 species. **Against which crop** does not:
+every pair is separated with the same May to June optical cells, the pair's own cue ranking 24.5 of 72 (median). The
+cue's direction agrees for 9 of 11 species.

@@ -332,9 +332,8 @@ def fig_sowing(df, A, ok):
         for f, c in (("winter", "#2a78d6"), ("spring", "#eb6834")):
             sel = ok & (df.species == s).to_numpy() & (df.sowing == f).to_numpy()
             y = A["shap_m0_a"][sel].mean(0)
-            ax.plot(range(12), y, color=c, lw=2, marker="o", ms=3)
-            ax.annotate(f"{f} ({sel.sum()})", (11, y[-1]), xytext=(4, 0), textcoords="offset points", fontsize=7,
-                        color=INK2, va="center")
+            ax.plot(range(12), y, color=c, lw=2, marker="o", ms=3, label=f"{f} ({sel.sum()} fields)")
+        ax.legend(frameon=False, fontsize=7, loc="upper left")       # end labels collide where the lines meet
         ax.axhline(0, color="#c3c2b7", lw=0.8)
         ax.set_xticks(range(12), [m[0] for m in MONTHS])
         ax.set_title(s, loc="left")
@@ -542,8 +541,12 @@ def main() -> None:
         conc = float(np.median(np.abs(ab[i]).max(1) / np.maximum(np.abs(ab[i]).sum(1), 1e-9)))
         p = pairs[((pairs.a == s) & (pairs.b == b)) | ((pairs.a == b) & (pairs.b == s))]
         cue = f"{p.month.iat[0]} {p.group.iat[0]} ({p.auc.iat[0]:.2f}, {p.verdict.iat[0]})" if len(p) else None
+        # where the pair's reference cue cell ranks in the model's mean A - B map (1 = the model's top cell, of 72)
+        rank = (int(1 + (m > m[cell_names.index(f"{p.month.iat[0]} {p.group.iat[0]}")]).sum())
+                if len(p) and f"{p.month.iat[0]} {p.group.iat[0]}" in cell_names else None)
         rows.append({"A": s, "rival B": b, "fields": len(g), "model wrong": int((~g.correct_species).sum()),
-                     "IG (A - B) top cell": top, "share of the top cell": conc, "reference pair cue": cue})
+                     "IG (A - B) top cell": top, "share of the top cell": conc, "reference pair cue": cue,
+                     "rank of the reference cue cell (of 72)": "" if rank is None else str(rank)})
     T.append(("Q3 Against which crop: what separates a field's species from its rival (IG of A - B)",
               md(pd.DataFrame(rows).sort_values("fields", ascending=False)) if rows
               else "no species and rival with 8 fields or more"))
