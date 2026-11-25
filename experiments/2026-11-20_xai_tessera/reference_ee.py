@@ -13,7 +13,7 @@ input, as there).
     poetry run python experiments/2026-11-20_xai_tessera/reference_ee.py [--threads 16]
 
 Writes ``reference/``: ``ee_species_reference.csv`` (one row per species), ``ee_auc_map.csv`` (species against the
-rest, per month and band group), ``ee_pairs.csv`` (the cue of every pair of species), ``ee_importance.csv`` (the
+rest, per month and band group), ``ee_pairs.csv`` (the cue of every pair of species), ``ee_pair_auc_map.csv`` (every pair's 72 cells), ``ee_importance.csv`` (the
 forest's recall lost per hidden unit), ``ee_confusion.csv``, ``ee_classifier.csv``, ``ee_profiles.csv``.
 """
 
@@ -88,6 +88,7 @@ def main() -> None:
     p = pair[(pair.kind == "group") & pair.name.isin(TESSERA_GROUPS)].copy()
     p["month"] = p.month.map(month_name)
     p = p.rename(columns={"name": "group"}).reset_index(drop=True)      # the pair frame repeats its index per pair
+    p[["a", "b", "month", "group", "auc", "best_band", "auc_signed"]].round(3).to_csv(OUT / "ee_pair_auc_map.csv", index=False)
     best_pair = p.loc[p.groupby(["a", "b"]).auc.idxmax(), ["a", "b", "month", "group", "best_band", "auc",
                                                            "auc_signed"]]
     best_pair["a_is"] = np.where(best_pair.auc_signed > 0.5, "higher", "lower")

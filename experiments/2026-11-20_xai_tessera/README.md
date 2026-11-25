@@ -46,8 +46,10 @@ retrained (user, 20 November 2026). The core is not touched: `chain.py` imports 
 **Outcome (25 November 2026, [REPORT.md](REPORT.md)).** Run on the hub GPU (the cluster had none free before
 1 December). The rebuilt chain matches the stored predictions (fp32: 99.65 % of pixels, 99.91 % of parcels), and
 the three methods pass completeness, convergence, deletion and randomisation. **When** agrees with the crop
-signatures: the costliest window is the reference's or its neighbour in 21 of 22 species × method cases, mostly a
-month later. **Which property** agrees in part: the model rests on red-edge and NIR and leaves most radar cues
-unused (rapeseed excepted); SHAP's band group is the reference's for 5 of 11 species. **Against which crop** does not:
-every pair is separated with the same May to June optical cells, the pair's own cue ranking 24.5 of 72 (median). The
-cue's direction agrees for 9 of 11 species.
+signatures: the evidence centre moves with the crop's NDVI peak (Spearman 0.57 SHAP, 0.78 IG), 9 of 11 species put
+more attribution in their own reference window than in the other species' windows, and the costliest window is the
+reference's or its neighbour in 21 of 22 species × method cases, mostly a month later. **Which property** agrees in
+part: the model rests on red-edge and NIR (SHAP's band group is the reference's for 5 of 11 species, 1.8 by chance;
+its main cell is a strong cue for 8 of 10), and reads the field's radar only for oats, potatoes and rapeseed.
+**Against which crop** agrees on the month (cue month rank 3 of 12, chance 6.5) and not on the band (4.5 of 6,
+chance 3.5): the same optical cells serve most rivals. The cue's direction agrees for 9 of 11 species.

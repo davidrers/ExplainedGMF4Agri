@@ -473,20 +473,33 @@ def main() -> None:
                "occlusion (drop)": f"{top_d} ({window_relation(top_d, exp)})"}
         if isinstance(exp, str):
             w = months_of_window(exp)
-            for key, v in (("SHAP share in window", A["shap_m0_a"][sel]), ("IG share in window", A["ig_a"][sel].sum(-1))):
-                share = np.abs(v[:, w]).sum(1) / np.maximum(np.abs(v).sum(1), 1e-9)
-                row[key] = float(np.median(share))
+            others = {ref.hide_window[t] for t in species_in(df[ok]) if t in ref.index and t != s
+                      and isinstance(ref.hide_window[t], str)} - {exp}
+            for key, v in (("SHAP", A["shap_m0_a"][sel]), ("IG", A["ig_a"][sel].sum(-1))):
+                tot = np.maximum(np.abs(v).sum(1), 1e-9)
+                row[f"{key} share in window"] = float(np.median(np.abs(v[:, w]).sum(1) / tot))
+                if key == "SHAP" and others:
+                    row["SHAP share in the other species' windows"] = float(np.median(
+                        [np.median(np.abs(v[:, months_of_window(o)]).sum(1) / tot) for o in others]))
+        for key, v in (("SHAP", A["shap_m0_a"][sel]), ("IG", A["ig_a"][sel].sum(-1))):
+            p = v.clip(0)
+            row[f"{key} centre (month)"] = float(np.median((p * np.arange(1, 13)).sum(1) / np.maximum(p.sum(1), 1e-9)))
         row["NDVI peak"] = r.peak if r is not None else None
         row["reference"] = r.source if r is not None else None
         rows.append(row)
     q1 = pd.DataFrame(rows)
-    T.append(("Q1 When: the costliest window and the share of attribution in the expected window (uniform = 0.25)",
-              md(q1)))
+    peak_m = q1["NDVI peak"].map(lambda m: MONTHS.index(m) + 1 if isinstance(m, str) else np.nan)
+    T.append(("Q1 When: the costliest window, the share of attribution in the expected window (uniform = 0.25) and "
+              "in the other species' windows, and the centre of the supporting evidence (month, 1 = Jan)",
+              md(q1) + f"\n\nSpearman of the evidence centre with the NDVI peak over the species: SHAP "
+              f"{spearman(q1['SHAP centre (month)'].to_numpy(), peak_m.to_numpy()):.2f}, IG "
+              f"{spearman(q1['IG centre (month)'].to_numpy(), peak_m.to_numpy()):.2f}"))
     fig_when(df, A, ref, ok)
 
     # ---- Q2 which property
     gcols = unit_cols(mu, "band group")
     scols = unit_cols(du, "sensor")
+    scols_m = unit_cols(mu, "sensor")                         # the same sensors replaced by the mean (state test)
     rows = []
     for s in species_in(df[ok]):
         sel = ok & (df.species == s).to_numpy()
@@ -495,16 +508,22 @@ def main() -> None:
         occ_g = A["occl_mean_a"][sel][:, gcols].mean(0)
         ig_g = group_sum(A["ig_a"][sel]).sum(1).mean(0)
         sens = A["occl_drop_a"][sel][:, scols].mean(0)
+        sens_m = A["occl_mean_a"][sel][:, scols_m].mean(0)
         s1_share = np.abs(A["shap_g_a"][sel][:, 4:]).sum(1) / np.maximum(np.abs(A["shap_g_a"][sel]).sum(1), 1e-9)
         rows.append({"species": s, "SHAP top": GROUPS[int(np.argmax(shap_g))],
                      "occlusion (mean) top": GROUPS[int(np.argmax(occ_g))], "IG top": GROUPS[int(np.argmax(ig_g))],
                      "reference: costliest group": r.hide_band_group if r is not None else None,
                      "reference: best cue": f"{r.cue_month} {r.cue_group} ({r.cue_auc:.2f})" if r is not None else None,
                      "S2 removed (drop)": float(sens[0]), "S1 removed (drop)": float(sens[1]),
+                     "S2 replaced (mean)": float(sens_m[0]), "S1 replaced (mean)": float(sens_m[1]),
                      "reference S2 / S1 recall lost": f"{r.hide_sentinel2_drop:.2f} / {r.hide_sentinel1_drop:.2f}"
                      if r is not None else None,
                      "SHAP share of radar": float(np.median(s1_share))})
-    T.append(("Q2 Which property: the leading band group by each method, and the sensors", md(pd.DataFrame(rows))))
+    q2 = pd.DataFrame(rows)
+    hit = {k: int((q2[k] == q2["reference: costliest group"]).sum()) for k in ("SHAP top", "occlusion (mean) top", "IG top")}
+    T.append(("Q2 Which property: the leading band group by each method, and the sensors", md(q2) + "\n\n"
+              + "leading group = the reference's costliest group: " + ", ".join(f"{k} {v} of {len(q2)}" for k, v in hit.items())
+              + f" (chance {len(q2) / 6:.1f} of {len(q2)})"))
     fig_property(df, A, ref, ok)
 
     # ---- the cell maps against the reference AUC map
@@ -519,7 +538,10 @@ def main() -> None:
         amap = a.pivot(index="month", columns="group", values="auc").reindex(index=MONTHS, columns=GROUPS).to_numpy()
         nulls = (amap < 0.55).ravel()
         mig = np.abs(igc[sel]).mean(0)
-        rows.append({"species": s, "IG cells (absolute) vs AUC": spearman(mig, amap.ravel()),
+        top = int(np.argmax(igc[sel].mean(0)))
+        rows.append({"species": s, "IG top cell": f"{MONTHS[top // 6]} {GROUPS[top % 6]}", "its AUC": float(amap.ravel()[top]),
+                     "best cell's AUC": float(np.nanmax(amap)), "median cell's AUC": float(np.nanmedian(amap)),
+                     "IG cells (absolute) vs AUC": spearman(mig, amap.ravel()),
                      "occlusion cells vs AUC": spearman(occ_c[sel].mean(0), amap.ravel()),
                      "null cells (AUC < 0.55)": int(nulls.sum()),
                      "IG share on null cells": float(mig[nulls].sum() / max(mig.sum(), 1e-9)),
@@ -532,6 +554,10 @@ def main() -> None:
     pairs = pd.read_csv(HERE / "reference" / "ee_pairs.csv")
     ab = group_sum(A["ig_ab"]).reshape(n, -1)
     cell_names = [f"{m} {g}" for m in MONTHS for g in GROUPS]
+    pmap_f = HERE / "reference" / "ee_pair_auc_map.csv"
+    pmap = pd.read_csv(pmap_f) if pmap_f.exists() else None
+    mcols = [mu.index(f"month|{m}") for m in MONTHS]                    # occlusion under the mean, fall of A - B
+    gcols3 = [mu.index(f"band group|{g}") for g in GROUPS]
     for (s, b), g in df.groupby(["species", "rival"]):
         if len(g) < 8:
             continue
@@ -544,11 +570,32 @@ def main() -> None:
         # where the pair's reference cue cell ranks in the model's mean A - B map (1 = the model's top cell, of 72)
         rank = (int(1 + (m > m[cell_names.index(f"{p.month.iat[0]} {p.group.iat[0]}")]).sum())
                 if len(p) and f"{p.month.iat[0]} {p.group.iat[0]}" in cell_names else None)
-        rows.append({"A": s, "rival B": b, "fields": len(g), "model wrong": int((~g.correct_species).sum()),
-                     "IG (A - B) top cell": top, "share of the top cell": conc, "reference pair cue": cue,
-                     "rank of the reference cue cell (of 72)": "" if rank is None else str(rank)})
-    T.append(("Q3 Against which crop: what separates a field's species from its rival (IG of A - B)",
-              md(pd.DataFrame(rows).sort_values("fields", ascending=False)) if rows
+        row = {"A": s, "rival B": b, "fields": len(g), "model wrong": int((~g.correct_species).sum()),
+               "IG (A - B) top cell": top, "share of the top cell": conc, "reference pair cue": cue,
+               "rank of the reference cue cell (of 72)": "" if rank is None else str(rank)}
+        if len(p):
+            if pmap is not None:                                  # how good a cue the model's top cell is for this pair
+                q = pmap[((pmap.a == p.a.iat[0]) & (pmap.b == p.b.iat[0]))]
+                q = q[(q.month == top.split()[0]) & (q.group == top.split()[1])]
+                row["pair AUC of the model's top cell"] = f"{q.auc.iat[0]:.2f}" if len(q) else ""
+            fm, fg = A["occl_mean_ab"][i][:, mcols].mean(0), A["occl_mean_ab"][i][:, gcols3].mean(0)
+            fm_c, fg_c = fm[MONTHS.index(p.month.iat[0])], fg[GROUPS.index(p.group.iat[0])]
+            row["cue month's rank (of 12, occlusion)"] = str(int(1 + (fm > fm_c).sum()))
+            row["cue group's rank (of 6, occlusion)"] = str(int(1 + (fg > fg_c).sum()))
+        rows.append(row)
+    q3 = pd.DataFrame(rows)
+    summary = ""
+    if rows and "cue month's rank (of 12, occlusion)" in q3:
+        r72 = pd.to_numeric(q3["rank of the reference cue cell (of 72)"], errors="coerce").dropna()
+        r12 = pd.to_numeric(q3["cue month's rank (of 12, occlusion)"], errors="coerce").dropna()
+        r6 = pd.to_numeric(q3["cue group's rank (of 6, occlusion)"], errors="coerce").dropna()
+        summary = (f"\n\nOver the {len(r72)} pairs with a reference cue, median rank of the cue (chance in brackets): cell "
+                   f"{r72.median():g} of 72 (36.5), first in {(r72 == 1).sum()}; month {r12.median():g} of 12 (6.5), first in "
+                   f"{(r12 == 1).sum()}, top 3 in {(r12 <= 3).sum()}; band group {r6.median():g} of 6 (3.5), first in "
+                   f"{(r6 == 1).sum()}")
+    T.append(("Q3 Against which crop: what separates a field's species from its rival (IG of A - B; occlusion of A - B "
+              "under the mean for the month and band group)",
+              md(q3.sort_values("fields", ascending=False)) + summary if rows
               else "no species and rival with 8 fields or more"))
 
     # ---- Q4 direction
