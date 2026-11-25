@@ -53,3 +53,7 @@ part: the model rests on red-edge and NIR (SHAP's band group is the reference's 
 its main cell is a strong cue for 8 of 10), and reads the field's radar only for oats, potatoes and rapeseed.
 **Against which crop** agrees on the month (cue month rank 3 of 12, chance 6.5) and not on the band (4.5 of 6,
 chance 3.5): the same optical cells serve most rivals. The cue's direction agrees for 9 of 11 species.
+**Per field against the AUC map** (`drivers.py`, 544 correctly predicted fields): the main driver is one of the
+species' strongest AUC cues for most fields of wheat, rapeseed, oats, buckwheat and maize (at one level or more),
+and for almost none of grassland, forage legumes, barley and dry pulses; pooled, 20 % of fields' main cells are in
+their species' AUC top 5 (chance 7 %, other species' maps 14 to 17 %).

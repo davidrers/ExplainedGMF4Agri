@@ -13,7 +13,10 @@ a strong cue in the data for 8 of 10 species; the field's radar values matter on
 **"Against which crop" agrees on the month and not on the band**: the pair's cue month ranks 3 of 12 in the model's
 evidence (median; 6.5 by chance), its band group 4.5 of 6 (3.5 by chance), because the model separates every pair
 with the same optical cells, cues of median pair AUC 0.78 where the data's best is 0.92. The direction of the cue
-agrees for 9 of 11 species.
+agrees for 9 of 11 species. **Per field, against the AUC map** (correctly predicted fields only): the
+field's main driver is one of its species' strongest AUC cues for most fields of wheat (every level), rapeseed and
+oats (month), buckwheat (cell) and maize (band group), and for almost none of grassland, forage legumes, barley and
+dry pulses, whose strongest cues in the data are radar or late season.
 
 ## Setup
 
@@ -230,6 +233,67 @@ fields (25 % if spread evenly), so the composites' copied months are not where t
 the whole chip rather than on the field alone barely changes anything (largest fall 2.75 against 2.65 under the
 mean; ranking Spearman 0.99): the evidence comes from the field itself, not from its neighbours.
 
+### Main drivers per field against the AUC map (inference level)
+
+Added on 25 November 2026 at the user's request: for the **correctly predicted fields only**, do the main drivers
+the XAI methods give agree with the main drivers of the species' AUC map (not the random forest)? Computed by
+`drivers.py` from the stored explanations; tables in `figures/drivers.md`.
+
+**Which levels exist.** All three methods are local: they explain one inference, a field's prediction. There is no
+global method in this run (global surrogate, ALE, dataset-wide permutation importance); the **model level** here is
+the mean of the local explanations over a species' correctly predicted fields, as SHAP's global importance is.
+
+**How it is compared.**
+
+| | |
+|---|---|
+| Fields | the stored prediction's species and the argmax of the explained score both equal the true species: 578 of 780 fields (the two agree on 96 % of fields); 544 of them in the 10 species with an Estonian AUC map (potatoes has none; orchards and vegetables have no correct field) |
+| AUC main drivers | per species, from `reference/ee_auc_map.csv` (species against the rest, the best band of each group): the 5 cells of highest AUC (of 72), the 3 months whose best cell is highest (of 12), the 2 band groups whose best cell is highest (of 6) |
+| XAI main driver of a field | the unit with the largest supporting attribution to its species: cells from IG and occlusion (mean); months from SHAP, IG, occlusion (mean) and (drop); band groups from SHAP, IG and occlusion (mean) |
+| Agreement | *hit*: the field's main driver is one of its species' AUC main drivers; *AUC gap*: the species' best AUC minus the AUC of the field's main driver |
+| Baselines | chance (5/72, 3/12, 2/6), and the same field's main driver checked against the *other* nine species' maps: every map is strong in summer, so a hit only means something if it is more frequent for the field's own species |
+
+![Inference level, pooled](figures/drivers_inference.png)
+
+**What it shows.** For each level and method, the share of the 544 correct fields whose main driver is one of their
+species' AUC main drivers (bars), the same share against the other species' maps (circles), and chance (dashed).
+
+**What it tells us.** Pooled over species, the agreement is weak and only the cells are species specific: the main
+cell is one of the species' five best AUC cells for 20 % of fields (chance 7 %, other species' maps 14 to 17 %). The
+main month is one of the three best AUC months for 50 to 56 % of fields, twice chance but no more often than for
+the other species' maps (51 to 54 %), and the main band group for 34 to 37 %, at chance (33 %; other maps 30 to
+32 %). The main month is still a strong month in the data: its AUC is within 0.05 of the best month for 46 to 61 %
+of fields (median gap 0.02 to 0.05). Pooling hides the species, which split cleanly:
+
+![Inference level per species](figures/drivers_species.png)
+
+**What it shows.** Per species and method, the share of its correct fields whose main driver is one of its AUC main
+drivers (number in the cell); colour: that share minus the share against the other species' maps (blue = the
+agreement is specific to the species).
+
+**What it tells us.** Two groups of crops.
+
+- **The model's drivers are the data's main cues.** *Wheat* at every level (main month 92 % of fields, cell 60 %,
+  band group 78 %: June red-edge, the species' best AUC cell, is the main cell of 58 % of wheat fields). *Rapeseed*
+  and *oats* on the month (98 % and 100 %: June to July, and May). *Buckwheat* on the cell (88 %: July red-edge,
+  AUC 0.89). *Maize* on the band group (red-edge, 100 %). *Rye* on the band group (56 to 74 %: SWIR and red-edge),
+  not on the month (the model's main month is July for 70 % of rye fields; the data's are June, May and April).
+- **The model's drivers are not the data's main cues.** *Grassland* (main month 5 %, cell 0 %), *forage legumes*
+  (9 %, 0 %), *barley* (40 %, 0 %, band group 0 %) and *dry pulses* (47 %, 0 %, 0 %). Their AUC main cues are radar
+  or late season: autumn VV for grassland (August to November, AUC 0.88 to 0.89) and forage legumes (0.72 to 0.74),
+  August and September SWIR and visible plus June VV for barley (0.73 to 0.74), June VH and VV for dry pulses (0.79
+  to 0.82). For those fields the model's main drivers are optical cells of May to July: May NIR for 60 % of
+  grassland fields, June red-edge for forage legumes and dry pulses, May and June NIR for barley. These are also the
+  crops whose AUC cues are weakest (best cell 0.74 for forage legumes and barley) or, for grassland, a different
+  season.
+
+**Model level.** Each species' mean explanation agrees more, and more specifically, than single fields at the cell
+level: the species' main IG cell is one of its five best AUC cells for 6 of 10 species (wheat, rye, oats,
+rapeseed, buckwheat, maize; 14 % against the other species' maps), against 20 % of single fields. Its main month
+(SHAP) is one of the three best for 6 of 10 (52 % for other maps), its main band group for 6 of 10 (30 %). Single
+fields scatter around the species' main cell, so a per-field explanation is less likely to name the data's cue than
+the species summary is.
+
 ## Analysis
 
 **The explanations are usable.** All three methods pass completeness, convergence, deletion and randomisation, on
@@ -262,6 +326,13 @@ no more likely than chance to lead (4.5 of 6). Its cells are fair cues for the p
 the best one (0.92). For an explanation offered to an agronomist ("this field is barley rather than wheat because
 ..."), the month would be right and the band would be the general optical cue, not the one a crop specialist would
 check.
+
+**Per field, the explanation names the data's main cue for some crops and not for others.** For wheat,
+rapeseed, oats, buckwheat and maize, the main driver of a correctly predicted field is one of its species' strongest
+AUC cues at least at one level, for most fields; for grassland, forage legumes, barley and dry pulses it is not,
+because the data's strongest cues for them are radar or late season and the model reads them through May to July
+optics. For an agronomist checking single fields, the explanations are trustworthy as statements about the model
+for every crop, but agree with the data's cue only for the first group.
 
 **The direction is right where the model responds at all**, which is the property an agronomist can check most
 easily on a single field.
@@ -300,6 +371,7 @@ easily on a single field.
     bash experiments/2026-11-20_xai_tessera/run_hub.sh            # hub GPU: step 0, the pass criterion, pilot, 8 shards, sanity
     poetry run python experiments/2026-11-20_xai_tessera/reference_ee.py --threads 24   # the Estonian reference (hub)
     poetry run python experiments/2026-11-20_xai_tessera/report.py
+    poetry run python experiments/2026-11-20_xai_tessera/drivers.py         # main drivers per field against the AUC map
 
 The sample (`sample/`) and the reference (`reference/`) are committed; the explanations are in
 `results/2026-11-20_xai_tessera/EE_2021_rev/{step0,explain,sanity}/`.
