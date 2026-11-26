@@ -10,6 +10,11 @@ average per-date maps: each month's fields (default confidence 0.15) become a th
 field, boundary on each field's rim as ``prue.boundary_map`` draws it, interior inside), the six months April to
 September are averaged, and the fields are built from the mean as from FTW's maps (``prue.parcels(prob, "grow")``).
 Saved as the variant ``<recipe>_fused6`` of each model, scored by ``score.py`` like any three-class map.
+
+**The control.** The fused map's fields are built by another rule than the single-date instances' (interiors grown
+by watershed, not the model's own instances). Each month alone is therefore also passed through the same path,
+``<recipe>_<Mon>_3class`` (its one-hot map, unaveraged), so that one date against six is compared under one field
+rule and the gain of fusion splits into the field rule's and the time's.
 """
 
 from __future__ import annotations
@@ -31,7 +36,7 @@ def main():
                 if not all(p.exists() for p in paths):
                     continue
                 acc = None
-                for p in paths:
+                for m, p in zip(C.SEASON, paths):
                     with np.load(p) as z:
                         ids, inst, mask, conf, off = z["ids"], z["inst"], z["mask"], z["conf"], z["conf_offsets"]
                     one = np.zeros((len(ids), 3, 224, 224), np.float32)
@@ -44,6 +49,10 @@ def main():
                         one[i, prue.INTERIOR] = (seg > 0) & ~bnd
                         one[i, prue.BACKGROUND] = seg == 0
                     acc = one if acc is None else acc + one
+                    single = np.round(255 * one).astype(np.uint8)
+                    C.save_prob(model, f"{recipe}_{C.MONTHS[m]}_3class", split, ids, single, mask,
+                                {"model": model, "recipe": recipe, "month": C.MONTHS[m], "confidence": CONF,
+                                 "rule": "one month's one-hot background / interior / boundary, unaveraged (control)"})
                 prob = np.round(255 * acc / len(paths)).astype(np.uint8)
                 meta = {"model": model, "recipe": recipe, "fused_months": [C.MONTHS[m] for m in C.SEASON],
                         "confidence": CONF, "rule": "mean over months of one-hot background / interior / boundary"}

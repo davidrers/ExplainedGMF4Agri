@@ -22,7 +22,8 @@ GFM side is our own six arms of the two-head workflow, rescored on the same chip
 - One scorer (`score.py`): the two-head workflow's own functions, read-only, so every model's fields and borders
   are scored as our arms are; rescoring our arms reproduces their stored border F1 and PQ exactly.
 - Each external model's variants (month, window pair, recipe, threshold, fold, normalisation) are chosen on the
-  validation chips only; their published defaults are reported beside them.
+  validation chips only; for FTW the middle months of its Estonian windows (May and August) are reported beside
+  them as an untuned setting.
 - **Leakage.** Fields of The World holds Estonia 2021 from the same declarations; 338 of our 1,475 test chips touch
   an FTW chip (`ftw_overlap.py`, `reference/ftw_overlap_table.md`). The headline is `test_clean`, the 1,137 test
   chips that touch none.
@@ -65,9 +66,9 @@ not used.
   against 0.637 for the best open model, FTW's released PRUE B7. Delineate Anything v2 reaches 0.525 (0.598 with
   six dates fused) and U-TAE + PaPs 0.522.
 - **FTW's gap is mostly grassland, which its labels call background.** With grassland parcels set aside it reaches
-  0.856 against our 0.872, with better fields (PQ 0.467 against 0.423). That is level with our arms trained on
-  20 % of the labels.
+  0.856 against our 0.872, with better fields (PQ 0.467 against 0.423), above our arms trained on 20 % of the
+  labels.
 - **Temporal data.** The common approaches read one image or two dates; only U-TAE + PaPs and PTAViT3D encode a
-  series. Here more dates helped every open model: six fused dates add 0.07 to Delineate Anything v2, and U-TAE
-  loses 0.11 with two months instead of twelve. Which dates are used matters as much: FTW's best window pair,
-  April + July, beats its published default, May + August, by 0.10.
+  series. Here which dates a model reads matters most: FTW PRUE B7's best pair, April + July, beats the mid-window
+  pair, May + August, by 0.10. Averaging six single dates helps the one-image models (Delineate Anything v2 +0.07,
+  FTW one-window +0.04) but not the two-date ones (about −0.05 against their best pair).

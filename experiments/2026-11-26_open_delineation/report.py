@@ -56,13 +56,18 @@ FAMILIES = {
     "v2_multi": ("FTW v2, 2 dates", "v2_multi/", lambda v: v != "pairs_mean", SLOTS[6]),
     "v2_single": ("FTW v2, 1 date", "v2_single/", lambda v: v != "season_mean", SLOTS[6]),
     "v2_single_mean": ("FTW v2 one-window, 6 dates averaged", "v2_single/", lambda v: v == "season_mean", SLOTS[6]),
-    "delany_v2": ("Delineate Anything v2, 1 date", "delany_v2/", lambda v: "fused" not in v, SLOTS[7]),
+    "delany_v2": ("Delineate Anything v2, 1 date", "delany_v2/", lambda v: "fused" not in v and "3class" not in v,
+                  SLOTS[7]),
     "delany_v2_fused": ("Delineate Anything v2, 6 dates fused", "delany_v2/", lambda v: "fused" in v, SLOTS[7]),
-    "delany_v1": ("Delineate Anything v1, 1 date", "delany_v1/", lambda v: "fused" not in v, SLOTS[7]),
+    "delany_v1": ("Delineate Anything v1, 1 date", "delany_v1/", lambda v: "fused" not in v and "3class" not in v,
+                  SLOTS[7]),
     "utae_paps": ("U-TAE + PaPs (PASTIS), 12 dates", "utae_paps/", lambda v: v.endswith("all12"), INK_2),
 }
-#: Published defaults, scored beside the validation choice: (variant, fields).
-DEFAULTS = {"prue_b7": ("AMay_BAug", "cc"), "v2_multi": ("AMay_BAug", "cc"), "v2_single": ("WMay", "cc")}
+#: Mid-window settings, scored beside the validation choice: (variant, fields, label). FTW's Estonian windows are
+#: April to June and July to September (one scene each); the middle months stand in for an untuned choice.
+DEFAULTS = {"prue_b7": ("AMay_BAug", "cc", "mid-window pair (May + Aug)"),
+            "v2_multi": ("AMay_BAug", "cc", "mid-window pair (May + Aug)"),
+            "v2_single": ("WMay", "cc", "mid-window (May)")}
 
 
 def load() -> pd.DataFrame:
@@ -96,7 +101,7 @@ def entries(df: pd.DataFrame) -> list[dict]:
         if fam in DEFAULTS:
             d = f"{prefix}{DEFAULTS[fam][0]}"
             if (d, DEFAULTS[fam][1]) != ch:
-                out.append({"key": fam + "_default", "name": lab + ", published default", "label": d,
+                out.append({"key": fam + "_default", "name": lab + ", " + DEFAULTS[fam][2], "label": d,
                             "fields": DEFAULTS[fam][1], "group": "open", "colour": col})
     return out
 
@@ -240,11 +245,15 @@ def temporal_rows(df) -> list[dict]:
                             "fields": fields, "border_f1": r.border_f1_d1, "pq": r.pq_agnostic})
 
     for fam, pre in (("delany_v2", "delany_v2/"), ("delany_v1", "delany_v1/")):
-        b = _best(df, pre, lambda v: "fused" not in v)
-        if b is not None:
-            add(fam, 1, b.label, b.fields, f"best month on val ({b.variant}, conf {b.fields})")
-            fused = f"{pre}{b.variant.split('_')[0]}_fused6"
-            add(fam, 6, fused, "grow", "six months fused")
+        b = _best(df, pre, lambda v: "fused" not in v and "3class" not in v)
+        if b is None:
+            continue
+        recipe = b.variant.split("_")[0]
+        add(fam + "_inst", 1, b.label, b.fields, f"best month on val ({b.variant}), its own instances")
+        b3 = _best(df, pre, lambda v, r=recipe: v.startswith(r + "_") and v.endswith("_3class"))
+        if b3 is not None:                         # the same field rule as the fusion: one date against six
+            add(fam, 1, b3.label, "grow", f"best month on val ({b3.variant}), fields as the fusion builds them")
+        add(fam, 6, f"{pre}{recipe}_fused6", "grow", "six months fused")
     b = _best(df, "v2_single/", lambda v: v != "season_mean")
     if b is not None:
         add("v2s", 1, b.label, b.fields, f"best month on val ({b.variant})")
@@ -265,6 +274,8 @@ def temporal_rows(df) -> list[dict]:
 
 
 TFAM = {"delany_v2": ("Delineate Anything v2", SLOTS[7], "-"), "delany_v1": ("Delineate Anything v1", SLOTS[7], "--"),
+        "delany_v2_inst": ("Delineate Anything v2", SLOTS[7], None),
+        "delany_v1_inst": ("Delineate Anything v1", SLOTS[7], None),
         "v2s": ("FTW v2, one window", SLOTS[6], ":"), "v2m": ("FTW v2, two windows", SLOTS[6], "--"),
         "prue_b7": ("FTW PRUE B7", SLOTS[6], "-"),
         "utae": ("U-TAE + PaPs", INK_2, "-"), "ours": ("Ours: PRUE from ImageNet", SLOTS[5], ""),
@@ -279,7 +290,7 @@ def fig_temporal(df, pts):
         ax.grid(axis="y")
         for fam, (lab, col, ls) in TFAM.items():
             s = t[(t.family == fam) & (t.truth == truth)].sort_values("dates")
-            if s.empty:
+            if s.empty or ls is None:                  # own-instance single dates: in the table only
                 continue
             ax.plot(s.dates, s.border_f1, color=col, ls=ls or "none", marker="o" if ls else "*",
                     markersize=7 if ls else 13, label=lab)
@@ -299,12 +310,13 @@ def fig_temporal(df, pts):
         for m in C.SEASON:
             sub = df[(df.split == "test") & (df.subset == SUBSET) & (df.truth == "no_grass")
                      & (df.label == f"{pre}{keep}{C.MONTHS[m]}")]
-            b = _best(df, pre, lambda v, k=keep: v.startswith(k) and "fused" not in v and v != "season_mean")
+            b = _best(df, pre, lambda v, k=keep: v.startswith(k) and "fused" not in v and "3class" not in v
+                      and v != "season_mean")
             ys.append(sub[sub.fields == b.fields].border_f1_d1.iloc[0] if b is not None and len(sub) else np.nan)
         ax.plot(range(6), ys, color=col, ls=ls, marker="o", label=lab)
     ax.set_xticks(range(6), [C.MONTHS[m] for m in C.SEASON])
     ax.set_ylabel("border F1 within 1 px")
-    ax.set_title("one date: which month (grassland set aside)")
+    ax.set_title("one date: which month (grassland set aside; each model's own fields)")
     ax.legend(fontsize=7.5)
     fig.suptitle("Does seeing more of the season help? Choices on validation, values on the test chips no FTW chip "
                  "touches", x=0.01, ha="left", fontsize=10.5, color=INK)

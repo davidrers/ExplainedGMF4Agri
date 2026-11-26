@@ -15,20 +15,24 @@ by [report.py](report.py); how to run everything is in the [README](README.md).
   F1 of 0.856 against our 0.872 (paired difference −0.016, interval −0.023 to −0.009). Its fields score higher than
   ours: panoptic quality 0.467 against 0.423 (+0.044, interval +0.025 to +0.066). It predicts fewer fields, and
   more of those it predicts are right.
-- **Zero-shot, FTW PRUE B7 equals our models trained on 20 % of the labels.** With grassland set aside, its 0.856
-  lies above every arm at K = 20 % (best 0.824) and below the best arms at K = 100 % (0.872). On all parcels the
+- **Zero-shot, FTW PRUE B7 beats our models trained on 20 % of the labels, on crops.** With grassland set aside,
+  its 0.856 lies above every arm at K = 20 % (best 0.824) and below the best arms at K = 100 % (0.872). On all parcels the
   10 m arms and the baseline beat every open model even at K = 5 % (0.750 to 0.761 against at most 0.637).
-- **Delineate Anything is far behind at 10 m**, yet it draws the border between two fields of the same crop as
-  often as ours do (recall 0.37 against 0.36), from one image. Its fields are made for sharper images.
+- **Delineate Anything is far behind at 10 m.** It over-segments: it predicts more fields than there are parcels,
+  and fewer than half of its borders are real (precision 0.47). Its fields are made for sharper images.
 - **Do the common approaches use time?** Mostly not, or only a little. The instance and foundation-model approaches
   read one image. Fields of The World and PRUE stack two dates, and older pipelines average single-date predictions
-  after the network. Only U-TAE + PaPs and PTAViT3D encode a whole series. Here, **time helps every open model, but
-  which dates matters as much as how many**:
-  - Delineate Anything v2 gains 0.07 border F1 when six monthly predictions are averaged.
-  - FTW's one-window model gains 0.04 from six averaged months, and 0.14 with grassland aside.
-  - U-TAE loses 0.11 when it gets two months instead of twelve.
-  - FTW PRUE B7's nine window pairs span 0.51 to 0.64. Its published default (May and August) is one of the worst
-    pairs, and April with July the best.
+  after the network. Only U-TAE + PaPs and PTAViT3D encode a whole series. Here, **which dates a model reads
+  matters most; averaging more dates helps two of the three one-image models and neither two-date model**:
+  - FTW PRUE B7's nine window pairs span 0.51 to 0.64 border F1. The mid-window pair, May and August, is the third
+    worst (0.537); April with July is the best (0.637).
+  - Averaging six single-date predictions helps the one-image models. Delineate Anything v2 gains 0.07 border F1
+    and FTW's one-window model 0.04 (0.14 with grassland aside), the same field rule on both sides.
+    Delineate Anything v1 loses 0.04.
+  - Averaging the nine pairs does not help the two-date models: FTW PRUE B7 loses 0.05 against its best pair, FTW v2
+    0.05.
+  - U-TAE + PaPs loses 0.11 with two months instead of twelve, though two monthly composites are far from the 33 to
+    61 dates it was trained on.
 
 ## 1. The question
 
@@ -71,8 +75,9 @@ arms are therefore the foundation-model side.
 
 **Choices on validation only.** For each open model, the month or window pair, the recipe, the confidence, the fold,
 the normalisation and the field rule are those of the best border F1 on the 769 validation chips. The test chips are
-never used to choose. Where a model has a published default, the default is reported as well. For FTW that means
-the middle of its Estonian windows, May and August, with its own fields. The choices made:
+never used to choose. FTW publishes windows, not months: April to June and July to September for Estonia, one
+scene picked within each. As an untuned setting, the middle month of each window (May and August, FTW's own fields)
+is reported beside the choice. The choices made:
 
 | Model | Chosen on validation |
 |---|---|
@@ -129,7 +134,7 @@ resamples for every model, so that differences are paired.
 | Ours: TerraMind v1 L | 0.786 | 0.812 | 0.320 | 0.415 |
 | Ours: THOR v1 L | 0.650 | 0.661 | 0.220 | 0.304 |
 | FTW PRUE B7, April + July | 0.637 | 0.856 | 0.258 | **0.467** |
-| FTW PRUE B7, published default (May + August) | 0.537 | 0.737 | 0.197 | 0.362 |
+| FTW PRUE B7, mid-window pair (May + August) | 0.537 | 0.737 | 0.197 | 0.362 |
 | FTW v2, two windows | 0.612 | 0.746 | 0.253 | 0.410 |
 | FTW v2, one window (July) | 0.593 | 0.644 | 0.178 | 0.248 |
 | FTW v2, one window, six months averaged | 0.637 | 0.785 | 0.272 | **0.467** |
@@ -139,7 +144,7 @@ resamples for every model, so that differences are paired.
 | U-TAE + PaPs, twelve months | 0.522 | 0.535 | 0.205 | 0.242 |
 
 - **On all parcels, our five better arms lead clearly.** Every open model lies 0.22 to 0.40 border F1 below our
-  baseline (0.45 for FTW v2's published default), and the block-bootstrap intervals of the differences exclude
+  baseline (0.45 for FTW v2's mid-window pair), and the block-bootstrap intervals of the differences exclude
   zero.
 - **FTW draws few borders, but they are right.** Its border precision is 0.929 on all parcels, close to our
   baseline's 0.936, and 0.943 with grassland aside, the highest of all models (ours 0.900). Its recall on all
@@ -175,9 +180,10 @@ Prithvi and TerraMind fall below FTW PRUE B7 at K = 5 % (0.592 and 0.550), and T
 | U-TAE + PaPs | 0.354 | 0.714 | 0.507 | 0.488 |
 
 The border between two parcels of the same crop stays the hardest for every model, as the two-head report found.
-Delineate Anything, which reads one image, draws it as often as our models do (U-TAE as well): such a border is a
-line in the image, a ditch or a track, more than a change over the season. FTW draws a fifth of them, because 58 %
-of the same-crop border pixels lie between grassland parcels, which FTW does not draw.
+Delineate Anything and U-TAE recover as many of them as our models do, but only as recall: both over-segment, with
+border precision 0.47 and 0.54 against our 0.94, so many of their borders fall anywhere, the same-crop borders
+among them. FTW draws a fifth of them, because 58 % of the same-crop border pixels lie between grassland parcels,
+which FTW does not draw.
 
 ### 3.4 Examples
 
@@ -228,7 +234,8 @@ summarises the year.
 
 | Model | One date | Two dates | Six dates | Twelve |
 |---|---|---|---|---|
-| Delineate Anything v2 | 0.525 (June) | | 0.598 (fused) | |
+| Delineate Anything v2 | 0.525 (June, own instances); 0.526 (June, the fusion's field rule) | | 0.598 (fused) | |
+| Delineate Anything v1 | 0.456 (June); 0.455 (the fusion's field rule) | | 0.419 (fused) | |
 | FTW v2, one window | 0.593 (July) | | 0.637 (averaged) | |
 | FTW v2, two windows | | 0.612 (April + July) | 0.558 (nine pairs averaged) | |
 | FTW PRUE B7 | | 0.637 (April + July) | 0.589 (nine pairs averaged) | |
@@ -237,17 +244,24 @@ summarises the year.
 
 Border F1 on all parcels; with grassland aside the pattern is the same and larger ([tables](figures/tables.md)).
 
-- **More dates help a model that reads one image.** Averaging six monthly maps adds 0.07 border F1 and 0.06 PQ to
-  Delineate Anything v2, and 0.04 border F1 to FTW's one-window model (0.14 with grassland aside, where the averaged
-  one-window model passes the two-window one). Delineate Anything v1 is the exception (0.456 to 0.419): it finds
-  few fields per month (10 to 12 per chip against 40 to 65 for v2), probably too few for averaging to help.
-- **A series model needs its series.** U-TAE + PaPs, trained on 33 to 61 dates, drops from 0.52 to 0.41 when it gets
-  only May and August.
+- **Averaging single dates helps the models that read one image.** The fused map's fields are built by another
+  rule than Delineate Anything's own instances, so each month alone was also passed through the fusion's rule
+  (`fuse.py`, the control). June scores 0.526 that way against 0.525 as its own instances. The fusion's gain in
+  border F1, 0.526 to 0.598, is therefore the six dates', and in PQ 0.048 of the 0.063 is (0.015 is the rule).
+  FTW's one-window model, whose variants share one field rule, gains 0.04 from six averaged months (0.14 with
+  grassland aside, where it passes the two-window model). Delineate Anything v1 loses (0.455 to 0.419): it finds
+  10 to 12 fields per chip and month against 40 to 65 for v2, probably too few for averaging to help.
+- **Averaging pairs does not help the two-date models.** FTW PRUE B7 falls from 0.637 (best pair) to 0.589 with all
+  nine pairs averaged, FTW v2 from 0.612 to 0.558. With grassland aside B7 still falls (0.856 to 0.826) and v2 holds
+  level (0.746 to 0.752), probably because the average mixes the best pair with weaker ones.
+- **A series model loses its series.** U-TAE + PaPs drops from 0.52 to 0.41 when it gets only May and August. It was
+  trained on 33 to 61 dates, so two composites are also far outside what it knows; this shows it needs a series,
+  not that two dates carry less information.
 - **Which dates matters as much as how many.** For a single date, June is the best month for both Delineate
   Anything models, and for FTW's one-window model with grassland aside (July on all parcels); August or September
-  is the worst. For a pair, FTW PRUE B7 ranges from 0.513 (June + August) to 0.637 (April + July). Its published
-  default, May + August (0.537), is the third worst of the nine pairs, and averaging all nine (0.589) is worse than
-  the best pair. A likely reason: in April most arable fields are bare or just emerging and in July near their peak,
+  is the worst. For a pair, FTW PRUE B7 ranges from 0.513 (June + August) to 0.637 (April + July) on all parcels,
+  and from 0.716 to 0.856 with grassland aside (the figure below). The mid-window pair, May + August (0.537), is the
+  third worst of the nine. A likely reason: in April most arable fields are bare or just emerging and in July near their peak,
   so that pair holds the largest contrast between neighbouring fields.
 
 ![FTW's border F1 for each window pair, grassland aside](figures/pairs.png)
@@ -300,10 +314,10 @@ every FTW prediction was redone there and rescored. The first run's log is kept 
    two (April and July), six and twelve monthly composites. That would show whether our models' lead comes from
    the series or from the labels, the one temporal question this experiment leaves open for trained models.
 2. **FTW's weights as a starting point.** Fine-tune FTW PRUE B7 on our labels in place of ImageNet, on two windows
-   or on the twelve months. Zero-shot it already equals our arms at K = 20 % on crops, so it may help most when
+   or on the twelve months. Zero-shot it already beats our arms at K = 20 % on crops, so it may help most when
    labels are scarce (RQ1.2).
 3. **Report FTW with grassland aside, and with April and July,** wherever it is cited as a reference for Estonia:
-   its published default windows and its field definition understate it.
+   mid-window months and its field definition understate it.
 4. If agreed, an entry in pipeline.md section 11 among the experiments of the analysis.
 
 ## Files

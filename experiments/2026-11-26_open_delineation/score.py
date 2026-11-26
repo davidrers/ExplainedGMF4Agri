@@ -182,7 +182,7 @@ def sources() -> list[dict]:
     for split in ("val", "test"):
         for p in sorted(C.RESULTS.glob(f"*/*/predictions_{split}.npz")):
             model, variant = p.parent.parent.name, p.parent.name
-            if "fused" in variant:                               # a three-class map built from instances
+            if "fused" in variant or variant.endswith("_3class"):   # a three-class map built from instances
                 fv = ["grow"]
             elif model.startswith("delany"):
                 fv = [str(t) for t in THRESHOLDS["delany"]]
