@@ -1,0 +1,93 @@
+{
+ "utae_paps_fold1_on_pastis_fold5": {
+  "patches": [
+   10003,
+   10010,
+   10012,
+   10017
+  ],
+  "tp": 105,
+  "fp": 100,
+  "fn": 38,
+  "rq_agnostic": 0.603448275862069,
+  "authors_fold1_test": {
+   "PQ": 0.397,
+   "SQ": 0.812,
+   "RQ": 0.484
+  }
+ },
+ "ftw_prue_b7_vs_ftw_tools_run": {
+  "chips": [
+   {
+    "chip": "EE_02238_01776",
+    "max_abs_diff_x255": 1,
+    "argmax_agreement": 1.0
+   },
+   {
+    "chip": "EE_02292_01816",
+    "max_abs_diff_x255": 4,
+    "argmax_agreement": 1.0
+   },
+   {
+    "chip": "EE_02313_01780",
+    "max_abs_diff_x255": 4,
+    "argmax_agreement": 1.0
+   },
+   {
+    "chip": "EE_02334_01831",
+    "max_abs_diff_x255": 12,
+    "argmax_agreement": 0.9998206313775511
+   },
+   {
+    "chip": "EE_02358_01797",
+    "max_abs_diff_x255": 45,
+    "argmax_agreement": 0.9985251913265306
+   }
+  ],
+  "mean_argmax_agreement": 0.9996691645408162
+ },
+ "delany_v2_ftw_recipe_vs_ftw_tools_wrapper": {
+  "chips": [
+   {
+    "chip": "EE_02238_01776",
+    "fields_ftw_tools": 16,
+    "fields_ours": 16,
+    "field_pixel_agreement": 0.9999601403061225,
+    "share_of_our_fields_matched_iou_0.9": 1.0,
+    "mean_best_iou": 0.9998560094019988
+   },
+   {
+    "chip": "EE_02292_01816",
+    "fields_ftw_tools": 99,
+    "fields_ours": 99,
+    "field_pixel_agreement": 0.9994618941326531,
+    "share_of_our_fields_matched_iou_0.9": 0.9696969696969697,
+    "mean_best_iou": 0.9909080401159459
+   },
+   {
+    "chip": "EE_02313_01780",
+    "fields_ftw_tools": 99,
+    "fields_ours": 99,
+    "field_pixel_agreement": 0.9996811224489796,
+    "share_of_our_fields_matched_iou_0.9": 0.98989898989899,
+    "mean_best_iou": 0.9951686879421389
+   },
+   {
+    "chip": "EE_02334_01831",
+    "fields_ftw_tools": 96,
+    "fields_ours": 96,
+    "field_pixel_agreement": 0.9991629464285714,
+    "share_of_our_fields_matched_iou_0.9": 0.9791666666666666,
+    "mean_best_iou": 0.9915247771296665
+   },
+   {
+    "chip": "EE_02358_01797",
+    "fields_ftw_tools": 100,
+    "fields_ours": 100,
+    "field_pixel_agreement": 0.9989835778061225,
+    "share_of_our_fields_matched_iou_0.9": 0.97,
+    "mean_best_iou": 0.9853926929526169
+   }
+  ]
+ }
+}
