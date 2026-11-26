@@ -57,3 +57,4 @@ chance 3.5): the same optical cells serve most rivals. The cue's direction agree
 species' strongest AUC cues for most fields of wheat, rapeseed, oats, buckwheat and maize (at one level or more),
 and for almost none of grassland, forage legumes, barley and dry pulses; pooled, 20 % of fields' main cells are in
 their species' AUC top 5 (chance 7 %, other species' maps 14 to 17 %).
+One confident field per species, its input curves, each method's drivers and the AUC map: [FIELD_CASES.md](FIELD_CASES.md).

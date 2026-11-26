@@ -321,6 +321,10 @@ model recognises the crop from May to July optical evidence. Disagreement does n
 these fields are classified correctly; it means that for these crops the explanation will not point to the cue a
 single-band check of the data would name.
 
+**Single fields.** [FIELD_CASES.md](FIELD_CASES.md) shows one confidently predicted field per species (p ≥ 0.95;
+oats 0.90): its input curves as the model gets them, each method's main drivers and the species' AUC map, with a
+short reading of each (`field_cases.py`).
+
 ## Analysis
 
 **The explanations are usable.** All three methods pass completeness, convergence, deletion and randomisation, on
