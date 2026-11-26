@@ -1,0 +1,2179 @@
+species,scale,period,kind,name,auc,best_band,auc_signed,n_a,n_b
+barley,month,Jan,group,Visible,0.5285,B04,0.5285,3000,3000
+barley,month,Jan,group,Red-edge,0.5893,B07,0.4107,3000,3000
+barley,month,Jan,group,NIR,0.5924,B8A,0.4076,3000,3000
+barley,month,Jan,group,SWIR,0.538,B12,0.538,3000,3000
+barley,month,Jan,group,VV,0.5882,VV,0.5882,3000,3000
+barley,month,Jan,group,VH,0.5417,VH,0.5417,3000,3000
+barley,month,Feb,group,Visible,0.5288,B04,0.5288,3000,3000
+barley,month,Feb,group,Red-edge,0.5891,B07,0.4109,3000,3000
+barley,month,Feb,group,NIR,0.5922,B8A,0.4078,3000,3000
+barley,month,Feb,group,SWIR,0.5382,B12,0.5382,3000,3000
+barley,month,Feb,group,VV,0.5926,VV,0.5926,3000,3000
+barley,month,Feb,group,VH,0.5403,VH,0.5403,3000,3000
+barley,month,Mar,group,Visible,0.5295,B04,0.5295,3000,3000
+barley,month,Mar,group,Red-edge,0.5904,B07,0.4096,3000,3000
+barley,month,Mar,group,NIR,0.593,B8A,0.407,3000,3000
+barley,month,Mar,group,SWIR,0.5402,B12,0.5402,3000,3000
+barley,month,Mar,group,VV,0.5799,VV,0.5799,3000,3000
+barley,month,Mar,group,VH,0.5198,VH,0.5198,3000,3000
+barley,month,Apr,group,Visible,0.556,B04,0.556,3000,3000
+barley,month,Apr,group,Red-edge,0.6084,B07,0.3916,3000,3000
+barley,month,Apr,group,NIR,0.6093,B8A,0.3907,3000,3000
+barley,month,Apr,group,SWIR,0.5663,B12,0.5663,3000,3000
+barley,month,Apr,group,VV,0.5594,VV,0.5594,3000,3000
+barley,month,Apr,group,VH,0.5666,VH,0.4334,3000,3000
+barley,month,May,group,Visible,0.5908,B04,0.5908,3000,3000
+barley,month,May,group,Red-edge,0.6276,B06,0.3724,3000,3000
+barley,month,May,group,NIR,0.6236,B08,0.3764,3000,3000
+barley,month,May,group,SWIR,0.6073,B12,0.6073,3000,3000
+barley,month,May,group,VV,0.5127,VV,0.4873,3000,3000
+barley,month,May,group,VH,0.6532,VH,0.3468,3000,3000
+barley,month,Jun,group,Visible,0.647,B04,0.353,3000,3000
+barley,month,Jun,group,Red-edge,0.678,B05,0.322,3000,3000
+barley,month,Jun,group,NIR,0.6072,B08,0.6072,3000,3000
+barley,month,Jun,group,SWIR,0.6046,B11,0.3954,3000,3000
+barley,month,Jun,group,VV,0.7246,VV,0.2754,3000,3000
+barley,month,Jun,group,VH,0.594,VH,0.406,3000,3000
+barley,month,Jul,group,Visible,0.7201,B04,0.7201,3000,3000
+barley,month,Jul,group,Red-edge,0.6622,B05,0.6622,3000,3000
+barley,month,Jul,group,NIR,0.5767,B08,0.4233,3000,3000
+barley,month,Jul,group,SWIR,0.6412,B12,0.6412,3000,3000
+barley,month,Jul,group,VV,0.6758,VV,0.3242,3000,3000
+barley,month,Jul,group,VH,0.7499,VH,0.2501,3000,3000
+barley,month,Aug,group,Visible,0.7561,B04,0.7561,3000,3000
+barley,month,Aug,group,Red-edge,0.7327,B07,0.2673,3000,3000
+barley,month,Aug,group,NIR,0.729,B08,0.271,3000,3000
+barley,month,Aug,group,SWIR,0.7554,B12,0.7554,3000,3000
+barley,month,Aug,group,VV,0.556,VV,0.444,3000,3000
+barley,month,Aug,group,VH,0.742,VH,0.258,3000,3000
+barley,month,Sep,group,Visible,0.7119,B04,0.7119,3000,3000
+barley,month,Sep,group,Red-edge,0.6745,B05,0.6745,3000,3000
+barley,month,Sep,group,NIR,0.6479,B8A,0.3521,3000,3000
+barley,month,Sep,group,SWIR,0.7102,B12,0.7102,3000,3000
+barley,month,Sep,group,VV,0.5557,VV,0.5557,3000,3000
+barley,month,Sep,group,VH,0.6211,VH,0.3789,3000,3000
+barley,month,Oct,group,Visible,0.6107,B03,0.6107,3000,3000
+barley,month,Oct,group,Red-edge,0.5632,B05,0.5632,3000,3000
+barley,month,Oct,group,NIR,0.5121,B8A,0.4879,3000,3000
+barley,month,Oct,group,SWIR,0.5445,B12,0.5445,3000,3000
+barley,month,Oct,group,VV,0.6369,VV,0.6369,3000,3000
+barley,month,Oct,group,VH,0.541,VH,0.541,3000,3000
+barley,month,Nov,group,Visible,0.5788,B02,0.5788,3000,3000
+barley,month,Nov,group,Red-edge,0.5608,B06,0.5608,3000,3000
+barley,month,Nov,group,NIR,0.5441,B08,0.5441,3000,3000
+barley,month,Nov,group,SWIR,0.5484,B11,0.4516,3000,3000
+barley,month,Nov,group,VV,0.6106,VV,0.6106,3000,3000
+barley,month,Nov,group,VH,0.5675,VH,0.5675,3000,3000
+barley,month,Dec,group,Visible,0.5772,B02,0.5772,3000,3000
+barley,month,Dec,group,Red-edge,0.562,B06,0.562,3000,3000
+barley,month,Dec,group,NIR,0.5454,B08,0.5454,3000,3000
+barley,month,Dec,group,SWIR,0.5475,B11,0.4525,3000,3000
+barley,month,Dec,group,VV,0.5732,VV,0.5732,3000,3000
+barley,month,Dec,group,VH,0.5229,VH,0.5229,3000,3000
+barley,month,Jan,index,NDVI,0.6283,NDVI,0.3717,3000,3000
+barley,month,Jan,index,NDMI,0.6237,NDMI,0.3763,3000,3000
+barley,month,Jan,index,EVI,0.6243,EVI,0.3757,3000,3000
+barley,month,Feb,index,NDVI,0.6287,NDVI,0.3713,3000,3000
+barley,month,Feb,index,NDMI,0.6237,NDMI,0.3763,3000,3000
+barley,month,Feb,index,EVI,0.6244,EVI,0.3756,3000,3000
+barley,month,Mar,index,NDVI,0.6301,NDVI,0.3699,3000,3000
+barley,month,Mar,index,NDMI,0.6257,NDMI,0.3743,3000,3000
+barley,month,Mar,index,EVI,0.6256,EVI,0.3744,3000,3000
+barley,month,Apr,index,NDVI,0.6426,NDVI,0.3574,3000,3000
+barley,month,Apr,index,NDMI,0.6409,NDMI,0.3591,3000,3000
+barley,month,Apr,index,EVI,0.6421,EVI,0.3579,3000,3000
+barley,month,May,index,NDVI,0.5878,NDVI,0.4122,3000,3000
+barley,month,May,index,NDMI,0.6146,NDMI,0.3854,3000,3000
+barley,month,May,index,EVI,0.5961,EVI,0.4039,3000,3000
+barley,month,Jun,index,NDVI,0.6406,NDVI,0.6406,3000,3000
+barley,month,Jun,index,NDMI,0.6143,NDMI,0.6143,3000,3000
+barley,month,Jun,index,EVI,0.6276,EVI,0.6276,3000,3000
+barley,month,Jul,index,NDVI,0.7219,NDVI,0.2781,3000,3000
+barley,month,Jul,index,NDMI,0.6249,NDMI,0.3751,3000,3000
+barley,month,Jul,index,EVI,0.7223,EVI,0.2777,3000,3000
+barley,month,Aug,index,NDVI,0.7913,NDVI,0.2087,3000,3000
+barley,month,Aug,index,NDMI,0.784,NDMI,0.216,3000,3000
+barley,month,Aug,index,EVI,0.7915,EVI,0.2085,3000,3000
+barley,month,Sep,index,NDVI,0.6975,NDVI,0.3025,3000,3000
+barley,month,Sep,index,NDMI,0.6973,NDMI,0.3027,3000,3000
+barley,month,Sep,index,EVI,0.683,EVI,0.317,3000,3000
+barley,month,Oct,index,NDVI,0.5446,NDVI,0.4554,3000,3000
+barley,month,Oct,index,NDMI,0.5231,NDMI,0.4769,3000,3000
+barley,month,Oct,index,EVI,0.5248,EVI,0.4752,3000,3000
+barley,month,Nov,index,NDVI,0.5221,NDVI,0.5221,3000,3000
+barley,month,Nov,index,NDMI,0.5433,NDMI,0.5433,3000,3000
+barley,month,Nov,index,EVI,0.5376,EVI,0.5376,3000,3000
+barley,month,Dec,index,NDVI,0.5233,NDVI,0.5233,3000,3000
+barley,month,Dec,index,NDMI,0.5428,NDMI,0.5428,3000,3000
+barley,month,Dec,index,EVI,0.5388,EVI,0.5388,3000,3000
+barley,window,Jan-Mar,group,Visible,0.529,B04,0.529,3000,3000
+barley,window,Jan-Mar,group,Red-edge,0.5897,B07,0.4103,3000,3000
+barley,window,Jan-Mar,group,NIR,0.5927,B8A,0.4073,3000,3000
+barley,window,Jan-Mar,group,SWIR,0.5385,B12,0.5385,3000,3000
+barley,window,Jan-Mar,group,VV,0.595,VV,0.595,3000,3000
+barley,window,Jan-Mar,group,VH,0.5411,VH,0.5411,3000,3000
+barley,window,Feb-Apr,group,Visible,0.5393,B04,0.5393,3000,3000
+barley,window,Feb-Apr,group,Red-edge,0.5976,B07,0.4024,3000,3000
+barley,window,Feb-Apr,group,NIR,0.5994,B8A,0.4006,3000,3000
+barley,window,Feb-Apr,group,SWIR,0.5512,B12,0.5512,3000,3000
+barley,window,Feb-Apr,group,VV,0.5883,VV,0.5883,3000,3000
+barley,window,Feb-Apr,group,VH,0.5002,VH,0.5002,3000,3000
+barley,window,Mar-May,group,Visible,0.568,B04,0.568,3000,3000
+barley,window,Mar-May,group,Red-edge,0.6175,B07,0.3825,3000,3000
+barley,window,Mar-May,group,NIR,0.6179,B8A,0.3821,3000,3000
+barley,window,Mar-May,group,SWIR,0.5936,B12,0.5936,3000,3000
+barley,window,Mar-May,group,VV,0.5375,VV,0.5375,3000,3000
+barley,window,Mar-May,group,VH,0.5865,VH,0.4135,3000,3000
+barley,window,Apr-Jun,group,Visible,0.5476,B03,0.4524,3000,3000
+barley,window,Apr-Jun,group,Red-edge,0.5996,B05,0.4004,3000,3000
+barley,window,Apr-Jun,group,NIR,0.5126,B08,0.4874,3000,3000
+barley,window,Apr-Jun,group,SWIR,0.5451,B11,0.4549,3000,3000
+barley,window,Apr-Jun,group,VV,0.5914,VV,0.4086,3000,3000
+barley,window,Apr-Jun,group,VH,0.6449,VH,0.3551,3000,3000
+barley,window,May-Jul,group,Visible,0.5997,B04,0.5997,3000,3000
+barley,window,May-Jul,group,Red-edge,0.5749,B06,0.4251,3000,3000
+barley,window,May-Jul,group,NIR,0.5276,B08,0.4724,3000,3000
+barley,window,May-Jul,group,SWIR,0.536,B12,0.536,3000,3000
+barley,window,May-Jul,group,VV,0.6655,VV,0.3345,3000,3000
+barley,window,May-Jul,group,VH,0.7411,VH,0.2589,3000,3000
+barley,window,Jun-Aug,group,Visible,0.6705,B04,0.6705,3000,3000
+barley,window,Jun-Aug,group,Red-edge,0.6369,B06,0.3631,3000,3000
+barley,window,Jun-Aug,group,NIR,0.6001,B08,0.3999,3000,3000
+barley,window,Jun-Aug,group,SWIR,0.6064,B12,0.6064,3000,3000
+barley,window,Jun-Aug,group,VV,0.6854,VV,0.3146,3000,3000
+barley,window,Jun-Aug,group,VH,0.7848,VH,0.2152,3000,3000
+barley,window,Jul-Sep,group,Visible,0.7757,B04,0.7757,3000,3000
+barley,window,Jul-Sep,group,Red-edge,0.7224,B07,0.2776,3000,3000
+barley,window,Jul-Sep,group,NIR,0.7133,B08,0.2867,3000,3000
+barley,window,Jul-Sep,group,SWIR,0.7619,B12,0.7619,3000,3000
+barley,window,Jul-Sep,group,VV,0.5784,VV,0.4216,3000,3000
+barley,window,Jul-Sep,group,VH,0.7526,VH,0.2474,3000,3000
+barley,window,Aug-Oct,group,Visible,0.7231,B04,0.7231,3000,3000
+barley,window,Aug-Oct,group,Red-edge,0.663,B05,0.663,3000,3000
+barley,window,Aug-Oct,group,NIR,0.6588,B8A,0.3412,3000,3000
+barley,window,Aug-Oct,group,SWIR,0.7095,B12,0.7095,3000,3000
+barley,window,Aug-Oct,group,VV,0.5493,VV,0.5493,3000,3000
+barley,window,Aug-Oct,group,VH,0.6436,VH,0.3564,3000,3000
+barley,window,Sep-Nov,group,Visible,0.6641,B03,0.6641,3000,3000
+barley,window,Sep-Nov,group,Red-edge,0.6218,B05,0.6218,3000,3000
+barley,window,Sep-Nov,group,NIR,0.5394,B8A,0.4606,3000,3000
+barley,window,Sep-Nov,group,SWIR,0.6056,B12,0.6056,3000,3000
+barley,window,Sep-Nov,group,VV,0.6116,VV,0.6116,3000,3000
+barley,window,Sep-Nov,group,VH,0.5152,VH,0.4848,3000,3000
+barley,window,Oct-Dec,group,Visible,0.5973,B03,0.5973,3000,3000
+barley,window,Oct-Dec,group,Red-edge,0.5497,B05,0.5497,3000,3000
+barley,window,Oct-Dec,group,NIR,0.5303,B08,0.5303,3000,3000
+barley,window,Oct-Dec,group,SWIR,0.5325,B11,0.4675,3000,3000
+barley,window,Oct-Dec,group,VV,0.6197,VV,0.6197,3000,3000
+barley,window,Oct-Dec,group,VH,0.5497,VH,0.5497,3000,3000
+barley,window,Jan-Mar,index,NDVI,0.6289,NDVI,0.3711,3000,3000
+barley,window,Jan-Mar,index,NDMI,0.6244,NDMI,0.3756,3000,3000
+barley,window,Jan-Mar,index,EVI,0.6248,EVI,0.3752,3000,3000
+barley,window,Feb-Apr,index,NDVI,0.6344,NDVI,0.3656,3000,3000
+barley,window,Feb-Apr,index,NDMI,0.631,NDMI,0.369,3000,3000
+barley,window,Feb-Apr,index,EVI,0.6308,EVI,0.3692,3000,3000
+barley,window,Mar-May,index,NDVI,0.6195,NDVI,0.3805,3000,3000
+barley,window,Mar-May,index,NDMI,0.6308,NDMI,0.3692,3000,3000
+barley,window,Mar-May,index,EVI,0.6184,EVI,0.3816,3000,3000
+barley,window,Apr-Jun,index,NDVI,0.502,NDVI,0.498,3000,3000
+barley,window,Apr-Jun,index,NDMI,0.5031,NDMI,0.5031,3000,3000
+barley,window,Apr-Jun,index,EVI,0.5149,EVI,0.5149,3000,3000
+barley,window,May-Jul,index,NDVI,0.5716,NDVI,0.4284,3000,3000
+barley,window,May-Jul,index,NDMI,0.5168,NDMI,0.4832,3000,3000
+barley,window,May-Jul,index,EVI,0.5605,EVI,0.4395,3000,3000
+barley,window,Jun-Aug,index,NDVI,0.6971,NDVI,0.3029,3000,3000
+barley,window,Jun-Aug,index,NDMI,0.6386,NDMI,0.3614,3000,3000
+barley,window,Jun-Aug,index,EVI,0.6877,EVI,0.3123,3000,3000
+barley,window,Jul-Sep,index,NDVI,0.7826,NDVI,0.2174,3000,3000
+barley,window,Jul-Sep,index,NDMI,0.7774,NDMI,0.2226,3000,3000
+barley,window,Jul-Sep,index,EVI,0.7842,EVI,0.2158,3000,3000
+barley,window,Aug-Oct,index,NDVI,0.7144,NDVI,0.2856,3000,3000
+barley,window,Aug-Oct,index,NDMI,0.7065,NDMI,0.2935,3000,3000
+barley,window,Aug-Oct,index,EVI,0.706,EVI,0.294,3000,3000
+barley,window,Sep-Nov,index,NDVI,0.5885,NDVI,0.4115,3000,3000
+barley,window,Sep-Nov,index,NDMI,0.5694,NDMI,0.4306,3000,3000
+barley,window,Sep-Nov,index,EVI,0.5683,EVI,0.4317,3000,3000
+barley,window,Oct-Dec,index,NDVI,0.5002,NDVI,0.4998,3000,3000
+barley,window,Oct-Dec,index,NDMI,0.5231,NDMI,0.5231,3000,3000
+barley,window,Oct-Dec,index,EVI,0.5188,EVI,0.5188,3000,3000
+buckwheat,month,Jan,group,Visible,0.5347,B04,0.5347,809,3000
+buckwheat,month,Jan,group,Red-edge,0.5735,B06,0.4265,809,3000
+buckwheat,month,Jan,group,NIR,0.5678,B08,0.4322,809,3000
+buckwheat,month,Jan,group,SWIR,0.5362,B12,0.5362,809,3000
+buckwheat,month,Jan,group,VV,0.5126,VV,0.4874,809,3000
+buckwheat,month,Jan,group,VH,0.5382,VH,0.5382,809,3000
+buckwheat,month,Feb,group,Visible,0.5349,B04,0.5349,809,3000
+buckwheat,month,Feb,group,Red-edge,0.5738,B06,0.4262,809,3000
+buckwheat,month,Feb,group,NIR,0.5682,B08,0.4318,809,3000
+buckwheat,month,Feb,group,SWIR,0.5361,B12,0.5361,809,3000
+buckwheat,month,Feb,group,VV,0.5051,VV,0.5051,809,3000
+buckwheat,month,Feb,group,VH,0.5352,VH,0.5352,809,3000
+buckwheat,month,Mar,group,Visible,0.5448,B04,0.5448,809,3000
+buckwheat,month,Mar,group,Red-edge,0.5652,B06,0.4348,809,3000
+buckwheat,month,Mar,group,NIR,0.5609,B08,0.4391,809,3000
+buckwheat,month,Mar,group,SWIR,0.5446,B12,0.5446,809,3000
+buckwheat,month,Mar,group,VV,0.5221,VV,0.4779,809,3000
+buckwheat,month,Mar,group,VH,0.5187,VH,0.5187,809,3000
+buckwheat,month,Apr,group,Visible,0.5261,B04,0.5261,809,3000
+buckwheat,month,Apr,group,Red-edge,0.5666,B06,0.4334,809,3000
+buckwheat,month,Apr,group,NIR,0.5667,B08,0.4333,809,3000
+buckwheat,month,Apr,group,SWIR,0.5218,B12,0.5218,809,3000
+buckwheat,month,Apr,group,VV,0.5378,VV,0.5378,809,3000
+buckwheat,month,Apr,group,VH,0.5679,VH,0.5679,809,3000
+buckwheat,month,May,group,Visible,0.6143,B04,0.6143,809,3000
+buckwheat,month,May,group,Red-edge,0.6145,B07,0.3855,809,3000
+buckwheat,month,May,group,NIR,0.614,B08,0.386,809,3000
+buckwheat,month,May,group,SWIR,0.6003,B11,0.6003,809,3000
+buckwheat,month,May,group,VV,0.6305,VV,0.6305,809,3000
+buckwheat,month,May,group,VH,0.5421,VH,0.5421,809,3000
+buckwheat,month,Jun,group,Visible,0.7698,B04,0.7698,809,3000
+buckwheat,month,Jun,group,Red-edge,0.7539,B07,0.2461,809,3000
+buckwheat,month,Jun,group,NIR,0.7608,B8A,0.2392,809,3000
+buckwheat,month,Jun,group,SWIR,0.7827,B12,0.7827,809,3000
+buckwheat,month,Jun,group,VV,0.6793,VV,0.6793,809,3000
+buckwheat,month,Jun,group,VH,0.6505,VH,0.3495,809,3000
+buckwheat,month,Jul,group,Visible,0.6698,B04,0.3302,809,3000
+buckwheat,month,Jul,group,Red-edge,0.8759,B06,0.8759,809,3000
+buckwheat,month,Jul,group,NIR,0.8464,B08,0.8464,809,3000
+buckwheat,month,Jul,group,SWIR,0.6795,B12,0.3205,809,3000
+buckwheat,month,Jul,group,VV,0.7194,VV,0.7194,809,3000
+buckwheat,month,Jul,group,VH,0.7353,VH,0.7353,809,3000
+buckwheat,month,Aug,group,Visible,0.6187,B04,0.3813,809,3000
+buckwheat,month,Aug,group,Red-edge,0.8063,B06,0.8063,809,3000
+buckwheat,month,Aug,group,NIR,0.7811,B08,0.7811,809,3000
+buckwheat,month,Aug,group,SWIR,0.8115,B12,0.1885,809,3000
+buckwheat,month,Aug,group,VV,0.769,VV,0.769,809,3000
+buckwheat,month,Aug,group,VH,0.8447,VH,0.8447,809,3000
+buckwheat,month,Sep,group,Visible,0.7214,B03,0.2786,809,3000
+buckwheat,month,Sep,group,Red-edge,0.5987,B06,0.5987,809,3000
+buckwheat,month,Sep,group,NIR,0.6319,B8A,0.6319,809,3000
+buckwheat,month,Sep,group,SWIR,0.8368,B11,0.1632,809,3000
+buckwheat,month,Sep,group,VV,0.6718,VV,0.6718,809,3000
+buckwheat,month,Sep,group,VH,0.8788,VH,0.8788,809,3000
+buckwheat,month,Oct,group,Visible,0.7567,B03,0.2433,809,3000
+buckwheat,month,Oct,group,Red-edge,0.5559,B06,0.4441,809,3000
+buckwheat,month,Oct,group,NIR,0.5204,B8A,0.5204,809,3000
+buckwheat,month,Oct,group,SWIR,0.691,B11,0.309,809,3000
+buckwheat,month,Oct,group,VV,0.5091,VV,0.4909,809,3000
+buckwheat,month,Oct,group,VH,0.837,VH,0.837,809,3000
+buckwheat,month,Nov,group,Visible,0.6982,B03,0.3018,809,3000
+buckwheat,month,Nov,group,Red-edge,0.597,B06,0.403,809,3000
+buckwheat,month,Nov,group,NIR,0.5652,B08,0.4348,809,3000
+buckwheat,month,Nov,group,SWIR,0.5426,B11,0.4574,809,3000
+buckwheat,month,Nov,group,VV,0.511,VV,0.489,809,3000
+buckwheat,month,Nov,group,VH,0.6138,VH,0.6138,809,3000
+buckwheat,month,Dec,group,Visible,0.698,B03,0.302,809,3000
+buckwheat,month,Dec,group,Red-edge,0.5969,B06,0.4031,809,3000
+buckwheat,month,Dec,group,NIR,0.5652,B08,0.4348,809,3000
+buckwheat,month,Dec,group,SWIR,0.5413,B11,0.4587,809,3000
+buckwheat,month,Dec,group,VV,0.5925,VV,0.5925,809,3000
+buckwheat,month,Dec,group,VH,0.6695,VH,0.6695,809,3000
+buckwheat,month,Jan,index,NDVI,0.5542,NDVI,0.4458,809,3000
+buckwheat,month,Jan,index,NDMI,0.5658,NDMI,0.4342,809,3000
+buckwheat,month,Jan,index,EVI,0.5654,EVI,0.4346,809,3000
+buckwheat,month,Feb,index,NDVI,0.5551,NDVI,0.4449,809,3000
+buckwheat,month,Feb,index,NDMI,0.5655,NDMI,0.4345,809,3000
+buckwheat,month,Feb,index,EVI,0.5658,EVI,0.4342,809,3000
+buckwheat,month,Mar,index,NDVI,0.5576,NDVI,0.4424,809,3000
+buckwheat,month,Mar,index,NDMI,0.5672,NDMI,0.4328,809,3000
+buckwheat,month,Mar,index,EVI,0.5648,EVI,0.4352,809,3000
+buckwheat,month,Apr,index,NDVI,0.5477,NDVI,0.4523,809,3000
+buckwheat,month,Apr,index,NDMI,0.5582,NDMI,0.4418,809,3000
+buckwheat,month,Apr,index,EVI,0.5592,EVI,0.4408,809,3000
+buckwheat,month,May,index,NDVI,0.6151,NDVI,0.3849,809,3000
+buckwheat,month,May,index,NDMI,0.6102,NDMI,0.3898,809,3000
+buckwheat,month,May,index,EVI,0.6169,EVI,0.3831,809,3000
+buckwheat,month,Jun,index,NDVI,0.7747,NDVI,0.2253,809,3000
+buckwheat,month,Jun,index,NDMI,0.7902,NDMI,0.2098,809,3000
+buckwheat,month,Jun,index,EVI,0.7723,EVI,0.2277,809,3000
+buckwheat,month,Jul,index,NDVI,0.7874,NDVI,0.7874,809,3000
+buckwheat,month,Jul,index,NDMI,0.795,NDMI,0.795,809,3000
+buckwheat,month,Jul,index,EVI,0.8524,EVI,0.8524,809,3000
+buckwheat,month,Aug,index,NDVI,0.7199,NDVI,0.7199,809,3000
+buckwheat,month,Aug,index,NDMI,0.8697,NDMI,0.8697,809,3000
+buckwheat,month,Aug,index,EVI,0.7933,EVI,0.7933,809,3000
+buckwheat,month,Sep,index,NDVI,0.6352,NDVI,0.6352,809,3000
+buckwheat,month,Sep,index,NDMI,0.767,NDMI,0.767,809,3000
+buckwheat,month,Sep,index,EVI,0.6316,EVI,0.6316,809,3000
+buckwheat,month,Oct,index,NDVI,0.5578,NDVI,0.5578,809,3000
+buckwheat,month,Oct,index,NDMI,0.6109,NDMI,0.6109,809,3000
+buckwheat,month,Oct,index,EVI,0.5232,EVI,0.5232,809,3000
+buckwheat,month,Nov,index,NDVI,0.5217,NDVI,0.4783,809,3000
+buckwheat,month,Nov,index,NDMI,0.5073,NDMI,0.4927,809,3000
+buckwheat,month,Nov,index,EVI,0.5596,EVI,0.4404,809,3000
+buckwheat,month,Dec,index,NDVI,0.5214,NDVI,0.4786,809,3000
+buckwheat,month,Dec,index,NDMI,0.5074,NDMI,0.4926,809,3000
+buckwheat,month,Dec,index,EVI,0.5593,EVI,0.4407,809,3000
+buckwheat,window,Jan-Mar,group,Visible,0.539,B04,0.539,809,3000
+buckwheat,window,Jan-Mar,group,Red-edge,0.5709,B06,0.4291,809,3000
+buckwheat,window,Jan-Mar,group,NIR,0.5657,B08,0.4343,809,3000
+buckwheat,window,Jan-Mar,group,SWIR,0.5394,B12,0.5394,809,3000
+buckwheat,window,Jan-Mar,group,VV,0.5122,VV,0.4878,809,3000
+buckwheat,window,Jan-Mar,group,VH,0.5373,VH,0.5373,809,3000
+buckwheat,window,Feb-Apr,group,Visible,0.5376,B04,0.5376,809,3000
+buckwheat,window,Feb-Apr,group,Red-edge,0.569,B06,0.431,809,3000
+buckwheat,window,Feb-Apr,group,NIR,0.5657,B08,0.4343,809,3000
+buckwheat,window,Feb-Apr,group,SWIR,0.5356,B12,0.5356,809,3000
+buckwheat,window,Feb-Apr,group,VV,0.506,VV,0.506,809,3000
+buckwheat,window,Feb-Apr,group,VH,0.5576,VH,0.5576,809,3000
+buckwheat,window,Mar-May,group,Visible,0.5783,B04,0.5783,809,3000
+buckwheat,window,Mar-May,group,Red-edge,0.59,B07,0.41,809,3000
+buckwheat,window,Mar-May,group,NIR,0.5882,B08,0.4118,809,3000
+buckwheat,window,Mar-May,group,SWIR,0.5648,B12,0.5648,809,3000
+buckwheat,window,Mar-May,group,VV,0.5655,VV,0.5655,809,3000
+buckwheat,window,Mar-May,group,VH,0.559,VH,0.559,809,3000
+buckwheat,window,Apr-Jun,group,Visible,0.7,B04,0.7,809,3000
+buckwheat,window,Apr-Jun,group,Red-edge,0.6951,B07,0.3049,809,3000
+buckwheat,window,Apr-Jun,group,NIR,0.6914,B08,0.3086,809,3000
+buckwheat,window,Apr-Jun,group,SWIR,0.6996,B12,0.6996,809,3000
+buckwheat,window,Apr-Jun,group,VV,0.6392,VV,0.6392,809,3000
+buckwheat,window,Apr-Jun,group,VH,0.5218,VH,0.4782,809,3000
+buckwheat,window,May-Jul,group,Visible,0.704,B02,0.704,809,3000
+buckwheat,window,May-Jul,group,Red-edge,0.688,B05,0.688,809,3000
+buckwheat,window,May-Jul,group,NIR,0.5259,B8A,0.4741,809,3000
+buckwheat,window,May-Jul,group,SWIR,0.676,B12,0.676,809,3000
+buckwheat,window,May-Jul,group,VV,0.7059,VV,0.7059,809,3000
+buckwheat,window,May-Jul,group,VH,0.5961,VH,0.5961,809,3000
+buckwheat,window,Jun-Aug,group,Visible,0.7002,B03,0.7002,809,3000
+buckwheat,window,Jun-Aug,group,Red-edge,0.7828,B06,0.7828,809,3000
+buckwheat,window,Jun-Aug,group,NIR,0.7021,B08,0.7021,809,3000
+buckwheat,window,Jun-Aug,group,SWIR,0.5456,B12,0.5456,809,3000
+buckwheat,window,Jun-Aug,group,VV,0.7402,VV,0.7402,809,3000
+buckwheat,window,Jun-Aug,group,VH,0.7142,VH,0.7142,809,3000
+buckwheat,window,Jul-Sep,group,Visible,0.6746,B04,0.3254,809,3000
+buckwheat,window,Jul-Sep,group,Red-edge,0.8621,B06,0.8621,809,3000
+buckwheat,window,Jul-Sep,group,NIR,0.8333,B08,0.8333,809,3000
+buckwheat,window,Jul-Sep,group,SWIR,0.8587,B12,0.1413,809,3000
+buckwheat,window,Jul-Sep,group,VV,0.7396,VV,0.7396,809,3000
+buckwheat,window,Jul-Sep,group,VH,0.8498,VH,0.8498,809,3000
+buckwheat,window,Aug-Oct,group,Visible,0.6786,B03,0.3214,809,3000
+buckwheat,window,Aug-Oct,group,Red-edge,0.6737,B06,0.6737,809,3000
+buckwheat,window,Aug-Oct,group,NIR,0.6895,B8A,0.6895,809,3000
+buckwheat,window,Aug-Oct,group,SWIR,0.8395,B11,0.1605,809,3000
+buckwheat,window,Aug-Oct,group,VV,0.6573,VV,0.6573,809,3000
+buckwheat,window,Aug-Oct,group,VH,0.8993,VH,0.8993,809,3000
+buckwheat,window,Sep-Nov,group,Visible,0.7848,B03,0.2152,809,3000
+buckwheat,window,Sep-Nov,group,Red-edge,0.5155,B06,0.4845,809,3000
+buckwheat,window,Sep-Nov,group,NIR,0.5491,B8A,0.5491,809,3000
+buckwheat,window,Sep-Nov,group,SWIR,0.745,B11,0.255,809,3000
+buckwheat,window,Sep-Nov,group,VV,0.5355,VV,0.5355,809,3000
+buckwheat,window,Sep-Nov,group,VH,0.8428,VH,0.8428,809,3000
+buckwheat,window,Oct-Dec,group,Visible,0.7375,B03,0.2625,809,3000
+buckwheat,window,Oct-Dec,group,Red-edge,0.592,B06,0.408,809,3000
+buckwheat,window,Oct-Dec,group,NIR,0.5502,B08,0.4498,809,3000
+buckwheat,window,Oct-Dec,group,SWIR,0.6025,B12,0.3975,809,3000
+buckwheat,window,Oct-Dec,group,VV,0.5146,VV,0.5146,809,3000
+buckwheat,window,Oct-Dec,group,VH,0.7432,VH,0.7432,809,3000
+buckwheat,window,Jan-Mar,index,NDVI,0.556,NDVI,0.444,809,3000
+buckwheat,window,Jan-Mar,index,NDMI,0.5665,NDMI,0.4335,809,3000
+buckwheat,window,Jan-Mar,index,EVI,0.5655,EVI,0.4345,809,3000
+buckwheat,window,Feb-Apr,index,NDVI,0.5544,NDVI,0.4456,809,3000
+buckwheat,window,Feb-Apr,index,NDMI,0.564,NDMI,0.436,809,3000
+buckwheat,window,Feb-Apr,index,EVI,0.5633,EVI,0.4367,809,3000
+buckwheat,window,Mar-May,index,NDVI,0.5801,NDVI,0.4199,809,3000
+buckwheat,window,Mar-May,index,NDMI,0.5854,NDMI,0.4146,809,3000
+buckwheat,window,Mar-May,index,EVI,0.5857,EVI,0.4143,809,3000
+buckwheat,window,Apr-Jun,index,NDVI,0.6969,NDVI,0.3031,809,3000
+buckwheat,window,Apr-Jun,index,NDMI,0.7169,NDMI,0.2831,809,3000
+buckwheat,window,Apr-Jun,index,EVI,0.7127,EVI,0.2873,809,3000
+buckwheat,window,May-Jul,index,NDVI,0.6464,NDVI,0.3536,809,3000
+buckwheat,window,May-Jul,index,NDMI,0.6356,NDMI,0.3644,809,3000
+buckwheat,window,May-Jul,index,EVI,0.578,EVI,0.422,809,3000
+buckwheat,window,Jun-Aug,index,NDVI,0.5744,NDVI,0.5744,809,3000
+buckwheat,window,Jun-Aug,index,NDMI,0.6475,NDMI,0.6475,809,3000
+buckwheat,window,Jun-Aug,index,EVI,0.6867,EVI,0.6867,809,3000
+buckwheat,window,Jul-Sep,index,NDVI,0.7611,NDVI,0.7611,809,3000
+buckwheat,window,Jul-Sep,index,NDMI,0.901,NDMI,0.901,809,3000
+buckwheat,window,Jul-Sep,index,EVI,0.8243,EVI,0.8243,809,3000
+buckwheat,window,Aug-Oct,index,NDVI,0.6711,NDVI,0.6711,809,3000
+buckwheat,window,Aug-Oct,index,NDMI,0.8065,NDMI,0.8065,809,3000
+buckwheat,window,Aug-Oct,index,EVI,0.6795,EVI,0.6795,809,3000
+buckwheat,window,Sep-Nov,index,NDVI,0.5977,NDVI,0.5977,809,3000
+buckwheat,window,Sep-Nov,index,NDMI,0.6563,NDMI,0.6563,809,3000
+buckwheat,window,Sep-Nov,index,EVI,0.561,EVI,0.561,809,3000
+buckwheat,window,Oct-Dec,index,NDVI,0.5089,NDVI,0.5089,809,3000
+buckwheat,window,Oct-Dec,index,NDMI,0.5347,NDMI,0.5347,809,3000
+buckwheat,window,Oct-Dec,index,EVI,0.5315,EVI,0.4685,809,3000
+dry pulses,month,Jan,group,Visible,0.5638,B03,0.4362,3000,3000
+dry pulses,month,Jan,group,Red-edge,0.6918,B07,0.3082,3000,3000
+dry pulses,month,Jan,group,NIR,0.6898,B08,0.3102,3000,3000
+dry pulses,month,Jan,group,SWIR,0.5709,B12,0.5709,3000,3000
+dry pulses,month,Jan,group,VV,0.6113,VV,0.6113,3000,3000
+dry pulses,month,Jan,group,VH,0.5387,VH,0.5387,3000,3000
+dry pulses,month,Feb,group,Visible,0.564,B03,0.436,3000,3000
+dry pulses,month,Feb,group,Red-edge,0.6921,B07,0.3079,3000,3000
+dry pulses,month,Feb,group,NIR,0.69,B08,0.31,3000,3000
+dry pulses,month,Feb,group,SWIR,0.5711,B12,0.5711,3000,3000
+dry pulses,month,Feb,group,VV,0.6194,VV,0.6194,3000,3000
+dry pulses,month,Feb,group,VH,0.5478,VH,0.5478,3000,3000
+dry pulses,month,Mar,group,Visible,0.5689,B03,0.4311,3000,3000
+dry pulses,month,Mar,group,Red-edge,0.6927,B07,0.3073,3000,3000
+dry pulses,month,Mar,group,NIR,0.6904,B08,0.3096,3000,3000
+dry pulses,month,Mar,group,SWIR,0.5664,B12,0.5664,3000,3000
+dry pulses,month,Mar,group,VV,0.6008,VV,0.6008,3000,3000
+dry pulses,month,Mar,group,VH,0.5162,VH,0.5162,3000,3000
+dry pulses,month,Apr,group,Visible,0.5601,B04,0.5601,3000,3000
+dry pulses,month,Apr,group,Red-edge,0.6995,B07,0.3005,3000,3000
+dry pulses,month,Apr,group,NIR,0.6955,B08,0.3045,3000,3000
+dry pulses,month,Apr,group,SWIR,0.6245,B12,0.6245,3000,3000
+dry pulses,month,Apr,group,VV,0.5294,VV,0.5294,3000,3000
+dry pulses,month,Apr,group,VH,0.6471,VH,0.3529,3000,3000
+dry pulses,month,May,group,Visible,0.7306,B04,0.7306,3000,3000
+dry pulses,month,May,group,Red-edge,0.6853,B07,0.3147,3000,3000
+dry pulses,month,May,group,NIR,0.683,B08,0.317,3000,3000
+dry pulses,month,May,group,SWIR,0.7346,B12,0.7346,3000,3000
+dry pulses,month,May,group,VV,0.5781,VV,0.5781,3000,3000
+dry pulses,month,May,group,VH,0.609,VH,0.391,3000,3000
+dry pulses,month,Jun,group,Visible,0.6673,B03,0.6673,3000,3000
+dry pulses,month,Jun,group,Red-edge,0.637,B05,0.637,3000,3000
+dry pulses,month,Jun,group,NIR,0.5296,B8A,0.4704,3000,3000
+dry pulses,month,Jun,group,SWIR,0.5977,B12,0.5977,3000,3000
+dry pulses,month,Jun,group,VV,0.7864,VV,0.7864,3000,3000
+dry pulses,month,Jun,group,VH,0.8359,VH,0.8359,3000,3000
+dry pulses,month,Jul,group,Visible,0.6269,B03,0.6269,3000,3000
+dry pulses,month,Jul,group,Red-edge,0.6386,B06,0.6386,3000,3000
+dry pulses,month,Jul,group,NIR,0.5815,B08,0.5815,3000,3000
+dry pulses,month,Jul,group,SWIR,0.5096,B12,0.5096,3000,3000
+dry pulses,month,Jul,group,VV,0.6318,VV,0.6318,3000,3000
+dry pulses,month,Jul,group,VH,0.6452,VH,0.6452,3000,3000
+dry pulses,month,Aug,group,Visible,0.5672,B04,0.5672,3000,3000
+dry pulses,month,Aug,group,Red-edge,0.6684,B07,0.3316,3000,3000
+dry pulses,month,Aug,group,NIR,0.678,B08,0.322,3000,3000
+dry pulses,month,Aug,group,SWIR,0.6284,B12,0.6284,3000,3000
+dry pulses,month,Aug,group,VV,0.5538,VV,0.5538,3000,3000
+dry pulses,month,Aug,group,VH,0.5529,VH,0.4471,3000,3000
+dry pulses,month,Sep,group,Visible,0.6415,B04,0.6415,3000,3000
+dry pulses,month,Sep,group,Red-edge,0.7204,B07,0.2796,3000,3000
+dry pulses,month,Sep,group,NIR,0.7269,B8A,0.2731,3000,3000
+dry pulses,month,Sep,group,SWIR,0.6858,B12,0.6858,3000,3000
+dry pulses,month,Sep,group,VV,0.5765,VV,0.5765,3000,3000
+dry pulses,month,Sep,group,VH,0.6169,VH,0.3831,3000,3000
+dry pulses,month,Oct,group,Visible,0.5403,B02,0.5403,3000,3000
+dry pulses,month,Oct,group,Red-edge,0.6067,B07,0.3933,3000,3000
+dry pulses,month,Oct,group,NIR,0.6259,B8A,0.3741,3000,3000
+dry pulses,month,Oct,group,SWIR,0.5611,B12,0.5611,3000,3000
+dry pulses,month,Oct,group,VV,0.5775,VV,0.5775,3000,3000
+dry pulses,month,Oct,group,VH,0.5755,VH,0.4245,3000,3000
+dry pulses,month,Nov,group,Visible,0.5559,B04,0.4441,3000,3000
+dry pulses,month,Nov,group,Red-edge,0.5575,B05,0.4425,3000,3000
+dry pulses,month,Nov,group,NIR,0.5121,B8A,0.4879,3000,3000
+dry pulses,month,Nov,group,SWIR,0.5522,B11,0.4478,3000,3000
+dry pulses,month,Nov,group,VV,0.5135,VV,0.5135,3000,3000
+dry pulses,month,Nov,group,VH,0.5472,VH,0.4528,3000,3000
+dry pulses,month,Dec,group,Visible,0.5563,B04,0.4437,3000,3000
+dry pulses,month,Dec,group,Red-edge,0.558,B05,0.442,3000,3000
+dry pulses,month,Dec,group,NIR,0.5122,B8A,0.4878,3000,3000
+dry pulses,month,Dec,group,SWIR,0.5528,B11,0.4472,3000,3000
+dry pulses,month,Dec,group,VV,0.5452,VV,0.4548,3000,3000
+dry pulses,month,Dec,group,VH,0.5984,VH,0.4016,3000,3000
+dry pulses,month,Jan,index,NDVI,0.7094,NDVI,0.2906,3000,3000
+dry pulses,month,Jan,index,NDMI,0.7227,NDMI,0.2773,3000,3000
+dry pulses,month,Jan,index,EVI,0.7216,EVI,0.2784,3000,3000
+dry pulses,month,Feb,index,NDVI,0.7097,NDVI,0.2903,3000,3000
+dry pulses,month,Feb,index,NDMI,0.7228,NDMI,0.2772,3000,3000
+dry pulses,month,Feb,index,EVI,0.7221,EVI,0.2779,3000,3000
+dry pulses,month,Mar,index,NDVI,0.7103,NDVI,0.2897,3000,3000
+dry pulses,month,Mar,index,NDMI,0.7237,NDMI,0.2763,3000,3000
+dry pulses,month,Mar,index,EVI,0.7231,EVI,0.2769,3000,3000
+dry pulses,month,Apr,index,NDVI,0.7181,NDVI,0.2819,3000,3000
+dry pulses,month,Apr,index,NDMI,0.7409,NDMI,0.2591,3000,3000
+dry pulses,month,Apr,index,EVI,0.7281,EVI,0.2719,3000,3000
+dry pulses,month,May,index,NDVI,0.7169,NDVI,0.2831,3000,3000
+dry pulses,month,May,index,NDMI,0.726,NDMI,0.274,3000,3000
+dry pulses,month,May,index,EVI,0.705,EVI,0.295,3000,3000
+dry pulses,month,Jun,index,NDVI,0.5942,NDVI,0.4058,3000,3000
+dry pulses,month,Jun,index,NDMI,0.5607,NDMI,0.4393,3000,3000
+dry pulses,month,Jun,index,EVI,0.552,EVI,0.448,3000,3000
+dry pulses,month,Jul,index,NDVI,0.509,NDVI,0.491,3000,3000
+dry pulses,month,Jul,index,NDMI,0.5472,NDMI,0.5472,3000,3000
+dry pulses,month,Jul,index,EVI,0.5236,EVI,0.5236,3000,3000
+dry pulses,month,Aug,index,NDVI,0.6301,NDVI,0.3699,3000,3000
+dry pulses,month,Aug,index,NDMI,0.6582,NDMI,0.3418,3000,3000
+dry pulses,month,Aug,index,EVI,0.6521,EVI,0.3479,3000,3000
+dry pulses,month,Sep,index,NDVI,0.6977,NDVI,0.3023,3000,3000
+dry pulses,month,Sep,index,NDMI,0.7145,NDMI,0.2855,3000,3000
+dry pulses,month,Sep,index,EVI,0.7106,EVI,0.2894,3000,3000
+dry pulses,month,Oct,index,NDVI,0.5655,NDVI,0.4345,3000,3000
+dry pulses,month,Oct,index,NDMI,0.5889,NDMI,0.4111,3000,3000
+dry pulses,month,Oct,index,EVI,0.5783,EVI,0.4217,3000,3000
+dry pulses,month,Nov,index,NDVI,0.5457,NDVI,0.5457,3000,3000
+dry pulses,month,Nov,index,NDMI,0.5276,NDMI,0.5276,3000,3000
+dry pulses,month,Nov,index,EVI,0.5367,EVI,0.5367,3000,3000
+dry pulses,month,Dec,index,NDVI,0.5456,NDVI,0.5456,3000,3000
+dry pulses,month,Dec,index,NDMI,0.5278,NDMI,0.5278,3000,3000
+dry pulses,month,Dec,index,EVI,0.5365,EVI,0.5365,3000,3000
+dry pulses,window,Jan-Mar,group,Visible,0.5664,B03,0.4336,3000,3000
+dry pulses,window,Jan-Mar,group,Red-edge,0.6925,B07,0.3075,3000,3000
+dry pulses,window,Jan-Mar,group,NIR,0.6903,B08,0.3097,3000,3000
+dry pulses,window,Jan-Mar,group,SWIR,0.57,B12,0.57,3000,3000
+dry pulses,window,Jan-Mar,group,VV,0.6216,VV,0.6216,3000,3000
+dry pulses,window,Jan-Mar,group,VH,0.5419,VH,0.5419,3000,3000
+dry pulses,window,Feb-Apr,group,Visible,0.5591,B03,0.4409,3000,3000
+dry pulses,window,Feb-Apr,group,Red-edge,0.6991,B07,0.3009,3000,3000
+dry pulses,window,Feb-Apr,group,NIR,0.6958,B08,0.3042,3000,3000
+dry pulses,window,Feb-Apr,group,SWIR,0.5936,B12,0.5936,3000,3000
+dry pulses,window,Feb-Apr,group,VV,0.6002,VV,0.6002,3000,3000
+dry pulses,window,Feb-Apr,group,VH,0.5361,VH,0.4639,3000,3000
+dry pulses,window,Mar-May,group,Visible,0.6409,B04,0.6409,3000,3000
+dry pulses,window,Mar-May,group,Red-edge,0.7084,B07,0.2916,3000,3000
+dry pulses,window,Mar-May,group,NIR,0.7046,B08,0.2954,3000,3000
+dry pulses,window,Mar-May,group,SWIR,0.69,B12,0.69,3000,3000
+dry pulses,window,Mar-May,group,VV,0.5891,VV,0.5891,3000,3000
+dry pulses,window,Mar-May,group,VH,0.6054,VH,0.3946,3000,3000
+dry pulses,window,Apr-Jun,group,Visible,0.6822,B02,0.6822,3000,3000
+dry pulses,window,Apr-Jun,group,Red-edge,0.6318,B07,0.3682,3000,3000
+dry pulses,window,Apr-Jun,group,NIR,0.6365,B8A,0.3635,3000,3000
+dry pulses,window,Apr-Jun,group,SWIR,0.6657,B12,0.6657,3000,3000
+dry pulses,window,Apr-Jun,group,VV,0.6713,VV,0.6713,3000,3000
+dry pulses,window,Apr-Jun,group,VH,0.6501,VH,0.6501,3000,3000
+dry pulses,window,May-Jul,group,Visible,0.7138,B02,0.7138,3000,3000
+dry pulses,window,May-Jul,group,Red-edge,0.6801,B05,0.6801,3000,3000
+dry pulses,window,May-Jul,group,NIR,0.5764,B8A,0.4236,3000,3000
+dry pulses,window,May-Jul,group,SWIR,0.6516,B12,0.6516,3000,3000
+dry pulses,window,May-Jul,group,VV,0.706,VV,0.706,3000,3000
+dry pulses,window,May-Jul,group,VH,0.7568,VH,0.7568,3000,3000
+dry pulses,window,Jun-Aug,group,Visible,0.6375,B03,0.6375,3000,3000
+dry pulses,window,Jun-Aug,group,Red-edge,0.61,B05,0.61,3000,3000
+dry pulses,window,Jun-Aug,group,NIR,0.5931,B8A,0.4069,3000,3000
+dry pulses,window,Jun-Aug,group,SWIR,0.6076,B12,0.6076,3000,3000
+dry pulses,window,Jun-Aug,group,VV,0.6907,VV,0.6907,3000,3000
+dry pulses,window,Jun-Aug,group,VH,0.7367,VH,0.7367,3000,3000
+dry pulses,window,Jul-Sep,group,Visible,0.6007,B04,0.6007,3000,3000
+dry pulses,window,Jul-Sep,group,Red-edge,0.6501,B07,0.3499,3000,3000
+dry pulses,window,Jul-Sep,group,NIR,0.6675,B8A,0.3325,3000,3000
+dry pulses,window,Jul-Sep,group,SWIR,0.6502,B12,0.6502,3000,3000
+dry pulses,window,Jul-Sep,group,VV,0.591,VV,0.591,3000,3000
+dry pulses,window,Jul-Sep,group,VH,0.5232,VH,0.4768,3000,3000
+dry pulses,window,Aug-Oct,group,Visible,0.5933,B04,0.5933,3000,3000
+dry pulses,window,Aug-Oct,group,Red-edge,0.7096,B07,0.2904,3000,3000
+dry pulses,window,Aug-Oct,group,NIR,0.7195,B8A,0.2805,3000,3000
+dry pulses,window,Aug-Oct,group,SWIR,0.6579,B12,0.6579,3000,3000
+dry pulses,window,Aug-Oct,group,VV,0.5702,VV,0.5702,3000,3000
+dry pulses,window,Aug-Oct,group,VH,0.5973,VH,0.4027,3000,3000
+dry pulses,window,Sep-Nov,group,Visible,0.5777,B02,0.5777,3000,3000
+dry pulses,window,Sep-Nov,group,Red-edge,0.6209,B07,0.3791,3000,3000
+dry pulses,window,Sep-Nov,group,NIR,0.6372,B8A,0.3628,3000,3000
+dry pulses,window,Sep-Nov,group,SWIR,0.6087,B12,0.6087,3000,3000
+dry pulses,window,Sep-Nov,group,VV,0.549,VV,0.549,3000,3000
+dry pulses,window,Sep-Nov,group,VH,0.6015,VH,0.3985,3000,3000
+dry pulses,window,Oct-Dec,group,Visible,0.5299,B02,0.5299,3000,3000
+dry pulses,window,Oct-Dec,group,Red-edge,0.5628,B05,0.4372,3000,3000
+dry pulses,window,Oct-Dec,group,NIR,0.5435,B8A,0.4565,3000,3000
+dry pulses,window,Oct-Dec,group,SWIR,0.5504,B11,0.4496,3000,3000
+dry pulses,window,Oct-Dec,group,VV,0.5174,VV,0.5174,3000,3000
+dry pulses,window,Oct-Dec,group,VH,0.5834,VH,0.4166,3000,3000
+dry pulses,window,Jan-Mar,index,NDVI,0.7102,NDVI,0.2898,3000,3000
+dry pulses,window,Jan-Mar,index,NDMI,0.7234,NDMI,0.2766,3000,3000
+dry pulses,window,Jan-Mar,index,EVI,0.7223,EVI,0.2777,3000,3000
+dry pulses,window,Feb-Apr,index,NDVI,0.7159,NDVI,0.2841,3000,3000
+dry pulses,window,Feb-Apr,index,NDMI,0.7325,NDMI,0.2675,3000,3000
+dry pulses,window,Feb-Apr,index,EVI,0.7267,EVI,0.2733,3000,3000
+dry pulses,window,Mar-May,index,NDVI,0.7269,NDVI,0.2731,3000,3000
+dry pulses,window,Mar-May,index,NDMI,0.7429,NDMI,0.2571,3000,3000
+dry pulses,window,Mar-May,index,EVI,0.7262,EVI,0.2738,3000,3000
+dry pulses,window,Apr-Jun,index,NDVI,0.6661,NDVI,0.3339,3000,3000
+dry pulses,window,Apr-Jun,index,NDMI,0.6471,NDMI,0.3529,3000,3000
+dry pulses,window,Apr-Jun,index,EVI,0.6372,EVI,0.3628,3000,3000
+dry pulses,window,May-Jul,index,NDVI,0.6661,NDVI,0.3339,3000,3000
+dry pulses,window,May-Jul,index,NDMI,0.6109,NDMI,0.3891,3000,3000
+dry pulses,window,May-Jul,index,EVI,0.6297,EVI,0.3703,3000,3000
+dry pulses,window,Jun-Aug,index,NDVI,0.6034,NDVI,0.3966,3000,3000
+dry pulses,window,Jun-Aug,index,NDMI,0.6106,NDMI,0.3894,3000,3000
+dry pulses,window,Jun-Aug,index,EVI,0.6096,EVI,0.3904,3000,3000
+dry pulses,window,Jul-Sep,index,NDVI,0.6522,NDVI,0.3478,3000,3000
+dry pulses,window,Jul-Sep,index,NDMI,0.6705,NDMI,0.3295,3000,3000
+dry pulses,window,Jul-Sep,index,EVI,0.6564,EVI,0.3436,3000,3000
+dry pulses,window,Aug-Oct,index,NDVI,0.6574,NDVI,0.3426,3000,3000
+dry pulses,window,Aug-Oct,index,NDMI,0.6922,NDMI,0.3078,3000,3000
+dry pulses,window,Aug-Oct,index,EVI,0.6811,EVI,0.3189,3000,3000
+dry pulses,window,Sep-Nov,index,NDVI,0.5869,NDVI,0.4131,3000,3000
+dry pulses,window,Sep-Nov,index,NDMI,0.613,NDMI,0.387,3000,3000
+dry pulses,window,Sep-Nov,index,EVI,0.6022,EVI,0.3978,3000,3000
+dry pulses,window,Oct-Dec,index,NDVI,0.5097,NDVI,0.5097,3000,3000
+dry pulses,window,Oct-Dec,index,NDMI,0.5077,NDMI,0.4923,3000,3000
+dry pulses,window,Oct-Dec,index,EVI,0.5029,EVI,0.5029,3000,3000
+forage legumes,month,Jan,group,Visible,0.5557,B04,0.5557,3000,3000
+forage legumes,month,Jan,group,Red-edge,0.6651,B07,0.6651,3000,3000
+forage legumes,month,Jan,group,NIR,0.6923,B8A,0.6923,3000,3000
+forage legumes,month,Jan,group,SWIR,0.687,B11,0.687,3000,3000
+forage legumes,month,Jan,group,VV,0.7215,VV,0.2785,3000,3000
+forage legumes,month,Jan,group,VH,0.5188,VH,0.4812,3000,3000
+forage legumes,month,Feb,group,Visible,0.5565,B04,0.5565,3000,3000
+forage legumes,month,Feb,group,Red-edge,0.666,B07,0.666,3000,3000
+forage legumes,month,Feb,group,NIR,0.6932,B8A,0.6932,3000,3000
+forage legumes,month,Feb,group,SWIR,0.6881,B11,0.6881,3000,3000
+forage legumes,month,Feb,group,VV,0.7389,VV,0.2611,3000,3000
+forage legumes,month,Feb,group,VH,0.5827,VH,0.4173,3000,3000
+forage legumes,month,Mar,group,Visible,0.5783,B04,0.5783,3000,3000
+forage legumes,month,Mar,group,Red-edge,0.6709,B07,0.6709,3000,3000
+forage legumes,month,Mar,group,NIR,0.6971,B8A,0.6971,3000,3000
+forage legumes,month,Mar,group,SWIR,0.7042,B11,0.7042,3000,3000
+forage legumes,month,Mar,group,VV,0.7376,VV,0.2624,3000,3000
+forage legumes,month,Mar,group,VH,0.5686,VH,0.4314,3000,3000
+forage legumes,month,Apr,group,Visible,0.5672,B03,0.5672,3000,3000
+forage legumes,month,Apr,group,Red-edge,0.7035,B07,0.7035,3000,3000
+forage legumes,month,Apr,group,NIR,0.7256,B8A,0.7256,3000,3000
+forage legumes,month,Apr,group,SWIR,0.6911,B11,0.6911,3000,3000
+forage legumes,month,Apr,group,VV,0.7333,VV,0.2667,3000,3000
+forage legumes,month,Apr,group,VH,0.5319,VH,0.5319,3000,3000
+forage legumes,month,May,group,Visible,0.6855,B04,0.3145,3000,3000
+forage legumes,month,May,group,Red-edge,0.7388,B06,0.7388,3000,3000
+forage legumes,month,May,group,NIR,0.7413,B8A,0.7413,3000,3000
+forage legumes,month,May,group,SWIR,0.6763,B12,0.3237,3000,3000
+forage legumes,month,May,group,VV,0.7407,VV,0.2593,3000,3000
+forage legumes,month,May,group,VH,0.5108,VH,0.5108,3000,3000
+forage legumes,month,Jun,group,Visible,0.6846,B02,0.3154,3000,3000
+forage legumes,month,Jun,group,Red-edge,0.6701,B06,0.6701,3000,3000
+forage legumes,month,Jun,group,NIR,0.662,B8A,0.662,3000,3000
+forage legumes,month,Jun,group,SWIR,0.5631,B12,0.4369,3000,3000
+forage legumes,month,Jun,group,VV,0.634,VV,0.366,3000,3000
+forage legumes,month,Jun,group,VH,0.5678,VH,0.5678,3000,3000
+forage legumes,month,Jul,group,Visible,0.6522,B03,0.3478,3000,3000
+forage legumes,month,Jul,group,Red-edge,0.6081,B05,0.3919,3000,3000
+forage legumes,month,Jul,group,NIR,0.5424,B08,0.4576,3000,3000
+forage legumes,month,Jul,group,SWIR,0.7198,B11,0.7198,3000,3000
+forage legumes,month,Jul,group,VV,0.7065,VV,0.2935,3000,3000
+forage legumes,month,Jul,group,VH,0.6613,VH,0.3387,3000,3000
+forage legumes,month,Aug,group,Visible,0.7051,B04,0.2949,3000,3000
+forage legumes,month,Aug,group,Red-edge,0.6345,B05,0.3655,3000,3000
+forage legumes,month,Aug,group,NIR,0.6203,B8A,0.6203,3000,3000
+forage legumes,month,Aug,group,SWIR,0.5987,B12,0.4013,3000,3000
+forage legumes,month,Aug,group,VV,0.74,VV,0.26,3000,3000
+forage legumes,month,Aug,group,VH,0.6398,VH,0.3602,3000,3000
+forage legumes,month,Sep,group,Visible,0.7444,B04,0.2556,3000,3000
+forage legumes,month,Sep,group,Red-edge,0.7183,B06,0.7183,3000,3000
+forage legumes,month,Sep,group,NIR,0.7163,B08,0.7163,3000,3000
+forage legumes,month,Sep,group,SWIR,0.6577,B12,0.3423,3000,3000
+forage legumes,month,Sep,group,VV,0.7469,VV,0.2531,3000,3000
+forage legumes,month,Sep,group,VH,0.5544,VH,0.4456,3000,3000
+forage legumes,month,Oct,group,Visible,0.7642,B04,0.2358,3000,3000
+forage legumes,month,Oct,group,Red-edge,0.7464,B07,0.7464,3000,3000
+forage legumes,month,Oct,group,NIR,0.753,B8A,0.753,3000,3000
+forage legumes,month,Oct,group,SWIR,0.7189,B12,0.2811,3000,3000
+forage legumes,month,Oct,group,VV,0.7486,VV,0.2514,3000,3000
+forage legumes,month,Oct,group,VH,0.5372,VH,0.4628,3000,3000
+forage legumes,month,Nov,group,Visible,0.6849,B04,0.3151,3000,3000
+forage legumes,month,Nov,group,Red-edge,0.7207,B07,0.7207,3000,3000
+forage legumes,month,Nov,group,NIR,0.7323,B8A,0.7323,3000,3000
+forage legumes,month,Nov,group,SWIR,0.6206,B12,0.3794,3000,3000
+forage legumes,month,Nov,group,VV,0.756,VV,0.244,3000,3000
+forage legumes,month,Nov,group,VH,0.5932,VH,0.4068,3000,3000
+forage legumes,month,Dec,group,Visible,0.6842,B04,0.3158,3000,3000
+forage legumes,month,Dec,group,Red-edge,0.7204,B07,0.7204,3000,3000
+forage legumes,month,Dec,group,NIR,0.7319,B8A,0.7319,3000,3000
+forage legumes,month,Dec,group,SWIR,0.6193,B12,0.3807,3000,3000
+forage legumes,month,Dec,group,VV,0.7109,VV,0.2891,3000,3000
+forage legumes,month,Dec,group,VH,0.5124,VH,0.4876,3000,3000
+forage legumes,month,Jan,index,NDVI,0.6677,NDVI,0.6677,3000,3000
+forage legumes,month,Jan,index,NDMI,0.6233,NDMI,0.6233,3000,3000
+forage legumes,month,Jan,index,EVI,0.6776,EVI,0.6776,3000,3000
+forage legumes,month,Feb,index,NDVI,0.668,NDVI,0.668,3000,3000
+forage legumes,month,Feb,index,NDMI,0.623,NDMI,0.623,3000,3000
+forage legumes,month,Feb,index,EVI,0.6781,EVI,0.6781,3000,3000
+forage legumes,month,Mar,index,NDVI,0.6639,NDVI,0.6639,3000,3000
+forage legumes,month,Mar,index,NDMI,0.6206,NDMI,0.6206,3000,3000
+forage legumes,month,Mar,index,EVI,0.6769,EVI,0.6769,3000,3000
+forage legumes,month,Apr,index,NDVI,0.6846,NDVI,0.6846,3000,3000
+forage legumes,month,Apr,index,NDMI,0.6526,NDMI,0.6526,3000,3000
+forage legumes,month,Apr,index,EVI,0.702,EVI,0.702,3000,3000
+forage legumes,month,May,index,NDVI,0.7212,NDVI,0.7212,3000,3000
+forage legumes,month,May,index,NDMI,0.6967,NDMI,0.6967,3000,3000
+forage legumes,month,May,index,EVI,0.7299,EVI,0.7299,3000,3000
+forage legumes,month,Jun,index,NDVI,0.6641,NDVI,0.6641,3000,3000
+forage legumes,month,Jun,index,NDMI,0.5691,NDMI,0.5691,3000,3000
+forage legumes,month,Jun,index,EVI,0.6482,EVI,0.6482,3000,3000
+forage legumes,month,Jul,index,NDVI,0.5797,NDVI,0.5797,3000,3000
+forage legumes,month,Jul,index,NDMI,0.6641,NDMI,0.3359,3000,3000
+forage legumes,month,Jul,index,EVI,0.5382,EVI,0.5382,3000,3000
+forage legumes,month,Aug,index,NDVI,0.6952,NDVI,0.6952,3000,3000
+forage legumes,month,Aug,index,NDMI,0.5898,NDMI,0.5898,3000,3000
+forage legumes,month,Aug,index,EVI,0.6728,EVI,0.6728,3000,3000
+forage legumes,month,Sep,index,NDVI,0.7502,NDVI,0.7502,3000,3000
+forage legumes,month,Sep,index,NDMI,0.6818,NDMI,0.6818,3000,3000
+forage legumes,month,Sep,index,EVI,0.7406,EVI,0.7406,3000,3000
+forage legumes,month,Oct,index,NDVI,0.7841,NDVI,0.7841,3000,3000
+forage legumes,month,Oct,index,NDMI,0.7466,NDMI,0.7466,3000,3000
+forage legumes,month,Oct,index,EVI,0.7765,EVI,0.7765,3000,3000
+forage legumes,month,Nov,index,NDVI,0.7558,NDVI,0.7558,3000,3000
+forage legumes,month,Nov,index,NDMI,0.7198,NDMI,0.7198,3000,3000
+forage legumes,month,Nov,index,EVI,0.7485,EVI,0.7485,3000,3000
+forage legumes,month,Dec,index,NDVI,0.7551,NDVI,0.7551,3000,3000
+forage legumes,month,Dec,index,NDMI,0.7197,NDMI,0.7197,3000,3000
+forage legumes,month,Dec,index,EVI,0.7479,EVI,0.7479,3000,3000
+forage legumes,window,Jan-Mar,group,Visible,0.5641,B04,0.5641,3000,3000
+forage legumes,window,Jan-Mar,group,Red-edge,0.6677,B07,0.6677,3000,3000
+forage legumes,window,Jan-Mar,group,NIR,0.6945,B8A,0.6945,3000,3000
+forage legumes,window,Jan-Mar,group,SWIR,0.6943,B11,0.6943,3000,3000
+forage legumes,window,Jan-Mar,group,VV,0.753,VV,0.247,3000,3000
+forage legumes,window,Jan-Mar,group,VH,0.5749,VH,0.4251,3000,3000
+forage legumes,window,Feb-Apr,group,Visible,0.5649,B03,0.5649,3000,3000
+forage legumes,window,Feb-Apr,group,Red-edge,0.6831,B07,0.6831,3000,3000
+forage legumes,window,Feb-Apr,group,NIR,0.7078,B8A,0.7078,3000,3000
+forage legumes,window,Feb-Apr,group,SWIR,0.7054,B11,0.7054,3000,3000
+forage legumes,window,Feb-Apr,group,VV,0.7682,VV,0.2318,3000,3000
+forage legumes,window,Feb-Apr,group,VH,0.5514,VH,0.4486,3000,3000
+forage legumes,window,Mar-May,group,Visible,0.5656,B02,0.4344,3000,3000
+forage legumes,window,Mar-May,group,Red-edge,0.7183,B07,0.7183,3000,3000
+forage legumes,window,Mar-May,group,NIR,0.7344,B8A,0.7344,3000,3000
+forage legumes,window,Mar-May,group,SWIR,0.6288,B11,0.6288,3000,3000
+forage legumes,window,Mar-May,group,VV,0.778,VV,0.222,3000,3000
+forage legumes,window,Mar-May,group,VH,0.5077,VH,0.4923,3000,3000
+forage legumes,window,Apr-Jun,group,Visible,0.6592,B02,0.3408,3000,3000
+forage legumes,window,Apr-Jun,group,Red-edge,0.7431,B06,0.7431,3000,3000
+forage legumes,window,Apr-Jun,group,NIR,0.7372,B8A,0.7372,3000,3000
+forage legumes,window,Apr-Jun,group,SWIR,0.643,B12,0.357,3000,3000
+forage legumes,window,Apr-Jun,group,VV,0.7364,VV,0.2636,3000,3000
+forage legumes,window,Apr-Jun,group,VH,0.5472,VH,0.5472,3000,3000
+forage legumes,window,May-Jul,group,Visible,0.7415,B04,0.2585,3000,3000
+forage legumes,window,May-Jul,group,Red-edge,0.7022,B06,0.7022,3000,3000
+forage legumes,window,May-Jul,group,NIR,0.7018,B8A,0.7018,3000,3000
+forage legumes,window,May-Jul,group,SWIR,0.6124,B12,0.3876,3000,3000
+forage legumes,window,May-Jul,group,VV,0.7263,VV,0.2737,3000,3000
+forage legumes,window,May-Jul,group,VH,0.5536,VH,0.4464,3000,3000
+forage legumes,window,Jun-Aug,group,Visible,0.7756,B04,0.2244,3000,3000
+forage legumes,window,Jun-Aug,group,Red-edge,0.6537,B05,0.3463,3000,3000
+forage legumes,window,Jun-Aug,group,NIR,0.6452,B8A,0.6452,3000,3000
+forage legumes,window,Jun-Aug,group,SWIR,0.6035,B12,0.3965,3000,3000
+forage legumes,window,Jun-Aug,group,VV,0.7228,VV,0.2772,3000,3000
+forage legumes,window,Jun-Aug,group,VH,0.6349,VH,0.3651,3000,3000
+forage legumes,window,Jul-Sep,group,Visible,0.7284,B04,0.2716,3000,3000
+forage legumes,window,Jul-Sep,group,Red-edge,0.6512,B05,0.3488,3000,3000
+forage legumes,window,Jul-Sep,group,NIR,0.6542,B8A,0.6542,3000,3000
+forage legumes,window,Jul-Sep,group,SWIR,0.5983,B12,0.4017,3000,3000
+forage legumes,window,Jul-Sep,group,VV,0.757,VV,0.243,3000,3000
+forage legumes,window,Jul-Sep,group,VH,0.6486,VH,0.3514,3000,3000
+forage legumes,window,Aug-Oct,group,Visible,0.7836,B04,0.2164,3000,3000
+forage legumes,window,Aug-Oct,group,Red-edge,0.7442,B06,0.7442,3000,3000
+forage legumes,window,Aug-Oct,group,NIR,0.7453,B08,0.7453,3000,3000
+forage legumes,window,Aug-Oct,group,SWIR,0.7038,B12,0.2962,3000,3000
+forage legumes,window,Aug-Oct,group,VV,0.7631,VV,0.2369,3000,3000
+forage legumes,window,Aug-Oct,group,VH,0.5967,VH,0.4033,3000,3000
+forage legumes,window,Sep-Nov,group,Visible,0.7759,B04,0.2241,3000,3000
+forage legumes,window,Sep-Nov,group,Red-edge,0.7618,B07,0.7618,3000,3000
+forage legumes,window,Sep-Nov,group,NIR,0.7679,B8A,0.7679,3000,3000
+forage legumes,window,Sep-Nov,group,SWIR,0.722,B12,0.278,3000,3000
+forage legumes,window,Sep-Nov,group,VV,0.7641,VV,0.2359,3000,3000
+forage legumes,window,Sep-Nov,group,VH,0.5779,VH,0.4221,3000,3000
+forage legumes,window,Oct-Dec,group,Visible,0.7317,B04,0.2683,3000,3000
+forage legumes,window,Oct-Dec,group,Red-edge,0.7381,B07,0.7381,3000,3000
+forage legumes,window,Oct-Dec,group,NIR,0.7477,B8A,0.7477,3000,3000
+forage legumes,window,Oct-Dec,group,SWIR,0.6802,B12,0.3198,3000,3000
+forage legumes,window,Oct-Dec,group,VV,0.7545,VV,0.2455,3000,3000
+forage legumes,window,Oct-Dec,group,VH,0.5604,VH,0.4396,3000,3000
+forage legumes,window,Jan-Mar,index,NDVI,0.6667,NDVI,0.6667,3000,3000
+forage legumes,window,Jan-Mar,index,NDMI,0.6227,NDMI,0.6227,3000,3000
+forage legumes,window,Jan-Mar,index,EVI,0.6777,EVI,0.6777,3000,3000
+forage legumes,window,Feb-Apr,index,NDVI,0.6734,NDVI,0.6734,3000,3000
+forage legumes,window,Feb-Apr,index,NDMI,0.6348,NDMI,0.6348,3000,3000
+forage legumes,window,Feb-Apr,index,EVI,0.6864,EVI,0.6864,3000,3000
+forage legumes,window,Mar-May,index,NDVI,0.7005,NDVI,0.7005,3000,3000
+forage legumes,window,Mar-May,index,NDMI,0.6764,NDMI,0.6764,3000,3000
+forage legumes,window,Mar-May,index,EVI,0.7138,EVI,0.7138,3000,3000
+forage legumes,window,Apr-Jun,index,NDVI,0.7021,NDVI,0.7021,3000,3000
+forage legumes,window,Apr-Jun,index,NDMI,0.6616,NDMI,0.6616,3000,3000
+forage legumes,window,Apr-Jun,index,EVI,0.7126,EVI,0.7126,3000,3000
+forage legumes,window,May-Jul,index,NDVI,0.7484,NDVI,0.7484,3000,3000
+forage legumes,window,May-Jul,index,NDMI,0.6102,NDMI,0.6102,3000,3000
+forage legumes,window,May-Jul,index,EVI,0.728,EVI,0.728,3000,3000
+forage legumes,window,Jun-Aug,index,NDVI,0.7707,NDVI,0.7707,3000,3000
+forage legumes,window,Jun-Aug,index,NDMI,0.5525,NDMI,0.5525,3000,3000
+forage legumes,window,Jun-Aug,index,EVI,0.7305,EVI,0.7305,3000,3000
+forage legumes,window,Jul-Sep,index,NDVI,0.7203,NDVI,0.7203,3000,3000
+forage legumes,window,Jul-Sep,index,NDMI,0.5824,NDMI,0.5824,3000,3000
+forage legumes,window,Jul-Sep,index,EVI,0.6997,EVI,0.6997,3000,3000
+forage legumes,window,Aug-Oct,index,NDVI,0.7923,NDVI,0.7923,3000,3000
+forage legumes,window,Aug-Oct,index,NDMI,0.7176,NDMI,0.7176,3000,3000
+forage legumes,window,Aug-Oct,index,EVI,0.7795,EVI,0.7795,3000,3000
+forage legumes,window,Sep-Nov,index,NDVI,0.8004,NDVI,0.8004,3000,3000
+forage legumes,window,Sep-Nov,index,NDMI,0.758,NDMI,0.758,3000,3000
+forage legumes,window,Sep-Nov,index,EVI,0.7901,EVI,0.7901,3000,3000
+forage legumes,window,Oct-Dec,index,NDVI,0.7767,NDVI,0.7767,3000,3000
+forage legumes,window,Oct-Dec,index,NDMI,0.7375,NDMI,0.7375,3000,3000
+forage legumes,window,Oct-Dec,index,EVI,0.7669,EVI,0.7669,3000,3000
+grassland,month,Jan,group,Visible,0.7656,B04,0.7656,3000,3000
+grassland,month,Jan,group,Red-edge,0.8232,B05,0.8232,3000,3000
+grassland,month,Jan,group,NIR,0.8161,B8A,0.8161,3000,3000
+grassland,month,Jan,group,SWIR,0.7964,B11,0.7964,3000,3000
+grassland,month,Jan,group,VV,0.851,VV,0.149,3000,3000
+grassland,month,Jan,group,VH,0.6513,VH,0.3487,3000,3000
+grassland,month,Feb,group,Visible,0.7661,B04,0.7661,3000,3000
+grassland,month,Feb,group,Red-edge,0.8239,B05,0.8239,3000,3000
+grassland,month,Feb,group,NIR,0.8167,B8A,0.8167,3000,3000
+grassland,month,Feb,group,SWIR,0.7972,B11,0.7972,3000,3000
+grassland,month,Feb,group,VV,0.8713,VV,0.1287,3000,3000
+grassland,month,Feb,group,VH,0.7048,VH,0.2952,3000,3000
+grassland,month,Mar,group,Visible,0.7801,B04,0.7801,3000,3000
+grassland,month,Mar,group,Red-edge,0.8305,B05,0.8305,3000,3000
+grassland,month,Mar,group,NIR,0.8222,B8A,0.8222,3000,3000
+grassland,month,Mar,group,SWIR,0.8119,B11,0.8119,3000,3000
+grassland,month,Mar,group,VV,0.838,VV,0.162,3000,3000
+grassland,month,Mar,group,VH,0.6175,VH,0.3825,3000,3000
+grassland,month,Apr,group,Visible,0.7355,B03,0.7355,3000,3000
+grassland,month,Apr,group,Red-edge,0.8203,B07,0.8203,3000,3000
+grassland,month,Apr,group,NIR,0.8484,B8A,0.8484,3000,3000
+grassland,month,Apr,group,SWIR,0.8001,B11,0.8001,3000,3000
+grassland,month,Apr,group,VV,0.8364,VV,0.1636,3000,3000
+grassland,month,Apr,group,VH,0.51,VH,0.51,3000,3000
+grassland,month,May,group,Visible,0.6538,B04,0.3462,3000,3000
+grassland,month,May,group,Red-edge,0.7879,B06,0.7879,3000,3000
+grassland,month,May,group,NIR,0.7996,B8A,0.7996,3000,3000
+grassland,month,May,group,SWIR,0.6781,B12,0.3219,3000,3000
+grassland,month,May,group,VV,0.8181,VV,0.1819,3000,3000
+grassland,month,May,group,VH,0.5227,VH,0.4773,3000,3000
+grassland,month,Jun,group,Visible,0.794,B02,0.206,3000,3000
+grassland,month,Jun,group,Red-edge,0.7405,B06,0.7405,3000,3000
+grassland,month,Jun,group,NIR,0.7498,B8A,0.7498,3000,3000
+grassland,month,Jun,group,SWIR,0.6637,B12,0.3363,3000,3000
+grassland,month,Jun,group,VV,0.7158,VV,0.2842,3000,3000
+grassland,month,Jun,group,VH,0.5033,VH,0.4967,3000,3000
+grassland,month,Jul,group,Visible,0.6858,B02,0.3142,3000,3000
+grassland,month,Jul,group,Red-edge,0.5831,B05,0.4169,3000,3000
+grassland,month,Jul,group,NIR,0.5633,B8A,0.5633,3000,3000
+grassland,month,Jul,group,SWIR,0.7072,B11,0.7072,3000,3000
+grassland,month,Jul,group,VV,0.8022,VV,0.1978,3000,3000
+grassland,month,Jul,group,VH,0.7316,VH,0.2684,3000,3000
+grassland,month,Aug,group,Visible,0.7379,B04,0.2621,3000,3000
+grassland,month,Aug,group,Red-edge,0.6974,B07,0.6974,3000,3000
+grassland,month,Aug,group,NIR,0.7133,B8A,0.7133,3000,3000
+grassland,month,Aug,group,SWIR,0.6332,B12,0.3668,3000,3000
+grassland,month,Aug,group,VV,0.8879,VV,0.1121,3000,3000
+grassland,month,Aug,group,VH,0.7198,VH,0.2802,3000,3000
+grassland,month,Sep,group,Visible,0.816,B04,0.184,3000,3000
+grassland,month,Sep,group,Red-edge,0.8291,B07,0.8291,3000,3000
+grassland,month,Sep,group,NIR,0.8406,B08,0.8406,3000,3000
+grassland,month,Sep,group,SWIR,0.7201,B12,0.2799,3000,3000
+grassland,month,Sep,group,VV,0.8874,VV,0.1126,3000,3000
+grassland,month,Sep,group,VH,0.6635,VH,0.3365,3000,3000
+grassland,month,Oct,group,Visible,0.7909,B04,0.2091,3000,3000
+grassland,month,Oct,group,Red-edge,0.8276,B07,0.8276,3000,3000
+grassland,month,Oct,group,NIR,0.8403,B8A,0.8403,3000,3000
+grassland,month,Oct,group,SWIR,0.7599,B12,0.2401,3000,3000
+grassland,month,Oct,group,VV,0.8903,VV,0.1097,3000,3000
+grassland,month,Oct,group,VH,0.6573,VH,0.3427,3000,3000
+grassland,month,Nov,group,Visible,0.6578,B02,0.3422,3000,3000
+grassland,month,Nov,group,Red-edge,0.7759,B07,0.7759,3000,3000
+grassland,month,Nov,group,NIR,0.7986,B8A,0.7986,3000,3000
+grassland,month,Nov,group,SWIR,0.6123,B11,0.6123,3000,3000
+grassland,month,Nov,group,VV,0.8959,VV,0.1041,3000,3000
+grassland,month,Nov,group,VH,0.69,VH,0.31,3000,3000
+grassland,month,Dec,group,Visible,0.6537,B02,0.3463,3000,3000
+grassland,month,Dec,group,Red-edge,0.7738,B07,0.7738,3000,3000
+grassland,month,Dec,group,NIR,0.7964,B8A,0.7964,3000,3000
+grassland,month,Dec,group,SWIR,0.6117,B11,0.6117,3000,3000
+grassland,month,Dec,group,VV,0.8337,VV,0.1663,3000,3000
+grassland,month,Dec,group,VH,0.5905,VH,0.4095,3000,3000
+grassland,month,Jan,index,NDVI,0.6336,NDVI,0.6336,3000,3000
+grassland,month,Jan,index,NDMI,0.7047,NDMI,0.7047,3000,3000
+grassland,month,Jan,index,EVI,0.71,EVI,0.71,3000,3000
+grassland,month,Feb,index,NDVI,0.6337,NDVI,0.6337,3000,3000
+grassland,month,Feb,index,NDMI,0.705,NDMI,0.705,3000,3000
+grassland,month,Feb,index,EVI,0.7101,EVI,0.7101,3000,3000
+grassland,month,Mar,index,NDVI,0.6298,NDVI,0.6298,3000,3000
+grassland,month,Mar,index,NDMI,0.705,NDMI,0.705,3000,3000
+grassland,month,Mar,index,EVI,0.7122,EVI,0.7122,3000,3000
+grassland,month,Apr,index,NDVI,0.6889,NDVI,0.6889,3000,3000
+grassland,month,Apr,index,NDMI,0.7225,NDMI,0.7225,3000,3000
+grassland,month,Apr,index,EVI,0.7502,EVI,0.7502,3000,3000
+grassland,month,May,index,NDVI,0.7364,NDVI,0.7364,3000,3000
+grassland,month,May,index,NDMI,0.7222,NDMI,0.7222,3000,3000
+grassland,month,May,index,EVI,0.7633,EVI,0.7633,3000,3000
+grassland,month,Jun,index,NDVI,0.7689,NDVI,0.7689,3000,3000
+grassland,month,Jun,index,NDMI,0.6561,NDMI,0.6561,3000,3000
+grassland,month,Jun,index,EVI,0.7417,EVI,0.7417,3000,3000
+grassland,month,Jul,index,NDVI,0.6355,NDVI,0.6355,3000,3000
+grassland,month,Jul,index,NDMI,0.6083,NDMI,0.3917,3000,3000
+grassland,month,Jul,index,EVI,0.6002,EVI,0.6002,3000,3000
+grassland,month,Aug,index,NDVI,0.7609,NDVI,0.7609,3000,3000
+grassland,month,Aug,index,NDMI,0.6355,NDMI,0.6355,3000,3000
+grassland,month,Aug,index,EVI,0.746,EVI,0.746,3000,3000
+grassland,month,Sep,index,NDVI,0.8499,NDVI,0.8499,3000,3000
+grassland,month,Sep,index,NDMI,0.7713,NDMI,0.7713,3000,3000
+grassland,month,Sep,index,EVI,0.851,EVI,0.851,3000,3000
+grassland,month,Oct,index,NDVI,0.8449,NDVI,0.8449,3000,3000
+grassland,month,Oct,index,NDMI,0.8265,NDMI,0.8265,3000,3000
+grassland,month,Oct,index,EVI,0.8541,EVI,0.8541,3000,3000
+grassland,month,Nov,index,NDVI,0.7823,NDVI,0.7823,3000,3000
+grassland,month,Nov,index,NDMI,0.7561,NDMI,0.7561,3000,3000
+grassland,month,Nov,index,EVI,0.7918,EVI,0.7918,3000,3000
+grassland,month,Dec,index,NDVI,0.7795,NDVI,0.7795,3000,3000
+grassland,month,Dec,index,NDMI,0.7566,NDMI,0.7566,3000,3000
+grassland,month,Dec,index,EVI,0.7899,EVI,0.7899,3000,3000
+grassland,window,Jan-Mar,group,Visible,0.7735,B04,0.7735,3000,3000
+grassland,window,Jan-Mar,group,Red-edge,0.8282,B05,0.8282,3000,3000
+grassland,window,Jan-Mar,group,NIR,0.8191,B8A,0.8191,3000,3000
+grassland,window,Jan-Mar,group,SWIR,0.8045,B11,0.8045,3000,3000
+grassland,window,Jan-Mar,group,VV,0.8779,VV,0.1221,3000,3000
+grassland,window,Jan-Mar,group,VH,0.6872,VH,0.3128,3000,3000
+grassland,window,Feb-Apr,group,Visible,0.7701,B03,0.7701,3000,3000
+grassland,window,Feb-Apr,group,Red-edge,0.8293,B05,0.8293,3000,3000
+grassland,window,Feb-Apr,group,NIR,0.8325,B8A,0.8325,3000,3000
+grassland,window,Feb-Apr,group,SWIR,0.8163,B11,0.8163,3000,3000
+grassland,window,Feb-Apr,group,VV,0.8809,VV,0.1191,3000,3000
+grassland,window,Feb-Apr,group,VH,0.6265,VH,0.3735,3000,3000
+grassland,window,Mar-May,group,Visible,0.6963,B03,0.6963,3000,3000
+grassland,window,Mar-May,group,Red-edge,0.8071,B06,0.8071,3000,3000
+grassland,window,Mar-May,group,NIR,0.8303,B8A,0.8303,3000,3000
+grassland,window,Mar-May,group,SWIR,0.7576,B11,0.7576,3000,3000
+grassland,window,Mar-May,group,VV,0.8724,VV,0.1276,3000,3000
+grassland,window,Mar-May,group,VH,0.551,VH,0.449,3000,3000
+grassland,window,Apr-Jun,group,Visible,0.6111,B04,0.3889,3000,3000
+grassland,window,Apr-Jun,group,Red-edge,0.8182,B06,0.8182,3000,3000
+grassland,window,Apr-Jun,group,NIR,0.824,B8A,0.824,3000,3000
+grassland,window,Apr-Jun,group,SWIR,0.6692,B12,0.3308,3000,3000
+grassland,window,Apr-Jun,group,VV,0.8281,VV,0.1719,3000,3000
+grassland,window,Apr-Jun,group,VH,0.5083,VH,0.4917,3000,3000
+grassland,window,May-Jul,group,Visible,0.7818,B04,0.2182,3000,3000
+grassland,window,May-Jul,group,Red-edge,0.7778,B06,0.7778,3000,3000
+grassland,window,May-Jul,group,NIR,0.7991,B8A,0.7991,3000,3000
+grassland,window,May-Jul,group,SWIR,0.6852,B12,0.3148,3000,3000
+grassland,window,May-Jul,group,VV,0.8192,VV,0.1808,3000,3000
+grassland,window,May-Jul,group,VH,0.6256,VH,0.3744,3000,3000
+grassland,window,Jun-Aug,group,Visible,0.8629,B04,0.1371,3000,3000
+grassland,window,Jun-Aug,group,Red-edge,0.7261,B07,0.7261,3000,3000
+grassland,window,Jun-Aug,group,NIR,0.7678,B8A,0.7678,3000,3000
+grassland,window,Jun-Aug,group,SWIR,0.7241,B12,0.2759,3000,3000
+grassland,window,Jun-Aug,group,VV,0.8368,VV,0.1632,3000,3000
+grassland,window,Jun-Aug,group,VH,0.7138,VH,0.2862,3000,3000
+grassland,window,Jul-Sep,group,Visible,0.7876,B02,0.2124,3000,3000
+grassland,window,Jul-Sep,group,Red-edge,0.7617,B06,0.7617,3000,3000
+grassland,window,Jul-Sep,group,NIR,0.7885,B8A,0.7885,3000,3000
+grassland,window,Jul-Sep,group,SWIR,0.6727,B12,0.3273,3000,3000
+grassland,window,Jul-Sep,group,VV,0.8885,VV,0.1115,3000,3000
+grassland,window,Jul-Sep,group,VH,0.7397,VH,0.2603,3000,3000
+grassland,window,Aug-Oct,group,Visible,0.836,B04,0.164,3000,3000
+grassland,window,Aug-Oct,group,Red-edge,0.8464,B07,0.8464,3000,3000
+grassland,window,Aug-Oct,group,NIR,0.8593,B08,0.8593,3000,3000
+grassland,window,Aug-Oct,group,SWIR,0.7599,B12,0.2401,3000,3000
+grassland,window,Aug-Oct,group,VV,0.9077,VV,0.0923,3000,3000
+grassland,window,Aug-Oct,group,VH,0.7093,VH,0.2907,3000,3000
+grassland,window,Sep-Nov,group,Visible,0.8093,B04,0.1907,3000,3000
+grassland,window,Sep-Nov,group,Red-edge,0.8484,B07,0.8484,3000,3000
+grassland,window,Sep-Nov,group,NIR,0.8618,B8A,0.8618,3000,3000
+grassland,window,Sep-Nov,group,SWIR,0.7587,B12,0.2413,3000,3000
+grassland,window,Sep-Nov,group,VV,0.9074,VV,0.0926,3000,3000
+grassland,window,Sep-Nov,group,VH,0.6985,VH,0.3015,3000,3000
+grassland,window,Oct-Dec,group,Visible,0.7219,B04,0.2781,3000,3000
+grassland,window,Oct-Dec,group,Red-edge,0.8037,B07,0.8037,3000,3000
+grassland,window,Oct-Dec,group,NIR,0.8219,B8A,0.8219,3000,3000
+grassland,window,Oct-Dec,group,SWIR,0.6764,B12,0.3236,3000,3000
+grassland,window,Oct-Dec,group,VV,0.8959,VV,0.1041,3000,3000
+grassland,window,Oct-Dec,group,VH,0.6687,VH,0.3313,3000,3000
+grassland,window,Jan-Mar,index,NDVI,0.6322,NDVI,0.6322,3000,3000
+grassland,window,Jan-Mar,index,NDMI,0.7052,NDMI,0.7052,3000,3000
+grassland,window,Jan-Mar,index,EVI,0.7107,EVI,0.7107,3000,3000
+grassland,window,Feb-Apr,index,NDVI,0.6512,NDVI,0.6512,3000,3000
+grassland,window,Feb-Apr,index,NDMI,0.7143,NDMI,0.7143,3000,3000
+grassland,window,Feb-Apr,index,EVI,0.7243,EVI,0.7243,3000,3000
+grassland,window,Mar-May,index,NDVI,0.7058,NDVI,0.7058,3000,3000
+grassland,window,Mar-May,index,NDMI,0.7275,NDMI,0.7275,3000,3000
+grassland,window,Mar-May,index,EVI,0.7508,EVI,0.7508,3000,3000
+grassland,window,Apr-Jun,index,NDVI,0.7449,NDVI,0.7449,3000,3000
+grassland,window,Apr-Jun,index,NDMI,0.7268,NDMI,0.7268,3000,3000
+grassland,window,Apr-Jun,index,EVI,0.7755,EVI,0.7755,3000,3000
+grassland,window,May-Jul,index,NDVI,0.828,NDVI,0.828,3000,3000
+grassland,window,May-Jul,index,NDMI,0.6925,NDMI,0.6925,3000,3000
+grassland,window,May-Jul,index,EVI,0.8148,EVI,0.8148,3000,3000
+grassland,window,Jun-Aug,index,NDVI,0.8935,NDVI,0.8935,3000,3000
+grassland,window,Jun-Aug,index,NDMI,0.6797,NDMI,0.6797,3000,3000
+grassland,window,Jun-Aug,index,EVI,0.8496,EVI,0.8496,3000,3000
+grassland,window,Jul-Sep,index,NDVI,0.8114,NDVI,0.8114,3000,3000
+grassland,window,Jul-Sep,index,NDMI,0.6691,NDMI,0.6691,3000,3000
+grassland,window,Jul-Sep,index,EVI,0.803,EVI,0.803,3000,3000
+grassland,window,Aug-Oct,index,NDVI,0.8796,NDVI,0.8796,3000,3000
+grassland,window,Aug-Oct,index,NDMI,0.8014,NDMI,0.8014,3000,3000
+grassland,window,Aug-Oct,index,EVI,0.8756,EVI,0.8756,3000,3000
+grassland,window,Sep-Nov,index,NDVI,0.8698,NDVI,0.8698,3000,3000
+grassland,window,Sep-Nov,index,NDMI,0.8362,NDMI,0.8362,3000,3000
+grassland,window,Sep-Nov,index,EVI,0.8707,EVI,0.8707,3000,3000
+grassland,window,Oct-Dec,index,NDVI,0.8165,NDVI,0.8165,3000,3000
+grassland,window,Oct-Dec,index,NDMI,0.7902,NDMI,0.7902,3000,3000
+grassland,window,Oct-Dec,index,EVI,0.8231,EVI,0.8231,3000,3000
+maize,month,Jan,group,Visible,0.5588,B03,0.4412,704,3000
+maize,month,Jan,group,Red-edge,0.7246,B07,0.2754,704,3000
+maize,month,Jan,group,NIR,0.725,B8A,0.275,704,3000
+maize,month,Jan,group,SWIR,0.5952,B12,0.5952,704,3000
+maize,month,Jan,group,VV,0.6881,VV,0.6881,704,3000
+maize,month,Jan,group,VH,0.5718,VH,0.5718,704,3000
+maize,month,Feb,group,Visible,0.5582,B03,0.4418,704,3000
+maize,month,Feb,group,Red-edge,0.7239,B07,0.2761,704,3000
+maize,month,Feb,group,NIR,0.7244,B8A,0.2756,704,3000
+maize,month,Feb,group,SWIR,0.5955,B12,0.5955,704,3000
+maize,month,Feb,group,VV,0.6781,VV,0.6781,704,3000
+maize,month,Feb,group,VH,0.5895,VH,0.5895,704,3000
+maize,month,Mar,group,Visible,0.5675,B03,0.4325,704,3000
+maize,month,Mar,group,Red-edge,0.7259,B07,0.2741,704,3000
+maize,month,Mar,group,NIR,0.7257,B8A,0.2743,704,3000
+maize,month,Mar,group,SWIR,0.5913,B12,0.5913,704,3000
+maize,month,Mar,group,VV,0.6665,VV,0.6665,704,3000
+maize,month,Mar,group,VH,0.5447,VH,0.5447,704,3000
+maize,month,Apr,group,Visible,0.5447,B03,0.4553,704,3000
+maize,month,Apr,group,Red-edge,0.7418,B07,0.2582,704,3000
+maize,month,Apr,group,NIR,0.7393,B08,0.2607,704,3000
+maize,month,Apr,group,SWIR,0.637,B12,0.637,704,3000
+maize,month,Apr,group,VV,0.6427,VV,0.6427,704,3000
+maize,month,Apr,group,VH,0.5682,VH,0.4318,704,3000
+maize,month,May,group,Visible,0.6971,B04,0.6971,704,3000
+maize,month,May,group,Red-edge,0.8148,B07,0.1852,704,3000
+maize,month,May,group,NIR,0.8123,B8A,0.1877,704,3000
+maize,month,May,group,SWIR,0.7714,B12,0.7714,704,3000
+maize,month,May,group,VV,0.7156,VV,0.7156,704,3000
+maize,month,May,group,VH,0.6326,VH,0.3674,704,3000
+maize,month,Jun,group,Visible,0.8659,B04,0.8659,704,3000
+maize,month,Jun,group,Red-edge,0.8244,B05,0.8244,704,3000
+maize,month,Jun,group,NIR,0.8106,B8A,0.1894,704,3000
+maize,month,Jun,group,SWIR,0.875,B11,0.875,704,3000
+maize,month,Jun,group,VV,0.6341,VV,0.6341,704,3000
+maize,month,Jun,group,VH,0.7262,VH,0.2738,704,3000
+maize,month,Jul,group,Visible,0.6631,B03,0.3369,704,3000
+maize,month,Jul,group,Red-edge,0.8019,B05,0.1981,704,3000
+maize,month,Jul,group,NIR,0.5275,B8A,0.4725,704,3000
+maize,month,Jul,group,SWIR,0.5563,B12,0.5563,704,3000
+maize,month,Jul,group,VV,0.6748,VV,0.6748,704,3000
+maize,month,Jul,group,VH,0.6075,VH,0.6075,704,3000
+maize,month,Aug,group,Visible,0.8447,B04,0.1553,704,3000
+maize,month,Aug,group,Red-edge,0.9333,B05,0.0667,704,3000
+maize,month,Aug,group,NIR,0.7175,B08,0.7175,704,3000
+maize,month,Aug,group,SWIR,0.8452,B11,0.1548,704,3000
+maize,month,Aug,group,VV,0.7589,VV,0.7589,704,3000
+maize,month,Aug,group,VH,0.7948,VH,0.7948,704,3000
+maize,month,Sep,group,Visible,0.8388,B03,0.1612,704,3000
+maize,month,Sep,group,Red-edge,0.9424,B05,0.0576,704,3000
+maize,month,Sep,group,NIR,0.6992,B08,0.6992,704,3000
+maize,month,Sep,group,SWIR,0.9016,B11,0.0984,704,3000
+maize,month,Sep,group,VV,0.7865,VV,0.7865,704,3000
+maize,month,Sep,group,VH,0.8819,VH,0.8819,704,3000
+maize,month,Oct,group,Visible,0.6392,B04,0.6392,704,3000
+maize,month,Oct,group,Red-edge,0.6477,B06,0.3523,704,3000
+maize,month,Oct,group,NIR,0.6221,B08,0.3779,704,3000
+maize,month,Oct,group,SWIR,0.6154,B12,0.6154,704,3000
+maize,month,Oct,group,VV,0.7364,VV,0.7364,704,3000
+maize,month,Oct,group,VH,0.5795,VH,0.5795,704,3000
+maize,month,Nov,group,Visible,0.6074,B03,0.3926,704,3000
+maize,month,Nov,group,Red-edge,0.7266,B06,0.2734,704,3000
+maize,month,Nov,group,NIR,0.7175,B08,0.2825,704,3000
+maize,month,Nov,group,SWIR,0.5704,B11,0.4296,704,3000
+maize,month,Nov,group,VV,0.7806,VV,0.7806,704,3000
+maize,month,Nov,group,VH,0.6052,VH,0.6052,704,3000
+maize,month,Dec,group,Visible,0.6075,B03,0.3925,704,3000
+maize,month,Dec,group,Red-edge,0.7261,B06,0.2739,704,3000
+maize,month,Dec,group,NIR,0.7169,B08,0.2831,704,3000
+maize,month,Dec,group,SWIR,0.5699,B11,0.4301,704,3000
+maize,month,Dec,group,VV,0.6975,VV,0.6975,704,3000
+maize,month,Dec,group,VH,0.5304,VH,0.5304,704,3000
+maize,month,Jan,index,NDVI,0.7263,NDVI,0.2737,704,3000
+maize,month,Jan,index,NDMI,0.7697,NDMI,0.2303,704,3000
+maize,month,Jan,index,EVI,0.7404,EVI,0.2596,704,3000
+maize,month,Feb,index,NDVI,0.7258,NDVI,0.2742,704,3000
+maize,month,Feb,index,NDMI,0.7693,NDMI,0.2307,704,3000
+maize,month,Feb,index,EVI,0.7394,EVI,0.2606,704,3000
+maize,month,Mar,index,NDVI,0.7243,NDVI,0.2757,704,3000
+maize,month,Mar,index,NDMI,0.7717,NDMI,0.2283,704,3000
+maize,month,Mar,index,EVI,0.739,EVI,0.261,704,3000
+maize,month,Apr,index,NDVI,0.7297,NDVI,0.2703,704,3000
+maize,month,Apr,index,NDMI,0.7786,NDMI,0.2214,704,3000
+maize,month,Apr,index,EVI,0.7463,EVI,0.2537,704,3000
+maize,month,May,index,NDVI,0.8038,NDVI,0.1962,704,3000
+maize,month,May,index,NDMI,0.8479,NDMI,0.1521,704,3000
+maize,month,May,index,EVI,0.8341,EVI,0.1659,704,3000
+maize,month,Jun,index,NDVI,0.8657,NDVI,0.1343,704,3000
+maize,month,Jun,index,NDMI,0.8706,NDMI,0.1294,704,3000
+maize,month,Jun,index,EVI,0.8564,EVI,0.1436,704,3000
+maize,month,Jul,index,NDVI,0.6222,NDVI,0.6222,704,3000
+maize,month,Jul,index,NDMI,0.5119,NDMI,0.4881,704,3000
+maize,month,Jul,index,EVI,0.5978,EVI,0.5978,704,3000
+maize,month,Aug,index,NDVI,0.8473,NDVI,0.8473,704,3000
+maize,month,Aug,index,NDMI,0.8584,NDMI,0.8584,704,3000
+maize,month,Aug,index,EVI,0.7991,EVI,0.7991,704,3000
+maize,month,Sep,index,NDVI,0.7862,NDVI,0.7862,704,3000
+maize,month,Sep,index,NDMI,0.8653,NDMI,0.8653,704,3000
+maize,month,Sep,index,EVI,0.7522,EVI,0.7522,704,3000
+maize,month,Oct,index,NDVI,0.6378,NDVI,0.3622,704,3000
+maize,month,Oct,index,NDMI,0.6065,NDMI,0.3935,704,3000
+maize,month,Oct,index,EVI,0.634,EVI,0.366,704,3000
+maize,month,Nov,index,NDVI,0.7248,NDVI,0.2752,704,3000
+maize,month,Nov,index,NDMI,0.6997,NDMI,0.3003,704,3000
+maize,month,Nov,index,EVI,0.7346,EVI,0.2654,704,3000
+maize,month,Dec,index,NDVI,0.7239,NDVI,0.2761,704,3000
+maize,month,Dec,index,NDMI,0.7003,NDMI,0.2997,704,3000
+maize,month,Dec,index,EVI,0.7339,EVI,0.2661,704,3000
+maize,window,Jan-Mar,group,Visible,0.5625,B03,0.4375,704,3000
+maize,window,Jan-Mar,group,Red-edge,0.7254,B07,0.2746,704,3000
+maize,window,Jan-Mar,group,NIR,0.7256,B8A,0.2744,704,3000
+maize,window,Jan-Mar,group,SWIR,0.5944,B12,0.5944,704,3000
+maize,window,Jan-Mar,group,VV,0.7001,VV,0.7001,704,3000
+maize,window,Jan-Mar,group,VH,0.5901,VH,0.5901,704,3000
+maize,window,Feb-Apr,group,Visible,0.5644,B03,0.4356,704,3000
+maize,window,Feb-Apr,group,Red-edge,0.7362,B07,0.2638,704,3000
+maize,window,Feb-Apr,group,NIR,0.7348,B08,0.2652,704,3000
+maize,window,Feb-Apr,group,SWIR,0.612,B12,0.612,704,3000
+maize,window,Feb-Apr,group,VV,0.6973,VV,0.6973,704,3000
+maize,window,Feb-Apr,group,VH,0.5373,VH,0.5373,704,3000
+maize,window,Mar-May,group,Visible,0.5944,B04,0.5944,704,3000
+maize,window,Mar-May,group,Red-edge,0.7872,B07,0.2128,704,3000
+maize,window,Mar-May,group,NIR,0.7839,B8A,0.2161,704,3000
+maize,window,Mar-May,group,SWIR,0.726,B12,0.726,704,3000
+maize,window,Mar-May,group,VV,0.7252,VV,0.7252,704,3000
+maize,window,Mar-May,group,VH,0.5633,VH,0.4367,704,3000
+maize,window,Apr-Jun,group,Visible,0.7915,B04,0.7915,704,3000
+maize,window,Apr-Jun,group,Red-edge,0.8506,B07,0.1494,704,3000
+maize,window,Apr-Jun,group,NIR,0.8474,B8A,0.1526,704,3000
+maize,window,Apr-Jun,group,SWIR,0.856,B12,0.856,704,3000
+maize,window,Apr-Jun,group,VV,0.6882,VV,0.6882,704,3000
+maize,window,Apr-Jun,group,VH,0.6944,VH,0.3056,704,3000
+maize,window,May-Jul,group,Visible,0.7677,B04,0.7677,704,3000
+maize,window,May-Jul,group,Red-edge,0.8277,B06,0.1723,704,3000
+maize,window,May-Jul,group,NIR,0.8355,B8A,0.1645,704,3000
+maize,window,May-Jul,group,SWIR,0.8523,B12,0.8523,704,3000
+maize,window,May-Jul,group,VV,0.7051,VV,0.7051,704,3000
+maize,window,May-Jul,group,VH,0.6006,VH,0.3994,704,3000
+maize,window,Jun-Aug,group,Visible,0.576,B02,0.576,704,3000
+maize,window,Jun-Aug,group,Red-edge,0.6699,B05,0.3301,704,3000
+maize,window,Jun-Aug,group,NIR,0.6098,B8A,0.3902,704,3000
+maize,window,Jun-Aug,group,SWIR,0.7052,B12,0.7052,704,3000
+maize,window,Jun-Aug,group,VV,0.692,VV,0.692,704,3000
+maize,window,Jun-Aug,group,VH,0.5775,VH,0.5775,704,3000
+maize,window,Jul-Sep,group,Visible,0.8459,B03,0.1541,704,3000
+maize,window,Jul-Sep,group,Red-edge,0.9426,B05,0.0574,704,3000
+maize,window,Jul-Sep,group,NIR,0.6939,B08,0.6939,704,3000
+maize,window,Jul-Sep,group,SWIR,0.8404,B11,0.1596,704,3000
+maize,window,Jul-Sep,group,VV,0.7536,VV,0.7536,704,3000
+maize,window,Jul-Sep,group,VH,0.788,VH,0.788,704,3000
+maize,window,Aug-Oct,group,Visible,0.7904,B03,0.2096,704,3000
+maize,window,Aug-Oct,group,Red-edge,0.9131,B05,0.0869,704,3000
+maize,window,Aug-Oct,group,NIR,0.6288,B08,0.6288,704,3000
+maize,window,Aug-Oct,group,SWIR,0.8303,B11,0.1697,704,3000
+maize,window,Aug-Oct,group,VV,0.7896,VV,0.7896,704,3000
+maize,window,Aug-Oct,group,VH,0.8272,VH,0.8272,704,3000
+maize,window,Sep-Nov,group,Visible,0.6831,B03,0.3169,704,3000
+maize,window,Sep-Nov,group,Red-edge,0.7899,B05,0.2101,704,3000
+maize,window,Sep-Nov,group,NIR,0.5555,B8A,0.4445,704,3000
+maize,window,Sep-Nov,group,SWIR,0.7081,B11,0.2919,704,3000
+maize,window,Sep-Nov,group,VV,0.7931,VV,0.7931,704,3000
+maize,window,Sep-Nov,group,VH,0.7528,VH,0.7528,704,3000
+maize,window,Oct-Dec,group,Visible,0.6104,B04,0.6104,704,3000
+maize,window,Oct-Dec,group,Red-edge,0.7228,B06,0.2772,704,3000
+maize,window,Oct-Dec,group,NIR,0.7087,B08,0.2913,704,3000
+maize,window,Oct-Dec,group,SWIR,0.5931,B12,0.5931,704,3000
+maize,window,Oct-Dec,group,VV,0.7619,VV,0.7619,704,3000
+maize,window,Oct-Dec,group,VH,0.5814,VH,0.5814,704,3000
+maize,window,Jan-Mar,index,NDVI,0.7258,NDVI,0.2742,704,3000
+maize,window,Jan-Mar,index,NDMI,0.7705,NDMI,0.2295,704,3000
+maize,window,Jan-Mar,index,EVI,0.7397,EVI,0.2603,704,3000
+maize,window,Feb-Apr,index,NDVI,0.7294,NDVI,0.2706,704,3000
+maize,window,Feb-Apr,index,NDMI,0.7772,NDMI,0.2228,704,3000
+maize,window,Feb-Apr,index,EVI,0.7435,EVI,0.2565,704,3000
+maize,window,Mar-May,index,NDVI,0.7779,NDVI,0.2221,704,3000
+maize,window,Mar-May,index,NDMI,0.8283,NDMI,0.1717,704,3000
+maize,window,Mar-May,index,EVI,0.8033,EVI,0.1967,704,3000
+maize,window,Apr-Jun,index,NDVI,0.8778,NDVI,0.1222,704,3000
+maize,window,Apr-Jun,index,NDMI,0.9046,NDMI,0.0954,704,3000
+maize,window,Apr-Jun,index,EVI,0.885,EVI,0.115,704,3000
+maize,window,May-Jul,index,NDVI,0.8452,NDVI,0.1548,704,3000
+maize,window,May-Jul,index,NDMI,0.885,NDMI,0.115,704,3000
+maize,window,May-Jul,index,EVI,0.8546,EVI,0.1454,704,3000
+maize,window,Jun-Aug,index,NDVI,0.522,NDVI,0.478,704,3000
+maize,window,Jun-Aug,index,NDMI,0.611,NDMI,0.389,704,3000
+maize,window,Jun-Aug,index,EVI,0.5473,EVI,0.4527,704,3000
+maize,window,Jul-Sep,index,NDVI,0.8206,NDVI,0.8206,704,3000
+maize,window,Jul-Sep,index,NDMI,0.8357,NDMI,0.8357,704,3000
+maize,window,Jul-Sep,index,EVI,0.7705,EVI,0.7705,704,3000
+maize,window,Aug-Oct,index,NDVI,0.6731,NDVI,0.6731,704,3000
+maize,window,Aug-Oct,index,NDMI,0.7403,NDMI,0.7403,704,3000
+maize,window,Aug-Oct,index,EVI,0.6809,EVI,0.6809,704,3000
+maize,window,Sep-Nov,index,NDVI,0.5195,NDVI,0.4805,704,3000
+maize,window,Sep-Nov,index,NDMI,0.5385,NDMI,0.5385,704,3000
+maize,window,Sep-Nov,index,EVI,0.5006,EVI,0.5006,704,3000
+maize,window,Oct-Dec,index,NDVI,0.7079,NDVI,0.2921,704,3000
+maize,window,Oct-Dec,index,NDMI,0.6803,NDMI,0.3197,704,3000
+maize,window,Oct-Dec,index,EVI,0.7151,EVI,0.2849,704,3000
+oats,month,Jan,group,Visible,0.5917,B04,0.5917,3000,3000
+oats,month,Jan,group,Red-edge,0.598,B07,0.402,3000,3000
+oats,month,Jan,group,NIR,0.5978,B08,0.4022,3000,3000
+oats,month,Jan,group,SWIR,0.5939,B12,0.5939,3000,3000
+oats,month,Jan,group,VV,0.5345,VV,0.5345,3000,3000
+oats,month,Jan,group,VH,0.5189,VH,0.5189,3000,3000
+oats,month,Feb,group,Visible,0.5916,B04,0.5916,3000,3000
+oats,month,Feb,group,Red-edge,0.598,B07,0.402,3000,3000
+oats,month,Feb,group,NIR,0.5977,B08,0.4023,3000,3000
+oats,month,Feb,group,SWIR,0.5941,B12,0.5941,3000,3000
+oats,month,Feb,group,VV,0.5544,VV,0.5544,3000,3000
+oats,month,Feb,group,VH,0.5426,VH,0.5426,3000,3000
+oats,month,Mar,group,Visible,0.5813,B04,0.5813,3000,3000
+oats,month,Mar,group,Red-edge,0.6015,B07,0.3985,3000,3000
+oats,month,Mar,group,NIR,0.6009,B08,0.3991,3000,3000
+oats,month,Mar,group,SWIR,0.5852,B12,0.5852,3000,3000
+oats,month,Mar,group,VV,0.5332,VV,0.5332,3000,3000
+oats,month,Mar,group,VH,0.5054,VH,0.5054,3000,3000
+oats,month,Apr,group,Visible,0.5954,B04,0.5954,3000,3000
+oats,month,Apr,group,Red-edge,0.6228,B07,0.3772,3000,3000
+oats,month,Apr,group,NIR,0.6231,B08,0.3769,3000,3000
+oats,month,Apr,group,SWIR,0.6047,B12,0.6047,3000,3000
+oats,month,Apr,group,VV,0.5678,VV,0.5678,3000,3000
+oats,month,Apr,group,VH,0.5115,VH,0.4885,3000,3000
+oats,month,May,group,Visible,0.6505,B04,0.6505,3000,3000
+oats,month,May,group,Red-edge,0.6852,B07,0.3148,3000,3000
+oats,month,May,group,NIR,0.6893,B08,0.3107,3000,3000
+oats,month,May,group,SWIR,0.6064,B12,0.6064,3000,3000
+oats,month,May,group,VV,0.594,VV,0.594,3000,3000
+oats,month,May,group,VH,0.6096,VH,0.3904,3000,3000
+oats,month,Jun,group,Visible,0.5588,B03,0.4412,3000,3000
+oats,month,Jun,group,Red-edge,0.5738,B05,0.4262,3000,3000
+oats,month,Jun,group,NIR,0.5851,B8A,0.4149,3000,3000
+oats,month,Jun,group,SWIR,0.5453,B12,0.5453,3000,3000
+oats,month,Jun,group,VV,0.6901,VV,0.3099,3000,3000
+oats,month,Jun,group,VH,0.6057,VH,0.3943,3000,3000
+oats,month,Jul,group,Visible,0.7055,B03,0.2945,3000,3000
+oats,month,Jul,group,Red-edge,0.6794,B05,0.3206,3000,3000
+oats,month,Jul,group,NIR,0.6087,B08,0.3913,3000,3000
+oats,month,Jul,group,SWIR,0.6075,B11,0.3925,3000,3000
+oats,month,Jul,group,VV,0.8144,VV,0.1856,3000,3000
+oats,month,Jul,group,VH,0.7799,VH,0.2201,3000,3000
+oats,month,Aug,group,Visible,0.579,B03,0.421,3000,3000
+oats,month,Aug,group,Red-edge,0.5988,B06,0.4012,3000,3000
+oats,month,Aug,group,NIR,0.5956,B08,0.4044,3000,3000
+oats,month,Aug,group,SWIR,0.5278,B11,0.4722,3000,3000
+oats,month,Aug,group,VV,0.6266,VV,0.3734,3000,3000
+oats,month,Aug,group,VH,0.5872,VH,0.4128,3000,3000
+oats,month,Sep,group,Visible,0.5518,B04,0.4482,3000,3000
+oats,month,Sep,group,Red-edge,0.5441,B05,0.4559,3000,3000
+oats,month,Sep,group,NIR,0.523,B8A,0.523,3000,3000
+oats,month,Sep,group,SWIR,0.5324,B12,0.4676,3000,3000
+oats,month,Sep,group,VV,0.593,VV,0.407,3000,3000
+oats,month,Sep,group,VH,0.5291,VH,0.4709,3000,3000
+oats,month,Oct,group,Visible,0.6264,B04,0.3736,3000,3000
+oats,month,Oct,group,Red-edge,0.5837,B06,0.5837,3000,3000
+oats,month,Oct,group,NIR,0.5793,B08,0.5793,3000,3000
+oats,month,Oct,group,SWIR,0.6099,B12,0.3901,3000,3000
+oats,month,Oct,group,VV,0.5792,VV,0.4208,3000,3000
+oats,month,Oct,group,VH,0.5111,VH,0.4889,3000,3000
+oats,month,Nov,group,Visible,0.5788,B04,0.4212,3000,3000
+oats,month,Nov,group,Red-edge,0.5475,B06,0.5475,3000,3000
+oats,month,Nov,group,NIR,0.547,B08,0.547,3000,3000
+oats,month,Nov,group,SWIR,0.5696,B12,0.4304,3000,3000
+oats,month,Nov,group,VV,0.5617,VV,0.4383,3000,3000
+oats,month,Nov,group,VH,0.5255,VH,0.4745,3000,3000
+oats,month,Dec,group,Visible,0.5786,B04,0.4214,3000,3000
+oats,month,Dec,group,Red-edge,0.5468,B06,0.5468,3000,3000
+oats,month,Dec,group,NIR,0.5464,B08,0.5464,3000,3000
+oats,month,Dec,group,SWIR,0.5691,B12,0.4309,3000,3000
+oats,month,Dec,group,VV,0.5122,VV,0.5122,3000,3000
+oats,month,Dec,group,VH,0.5627,VH,0.5627,3000,3000
+oats,month,Jan,index,NDVI,0.6574,NDVI,0.3426,3000,3000
+oats,month,Jan,index,NDMI,0.619,NDMI,0.381,3000,3000
+oats,month,Jan,index,EVI,0.6534,EVI,0.3466,3000,3000
+oats,month,Feb,index,NDVI,0.6573,NDVI,0.3427,3000,3000
+oats,month,Feb,index,NDMI,0.6196,NDMI,0.3804,3000,3000
+oats,month,Feb,index,EVI,0.6535,EVI,0.3465,3000,3000
+oats,month,Mar,index,NDVI,0.6557,NDVI,0.3443,3000,3000
+oats,month,Mar,index,NDMI,0.6188,NDMI,0.3812,3000,3000
+oats,month,Mar,index,EVI,0.6543,EVI,0.3457,3000,3000
+oats,month,Apr,index,NDVI,0.6766,NDVI,0.3234,3000,3000
+oats,month,Apr,index,NDMI,0.6373,NDMI,0.3627,3000,3000
+oats,month,Apr,index,EVI,0.6743,EVI,0.3257,3000,3000
+oats,month,May,index,NDVI,0.6458,NDVI,0.3542,3000,3000
+oats,month,May,index,NDMI,0.632,NDMI,0.368,3000,3000
+oats,month,May,index,EVI,0.659,EVI,0.341,3000,3000
+oats,month,Jun,index,NDVI,0.529,NDVI,0.471,3000,3000
+oats,month,Jun,index,NDMI,0.5602,NDMI,0.4398,3000,3000
+oats,month,Jun,index,EVI,0.5488,EVI,0.4512,3000,3000
+oats,month,Jul,index,NDVI,0.5432,NDVI,0.5432,3000,3000
+oats,month,Jul,index,NDMI,0.5111,NDMI,0.5111,3000,3000
+oats,month,Jul,index,EVI,0.5084,EVI,0.4916,3000,3000
+oats,month,Aug,index,NDVI,0.5328,NDVI,0.4672,3000,3000
+oats,month,Aug,index,NDMI,0.5486,NDMI,0.4514,3000,3000
+oats,month,Aug,index,EVI,0.5547,EVI,0.4453,3000,3000
+oats,month,Sep,index,NDVI,0.546,NDVI,0.546,3000,3000
+oats,month,Sep,index,NDMI,0.5157,NDMI,0.5157,3000,3000
+oats,month,Sep,index,EVI,0.5437,EVI,0.5437,3000,3000
+oats,month,Oct,index,NDVI,0.6142,NDVI,0.6142,3000,3000
+oats,month,Oct,index,NDMI,0.5936,NDMI,0.5936,3000,3000
+oats,month,Oct,index,EVI,0.6004,EVI,0.6004,3000,3000
+oats,month,Nov,index,NDVI,0.5732,NDVI,0.5732,3000,3000
+oats,month,Nov,index,NDMI,0.5665,NDMI,0.5665,3000,3000
+oats,month,Nov,index,EVI,0.5661,EVI,0.5661,3000,3000
+oats,month,Dec,index,NDVI,0.5724,NDVI,0.5724,3000,3000
+oats,month,Dec,index,NDMI,0.5665,NDMI,0.5665,3000,3000
+oats,month,Dec,index,EVI,0.5654,EVI,0.5654,3000,3000
+oats,window,Jan-Mar,group,Visible,0.5889,B04,0.5889,3000,3000
+oats,window,Jan-Mar,group,Red-edge,0.5994,B07,0.4006,3000,3000
+oats,window,Jan-Mar,group,NIR,0.599,B08,0.401,3000,3000
+oats,window,Jan-Mar,group,SWIR,0.5915,B12,0.5915,3000,3000
+oats,window,Jan-Mar,group,VV,0.5475,VV,0.5475,3000,3000
+oats,window,Jan-Mar,group,VH,0.5324,VH,0.5324,3000,3000
+oats,window,Feb-Apr,group,Visible,0.593,B04,0.593,3000,3000
+oats,window,Feb-Apr,group,Red-edge,0.6087,B07,0.3913,3000,3000
+oats,window,Feb-Apr,group,NIR,0.608,B08,0.392,3000,3000
+oats,window,Feb-Apr,group,SWIR,0.5994,B12,0.5994,3000,3000
+oats,window,Feb-Apr,group,VV,0.5613,VV,0.5613,3000,3000
+oats,window,Feb-Apr,group,VH,0.5217,VH,0.5217,3000,3000
+oats,window,Mar-May,group,Visible,0.6332,B04,0.6332,3000,3000
+oats,window,Mar-May,group,Red-edge,0.649,B07,0.351,3000,3000
+oats,window,Mar-May,group,NIR,0.6486,B08,0.3514,3000,3000
+oats,window,Mar-May,group,SWIR,0.615,B12,0.615,3000,3000
+oats,window,Mar-May,group,VV,0.5806,VV,0.5806,3000,3000
+oats,window,Mar-May,group,VH,0.5551,VH,0.4449,3000,3000
+oats,window,Apr-Jun,group,Visible,0.5905,B04,0.5905,3000,3000
+oats,window,Apr-Jun,group,Red-edge,0.6519,B06,0.3481,3000,3000
+oats,window,Apr-Jun,group,NIR,0.6447,B8A,0.3553,3000,3000
+oats,window,Apr-Jun,group,SWIR,0.5761,B12,0.5761,3000,3000
+oats,window,Apr-Jun,group,VV,0.5124,VV,0.4876,3000,3000
+oats,window,Apr-Jun,group,VH,0.6048,VH,0.3952,3000,3000
+oats,window,May-Jul,group,Visible,0.5622,B03,0.4378,3000,3000
+oats,window,May-Jul,group,Red-edge,0.6941,B06,0.3059,3000,3000
+oats,window,May-Jul,group,NIR,0.6898,B08,0.3102,3000,3000
+oats,window,May-Jul,group,SWIR,0.5433,B12,0.5433,3000,3000
+oats,window,May-Jul,group,VV,0.6465,VV,0.3535,3000,3000
+oats,window,May-Jul,group,VH,0.7351,VH,0.2649,3000,3000
+oats,window,Jun-Aug,group,Visible,0.6461,B03,0.3539,3000,3000
+oats,window,Jun-Aug,group,Red-edge,0.6552,B06,0.3448,3000,3000
+oats,window,Jun-Aug,group,NIR,0.6597,B08,0.3403,3000,3000
+oats,window,Jun-Aug,group,SWIR,0.5713,B11,0.4287,3000,3000
+oats,window,Jun-Aug,group,VV,0.7509,VV,0.2491,3000,3000
+oats,window,Jun-Aug,group,VH,0.7338,VH,0.2662,3000,3000
+oats,window,Jul-Sep,group,Visible,0.6162,B03,0.3838,3000,3000
+oats,window,Jul-Sep,group,Red-edge,0.6235,B05,0.3765,3000,3000
+oats,window,Jul-Sep,group,NIR,0.576,B08,0.424,3000,3000
+oats,window,Jul-Sep,group,SWIR,0.5801,B11,0.4199,3000,3000
+oats,window,Jul-Sep,group,VV,0.7181,VV,0.2819,3000,3000
+oats,window,Jul-Sep,group,VH,0.6717,VH,0.3283,3000,3000
+oats,window,Aug-Oct,group,Visible,0.5756,B04,0.4244,3000,3000
+oats,window,Aug-Oct,group,Red-edge,0.5771,B05,0.4229,3000,3000
+oats,window,Aug-Oct,group,NIR,0.5042,B8A,0.5042,3000,3000
+oats,window,Aug-Oct,group,SWIR,0.5657,B12,0.4343,3000,3000
+oats,window,Aug-Oct,group,VV,0.6175,VV,0.3825,3000,3000
+oats,window,Aug-Oct,group,VH,0.5544,VH,0.4456,3000,3000
+oats,window,Sep-Nov,group,Visible,0.6035,B04,0.3965,3000,3000
+oats,window,Sep-Nov,group,Red-edge,0.568,B06,0.568,3000,3000
+oats,window,Sep-Nov,group,NIR,0.5576,B08,0.5576,3000,3000
+oats,window,Sep-Nov,group,SWIR,0.5948,B12,0.4052,3000,3000
+oats,window,Sep-Nov,group,VV,0.5849,VV,0.4151,3000,3000
+oats,window,Sep-Nov,group,VH,0.5344,VH,0.4656,3000,3000
+oats,window,Oct-Dec,group,Visible,0.6045,B04,0.3955,3000,3000
+oats,window,Oct-Dec,group,Red-edge,0.5625,B06,0.5625,3000,3000
+oats,window,Oct-Dec,group,NIR,0.5607,B08,0.5607,3000,3000
+oats,window,Oct-Dec,group,SWIR,0.5951,B12,0.4049,3000,3000
+oats,window,Oct-Dec,group,VV,0.5524,VV,0.4476,3000,3000
+oats,window,Oct-Dec,group,VH,0.5026,VH,0.5026,3000,3000
+oats,window,Jan-Mar,index,NDVI,0.6571,NDVI,0.3429,3000,3000
+oats,window,Jan-Mar,index,NDMI,0.6191,NDMI,0.3809,3000,3000
+oats,window,Jan-Mar,index,EVI,0.6539,EVI,0.3461,3000,3000
+oats,window,Feb-Apr,index,NDVI,0.6642,NDVI,0.3358,3000,3000
+oats,window,Feb-Apr,index,NDMI,0.6255,NDMI,0.3745,3000,3000
+oats,window,Feb-Apr,index,EVI,0.6611,EVI,0.3389,3000,3000
+oats,window,Mar-May,index,NDVI,0.6587,NDVI,0.3413,3000,3000
+oats,window,Mar-May,index,NDMI,0.6284,NDMI,0.3716,3000,3000
+oats,window,Mar-May,index,EVI,0.657,EVI,0.343,3000,3000
+oats,window,Apr-Jun,index,NDVI,0.6025,NDVI,0.3975,3000,3000
+oats,window,Apr-Jun,index,NDMI,0.5928,NDMI,0.4072,3000,3000
+oats,window,Apr-Jun,index,EVI,0.6109,EVI,0.3891,3000,3000
+oats,window,May-Jul,index,NDVI,0.5906,NDVI,0.4094,3000,3000
+oats,window,May-Jul,index,NDMI,0.5924,NDMI,0.4076,3000,3000
+oats,window,May-Jul,index,EVI,0.6292,EVI,0.3708,3000,3000
+oats,window,Jun-Aug,index,NDVI,0.5266,NDVI,0.5266,3000,3000
+oats,window,Jun-Aug,index,NDMI,0.5616,NDMI,0.4384,3000,3000
+oats,window,Jun-Aug,index,EVI,0.5694,EVI,0.4306,3000,3000
+oats,window,Jul-Sep,index,NDVI,0.5211,NDVI,0.5211,3000,3000
+oats,window,Jul-Sep,index,NDMI,0.5042,NDMI,0.4958,3000,3000
+oats,window,Jul-Sep,index,EVI,0.5127,EVI,0.4873,3000,3000
+oats,window,Aug-Oct,index,NDVI,0.5629,NDVI,0.5629,3000,3000
+oats,window,Aug-Oct,index,NDMI,0.5275,NDMI,0.5275,3000,3000
+oats,window,Aug-Oct,index,EVI,0.5375,EVI,0.5375,3000,3000
+oats,window,Sep-Nov,index,NDVI,0.5937,NDVI,0.5937,3000,3000
+oats,window,Sep-Nov,index,NDMI,0.5715,NDMI,0.5715,3000,3000
+oats,window,Sep-Nov,index,EVI,0.58,EVI,0.58,3000,3000
+oats,window,Oct-Dec,index,NDVI,0.5924,NDVI,0.5924,3000,3000
+oats,window,Oct-Dec,index,NDMI,0.579,NDMI,0.579,3000,3000
+oats,window,Oct-Dec,index,EVI,0.5819,EVI,0.5819,3000,3000
+potatoes,month,Jan,group,Visible,0.5499,B03,0.4501,392,3000
+potatoes,month,Jan,group,Red-edge,0.7281,B07,0.2719,392,3000
+potatoes,month,Jan,group,NIR,0.7323,B08,0.2677,392,3000
+potatoes,month,Jan,group,SWIR,0.5807,B12,0.5807,392,3000
+potatoes,month,Jan,group,VV,0.6905,VV,0.6905,392,3000
+potatoes,month,Jan,group,VH,0.5438,VH,0.4562,392,3000
+potatoes,month,Feb,group,Visible,0.554,B03,0.446,392,3000
+potatoes,month,Feb,group,Red-edge,0.7316,B07,0.2684,392,3000
+potatoes,month,Feb,group,NIR,0.7359,B08,0.2641,392,3000
+potatoes,month,Feb,group,SWIR,0.5787,B12,0.5787,392,3000
+potatoes,month,Feb,group,VV,0.6849,VV,0.6849,392,3000
+potatoes,month,Feb,group,VH,0.5326,VH,0.5326,392,3000
+potatoes,month,Mar,group,Visible,0.5583,B03,0.4417,392,3000
+potatoes,month,Mar,group,Red-edge,0.7297,B07,0.2703,392,3000
+potatoes,month,Mar,group,NIR,0.7342,B08,0.2658,392,3000
+potatoes,month,Mar,group,SWIR,0.5719,B12,0.5719,392,3000
+potatoes,month,Mar,group,VV,0.7209,VV,0.7209,392,3000
+potatoes,month,Mar,group,VH,0.5187,VH,0.4813,392,3000
+potatoes,month,Apr,group,Visible,0.6135,B04,0.6135,392,3000
+potatoes,month,Apr,group,Red-edge,0.6867,B07,0.3133,392,3000
+potatoes,month,Apr,group,NIR,0.6899,B08,0.3101,392,3000
+potatoes,month,Apr,group,SWIR,0.7016,B12,0.7016,392,3000
+potatoes,month,Apr,group,VV,0.6209,VV,0.6209,392,3000
+potatoes,month,Apr,group,VH,0.6863,VH,0.3137,392,3000
+potatoes,month,May,group,Visible,0.812,B02,0.812,392,3000
+potatoes,month,May,group,Red-edge,0.7244,B05,0.7244,392,3000
+potatoes,month,May,group,NIR,0.6655,B08,0.3345,392,3000
+potatoes,month,May,group,SWIR,0.8108,B12,0.8108,392,3000
+potatoes,month,May,group,VV,0.7107,VV,0.7107,392,3000
+potatoes,month,May,group,VH,0.5797,VH,0.4203,392,3000
+potatoes,month,Jun,group,Visible,0.87,B04,0.87,392,3000
+potatoes,month,Jun,group,Red-edge,0.8187,B07,0.1813,392,3000
+potatoes,month,Jun,group,NIR,0.8224,B08,0.1776,392,3000
+potatoes,month,Jun,group,SWIR,0.899,B12,0.899,392,3000
+potatoes,month,Jun,group,VV,0.6639,VV,0.6639,392,3000
+potatoes,month,Jun,group,VH,0.6506,VH,0.3494,392,3000
+potatoes,month,Jul,group,Visible,0.6148,B03,0.6148,392,3000
+potatoes,month,Jul,group,Red-edge,0.6384,B06,0.6384,392,3000
+potatoes,month,Jul,group,NIR,0.57,B08,0.57,392,3000
+potatoes,month,Jul,group,SWIR,0.7725,B12,0.7725,392,3000
+potatoes,month,Jul,group,VV,0.8374,VV,0.8374,392,3000
+potatoes,month,Jul,group,VH,0.7384,VH,0.7384,392,3000
+potatoes,month,Aug,group,Visible,0.5599,B04,0.4401,392,3000
+potatoes,month,Aug,group,Red-edge,0.6202,B06,0.6202,392,3000
+potatoes,month,Aug,group,NIR,0.5913,B08,0.5913,392,3000
+potatoes,month,Aug,group,SWIR,0.5329,B11,0.4671,392,3000
+potatoes,month,Aug,group,VV,0.8748,VV,0.8748,392,3000
+potatoes,month,Aug,group,VH,0.8517,VH,0.8517,392,3000
+potatoes,month,Sep,group,Visible,0.621,B04,0.621,392,3000
+potatoes,month,Sep,group,Red-edge,0.6102,B07,0.3898,392,3000
+potatoes,month,Sep,group,NIR,0.6196,B08,0.3804,392,3000
+potatoes,month,Sep,group,SWIR,0.6438,B12,0.6438,392,3000
+potatoes,month,Sep,group,VV,0.753,VV,0.753,392,3000
+potatoes,month,Sep,group,VH,0.6849,VH,0.6849,392,3000
+potatoes,month,Oct,group,Visible,0.723,B04,0.723,392,3000
+potatoes,month,Oct,group,Red-edge,0.7124,B07,0.2876,392,3000
+potatoes,month,Oct,group,NIR,0.72,B08,0.28,392,3000
+potatoes,month,Oct,group,SWIR,0.76,B12,0.76,392,3000
+potatoes,month,Oct,group,VV,0.6595,VV,0.6595,392,3000
+potatoes,month,Oct,group,VH,0.5706,VH,0.4294,392,3000
+potatoes,month,Nov,group,Visible,0.7146,B04,0.7146,392,3000
+potatoes,month,Nov,group,Red-edge,0.6947,B07,0.3053,392,3000
+potatoes,month,Nov,group,NIR,0.7043,B08,0.2957,392,3000
+potatoes,month,Nov,group,SWIR,0.7264,B12,0.7264,392,3000
+potatoes,month,Nov,group,VV,0.7015,VV,0.7015,392,3000
+potatoes,month,Nov,group,VH,0.5008,VH,0.4992,392,3000
+potatoes,month,Dec,group,Visible,0.7126,B04,0.7126,392,3000
+potatoes,month,Dec,group,Red-edge,0.6938,B07,0.3062,392,3000
+potatoes,month,Dec,group,NIR,0.7034,B08,0.2966,392,3000
+potatoes,month,Dec,group,SWIR,0.7225,B12,0.7225,392,3000
+potatoes,month,Dec,group,VV,0.6468,VV,0.6468,392,3000
+potatoes,month,Dec,group,VH,0.5698,VH,0.4302,392,3000
+potatoes,month,Jan,index,NDVI,0.7661,NDVI,0.2339,392,3000
+potatoes,month,Jan,index,NDMI,0.7374,NDMI,0.2626,392,3000
+potatoes,month,Jan,index,EVI,0.7674,EVI,0.2326,392,3000
+potatoes,month,Feb,index,NDVI,0.7656,NDVI,0.2344,392,3000
+potatoes,month,Feb,index,NDMI,0.7379,NDMI,0.2621,392,3000
+potatoes,month,Feb,index,EVI,0.7689,EVI,0.2311,392,3000
+potatoes,month,Mar,index,NDVI,0.7658,NDVI,0.2342,392,3000
+potatoes,month,Mar,index,NDMI,0.7381,NDMI,0.2619,392,3000
+potatoes,month,Mar,index,EVI,0.769,EVI,0.231,392,3000
+potatoes,month,Apr,index,NDVI,0.7787,NDVI,0.2213,392,3000
+potatoes,month,Apr,index,NDMI,0.7369,NDMI,0.2631,392,3000
+potatoes,month,Apr,index,EVI,0.7527,EVI,0.2473,392,3000
+potatoes,month,May,index,NDVI,0.8178,NDVI,0.1822,392,3000
+potatoes,month,May,index,NDMI,0.734,NDMI,0.266,392,3000
+potatoes,month,May,index,EVI,0.7656,EVI,0.2344,392,3000
+potatoes,month,Jun,index,NDVI,0.8859,NDVI,0.1141,392,3000
+potatoes,month,Jun,index,NDMI,0.8744,NDMI,0.1256,392,3000
+potatoes,month,Jun,index,EVI,0.8813,EVI,0.1187,392,3000
+potatoes,month,Jul,index,NDVI,0.5052,NDVI,0.5052,392,3000
+potatoes,month,Jul,index,NDMI,0.614,NDMI,0.386,392,3000
+potatoes,month,Jul,index,EVI,0.545,EVI,0.545,392,3000
+potatoes,month,Aug,index,NDVI,0.5879,NDVI,0.5879,392,3000
+potatoes,month,Aug,index,NDMI,0.5849,NDMI,0.5849,392,3000
+potatoes,month,Aug,index,EVI,0.5995,EVI,0.5995,392,3000
+potatoes,month,Sep,index,NDVI,0.6149,NDVI,0.3851,392,3000
+potatoes,month,Sep,index,NDMI,0.6045,NDMI,0.3955,392,3000
+potatoes,month,Sep,index,EVI,0.6108,EVI,0.3892,392,3000
+potatoes,month,Oct,index,NDVI,0.7636,NDVI,0.2364,392,3000
+potatoes,month,Oct,index,NDMI,0.7487,NDMI,0.2513,392,3000
+potatoes,month,Oct,index,EVI,0.7608,EVI,0.2392,392,3000
+potatoes,month,Nov,index,NDVI,0.7634,NDVI,0.2366,392,3000
+potatoes,month,Nov,index,NDMI,0.7467,NDMI,0.2533,392,3000
+potatoes,month,Nov,index,EVI,0.7486,EVI,0.2514,392,3000
+potatoes,month,Dec,index,NDVI,0.7628,NDVI,0.2372,392,3000
+potatoes,month,Dec,index,NDMI,0.7456,NDMI,0.2544,392,3000
+potatoes,month,Dec,index,EVI,0.748,EVI,0.252,392,3000
+potatoes,window,Jan-Mar,group,Visible,0.5548,B03,0.4452,392,3000
+potatoes,window,Jan-Mar,group,Red-edge,0.7304,B07,0.2696,392,3000
+potatoes,window,Jan-Mar,group,NIR,0.7346,B08,0.2654,392,3000
+potatoes,window,Jan-Mar,group,SWIR,0.5783,B12,0.5783,392,3000
+potatoes,window,Jan-Mar,group,VV,0.7204,VV,0.7204,392,3000
+potatoes,window,Jan-Mar,group,VH,0.5049,VH,0.4951,392,3000
+potatoes,window,Feb-Apr,group,Visible,0.5665,B04,0.5665,392,3000
+potatoes,window,Feb-Apr,group,Red-edge,0.7199,B07,0.2801,392,3000
+potatoes,window,Feb-Apr,group,NIR,0.7236,B08,0.2764,392,3000
+potatoes,window,Feb-Apr,group,SWIR,0.6349,B12,0.6349,392,3000
+potatoes,window,Feb-Apr,group,VV,0.7124,VV,0.7124,392,3000
+potatoes,window,Feb-Apr,group,VH,0.5803,VH,0.4197,392,3000
+potatoes,window,Mar-May,group,Visible,0.707,B04,0.707,392,3000
+potatoes,window,Mar-May,group,Red-edge,0.6977,B07,0.3023,392,3000
+potatoes,window,Mar-May,group,NIR,0.7023,B08,0.2977,392,3000
+potatoes,window,Mar-May,group,SWIR,0.767,B12,0.767,392,3000
+potatoes,window,Mar-May,group,VV,0.7332,VV,0.7332,392,3000
+potatoes,window,Mar-May,group,VH,0.6235,VH,0.3765,392,3000
+potatoes,window,Apr-Jun,group,Visible,0.8454,B04,0.8454,392,3000
+potatoes,window,Apr-Jun,group,Red-edge,0.781,B07,0.219,392,3000
+potatoes,window,Apr-Jun,group,NIR,0.7836,B08,0.2164,392,3000
+potatoes,window,Apr-Jun,group,SWIR,0.8893,B12,0.8893,392,3000
+potatoes,window,Apr-Jun,group,VV,0.6929,VV,0.6929,392,3000
+potatoes,window,Apr-Jun,group,VH,0.6811,VH,0.3189,392,3000
+potatoes,window,May-Jul,group,Visible,0.8485,B04,0.8485,392,3000
+potatoes,window,May-Jul,group,Red-edge,0.7312,B05,0.7312,392,3000
+potatoes,window,May-Jul,group,NIR,0.7392,B8A,0.2608,392,3000
+potatoes,window,May-Jul,group,SWIR,0.9126,B12,0.9126,392,3000
+potatoes,window,May-Jul,group,VV,0.773,VV,0.773,392,3000
+potatoes,window,May-Jul,group,VH,0.5224,VH,0.5224,392,3000
+potatoes,window,Jun-Aug,group,Visible,0.7375,B02,0.7375,392,3000
+potatoes,window,Jun-Aug,group,Red-edge,0.6483,B05,0.6483,392,3000
+potatoes,window,Jun-Aug,group,NIR,0.6341,B8A,0.3659,392,3000
+potatoes,window,Jun-Aug,group,SWIR,0.9014,B12,0.9014,392,3000
+potatoes,window,Jun-Aug,group,VV,0.8223,VV,0.8223,392,3000
+potatoes,window,Jun-Aug,group,VH,0.7001,VH,0.7001,392,3000
+potatoes,window,Jul-Sep,group,Visible,0.5839,B03,0.5839,392,3000
+potatoes,window,Jul-Sep,group,Red-edge,0.5677,B06,0.5677,392,3000
+potatoes,window,Jul-Sep,group,NIR,0.5159,B08,0.5159,392,3000
+potatoes,window,Jul-Sep,group,SWIR,0.6895,B12,0.6895,392,3000
+potatoes,window,Jul-Sep,group,VV,0.8584,VV,0.8584,392,3000
+potatoes,window,Jul-Sep,group,VH,0.7951,VH,0.7951,392,3000
+potatoes,window,Aug-Oct,group,Visible,0.6115,B04,0.6115,392,3000
+potatoes,window,Aug-Oct,group,Red-edge,0.5836,B07,0.4164,392,3000
+potatoes,window,Aug-Oct,group,NIR,0.5962,B08,0.4038,392,3000
+potatoes,window,Aug-Oct,group,SWIR,0.679,B12,0.679,392,3000
+potatoes,window,Aug-Oct,group,VV,0.7944,VV,0.7944,392,3000
+potatoes,window,Aug-Oct,group,VH,0.7165,VH,0.7165,392,3000
+potatoes,window,Sep-Nov,group,Visible,0.7105,B04,0.7105,392,3000
+potatoes,window,Sep-Nov,group,Red-edge,0.7074,B07,0.2926,392,3000
+potatoes,window,Sep-Nov,group,NIR,0.7172,B08,0.2828,392,3000
+potatoes,window,Sep-Nov,group,SWIR,0.7503,B12,0.7503,392,3000
+potatoes,window,Sep-Nov,group,VV,0.7276,VV,0.7276,392,3000
+potatoes,window,Sep-Nov,group,VH,0.5573,VH,0.5573,392,3000
+potatoes,window,Oct-Dec,group,Visible,0.7313,B04,0.7313,392,3000
+potatoes,window,Oct-Dec,group,Red-edge,0.7076,B07,0.2924,392,3000
+potatoes,window,Oct-Dec,group,NIR,0.7176,B08,0.2824,392,3000
+potatoes,window,Oct-Dec,group,SWIR,0.7619,B12,0.7619,392,3000
+potatoes,window,Oct-Dec,group,VV,0.6867,VV,0.6867,392,3000
+potatoes,window,Oct-Dec,group,VH,0.5492,VH,0.4508,392,3000
+potatoes,window,Jan-Mar,index,NDVI,0.7662,NDVI,0.2338,392,3000
+potatoes,window,Jan-Mar,index,NDMI,0.7381,NDMI,0.2619,392,3000
+potatoes,window,Jan-Mar,index,EVI,0.7684,EVI,0.2316,392,3000
+potatoes,window,Feb-Apr,index,NDVI,0.774,NDVI,0.226,392,3000
+potatoes,window,Feb-Apr,index,NDMI,0.7418,NDMI,0.2582,392,3000
+potatoes,window,Feb-Apr,index,EVI,0.7668,EVI,0.2332,392,3000
+potatoes,window,Mar-May,index,NDVI,0.8101,NDVI,0.1899,392,3000
+potatoes,window,Mar-May,index,NDMI,0.7479,NDMI,0.2521,392,3000
+potatoes,window,Mar-May,index,EVI,0.7804,EVI,0.2196,392,3000
+potatoes,window,Apr-Jun,index,NDVI,0.8957,NDVI,0.1043,392,3000
+potatoes,window,Apr-Jun,index,NDMI,0.8611,NDMI,0.1389,392,3000
+potatoes,window,Apr-Jun,index,EVI,0.8911,EVI,0.1089,392,3000
+potatoes,window,May-Jul,index,NDVI,0.882,NDVI,0.118,392,3000
+potatoes,window,May-Jul,index,NDMI,0.8752,NDMI,0.1248,392,3000
+potatoes,window,May-Jul,index,EVI,0.861,EVI,0.139,392,3000
+potatoes,window,Jun-Aug,index,NDVI,0.7472,NDVI,0.2528,392,3000
+potatoes,window,Jun-Aug,index,NDMI,0.8264,NDMI,0.1736,392,3000
+potatoes,window,Jun-Aug,index,EVI,0.7173,EVI,0.2827,392,3000
+potatoes,window,Jul-Sep,index,NDVI,0.5318,NDVI,0.4682,392,3000
+potatoes,window,Jul-Sep,index,NDMI,0.5572,NDMI,0.4428,392,3000
+potatoes,window,Jul-Sep,index,EVI,0.5008,EVI,0.5008,392,3000
+potatoes,window,Aug-Oct,index,NDVI,0.6143,NDVI,0.3857,392,3000
+potatoes,window,Aug-Oct,index,NDMI,0.6095,NDMI,0.3905,392,3000
+potatoes,window,Aug-Oct,index,EVI,0.5954,EVI,0.4046,392,3000
+potatoes,window,Sep-Nov,index,NDVI,0.7566,NDVI,0.2434,392,3000
+potatoes,window,Sep-Nov,index,NDMI,0.7427,NDMI,0.2573,392,3000
+potatoes,window,Sep-Nov,index,EVI,0.7516,EVI,0.2484,392,3000
+potatoes,window,Oct-Dec,index,NDVI,0.7799,NDVI,0.2201,392,3000
+potatoes,window,Oct-Dec,index,NDMI,0.7613,NDMI,0.2387,392,3000
+potatoes,window,Oct-Dec,index,EVI,0.7703,EVI,0.2297,392,3000
+rapeseed,month,Jan,group,Visible,0.6721,B04,0.3279,3000,3000
+rapeseed,month,Jan,group,Red-edge,0.761,B06,0.761,3000,3000
+rapeseed,month,Jan,group,NIR,0.741,B08,0.741,3000,3000
+rapeseed,month,Jan,group,SWIR,0.7507,B12,0.2493,3000,3000
+rapeseed,month,Jan,group,VV,0.7211,VV,0.7211,3000,3000
+rapeseed,month,Jan,group,VH,0.8067,VH,0.8067,3000,3000
+rapeseed,month,Feb,group,Visible,0.6718,B04,0.3282,3000,3000
+rapeseed,month,Feb,group,Red-edge,0.7617,B06,0.7617,3000,3000
+rapeseed,month,Feb,group,NIR,0.7417,B08,0.7417,3000,3000
+rapeseed,month,Feb,group,SWIR,0.7508,B12,0.2492,3000,3000
+rapeseed,month,Feb,group,VV,0.6581,VV,0.6581,3000,3000
+rapeseed,month,Feb,group,VH,0.7852,VH,0.7852,3000,3000
+rapeseed,month,Mar,group,Visible,0.6715,B04,0.3285,3000,3000
+rapeseed,month,Mar,group,Red-edge,0.7534,B06,0.7534,3000,3000
+rapeseed,month,Mar,group,NIR,0.7343,B08,0.7343,3000,3000
+rapeseed,month,Mar,group,SWIR,0.7555,B12,0.2445,3000,3000
+rapeseed,month,Mar,group,VV,0.5465,VV,0.5465,3000,3000
+rapeseed,month,Mar,group,VH,0.7168,VH,0.7168,3000,3000
+rapeseed,month,Apr,group,Visible,0.7025,B04,0.2975,3000,3000
+rapeseed,month,Apr,group,Red-edge,0.721,B06,0.721,3000,3000
+rapeseed,month,Apr,group,NIR,0.704,B08,0.704,3000,3000
+rapeseed,month,Apr,group,SWIR,0.7805,B12,0.2195,3000,3000
+rapeseed,month,Apr,group,VV,0.6659,VV,0.6659,3000,3000
+rapeseed,month,Apr,group,VH,0.808,VH,0.808,3000,3000
+rapeseed,month,May,group,Visible,0.7677,B04,0.2323,3000,3000
+rapeseed,month,May,group,Red-edge,0.8244,B06,0.8244,3000,3000
+rapeseed,month,May,group,NIR,0.8124,B08,0.8124,3000,3000
+rapeseed,month,May,group,SWIR,0.8393,B11,0.1607,3000,3000
+rapeseed,month,May,group,VV,0.7397,VV,0.7397,3000,3000
+rapeseed,month,May,group,VH,0.8727,VH,0.8727,3000,3000
+rapeseed,month,Jun,group,Visible,0.7022,B03,0.7022,3000,3000
+rapeseed,month,Jun,group,Red-edge,0.896,B06,0.896,3000,3000
+rapeseed,month,Jun,group,NIR,0.8621,B08,0.8621,3000,3000
+rapeseed,month,Jun,group,SWIR,0.8503,B11,0.1497,3000,3000
+rapeseed,month,Jun,group,VV,0.946,VV,0.946,3000,3000
+rapeseed,month,Jun,group,VH,0.9392,VH,0.9392,3000,3000
+rapeseed,month,Jul,group,Visible,0.8139,B03,0.8139,3000,3000
+rapeseed,month,Jul,group,Red-edge,0.824,B05,0.824,3000,3000
+rapeseed,month,Jul,group,NIR,0.6466,B8A,0.6466,3000,3000
+rapeseed,month,Jul,group,SWIR,0.7844,B11,0.2156,3000,3000
+rapeseed,month,Jul,group,VV,0.8695,VV,0.8695,3000,3000
+rapeseed,month,Jul,group,VH,0.8911,VH,0.8911,3000,3000
+rapeseed,month,Aug,group,Visible,0.7383,B03,0.7383,3000,3000
+rapeseed,month,Aug,group,Red-edge,0.7432,B05,0.7432,3000,3000
+rapeseed,month,Aug,group,NIR,0.5605,B08,0.4395,3000,3000
+rapeseed,month,Aug,group,SWIR,0.6251,B12,0.6251,3000,3000
+rapeseed,month,Aug,group,VV,0.5547,VV,0.5547,3000,3000
+rapeseed,month,Aug,group,VH,0.5736,VH,0.5736,3000,3000
+rapeseed,month,Sep,group,Visible,0.7472,B04,0.7472,3000,3000
+rapeseed,month,Sep,group,Red-edge,0.6878,B07,0.3122,3000,3000
+rapeseed,month,Sep,group,NIR,0.6881,B8A,0.3119,3000,3000
+rapeseed,month,Sep,group,SWIR,0.7298,B12,0.7298,3000,3000
+rapeseed,month,Sep,group,VV,0.5564,VV,0.5564,3000,3000
+rapeseed,month,Sep,group,VH,0.6395,VH,0.3605,3000,3000
+rapeseed,month,Oct,group,Visible,0.6795,B02,0.6795,3000,3000
+rapeseed,month,Oct,group,Red-edge,0.6206,B07,0.3794,3000,3000
+rapeseed,month,Oct,group,NIR,0.6369,B8A,0.3631,3000,3000
+rapeseed,month,Oct,group,SWIR,0.6584,B12,0.6584,3000,3000
+rapeseed,month,Oct,group,VV,0.5627,VV,0.5627,3000,3000
+rapeseed,month,Oct,group,VH,0.6197,VH,0.3803,3000,3000
+rapeseed,month,Nov,group,Visible,0.6013,B02,0.6013,3000,3000
+rapeseed,month,Nov,group,Red-edge,0.5242,B07,0.4758,3000,3000
+rapeseed,month,Nov,group,NIR,0.5434,B8A,0.4566,3000,3000
+rapeseed,month,Nov,group,SWIR,0.5293,B12,0.5293,3000,3000
+rapeseed,month,Nov,group,VV,0.5103,VV,0.5103,3000,3000
+rapeseed,month,Nov,group,VH,0.5524,VH,0.4476,3000,3000
+rapeseed,month,Dec,group,Visible,0.5996,B02,0.5996,3000,3000
+rapeseed,month,Dec,group,Red-edge,0.523,B07,0.477,3000,3000
+rapeseed,month,Dec,group,NIR,0.5422,B8A,0.4578,3000,3000
+rapeseed,month,Dec,group,SWIR,0.5297,B12,0.5297,3000,3000
+rapeseed,month,Dec,group,VV,0.5724,VV,0.4276,3000,3000
+rapeseed,month,Dec,group,VH,0.6264,VH,0.3736,3000,3000
+rapeseed,month,Jan,index,NDVI,0.7889,NDVI,0.7889,3000,3000
+rapeseed,month,Jan,index,NDMI,0.809,NDMI,0.809,3000,3000
+rapeseed,month,Jan,index,EVI,0.7911,EVI,0.7911,3000,3000
+rapeseed,month,Feb,index,NDVI,0.7889,NDVI,0.7889,3000,3000
+rapeseed,month,Feb,index,NDMI,0.8094,NDMI,0.8094,3000,3000
+rapeseed,month,Feb,index,EVI,0.7915,EVI,0.7915,3000,3000
+rapeseed,month,Mar,index,NDVI,0.7922,NDVI,0.7922,3000,3000
+rapeseed,month,Mar,index,NDMI,0.8121,NDMI,0.8121,3000,3000
+rapeseed,month,Mar,index,EVI,0.7923,EVI,0.7923,3000,3000
+rapeseed,month,Apr,index,NDVI,0.781,NDVI,0.781,3000,3000
+rapeseed,month,Apr,index,NDMI,0.8058,NDMI,0.8058,3000,3000
+rapeseed,month,Apr,index,EVI,0.7695,EVI,0.7695,3000,3000
+rapeseed,month,May,index,NDVI,0.7987,NDVI,0.7987,3000,3000
+rapeseed,month,May,index,NDMI,0.8348,NDMI,0.8348,3000,3000
+rapeseed,month,May,index,EVI,0.8149,EVI,0.8149,3000,3000
+rapeseed,month,Jun,index,NDVI,0.6541,NDVI,0.6541,3000,3000
+rapeseed,month,Jun,index,NDMI,0.8705,NDMI,0.8705,3000,3000
+rapeseed,month,Jun,index,EVI,0.8205,EVI,0.8205,3000,3000
+rapeseed,month,Jul,index,NDVI,0.5487,NDVI,0.4513,3000,3000
+rapeseed,month,Jul,index,NDMI,0.7667,NDMI,0.7667,3000,3000
+rapeseed,month,Jul,index,EVI,0.5205,EVI,0.5205,3000,3000
+rapeseed,month,Aug,index,NDVI,0.6748,NDVI,0.3252,3000,3000
+rapeseed,month,Aug,index,NDMI,0.5769,NDMI,0.4231,3000,3000
+rapeseed,month,Aug,index,EVI,0.6404,EVI,0.3596,3000,3000
+rapeseed,month,Sep,index,NDVI,0.7519,NDVI,0.2481,3000,3000
+rapeseed,month,Sep,index,NDMI,0.7187,NDMI,0.2813,3000,3000
+rapeseed,month,Sep,index,EVI,0.7346,EVI,0.2654,3000,3000
+rapeseed,month,Oct,index,NDVI,0.651,NDVI,0.349,3000,3000
+rapeseed,month,Oct,index,NDMI,0.6458,NDMI,0.3542,3000,3000
+rapeseed,month,Oct,index,EVI,0.6395,EVI,0.3605,3000,3000
+rapeseed,month,Nov,index,NDVI,0.5247,NDVI,0.4753,3000,3000
+rapeseed,month,Nov,index,NDMI,0.5195,NDMI,0.4805,3000,3000
+rapeseed,month,Nov,index,EVI,0.518,EVI,0.482,3000,3000
+rapeseed,month,Dec,index,NDVI,0.5236,NDVI,0.4764,3000,3000
+rapeseed,month,Dec,index,NDMI,0.5197,NDMI,0.4803,3000,3000
+rapeseed,month,Dec,index,EVI,0.517,EVI,0.483,3000,3000
+rapeseed,window,Jan-Mar,group,Visible,0.6739,B04,0.3261,3000,3000
+rapeseed,window,Jan-Mar,group,Red-edge,0.7594,B06,0.7594,3000,3000
+rapeseed,window,Jan-Mar,group,NIR,0.7396,B08,0.7396,3000,3000
+rapeseed,window,Jan-Mar,group,SWIR,0.7539,B12,0.2461,3000,3000
+rapeseed,window,Jan-Mar,group,VV,0.6371,VV,0.6371,3000,3000
+rapeseed,window,Jan-Mar,group,VH,0.8004,VH,0.8004,3000,3000
+rapeseed,window,Feb-Apr,group,Visible,0.6929,B04,0.3071,3000,3000
+rapeseed,window,Feb-Apr,group,Red-edge,0.7515,B06,0.7515,3000,3000
+rapeseed,window,Feb-Apr,group,NIR,0.7322,B08,0.7322,3000,3000
+rapeseed,window,Feb-Apr,group,SWIR,0.7767,B12,0.2233,3000,3000
+rapeseed,window,Feb-Apr,group,VV,0.625,VV,0.625,3000,3000
+rapeseed,window,Feb-Apr,group,VH,0.8151,VH,0.8151,3000,3000
+rapeseed,window,Mar-May,group,Visible,0.7648,B04,0.2352,3000,3000
+rapeseed,window,Mar-May,group,Red-edge,0.7976,B06,0.7976,3000,3000
+rapeseed,window,Mar-May,group,NIR,0.7823,B08,0.7823,3000,3000
+rapeseed,window,Mar-May,group,SWIR,0.8231,B12,0.1769,3000,3000
+rapeseed,window,Mar-May,group,VV,0.6804,VV,0.6804,3000,3000
+rapeseed,window,Mar-May,group,VH,0.864,VH,0.864,3000,3000
+rapeseed,window,Apr-Jun,group,Visible,0.7343,B04,0.2657,3000,3000
+rapeseed,window,Apr-Jun,group,Red-edge,0.8599,B06,0.8599,3000,3000
+rapeseed,window,Apr-Jun,group,NIR,0.8394,B08,0.8394,3000,3000
+rapeseed,window,Apr-Jun,group,SWIR,0.8558,B11,0.1442,3000,3000
+rapeseed,window,Apr-Jun,group,VV,0.8806,VV,0.8806,3000,3000
+rapeseed,window,Apr-Jun,group,VH,0.9107,VH,0.9107,3000,3000
+rapeseed,window,May-Jul,group,Visible,0.685,B03,0.685,3000,3000
+rapeseed,window,May-Jul,group,Red-edge,0.8939,B06,0.8939,3000,3000
+rapeseed,window,May-Jul,group,NIR,0.8658,B08,0.8658,3000,3000
+rapeseed,window,May-Jul,group,SWIR,0.8738,B11,0.1262,3000,3000
+rapeseed,window,May-Jul,group,VV,0.908,VV,0.908,3000,3000
+rapeseed,window,May-Jul,group,VH,0.9532,VH,0.9532,3000,3000
+rapeseed,window,Jun-Aug,group,Visible,0.8176,B03,0.8176,3000,3000
+rapeseed,window,Jun-Aug,group,Red-edge,0.8309,B05,0.8309,3000,3000
+rapeseed,window,Jun-Aug,group,NIR,0.7831,B08,0.7831,3000,3000
+rapeseed,window,Jun-Aug,group,SWIR,0.8305,B11,0.1695,3000,3000
+rapeseed,window,Jun-Aug,group,VV,0.9027,VV,0.9027,3000,3000
+rapeseed,window,Jun-Aug,group,VH,0.95,VH,0.95,3000,3000
+rapeseed,window,Jul-Sep,group,Visible,0.7928,B03,0.7928,3000,3000
+rapeseed,window,Jul-Sep,group,Red-edge,0.7948,B05,0.7948,3000,3000
+rapeseed,window,Jul-Sep,group,NIR,0.5772,B08,0.4228,3000,3000
+rapeseed,window,Jul-Sep,group,SWIR,0.5974,B12,0.5974,3000,3000
+rapeseed,window,Jul-Sep,group,VV,0.7501,VV,0.7501,3000,3000
+rapeseed,window,Jul-Sep,group,VH,0.7463,VH,0.7463,3000,3000
+rapeseed,window,Aug-Oct,group,Visible,0.7432,B02,0.7432,3000,3000
+rapeseed,window,Aug-Oct,group,Red-edge,0.712,B05,0.712,3000,3000
+rapeseed,window,Aug-Oct,group,NIR,0.6639,B08,0.3361,3000,3000
+rapeseed,window,Aug-Oct,group,SWIR,0.7081,B12,0.7081,3000,3000
+rapeseed,window,Aug-Oct,group,VV,0.5566,VV,0.5566,3000,3000
+rapeseed,window,Aug-Oct,group,VH,0.5666,VH,0.4334,3000,3000
+rapeseed,window,Sep-Nov,group,Visible,0.7118,B02,0.7118,3000,3000
+rapeseed,window,Sep-Nov,group,Red-edge,0.627,B07,0.373,3000,3000
+rapeseed,window,Sep-Nov,group,NIR,0.6388,B8A,0.3612,3000,3000
+rapeseed,window,Sep-Nov,group,SWIR,0.694,B12,0.694,3000,3000
+rapeseed,window,Sep-Nov,group,VV,0.5329,VV,0.5329,3000,3000
+rapeseed,window,Sep-Nov,group,VH,0.6289,VH,0.3711,3000,3000
+rapeseed,window,Oct-Dec,group,Visible,0.643,B02,0.643,3000,3000
+rapeseed,window,Oct-Dec,group,Red-edge,0.5499,B07,0.4501,3000,3000
+rapeseed,window,Oct-Dec,group,NIR,0.5678,B8A,0.4322,3000,3000
+rapeseed,window,Oct-Dec,group,SWIR,0.5966,B12,0.5966,3000,3000
+rapeseed,window,Oct-Dec,group,VV,0.501,VV,0.501,3000,3000
+rapeseed,window,Oct-Dec,group,VH,0.6111,VH,0.3889,3000,3000
+rapeseed,window,Jan-Mar,index,NDVI,0.7905,NDVI,0.7905,3000,3000
+rapeseed,window,Jan-Mar,index,NDMI,0.8104,NDMI,0.8104,3000,3000
+rapeseed,window,Jan-Mar,index,EVI,0.792,EVI,0.792,3000,3000
+rapeseed,window,Feb-Apr,index,NDVI,0.791,NDVI,0.791,3000,3000
+rapeseed,window,Feb-Apr,index,NDMI,0.8119,NDMI,0.8119,3000,3000
+rapeseed,window,Feb-Apr,index,EVI,0.7882,EVI,0.7882,3000,3000
+rapeseed,window,Mar-May,index,NDVI,0.7999,NDVI,0.7999,3000,3000
+rapeseed,window,Mar-May,index,NDMI,0.8281,NDMI,0.8281,3000,3000
+rapeseed,window,Mar-May,index,EVI,0.8084,EVI,0.8084,3000,3000
+rapeseed,window,Apr-Jun,index,NDVI,0.7916,NDVI,0.7916,3000,3000
+rapeseed,window,Apr-Jun,index,NDMI,0.8538,NDMI,0.8538,3000,3000
+rapeseed,window,Apr-Jun,index,EVI,0.8332,EVI,0.8332,3000,3000
+rapeseed,window,May-Jul,index,NDVI,0.7685,NDVI,0.7685,3000,3000
+rapeseed,window,May-Jul,index,NDMI,0.8822,NDMI,0.8822,3000,3000
+rapeseed,window,May-Jul,index,EVI,0.8419,EVI,0.8419,3000,3000
+rapeseed,window,Jun-Aug,index,NDVI,0.5059,NDVI,0.5059,3000,3000
+rapeseed,window,Jun-Aug,index,NDMI,0.857,NDMI,0.857,3000,3000
+rapeseed,window,Jun-Aug,index,EVI,0.6638,EVI,0.6638,3000,3000
+rapeseed,window,Jul-Sep,index,NDVI,0.7098,NDVI,0.2902,3000,3000
+rapeseed,window,Jul-Sep,index,NDMI,0.5414,NDMI,0.4586,3000,3000
+rapeseed,window,Jul-Sep,index,EVI,0.6643,EVI,0.3357,3000,3000
+rapeseed,window,Aug-Oct,index,NDVI,0.7316,NDVI,0.2684,3000,3000
+rapeseed,window,Aug-Oct,index,NDMI,0.6847,NDMI,0.3153,3000,3000
+rapeseed,window,Aug-Oct,index,EVI,0.7118,EVI,0.2882,3000,3000
+rapeseed,window,Sep-Nov,index,NDVI,0.6755,NDVI,0.3245,3000,3000
+rapeseed,window,Sep-Nov,index,NDMI,0.6643,NDMI,0.3357,3000,3000
+rapeseed,window,Sep-Nov,index,EVI,0.6654,EVI,0.3346,3000,3000
+rapeseed,window,Oct-Dec,index,NDVI,0.5671,NDVI,0.4329,3000,3000
+rapeseed,window,Oct-Dec,index,NDMI,0.5613,NDMI,0.4387,3000,3000
+rapeseed,window,Oct-Dec,index,EVI,0.5547,EVI,0.4453,3000,3000
+rye,month,Jan,group,Visible,0.7104,B04,0.2896,1173,3000
+rye,month,Jan,group,Red-edge,0.6857,B07,0.6857,1173,3000
+rye,month,Jan,group,NIR,0.6721,B08,0.6721,1173,3000
+rye,month,Jan,group,SWIR,0.7116,B12,0.2884,1173,3000
+rye,month,Jan,group,VV,0.6712,VV,0.3288,1173,3000
+rye,month,Jan,group,VH,0.6598,VH,0.3402,1173,3000
+rye,month,Feb,group,Visible,0.7102,B04,0.2898,1173,3000
+rye,month,Feb,group,Red-edge,0.6859,B07,0.6859,1173,3000
+rye,month,Feb,group,NIR,0.6724,B08,0.6724,1173,3000
+rye,month,Feb,group,SWIR,0.7116,B12,0.2884,1173,3000
+rye,month,Feb,group,VV,0.6306,VV,0.3694,1173,3000
+rye,month,Feb,group,VH,0.6395,VH,0.3605,1173,3000
+rye,month,Mar,group,Visible,0.7047,B04,0.2953,1173,3000
+rye,month,Mar,group,Red-edge,0.684,B07,0.684,1173,3000
+rye,month,Mar,group,NIR,0.6716,B08,0.6716,1173,3000
+rye,month,Mar,group,SWIR,0.7133,B12,0.2867,1173,3000
+rye,month,Mar,group,VV,0.5395,VV,0.4605,1173,3000
+rye,month,Mar,group,VH,0.5415,VH,0.4585,1173,3000
+rye,month,Apr,group,Visible,0.7406,B04,0.2594,1173,3000
+rye,month,Apr,group,Red-edge,0.6812,B07,0.6812,1173,3000
+rye,month,Apr,group,NIR,0.6657,B08,0.6657,1173,3000
+rye,month,Apr,group,SWIR,0.7683,B12,0.2317,1173,3000
+rye,month,Apr,group,VV,0.5394,VV,0.4606,1173,3000
+rye,month,Apr,group,VH,0.624,VH,0.624,1173,3000
+rye,month,May,group,Visible,0.8138,B04,0.1862,1173,3000
+rye,month,May,group,Red-edge,0.7691,B05,0.2309,1173,3000
+rye,month,May,group,NIR,0.6884,B08,0.6884,1173,3000
+rye,month,May,group,SWIR,0.8134,B11,0.1866,1173,3000
+rye,month,May,group,VV,0.7386,VV,0.2614,1173,3000
+rye,month,May,group,VH,0.6537,VH,0.6537,1173,3000
+rye,month,Jun,group,Visible,0.8092,B03,0.1908,1173,3000
+rye,month,Jun,group,Red-edge,0.815,B05,0.185,1173,3000
+rye,month,Jun,group,NIR,0.5348,B8A,0.4652,1173,3000
+rye,month,Jun,group,SWIR,0.8312,B11,0.1688,1173,3000
+rye,month,Jun,group,VV,0.6411,VV,0.3589,1173,3000
+rye,month,Jun,group,VH,0.5284,VH,0.5284,1173,3000
+rye,month,Jul,group,Visible,0.6545,B04,0.6545,1173,3000
+rye,month,Jul,group,Red-edge,0.7628,B07,0.2372,1173,3000
+rye,month,Jul,group,NIR,0.759,B08,0.241,1173,3000
+rye,month,Jul,group,SWIR,0.6562,B11,0.3438,1173,3000
+rye,month,Jul,group,VV,0.5328,VV,0.5328,1173,3000
+rye,month,Jul,group,VH,0.5961,VH,0.5961,1173,3000
+rye,month,Aug,group,Visible,0.6934,B04,0.6934,1173,3000
+rye,month,Aug,group,Red-edge,0.6402,B05,0.6402,1173,3000
+rye,month,Aug,group,NIR,0.6266,B08,0.3734,1173,3000
+rye,month,Aug,group,SWIR,0.6458,B11,0.6458,1173,3000
+rye,month,Aug,group,VV,0.5948,VV,0.4052,1173,3000
+rye,month,Aug,group,VH,0.6091,VH,0.3909,1173,3000
+rye,month,Sep,group,Visible,0.6177,B03,0.6177,1173,3000
+rye,month,Sep,group,Red-edge,0.6044,B05,0.6044,1173,3000
+rye,month,Sep,group,NIR,0.5404,B8A,0.4596,1173,3000
+rye,month,Sep,group,SWIR,0.6531,B11,0.6531,1173,3000
+rye,month,Sep,group,VV,0.5922,VV,0.4078,1173,3000
+rye,month,Sep,group,VH,0.6224,VH,0.3776,1173,3000
+rye,month,Oct,group,Visible,0.5569,B03,0.5569,1173,3000
+rye,month,Oct,group,Red-edge,0.5391,B05,0.5391,1173,3000
+rye,month,Oct,group,NIR,0.5256,B08,0.5256,1173,3000
+rye,month,Oct,group,SWIR,0.5651,B11,0.5651,1173,3000
+rye,month,Oct,group,VV,0.5056,VV,0.5056,1173,3000
+rye,month,Oct,group,VH,0.5327,VH,0.5327,1173,3000
+rye,month,Nov,group,Visible,0.566,B02,0.566,1173,3000
+rye,month,Nov,group,Red-edge,0.5303,B05,0.5303,1173,3000
+rye,month,Nov,group,NIR,0.5031,B8A,0.4969,1173,3000
+rye,month,Nov,group,SWIR,0.5163,B11,0.5163,1173,3000
+rye,month,Nov,group,VV,0.5148,VV,0.5148,1173,3000
+rye,month,Nov,group,VH,0.5609,VH,0.5609,1173,3000
+rye,month,Dec,group,Visible,0.5654,B02,0.5654,1173,3000
+rye,month,Dec,group,Red-edge,0.5301,B05,0.5301,1173,3000
+rye,month,Dec,group,NIR,0.5028,B8A,0.4972,1173,3000
+rye,month,Dec,group,SWIR,0.5161,B11,0.5161,1173,3000
+rye,month,Dec,group,VV,0.5414,VV,0.5414,1173,3000
+rye,month,Dec,group,VH,0.5745,VH,0.5745,1173,3000
+rye,month,Jan,index,NDVI,0.8005,NDVI,0.8005,1173,3000
+rye,month,Jan,index,NDMI,0.7906,NDMI,0.7906,1173,3000
+rye,month,Jan,index,EVI,0.7805,EVI,0.7805,1173,3000
+rye,month,Feb,index,NDVI,0.8004,NDVI,0.8004,1173,3000
+rye,month,Feb,index,NDMI,0.7909,NDMI,0.7909,1173,3000
+rye,month,Feb,index,EVI,0.7805,EVI,0.7805,1173,3000
+rye,month,Mar,index,NDVI,0.8046,NDVI,0.8046,1173,3000
+rye,month,Mar,index,NDMI,0.7945,NDMI,0.7945,1173,3000
+rye,month,Mar,index,EVI,0.7822,EVI,0.7822,1173,3000
+rye,month,Apr,index,NDVI,0.8034,NDVI,0.8034,1173,3000
+rye,month,Apr,index,NDMI,0.8009,NDMI,0.8009,1173,3000
+rye,month,Apr,index,EVI,0.778,EVI,0.778,1173,3000
+rye,month,May,index,NDVI,0.7878,NDVI,0.7878,1173,3000
+rye,month,May,index,NDMI,0.7816,NDMI,0.7816,1173,3000
+rye,month,May,index,EVI,0.7591,EVI,0.7591,1173,3000
+rye,month,Jun,index,NDVI,0.6484,NDVI,0.6484,1173,3000
+rye,month,Jun,index,NDMI,0.7109,NDMI,0.7109,1173,3000
+rye,month,Jun,index,EVI,0.5623,EVI,0.5623,1173,3000
+rye,month,Jul,index,NDVI,0.7319,NDVI,0.2681,1173,3000
+rye,month,Jul,index,NDMI,0.5541,NDMI,0.4459,1173,3000
+rye,month,Jul,index,EVI,0.7569,EVI,0.2431,1173,3000
+rye,month,Aug,index,NDVI,0.697,NDVI,0.303,1173,3000
+rye,month,Aug,index,NDMI,0.677,NDMI,0.323,1173,3000
+rye,month,Aug,index,EVI,0.6859,EVI,0.3141,1173,3000
+rye,month,Sep,index,NDVI,0.5867,NDVI,0.4133,1173,3000
+rye,month,Sep,index,NDMI,0.6129,NDMI,0.3871,1173,3000
+rye,month,Sep,index,EVI,0.571,EVI,0.429,1173,3000
+rye,month,Oct,index,NDVI,0.5104,NDVI,0.4896,1173,3000
+rye,month,Oct,index,NDMI,0.5233,NDMI,0.4767,1173,3000
+rye,month,Oct,index,EVI,0.502,EVI,0.502,1173,3000
+rye,month,Nov,index,NDVI,0.5308,NDVI,0.4692,1173,3000
+rye,month,Nov,index,NDMI,0.5247,NDMI,0.4753,1173,3000
+rye,month,Nov,index,EVI,0.5161,EVI,0.4839,1173,3000
+rye,month,Dec,index,NDVI,0.5304,NDVI,0.4696,1173,3000
+rye,month,Dec,index,NDMI,0.5249,NDMI,0.4751,1173,3000
+rye,month,Dec,index,EVI,0.5157,EVI,0.4843,1173,3000
+rye,window,Jan-Mar,group,Visible,0.7113,B04,0.2887,1173,3000
+rye,window,Jan-Mar,group,Red-edge,0.6855,B07,0.6855,1173,3000
+rye,window,Jan-Mar,group,NIR,0.6723,B08,0.6723,1173,3000
+rye,window,Jan-Mar,group,SWIR,0.7143,B12,0.2857,1173,3000
+rye,window,Jan-Mar,group,VV,0.6256,VV,0.3744,1173,3000
+rye,window,Jan-Mar,group,VH,0.6355,VH,0.3645,1173,3000
+rye,window,Feb-Apr,group,Visible,0.7283,B04,0.2717,1173,3000
+rye,window,Feb-Apr,group,Red-edge,0.687,B07,0.687,1173,3000
+rye,window,Feb-Apr,group,NIR,0.6728,B08,0.6728,1173,3000
+rye,window,Feb-Apr,group,SWIR,0.7483,B12,0.2517,1173,3000
+rye,window,Feb-Apr,group,VV,0.6008,VV,0.3992,1173,3000
+rye,window,Feb-Apr,group,VH,0.5205,VH,0.4795,1173,3000
+rye,window,Mar-May,group,Visible,0.8066,B04,0.1934,1173,3000
+rye,window,Mar-May,group,Red-edge,0.6996,B07,0.6996,1173,3000
+rye,window,Mar-May,group,NIR,0.6855,B08,0.6855,1173,3000
+rye,window,Mar-May,group,SWIR,0.81,B12,0.19,1173,3000
+rye,window,Mar-May,group,VV,0.6643,VV,0.3357,1173,3000
+rye,window,Mar-May,group,VH,0.6182,VH,0.6182,1173,3000
+rye,window,Apr-Jun,group,Visible,0.8307,B02,0.1693,1173,3000
+rye,window,Apr-Jun,group,Red-edge,0.8004,B05,0.1996,1173,3000
+rye,window,Apr-Jun,group,NIR,0.6308,B08,0.6308,1173,3000
+rye,window,Apr-Jun,group,SWIR,0.8442,B11,0.1558,1173,3000
+rye,window,Apr-Jun,group,VV,0.6992,VV,0.3008,1173,3000
+rye,window,Apr-Jun,group,VH,0.631,VH,0.631,1173,3000
+rye,window,May-Jul,group,Visible,0.7826,B03,0.2174,1173,3000
+rye,window,May-Jul,group,Red-edge,0.774,B05,0.226,1173,3000
+rye,window,May-Jul,group,NIR,0.5198,B8A,0.4802,1173,3000
+rye,window,May-Jul,group,SWIR,0.8457,B11,0.1543,1173,3000
+rye,window,May-Jul,group,VV,0.6592,VV,0.3408,1173,3000
+rye,window,May-Jul,group,VH,0.6418,VH,0.6418,1173,3000
+rye,window,Jun-Aug,group,Visible,0.6005,B03,0.3995,1173,3000
+rye,window,Jun-Aug,group,Red-edge,0.7428,B06,0.2572,1173,3000
+rye,window,Jun-Aug,group,NIR,0.712,B08,0.288,1173,3000
+rye,window,Jun-Aug,group,SWIR,0.7232,B11,0.2768,1173,3000
+rye,window,Jun-Aug,group,VV,0.5841,VV,0.4159,1173,3000
+rye,window,Jun-Aug,group,VH,0.5102,VH,0.4898,1173,3000
+rye,window,Jul-Sep,group,Visible,0.6774,B04,0.6774,1173,3000
+rye,window,Jul-Sep,group,Red-edge,0.6828,B07,0.3172,1173,3000
+rye,window,Jul-Sep,group,NIR,0.6749,B08,0.3251,1173,3000
+rye,window,Jul-Sep,group,SWIR,0.588,B12,0.588,1173,3000
+rye,window,Jul-Sep,group,VV,0.5682,VV,0.4318,1173,3000
+rye,window,Jul-Sep,group,VH,0.5583,VH,0.4417,1173,3000
+rye,window,Aug-Oct,group,Visible,0.6338,B03,0.6338,1173,3000
+rye,window,Aug-Oct,group,Red-edge,0.6262,B05,0.6262,1173,3000
+rye,window,Aug-Oct,group,NIR,0.5601,B08,0.4399,1173,3000
+rye,window,Aug-Oct,group,SWIR,0.6601,B11,0.6601,1173,3000
+rye,window,Aug-Oct,group,VV,0.574,VV,0.426,1173,3000
+rye,window,Aug-Oct,group,VH,0.5926,VH,0.4074,1173,3000
+rye,window,Sep-Nov,group,Visible,0.5895,B03,0.5895,1173,3000
+rye,window,Sep-Nov,group,Red-edge,0.5723,B05,0.5723,1173,3000
+rye,window,Sep-Nov,group,NIR,0.504,B8A,0.496,1173,3000
+rye,window,Sep-Nov,group,SWIR,0.6007,B11,0.6007,1173,3000
+rye,window,Sep-Nov,group,VV,0.523,VV,0.477,1173,3000
+rye,window,Sep-Nov,group,VH,0.5254,VH,0.4746,1173,3000
+rye,window,Oct-Dec,group,Visible,0.5619,B02,0.5619,1173,3000
+rye,window,Oct-Dec,group,Red-edge,0.536,B05,0.536,1173,3000
+rye,window,Oct-Dec,group,NIR,0.5076,B08,0.5076,1173,3000
+rye,window,Oct-Dec,group,SWIR,0.5335,B11,0.5335,1173,3000
+rye,window,Oct-Dec,group,VV,0.5196,VV,0.5196,1173,3000
+rye,window,Oct-Dec,group,VH,0.5627,VH,0.5627,1173,3000
+rye,window,Jan-Mar,index,NDVI,0.8023,NDVI,0.8023,1173,3000
+rye,window,Jan-Mar,index,NDMI,0.7922,NDMI,0.7922,1173,3000
+rye,window,Jan-Mar,index,EVI,0.7813,EVI,0.7813,1173,3000
+rye,window,Feb-Apr,index,NDVI,0.8064,NDVI,0.8064,1173,3000
+rye,window,Feb-Apr,index,NDMI,0.7984,NDMI,0.7984,1173,3000
+rye,window,Feb-Apr,index,EVI,0.7826,EVI,0.7826,1173,3000
+rye,window,Mar-May,index,NDVI,0.8129,NDVI,0.8129,1173,3000
+rye,window,Mar-May,index,NDMI,0.8018,NDMI,0.8018,1173,3000
+rye,window,Mar-May,index,EVI,0.7814,EVI,0.7814,1173,3000
+rye,window,Apr-Jun,index,NDVI,0.794,NDVI,0.794,1173,3000
+rye,window,Apr-Jun,index,NDMI,0.7897,NDMI,0.7897,1173,3000
+rye,window,Apr-Jun,index,EVI,0.7299,EVI,0.7299,1173,3000
+rye,window,May-Jul,index,NDVI,0.6958,NDVI,0.6958,1173,3000
+rye,window,May-Jul,index,NDMI,0.7573,NDMI,0.7573,1173,3000
+rye,window,May-Jul,index,EVI,0.6197,EVI,0.6197,1173,3000
+rye,window,Jun-Aug,index,NDVI,0.6053,NDVI,0.3947,1173,3000
+rye,window,Jun-Aug,index,NDMI,0.5393,NDMI,0.5393,1173,3000
+rye,window,Jun-Aug,index,EVI,0.6777,EVI,0.3223,1173,3000
+rye,window,Jul-Sep,index,NDVI,0.6877,NDVI,0.3123,1173,3000
+rye,window,Jul-Sep,index,NDMI,0.656,NDMI,0.344,1173,3000
+rye,window,Jul-Sep,index,EVI,0.6955,EVI,0.3045,1173,3000
+rye,window,Aug-Oct,index,NDVI,0.6111,NDVI,0.3889,1173,3000
+rye,window,Aug-Oct,index,NDMI,0.626,NDMI,0.374,1173,3000
+rye,window,Aug-Oct,index,EVI,0.606,EVI,0.394,1173,3000
+rye,window,Sep-Nov,index,NDVI,0.5487,NDVI,0.4513,1173,3000
+rye,window,Sep-Nov,index,NDMI,0.5623,NDMI,0.4377,1173,3000
+rye,window,Sep-Nov,index,EVI,0.5331,EVI,0.4669,1173,3000
+rye,window,Oct-Dec,index,NDVI,0.5258,NDVI,0.4742,1173,3000
+rye,window,Oct-Dec,index,NDMI,0.5245,NDMI,0.4755,1173,3000
+rye,window,Oct-Dec,index,EVI,0.5104,EVI,0.4896,1173,3000
+wheat,month,Jan,group,Visible,0.6738,B04,0.3262,3000,3000
+wheat,month,Jan,group,Red-edge,0.6248,B05,0.3752,3000,3000
+wheat,month,Jan,group,NIR,0.5081,B8A,0.4919,3000,3000
+wheat,month,Jan,group,SWIR,0.6365,B12,0.3635,3000,3000
+wheat,month,Jan,group,VV,0.5794,VV,0.4206,3000,3000
+wheat,month,Jan,group,VH,0.6491,VH,0.3509,3000,3000
+wheat,month,Feb,group,Visible,0.6738,B04,0.3262,3000,3000
+wheat,month,Feb,group,Red-edge,0.6248,B05,0.3752,3000,3000
+wheat,month,Feb,group,NIR,0.508,B8A,0.492,3000,3000
+wheat,month,Feb,group,SWIR,0.6369,B12,0.3631,3000,3000
+wheat,month,Feb,group,VV,0.5555,VV,0.4445,3000,3000
+wheat,month,Feb,group,VH,0.6482,VH,0.3518,3000,3000
+wheat,month,Mar,group,Visible,0.6797,B04,0.3203,3000,3000
+wheat,month,Mar,group,Red-edge,0.6275,B05,0.3725,3000,3000
+wheat,month,Mar,group,NIR,0.5114,B8A,0.4886,3000,3000
+wheat,month,Mar,group,SWIR,0.6421,B12,0.3579,3000,3000
+wheat,month,Mar,group,VV,0.5135,VV,0.4865,3000,3000
+wheat,month,Mar,group,VH,0.5809,VH,0.4191,3000,3000
+wheat,month,Apr,group,Visible,0.6811,B04,0.3189,3000,3000
+wheat,month,Apr,group,Red-edge,0.6399,B05,0.3601,3000,3000
+wheat,month,Apr,group,NIR,0.5219,B8A,0.4781,3000,3000
+wheat,month,Apr,group,SWIR,0.6469,B12,0.3531,3000,3000
+wheat,month,Apr,group,VV,0.5224,VV,0.4776,3000,3000
+wheat,month,Apr,group,VH,0.5604,VH,0.4396,3000,3000
+wheat,month,May,group,Visible,0.7067,B03,0.2933,3000,3000
+wheat,month,May,group,Red-edge,0.7208,B05,0.2792,3000,3000
+wheat,month,May,group,NIR,0.5386,B08,0.5386,3000,3000
+wheat,month,May,group,SWIR,0.6726,B11,0.3274,3000,3000
+wheat,month,May,group,VV,0.6556,VV,0.3444,3000,3000
+wheat,month,May,group,VH,0.5498,VH,0.5498,3000,3000
+wheat,month,Jun,group,Visible,0.8414,B03,0.1586,3000,3000
+wheat,month,Jun,group,Red-edge,0.8588,B05,0.1412,3000,3000
+wheat,month,Jun,group,NIR,0.672,B08,0.672,3000,3000
+wheat,month,Jun,group,SWIR,0.7454,B11,0.2546,3000,3000
+wheat,month,Jun,group,VV,0.8086,VV,0.1914,3000,3000
+wheat,month,Jun,group,VH,0.6225,VH,0.3775,3000,3000
+wheat,month,Jul,group,Visible,0.6184,B04,0.6184,3000,3000
+wheat,month,Jul,group,Red-edge,0.752,B06,0.248,3000,3000
+wheat,month,Jul,group,NIR,0.6844,B08,0.3156,3000,3000
+wheat,month,Jul,group,SWIR,0.5894,B11,0.4106,3000,3000
+wheat,month,Jul,group,VV,0.754,VV,0.246,3000,3000
+wheat,month,Jul,group,VH,0.779,VH,0.221,3000,3000
+wheat,month,Aug,group,Visible,0.7461,B04,0.7461,3000,3000
+wheat,month,Aug,group,Red-edge,0.7534,B07,0.2466,3000,3000
+wheat,month,Aug,group,NIR,0.7474,B08,0.2526,3000,3000
+wheat,month,Aug,group,SWIR,0.7352,B12,0.7352,3000,3000
+wheat,month,Aug,group,VV,0.5968,VV,0.4032,3000,3000
+wheat,month,Aug,group,VH,0.7162,VH,0.2838,3000,3000
+wheat,month,Sep,group,Visible,0.7089,B04,0.7089,3000,3000
+wheat,month,Sep,group,Red-edge,0.6922,B07,0.3078,3000,3000
+wheat,month,Sep,group,NIR,0.6973,B8A,0.3027,3000,3000
+wheat,month,Sep,group,SWIR,0.7378,B11,0.7378,3000,3000
+wheat,month,Sep,group,VV,0.5637,VV,0.4363,3000,3000
+wheat,month,Sep,group,VH,0.6999,VH,0.3001,3000,3000
+wheat,month,Oct,group,Visible,0.603,B04,0.603,3000,3000
+wheat,month,Oct,group,Red-edge,0.5901,B07,0.4099,3000,3000
+wheat,month,Oct,group,NIR,0.6002,B8A,0.3998,3000,3000
+wheat,month,Oct,group,SWIR,0.5945,B11,0.5945,3000,3000
+wheat,month,Oct,group,VV,0.5491,VV,0.5491,3000,3000
+wheat,month,Oct,group,VH,0.5199,VH,0.4801,3000,3000
+wheat,month,Nov,group,Visible,0.5776,B04,0.5776,3000,3000
+wheat,month,Nov,group,Red-edge,0.5743,B07,0.4257,3000,3000
+wheat,month,Nov,group,NIR,0.5831,B8A,0.4169,3000,3000
+wheat,month,Nov,group,SWIR,0.5485,B12,0.5485,3000,3000
+wheat,month,Nov,group,VV,0.5901,VV,0.5901,3000,3000
+wheat,month,Nov,group,VH,0.5606,VH,0.5606,3000,3000
+wheat,month,Dec,group,Visible,0.5773,B04,0.5773,3000,3000
+wheat,month,Dec,group,Red-edge,0.574,B07,0.426,3000,3000
+wheat,month,Dec,group,NIR,0.5829,B8A,0.4171,3000,3000
+wheat,month,Dec,group,SWIR,0.5485,B12,0.5485,3000,3000
+wheat,month,Dec,group,VV,0.5871,VV,0.5871,3000,3000
+wheat,month,Dec,group,VH,0.5411,VH,0.5411,3000,3000
+wheat,month,Jan,index,NDVI,0.6531,NDVI,0.6531,3000,3000
+wheat,month,Jan,index,NDMI,0.6109,NDMI,0.6109,3000,3000
+wheat,month,Jan,index,EVI,0.6158,EVI,0.6158,3000,3000
+wheat,month,Feb,index,NDVI,0.6531,NDVI,0.6531,3000,3000
+wheat,month,Feb,index,NDMI,0.6112,NDMI,0.6112,3000,3000
+wheat,month,Feb,index,EVI,0.6158,EVI,0.6158,3000,3000
+wheat,month,Mar,index,NDVI,0.6575,NDVI,0.6575,3000,3000
+wheat,month,Mar,index,NDMI,0.6135,NDMI,0.6135,3000,3000
+wheat,month,Mar,index,EVI,0.617,EVI,0.617,3000,3000
+wheat,month,Apr,index,NDVI,0.6416,NDVI,0.6416,3000,3000
+wheat,month,Apr,index,NDMI,0.6059,NDMI,0.6059,3000,3000
+wheat,month,Apr,index,EVI,0.6007,EVI,0.6007,3000,3000
+wheat,month,May,index,NDVI,0.6398,NDVI,0.6398,3000,3000
+wheat,month,May,index,NDMI,0.6228,NDMI,0.6228,3000,3000
+wheat,month,May,index,EVI,0.6047,EVI,0.6047,3000,3000
+wheat,month,Jun,index,NDVI,0.7795,NDVI,0.7795,3000,3000
+wheat,month,Jun,index,NDMI,0.7342,NDMI,0.7342,3000,3000
+wheat,month,Jun,index,EVI,0.7181,EVI,0.7181,3000,3000
+wheat,month,Jul,index,NDVI,0.6606,NDVI,0.3394,3000,3000
+wheat,month,Jul,index,NDMI,0.5394,NDMI,0.4606,3000,3000
+wheat,month,Jul,index,EVI,0.6896,EVI,0.3104,3000,3000
+wheat,month,Aug,index,NDVI,0.7921,NDVI,0.2079,3000,3000
+wheat,month,Aug,index,NDMI,0.7998,NDMI,0.2002,3000,3000
+wheat,month,Aug,index,EVI,0.7982,EVI,0.2018,3000,3000
+wheat,month,Sep,index,NDVI,0.7178,NDVI,0.2822,3000,3000
+wheat,month,Sep,index,NDMI,0.7549,NDMI,0.2451,3000,3000
+wheat,month,Sep,index,EVI,0.7146,EVI,0.2854,3000,3000
+wheat,month,Oct,index,NDVI,0.6134,NDVI,0.3866,3000,3000
+wheat,month,Oct,index,NDMI,0.6307,NDMI,0.3693,3000,3000
+wheat,month,Oct,index,EVI,0.6095,EVI,0.3905,3000,3000
+wheat,month,Nov,index,NDVI,0.6003,NDVI,0.3997,3000,3000
+wheat,month,Nov,index,NDMI,0.6042,NDMI,0.3958,3000,3000
+wheat,month,Nov,index,EVI,0.5938,EVI,0.4062,3000,3000
+wheat,month,Dec,index,NDVI,0.5999,NDVI,0.4001,3000,3000
+wheat,month,Dec,index,NDMI,0.6043,NDMI,0.3957,3000,3000
+wheat,month,Dec,index,EVI,0.5935,EVI,0.4065,3000,3000
+wheat,window,Jan-Mar,group,Visible,0.6773,B04,0.3227,3000,3000
+wheat,window,Jan-Mar,group,Red-edge,0.6269,B05,0.3731,3000,3000
+wheat,window,Jan-Mar,group,NIR,0.5093,B8A,0.4907,3000,3000
+wheat,window,Jan-Mar,group,SWIR,0.6394,B12,0.3606,3000,3000
+wheat,window,Jan-Mar,group,VV,0.5551,VV,0.4449,3000,3000
+wheat,window,Jan-Mar,group,VH,0.6492,VH,0.3508,3000,3000
+wheat,window,Feb-Apr,group,Visible,0.687,B04,0.313,3000,3000
+wheat,window,Feb-Apr,group,Red-edge,0.6359,B05,0.3641,3000,3000
+wheat,window,Feb-Apr,group,NIR,0.5127,B8A,0.4873,3000,3000
+wheat,window,Feb-Apr,group,SWIR,0.6525,B12,0.3475,3000,3000
+wheat,window,Feb-Apr,group,VV,0.5459,VV,0.4541,3000,3000
+wheat,window,Feb-Apr,group,VH,0.6223,VH,0.3777,3000,3000
+wheat,window,Mar-May,group,Visible,0.7095,B03,0.2905,3000,3000
+wheat,window,Mar-May,group,Red-edge,0.7051,B05,0.2949,3000,3000
+wheat,window,Mar-May,group,NIR,0.5156,B08,0.5156,3000,3000
+wheat,window,Mar-May,group,SWIR,0.686,B11,0.314,3000,3000
+wheat,window,Mar-May,group,VV,0.5986,VV,0.4014,3000,3000
+wheat,window,Mar-May,group,VH,0.537,VH,0.463,3000,3000
+wheat,window,Apr-Jun,group,Visible,0.8055,B03,0.1945,3000,3000
+wheat,window,Apr-Jun,group,Red-edge,0.8193,B05,0.1807,3000,3000
+wheat,window,Apr-Jun,group,NIR,0.5925,B08,0.5925,3000,3000
+wheat,window,Apr-Jun,group,SWIR,0.7387,B11,0.2613,3000,3000
+wheat,window,Apr-Jun,group,VV,0.7071,VV,0.2929,3000,3000
+wheat,window,Apr-Jun,group,VH,0.5653,VH,0.4347,3000,3000
+wheat,window,May-Jul,group,Visible,0.8122,B03,0.1878,3000,3000
+wheat,window,May-Jul,group,Red-edge,0.8189,B05,0.1811,3000,3000
+wheat,window,May-Jul,group,NIR,0.5462,B8A,0.5462,3000,3000
+wheat,window,May-Jul,group,SWIR,0.7377,B11,0.2623,3000,3000
+wheat,window,May-Jul,group,VV,0.7795,VV,0.2205,3000,3000
+wheat,window,May-Jul,group,VH,0.6901,VH,0.3099,3000,3000
+wheat,window,Jun-Aug,group,Visible,0.6863,B03,0.3137,3000,3000
+wheat,window,Jun-Aug,group,Red-edge,0.7492,B06,0.2508,3000,3000
+wheat,window,Jun-Aug,group,NIR,0.6122,B08,0.3878,3000,3000
+wheat,window,Jun-Aug,group,SWIR,0.6012,B11,0.3988,3000,3000
+wheat,window,Jun-Aug,group,VV,0.7674,VV,0.2326,3000,3000
+wheat,window,Jun-Aug,group,VH,0.792,VH,0.208,3000,3000
+wheat,window,Jul-Sep,group,Visible,0.7294,B04,0.7294,3000,3000
+wheat,window,Jul-Sep,group,Red-edge,0.7962,B06,0.2038,3000,3000
+wheat,window,Jul-Sep,group,NIR,0.7782,B08,0.2218,3000,3000
+wheat,window,Jul-Sep,group,SWIR,0.7063,B12,0.7063,3000,3000
+wheat,window,Jul-Sep,group,VV,0.677,VV,0.323,3000,3000
+wheat,window,Jul-Sep,group,VH,0.7808,VH,0.2192,3000,3000
+wheat,window,Aug-Oct,group,Visible,0.7219,B04,0.7219,3000,3000
+wheat,window,Aug-Oct,group,Red-edge,0.7275,B07,0.2725,3000,3000
+wheat,window,Aug-Oct,group,NIR,0.7255,B08,0.2745,3000,3000
+wheat,window,Aug-Oct,group,SWIR,0.7327,B11,0.7327,3000,3000
+wheat,window,Aug-Oct,group,VV,0.5469,VV,0.4531,3000,3000
+wheat,window,Aug-Oct,group,VH,0.6862,VH,0.3138,3000,3000
+wheat,window,Sep-Nov,group,Visible,0.6576,B04,0.6576,3000,3000
+wheat,window,Sep-Nov,group,Red-edge,0.6391,B07,0.3609,3000,3000
+wheat,window,Sep-Nov,group,NIR,0.6457,B8A,0.3543,3000,3000
+wheat,window,Sep-Nov,group,SWIR,0.6532,B12,0.6532,3000,3000
+wheat,window,Sep-Nov,group,VV,0.5316,VV,0.5316,3000,3000
+wheat,window,Sep-Nov,group,VH,0.5745,VH,0.4255,3000,3000
+wheat,window,Oct-Dec,group,Visible,0.5928,B04,0.5928,3000,3000
+wheat,window,Oct-Dec,group,Red-edge,0.5824,B07,0.4176,3000,3000
+wheat,window,Oct-Dec,group,NIR,0.5912,B8A,0.4088,3000,3000
+wheat,window,Oct-Dec,group,SWIR,0.5712,B12,0.5712,3000,3000
+wheat,window,Oct-Dec,group,VV,0.5798,VV,0.5798,3000,3000
+wheat,window,Oct-Dec,group,VH,0.5313,VH,0.5313,3000,3000
+wheat,window,Jan-Mar,index,NDVI,0.6547,NDVI,0.6547,3000,3000
+wheat,window,Jan-Mar,index,NDMI,0.6118,NDMI,0.6118,3000,3000
+wheat,window,Jan-Mar,index,EVI,0.6162,EVI,0.6162,3000,3000
+wheat,window,Feb-Apr,index,NDVI,0.6524,NDVI,0.6524,3000,3000
+wheat,window,Feb-Apr,index,NDMI,0.6111,NDMI,0.6111,3000,3000
+wheat,window,Feb-Apr,index,EVI,0.6111,EVI,0.6111,3000,3000
+wheat,window,Mar-May,index,NDVI,0.6527,NDVI,0.6527,3000,3000
+wheat,window,Mar-May,index,NDMI,0.6223,NDMI,0.6223,3000,3000
+wheat,window,Mar-May,index,EVI,0.6099,EVI,0.6099,3000,3000
+wheat,window,Apr-Jun,index,NDVI,0.6996,NDVI,0.6996,3000,3000
+wheat,window,Apr-Jun,index,NDMI,0.6836,NDMI,0.6836,3000,3000
+wheat,window,Apr-Jun,index,EVI,0.6658,EVI,0.6658,3000,3000
+wheat,window,May-Jul,index,NDVI,0.6577,NDVI,0.6577,3000,3000
+wheat,window,May-Jul,index,NDMI,0.6774,NDMI,0.6774,3000,3000
+wheat,window,May-Jul,index,EVI,0.6129,EVI,0.6129,3000,3000
+wheat,window,Jun-Aug,index,NDVI,0.6003,NDVI,0.3997,3000,3000
+wheat,window,Jun-Aug,index,NDMI,0.5257,NDMI,0.4743,3000,3000
+wheat,window,Jun-Aug,index,EVI,0.6191,EVI,0.3809,3000,3000
+wheat,window,Jul-Sep,index,NDVI,0.7711,NDVI,0.2289,3000,3000
+wheat,window,Jul-Sep,index,NDMI,0.7865,NDMI,0.2135,3000,3000
+wheat,window,Jul-Sep,index,EVI,0.7894,EVI,0.2106,3000,3000
+wheat,window,Aug-Oct,index,NDVI,0.7456,NDVI,0.2544,3000,3000
+wheat,window,Aug-Oct,index,NDMI,0.7768,NDMI,0.2232,3000,3000
+wheat,window,Aug-Oct,index,EVI,0.7551,EVI,0.2449,3000,3000
+wheat,window,Sep-Nov,index,NDVI,0.6704,NDVI,0.3296,3000,3000
+wheat,window,Sep-Nov,index,NDMI,0.696,NDMI,0.304,3000,3000
+wheat,window,Sep-Nov,index,EVI,0.6693,EVI,0.3307,3000,3000
+wheat,window,Oct-Dec,index,NDVI,0.6085,NDVI,0.3915,3000,3000
+wheat,window,Oct-Dec,index,NDMI,0.6174,NDMI,0.3826,3000,3000
+wheat,window,Oct-Dec,index,EVI,0.6022,EVI,0.3978,3000,3000

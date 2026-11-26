@@ -1,0 +1,14 @@
+# A focused second XAI run on the TESSERA two-head model (K = 100 %, Estonia 2021): blocks of three-month windows,
+# band groups and vegetation indices, compared block for block with an Estonian AUC map on the same blocks.
+# Not a K-shot spec: run_hub.sh runs the steps on the hub GPU.
+name: 2026-11-26_xai_tessera_blocks
+
+sample:
+  quota: 40          # correctly predicted test fields per species
+  per_chip: 3        # at most this many per species and chip
+
+methods:
+  shap_permutations: 16      # months game (8 antithetic pairs), summed to windows; band groups exact
+  ig_steps: 32               # from the mean field, the field's species only
+  net_batch: 8               # fields per forward pass
+  ig_batch: 2                # fields per IG pass (the backward; the hub GPU is shared)
