@@ -159,6 +159,9 @@ against 0.17 and 0.19; cells by occlusion 0.21 against 0.04). **Diffuse** fields
 their total effect, are gone at the window level (0 % under the mean; in the first run 13 to 27 % of the single-month main drivers
 rested on falls under 0.05); under drop 11 % remain, two thirds of grassland's fields among them.
 
+**Single fields.** [FIELD_CASES.md](FIELD_CASES.md): one confident field per species, its monthly input, each method's
+main window, property and cell with their AUC, and the species' main AUC cues (`field_cases.py`).
+
 ## Analysis
 
 **Coarser blocks removed the noise of the first run.** Every method now names a clear top window for every field,

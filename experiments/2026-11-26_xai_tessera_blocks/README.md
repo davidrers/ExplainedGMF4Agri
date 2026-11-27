@@ -53,3 +53,4 @@ agrees for maize and wheat; occlusion and SHAP agree with the map above the base
 17 and 19 %), IG's property split does not. **Cells**: specific for 8 of 11 species, exact for wheat. The **drop**
 test (which windows the model cannot do without) agrees with the AUC windows for 7 of 11 species, more than any
 method under the mean replacement.
+Field cases, with the AUC of each method's main blocks: [FIELD_CASES.md](FIELD_CASES.md).
