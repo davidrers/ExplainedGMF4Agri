@@ -254,8 +254,22 @@ def run(limit: int | None, pilot: bool) -> None:
         data = chain.read_chip(root / "chips", chip)
         want = set(sample.loc[sample.chip == chip, "field"])
         fields = [x for x in chain.chip_fields(data["mask"], data["parcels"]) if x["field"] in want]
-        rng = np.random.default_rng(int(chip.split("_")[1]) * 100000 + int(chip.split("_")[2]))
-        res = explain_chip(model, data, fields, mean, cfg["methods"], rng, check=pilot)
+        meth = dict(cfg["methods"])
+        for attempt in range(4):                       # the hub GPU is shared: on running out of memory, wait and
+            rng = np.random.default_rng(int(chip.split("_")[1]) * 100000 + int(chip.split("_")[2]))
+            try:                                       # retry with half the fields per pass (memory only)
+                res = explain_chip(model, data, fields, mean, meth, rng, check=pilot)
+                break
+            except torch.OutOfMemoryError:
+                torch.cuda.empty_cache()
+                meth["net_batch"] = max(1, int(meth["net_batch"]) // 2)
+                meth["ig_batch"] = max(1, int(meth.get("ig_batch", 8)) // 2)
+                print(f"{chip}: out of GPU memory, retry {attempt + 1} with net_batch {meth['net_batch']}, "
+                      f"ig_batch {meth['ig_batch']}", flush=True)
+                time.sleep(60)
+        else:
+            print(f"{chip}: skipped after 4 attempts", flush=True)
+            continue
         tmp = f.with_name(f"{chip}.part.npz")
         np.savez_compressed(tmp, **res)
         tmp.replace(f)

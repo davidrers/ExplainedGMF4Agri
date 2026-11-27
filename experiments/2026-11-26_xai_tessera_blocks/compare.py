@@ -51,6 +51,7 @@ CONSENSUS = {"window": ["Occlusion", "SHAP", "IG"], "property": ["Occlusion", "I
 COLOR = {"Consensus": "#3a3a37", "Occlusion": "#2a78d6", "SHAP": "#1baf7a", "SHAP (groups)": "#1baf7a", "IG": "#eda100",
          "Drop": "#eb6834"}
 INK, INK2 = "#1f1f1d", "#55554f"
+PLURAL = {"window": "windows", "property": "properties", "cell": "cells"}
 
 
 def style():
@@ -230,6 +231,21 @@ def main() -> None:
               "the top block is a main cue for half the fields or more; partly: one of the two",
               md(V[[c for c in V.columns if not c.startswith("_")]])))
 
+    # ---- the same verdict rule for every method
+    mv = []
+    for s in sp_list:
+        row = {"species": s}
+        for lv in METHODS:
+            for m in METHODS[lv]:
+                g = F[(F.species == s) & (F.level == lv) & (F.method == m)]
+                h = g.hit.mean()
+                _, lo, _ = boot(g.d_rho.to_numpy())
+                v = "agrees" if lo > 0 and h >= 0.5 else ("partly" if lo > 0 or h >= 0.5 else "no")
+                row[f"{lv}: {m}"] = f"{v} ({h:.0%})"
+        mv.append(row)
+    T.append(("The same verdict rule for each method (in brackets: share of fields whose top block is a main cue)",
+              md(pd.DataFrame(mv))))
+
     # ---- per method, pooled and per species
     def summ(g):
         return pd.Series({"fields": len(g), "hit": g.hit.mean(), "hit, other maps": g.hit_other.mean(),
@@ -283,7 +299,7 @@ def main() -> None:
         for yy, h in zip(y, g._h):
             ax.text(1.02, yy, f"{h:.0%}", transform=ax.get_yaxis_transform(), va="center", fontsize=8, color=INK2)
         ax.set_yticks(y, sp_list)
-        ax.set_title(f"{lv}s", loc="left")
+        ax.set_title(PLURAL[lv], loc="left")
         ax.set_xlabel("Spearman with own map minus other species' maps")
     fig.text(0.99, 0.98, "right margin: share of fields whose top block is a main cue", ha="right", fontsize=8, color=INK2)
     fig.suptitle("Does the model's block ranking follow its species' AUC map? (consensus of the methods, 95 % "
@@ -343,10 +359,10 @@ def main() -> None:
             axes[k // cols, k % cols].axis("off")
         h, l = axes[0, 0].get_legend_handles_labels()
         fig.legend(h, l, frameon=False, fontsize=8, loc="lower center", ncol=len(l), bbox_to_anchor=(0.5, -0.03))
-        fig.suptitle(f"{lv.capitalize()}s: the species' AUC (grey bars, 0.5 to its best) and each method's mean "
+        fig.suptitle(f"{PLURAL[lv].capitalize()}: the species' AUC (grey bars, 0.5 to its best) and each method's mean "
                      "evidence (scaled to its largest)", x=0.01, ha="left", y=1.0, fontsize=10)
         fig.tight_layout()
-        fig.savefig(FIG / f"{lv}s.png")
+        fig.savefig(FIG / f"{PLURAL[lv]}.png")
         plt.close(fig)
 
     (FIG / "tables.md").write_text("\n\n".join(f"### {t}\n\n{b}" for t, b in T) + "\n")

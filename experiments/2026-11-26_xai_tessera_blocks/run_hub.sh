@@ -10,7 +10,15 @@ EXP=experiments/2026-11-26_xai_tessera_blocks
 LOGS=results/2026-11-26_xai_tessera_blocks/EE_2021_rev/logs
 mkdir -p $LOGS
 echo "[hub $(date +%m-%d\ %H:%M:%S)] explain"
-poetry run python $EXP/blocks.py > $LOGS/explain.log 2>&1 || { echo "explain failed (log $LOGS/explain.log)"; exit 1; }
+N=$(python3 -c "import json; print(len(json.load(open('$EXP/sample/chips.json'))))")
+for attempt in 1 2 3 4 5; do                      # a chip already written is skipped, so a rerun resumes
+    poetry run python $EXP/blocks.py >> $LOGS/explain.log 2>&1
+    DONE=$(ls results/2026-11-26_xai_tessera_blocks/EE_2021_rev/explain/*.npz 2>/dev/null | grep -vc part)
+    echo "[hub $(date +%m-%d\ %H:%M:%S)] attempt $attempt: $DONE of $N chips"
+    [ "$DONE" -ge "$N" ] && break
+    sleep 120
+done
+[ "$DONE" -ge "$N" ] || { echo "explain incomplete after 5 attempts (log $LOGS/explain.log)"; exit 1; }
 echo "[hub $(date +%m-%d\ %H:%M:%S)] compare"
 CUDA_VISIBLE_DEVICES="" poetry run python $EXP/compare.py > $LOGS/compare.log 2>&1 || { echo "compare failed"; exit 1; }
 echo "[hub $(date +%m-%d\ %H:%M:%S)] all done"

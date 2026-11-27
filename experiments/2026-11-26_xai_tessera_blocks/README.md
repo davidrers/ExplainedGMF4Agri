@@ -43,4 +43,13 @@ K = 100 % (`best.pt`), with the step-0 statistics and mean field of the first ru
     bash experiments/2026-11-26_xai_tessera_blocks/run_hub.sh          # pilot, then every chip
     poetry run python experiments/2026-11-26_xai_tessera_blocks/compare.py
 
-**Results:** `results/2026-11-26_xai_tessera_blocks/EE_2021_rev/`. **Outcome.** Not run yet.
+**Results:** `results/2026-11-26_xai_tessera_blocks/EE_2021_rev/`.
+
+**Outcome (27 November 2026, [REPORT.md](REPORT.md)).** 438 correctly predicted fields; every check passes. The
+agreement with the AUC map on the same blocks is crop specific. **Windows**: agrees for potatoes, rapeseed and oats
+(top window a main AUC window for 97, 95 and 50 % of fields), not for barley, rye, forage legumes and grassland (the
+last two run against their maps: their cues are late summer and autumn, the model's May to July). **Properties**:
+agrees for maize and wheat; occlusion and SHAP agree with the map above the baseline (34 and 33 % of fields against
+17 and 19 %), IG's property split does not. **Cells**: specific for 8 of 11 species, exact for wheat. The **drop**
+test (which windows the model cannot do without) agrees with the AUC windows for 7 of 11 species, more than any
+method under the mean replacement.
