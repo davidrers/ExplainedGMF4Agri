@@ -4,20 +4,21 @@
 the crop in the data for some crops and not for others, and which ones depends on the level:
 
 - **When (10 windows).** The model's window ranking follows its species' own AUC map more than the other species'
-  maps for 6 of 11 species, and its top window is a main AUC window for most fields of **potatoes (97 %), rapeseed
-  (95 %), maize (70 %) and oats (50 %)**. It does not agree for **barley, rye, forage legumes and grassland**: for the
+  maps for 6 of 11 species, and its top window is a main AUC window for most fields of **potatoes (97 %; 30 % by
+  chance), rapeseed (95 %; 20 %) and maize (70 %; 10 %)**, and for half of the oats fields (50 %; 20 %). It does not agree for **barley, rye, forage legumes and grassland**: for the
   last two the ranking runs against their maps (Spearman with own map minus other maps −0.73 and −0.68), because their
   strongest window cues come in late summer and autumn (VV and NDVI) while the model looks at May to July.
-- **Which property (6 band groups, NDVI, NDMI).** Agreement for **maize (80 %) and wheat (52 %)**, specific but weak
-  for five more, none for **oats, barley, forage legumes and dry pulses**. Occlusion and SHAP give the clearer
-  answer (top block a main AUC property for 34 % and 33 % of fields, 17 % and 19 % against other maps); IG's property
-  split is at the baseline.
+- **Which property (6 band groups, NDVI, NDMI).** Agreement for **maize (80 %; 12 % by chance) and wheat (52 %;
+  25 %)**, specific but weak for five more, none for **oats, barley, forage legumes and dry pulses**. Occlusion gives
+  the clearer answer (top block a main AUC property for 34 % of fields, 17 % against other maps), and SHAP on the six
+  band groups agrees with it (33 % against 19 %); IG's property split is at the baseline.
 - **Window × property (80 cells).** Specific but rarely exact: the cell ranking follows the own map for 8 of 11
-  species, but the top cell is a main AUC cell for half the fields only for **wheat**, and for 31 to 40 % for
-  potatoes and maize.
-- **The event test agrees best.** Ranking the windows by how much the model *needs* them (drop: the window marked not
-  observed) agrees with the AUC windows for **7 of 11 species** (rye 82 %, buckwheat 72 %, maize 100 %), more than
-  any method under the mean replacement.
+  species, but the top cell is a main AUC cell for half the fields only for **wheat** (50 %; 5 % by chance), and for
+  31 to 40 % for potatoes and maize (chance 1 to 4 %).
+- **An exploratory finding, outside the pre-set verdict: the event test agrees best.** Ranking the windows by how
+  much the model *needs* them (drop: the window marked not observed) agrees with the AUC windows for **7 of 11
+  species** (rye 82 %, buckwheat 72 %, maize 100 %, against 10 to 20 % by chance), more than any method under the mean
+  replacement. It is the best of four methods on the windows, read after the results, so it is a lead, not a test.
 
 So the evidence is crop specific and partly agronomic: right season for the summer crops and rapeseed, right
 property for maize and wheat, and no agreement for grassland, forage legumes and barley, whose AUC cues are late
@@ -83,8 +84,11 @@ the other species' maps (dot, 95 % interval), and at the right the share of fiel
 | forage legumes | does not (0 %) | does not (12 %) | does not (0 %) |
 | grassland | does not (26 %) | partly (8 %) | does not (0 %) |
 
-Intervals are in `figures/tables.md`. **The same rule for each method** (share of fields whose top block is a main
-cue):
+The chance of a hit differs between species, because near ties enlarge the set of main cues: a random top window
+would hit 50 % of the time for grassland (5 main windows of 10) and 10 % for maize (1 of 10). Every "agrees" above is
+far above its chance level (in `figures/tables.md`, with the intervals). **The same rule for each method** (share of
+fields whose top block is a main cue; chance in brackets below the table; \* = the hit is no better than chance).
+SHAP ranks the six band groups only, with their main cues re-ranked among the six:
 
 | species | windows: occlusion / SHAP / IG / **drop** | properties: occlusion / SHAP (6 groups) / IG |
 |---|---|---|
@@ -97,8 +101,13 @@ cue):
 | barley | no / no / no / **agrees** (10, 2, 8, 68 %) | no / no / no (18, 2, 18 %) |
 | wheat | partly / partly / partly / partly (10, 10, 5, 30 %) | agrees / agrees / partly (55, 75, 50 %) |
 | dry pulses | partly / agrees / partly / partly (45, 55, 25, 12 %) | no / partly / no (42, 0, 5 %) |
-| grassland | no / no / no / partly (36, 28, 28, 51 %) | no / partly / partly (18, 0, 3 %) |
+| grassland | no / no / no / partly\* (36, 28, 28, 51 %) | no / partly / partly (18, 0, 3 %) |
 | forage legumes | no / no / no / no (0, 0, 0, 8 %) | partly / no / no (10, 18, 8 %) |
+
+Chance per species: windows 20 % (potatoes 30 %, maize 10 %, grassland 50 %); properties 25 % (rapeseed and maize
+12 %, barley 50 %); SHAP's six groups 17 to 50 %. Grassland's drop "partly" rests only on a hit at chance (51 %
+against 50 %); its ranking is not specific (interval of the Spearman difference −0.24 to +0.11), so it does not
+agree.
 
 ### Where the evidence sits
 
@@ -162,12 +171,13 @@ legumes, the pair the model confuses most, run against their maps: their stronge
 late summer and autumn (VV and NDVI, best cells Aug-Oct and Sep-Nov), while the model recognises them from May to July. Barley's map is flat
 (best cell 0.78) and the model's evidence matches none of it.
 
-**State and event answer differently, and the event agrees more.** Under the mean replacement a window matters when
+**State and event answer differently, and the event agrees more (exploratory).** Under the mean replacement a window matters when
 the field's state in it differs from the average crop's; under drop it matters when the model cannot fill it from the
 other months. The AUC of a window measures how well that window alone separates the crop. Drop agrees with it for 7
 of 11 species, including rye, buckwheat, barley and maize, where the mean replacement agrees only partly or not at
 all: the windows the data rates highly are the ones the model cannot fill from the other months, even where the
-field's state in another window carries more of its score.
+field's state in another window carries more of its score. This was not part of the pre-set verdict and holds for 7 of 11 species; for grassland,
+two thirds of the drop explanations are diffuse.
 
 **For properties, occlusion and SHAP are the methods to read; IG is not.** The two agree with each other and with
 the map above the baseline. IG's split between correlated groups (red-edge and NIR, an index and its brightness) is
@@ -179,7 +189,8 @@ potatoes agree on the property too.
 main property for buckwheat in both the data (its best cell, Jul-Sep NDMI 0.90) and the model (top property of 55 %
 of fields), and similarly for dry pulses. NDVI adds little beyond the band groups on either side.
 
-**Against the first run.** The pattern is the same: the model's evidence is optical, concentrated in May to July,
+**Against the first run.** There, "when" agreed against the random forest's window; against the AUC windows the
+verdict is harsher, as that run's own driver comparison already showed. The pattern is the same: the model's evidence is optical, concentrated in May to July,
 and agrees with the data's cue for wheat, rapeseed, maize and the summer crops, not for grassland, forage legumes and
 barley. What changed is that the comparison is now block for block with intervals, from the model's own input, and
 that the event test separates "the season the model needs" from "the season whose state it reads".

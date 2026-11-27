@@ -10,57 +10,57 @@
 
 ### Verdict per species (consensus of the methods; 95 % intervals over fields). agrees: the block ranking follows the species' own map more than the other species' maps (interval of the difference above 0) and the top block is a main cue for half the fields or more; partly: one of the two
 
-| species | level | fields | verdict | hit | hit, other maps | Spearman (median) | Spearman own - other |
-|---|---|---|---|---|---|---|---|
-| rye | window | 40 | does not agree | 0.25 [0.12, 0.38] | 0.30 | 0.05 | -0.04 [-0.16, +0.08] |
-| rye | property | 40 | partly | 0.17 [0.07, 0.30] | 0.22 | 0.39 | +0.34 [+0.27, +0.40] |
-| rye | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.04 | 0.21 | +0.15 [+0.11, +0.19] |
-| buckwheat | window | 40 | partly | 0.15 [0.05, 0.28] | 0.47 | 0.73 | +0.44 [+0.40, +0.48] |
-| buckwheat | property | 40 | partly | 0.25 [0.12, 0.40] | 0.18 | 0.33 | +0.38 [+0.30, +0.46] |
-| buckwheat | cell | 40 | partly | 0.05 [0.00, 0.12] | 0.03 | 0.18 | +0.17 [+0.14, +0.20] |
-| potatoes | window | 39 | agrees | 0.97 [0.92, 1.00] | 0.42 | 0.80 | +0.51 [+0.48, +0.54] |
-| potatoes | property | 39 | partly | 0.15 [0.05, 0.26] | 0.19 | 0.07 | +0.11 [+0.07, +0.16] |
-| potatoes | cell | 39 | partly | 0.31 [0.15, 0.46] | 0.06 | 0.23 | +0.13 [+0.10, +0.16] |
-| rapeseed | window | 40 | agrees | 0.95 [0.88, 1.00] | 0.48 | 0.71 | +0.46 [+0.40, +0.51] |
-| rapeseed | property | 40 | partly | 0.00 [0.00, 0.00] | 0.20 | 0.26 | +0.33 [+0.28, +0.37] |
-| rapeseed | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.03 | 0.45 | +0.41 [+0.34, +0.46] |
-| oats | window | 40 | agrees | 0.50 [0.35, 0.65] | 0.40 | 0.45 | +0.17 [+0.12, +0.23] |
-| oats | property | 40 | does not agree | 0.00 [0.00, 0.00] | 0.29 | -0.28 | -0.31 [-0.40, -0.23] |
-| oats | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.04 | 0.31 | +0.11 [+0.06, +0.15] |
-| maize | window | 40 | partly | 0.70 [0.55, 0.85] | 0.37 | 0.38 | +0.01 [-0.01, +0.04] |
-| maize | property | 40 | agrees | 0.80 [0.68, 0.93] | 0.11 | 0.68 | +0.72 [+0.67, +0.76] |
-| maize | cell | 40 | partly | 0.40 [0.25, 0.55] | 0.00 | 0.23 | +0.16 [+0.12, +0.19] |
-| barley | window | 40 | does not agree | 0.03 [0.00, 0.07] | 0.35 | 0.33 | +0.00 [-0.06, +0.06] |
-| barley | property | 40 | does not agree | 0.17 [0.07, 0.30] | 0.20 | 0.17 | +0.04 [-0.02, +0.10] |
-| barley | cell | 40 | does not agree | 0.00 [0.00, 0.00] | 0.05 | 0.07 | -0.03 [-0.07, +0.01] |
-| forage legumes | window | 40 | does not agree | 0.00 [0.00, 0.00] | 0.55 | -0.37 | -0.73 [-0.83, -0.63] |
-| forage legumes | property | 40 | does not agree | 0.12 [0.03, 0.23] | 0.21 | -0.07 | -0.05 [-0.15, +0.05] |
-| forage legumes | cell | 40 | does not agree | 0.00 [0.00, 0.00] | 0.08 | -0.01 | -0.07 [-0.14, -0.00] |
-| grassland | window | 39 | does not agree | 0.26 [0.13, 0.38] | 0.43 | -0.36 | -0.68 [-0.80, -0.54] |
-| grassland | property | 39 | partly | 0.08 [0.00, 0.18] | 0.05 | 0.05 | +0.11 [+0.02, +0.21] |
-| grassland | cell | 39 | does not agree | 0.00 [0.00, 0.00] | 0.02 | 0.04 | +0.03 [-0.01, +0.07] |
-| dry pulses | window | 40 | partly | 0.42 [0.28, 0.57] | 0.47 | 0.61 | +0.23 [+0.16, +0.30] |
-| dry pulses | property | 40 | does not agree | 0.05 [0.00, 0.12] | 0.27 | -0.04 | -0.06 [-0.15, +0.03] |
-| dry pulses | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.07 | 0.31 | +0.18 [+0.15, +0.20] |
-| wheat | window | 40 | partly | 0.10 [0.03, 0.20] | 0.45 | 0.63 | +0.28 [+0.20, +0.35] |
-| wheat | property | 40 | agrees | 0.53 [0.38, 0.68] | 0.09 | 0.10 | +0.12 [+0.03, +0.21] |
-| wheat | cell | 40 | agrees | 0.50 [0.35, 0.65] | 0.01 | 0.12 | +0.07 [+0.05, +0.10] |
+| species | level | fields | verdict | hit | chance | hit, other maps | Spearman (median) | Spearman own - other |
+|---|---|---|---|---|---|---|---|---|
+| rye | window | 40 | does not agree | 0.25 [0.12, 0.38] | 0.20 | 0.30 | 0.05 | -0.04 [-0.16, +0.08] |
+| rye | property | 40 | partly | 0.17 [0.07, 0.30] | 0.25 | 0.22 | 0.39 | +0.34 [+0.27, +0.40] |
+| rye | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.04 | 0.04 | 0.21 | +0.15 [+0.11, +0.19] |
+| buckwheat | window | 40 | partly | 0.15 [0.05, 0.28] | 0.20 | 0.47 | 0.73 | +0.44 [+0.40, +0.48] |
+| buckwheat | property | 40 | partly | 0.25 [0.12, 0.40] | 0.25 | 0.18 | 0.33 | +0.38 [+0.30, +0.46] |
+| buckwheat | cell | 40 | partly | 0.05 [0.00, 0.12] | 0.03 | 0.03 | 0.18 | +0.17 [+0.14, +0.20] |
+| potatoes | window | 39 | agrees | 0.97 [0.92, 1.00] | 0.30 | 0.42 | 0.80 | +0.51 [+0.48, +0.54] |
+| potatoes | property | 39 | partly | 0.15 [0.05, 0.26] | 0.25 | 0.19 | 0.07 | +0.11 [+0.07, +0.16] |
+| potatoes | cell | 39 | partly | 0.31 [0.15, 0.46] | 0.04 | 0.06 | 0.23 | +0.13 [+0.10, +0.16] |
+| rapeseed | window | 40 | agrees | 0.95 [0.88, 1.00] | 0.20 | 0.48 | 0.71 | +0.46 [+0.40, +0.51] |
+| rapeseed | property | 40 | partly | 0.00 [0.00, 0.00] | 0.12 | 0.20 | 0.26 | +0.33 [+0.28, +0.37] |
+| rapeseed | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.03 | 0.03 | 0.45 | +0.41 [+0.34, +0.46] |
+| oats | window | 40 | agrees | 0.50 [0.35, 0.65] | 0.20 | 0.40 | 0.45 | +0.17 [+0.12, +0.23] |
+| oats | property | 40 | does not agree | 0.00 [0.00, 0.00] | 0.25 | 0.29 | -0.28 | -0.31 [-0.40, -0.23] |
+| oats | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.04 | 0.04 | 0.31 | +0.11 [+0.06, +0.15] |
+| maize | window | 40 | partly | 0.70 [0.55, 0.85] | 0.10 | 0.37 | 0.38 | +0.01 [-0.01, +0.04] |
+| maize | property | 40 | agrees | 0.80 [0.68, 0.93] | 0.12 | 0.11 | 0.68 | +0.72 [+0.67, +0.76] |
+| maize | cell | 40 | partly | 0.40 [0.25, 0.55] | 0.01 | 0.00 | 0.23 | +0.16 [+0.12, +0.19] |
+| barley | window | 40 | does not agree | 0.03 [0.00, 0.07] | 0.20 | 0.35 | 0.33 | +0.00 [-0.06, +0.06] |
+| barley | property | 40 | does not agree | 0.17 [0.07, 0.30] | 0.50 | 0.20 | 0.17 | +0.04 [-0.02, +0.10] |
+| barley | cell | 40 | does not agree | 0.00 [0.00, 0.00] | 0.05 | 0.05 | 0.07 | -0.03 [-0.07, +0.01] |
+| forage legumes | window | 40 | does not agree | 0.00 [0.00, 0.00] | 0.20 | 0.55 | -0.37 | -0.73 [-0.83, -0.63] |
+| forage legumes | property | 40 | does not agree | 0.12 [0.03, 0.23] | 0.25 | 0.21 | -0.07 | -0.05 [-0.15, +0.05] |
+| forage legumes | cell | 40 | does not agree | 0.00 [0.00, 0.00] | 0.04 | 0.08 | -0.01 | -0.07 [-0.14, -0.00] |
+| grassland | window | 39 | does not agree | 0.26 [0.13, 0.38] | 0.50 | 0.43 | -0.36 | -0.68 [-0.80, -0.54] |
+| grassland | property | 39 | partly | 0.08 [0.00, 0.18] | 0.25 | 0.05 | 0.05 | +0.11 [+0.02, +0.21] |
+| grassland | cell | 39 | does not agree | 0.00 [0.00, 0.00] | 0.06 | 0.02 | 0.04 | +0.03 [-0.01, +0.07] |
+| dry pulses | window | 40 | partly | 0.42 [0.28, 0.57] | 0.20 | 0.47 | 0.61 | +0.23 [+0.16, +0.30] |
+| dry pulses | property | 40 | does not agree | 0.05 [0.00, 0.12] | 0.25 | 0.27 | -0.04 | -0.06 [-0.15, +0.03] |
+| dry pulses | cell | 40 | partly | 0.00 [0.00, 0.00] | 0.03 | 0.07 | 0.31 | +0.18 [+0.15, +0.20] |
+| wheat | window | 40 | partly | 0.10 [0.03, 0.20] | 0.20 | 0.45 | 0.63 | +0.28 [+0.20, +0.35] |
+| wheat | property | 40 | agrees | 0.53 [0.38, 0.68] | 0.25 | 0.09 | 0.10 | +0.12 [+0.03, +0.21] |
+| wheat | cell | 40 | agrees | 0.50 [0.35, 0.65] | 0.05 | 0.01 | 0.12 | +0.07 [+0.05, +0.10] |
 
-### The same verdict rule for each method (in brackets: share of fields whose top block is a main cue)
+### The same verdict rule for each method (in brackets: share of fields whose top block is a main cue; chance, the share of the blocks that are main cues; * = the hit is within 5 points of chance). SHAP (groups) ranks the 6 band groups only, with the main cues re-ranked among them
 
 | species | window: Occlusion | window: SHAP | window: IG | window: Drop | property: Occlusion | property: IG | property: SHAP (groups) | cell: Occlusion | cell: IG |
 |---|---|---|---|---|---|---|---|---|---|
-| rye | no (30%) | no (12%) | no (38%) | agrees (82%) | partly (5%) | partly (8%) | partly (35%) | partly (22%) | partly (0%) |
-| buckwheat | partly (30%) | partly (28%) | partly (18%) | agrees (72%) | agrees (55%) | partly (15%) | partly (0%) | partly (15%) | partly (0%) |
-| potatoes | agrees (95%) | agrees (92%) | agrees (92%) | agrees (56%) | agrees (77%) | partly (21%) | agrees (69%) | agrees (51%) | partly (8%) |
-| rapeseed | agrees (95%) | agrees (92%) | agrees (100%) | agrees (88%) | partly (0%) | partly (0%) | agrees (50%) | partly (0%) | partly (0%) |
-| oats | no (30%) | agrees (60%) | agrees (78%) | agrees (62%) | no (0%) | no (0%) | no (12%) | partly (0%) | partly (0%) |
-| maize | partly (70%) | partly (68%) | partly (52%) | agrees (100%) | agrees (90%) | agrees (50%) | agrees (100%) | agrees (88%) | partly (10%) |
-| barley | no (10%) | no (2%) | no (8%) | agrees (68%) | no (18%) | no (18%) | no (2%) | no (0%) | no (0%) |
-| forage legumes | no (0%) | no (0%) | no (0%) | no (8%) | partly (10%) | no (8%) | no (18%) | no (0%) | no (0%) |
-| grassland | no (36%) | no (28%) | no (28%) | partly (51%) | no (18%) | partly (3%) | partly (0%) | partly (0%) | no (0%) |
-| dry pulses | partly (45%) | agrees (55%) | partly (25%) | partly (12%) | no (42%) | no (5%) | partly (0%) | partly (0%) | partly (0%) |
-| wheat | partly (10%) | partly (10%) | partly (5%) | partly (30%) | agrees (55%) | partly (50%) | agrees (75%) | partly (18%) | partly (35%) |
+| rye | no (30%; 20%) | no (12%; 20%) | no (38%; 20%) | agrees (82%; 20%) | partly (5%; 25%) | partly (8%; 25%) | partly (35%; 33%) | partly (22%; 4%) | partly (0%; 4%) |
+| buckwheat | partly (30%; 20%) | partly (28%; 20%) | partly (18%; 20%) | agrees (72%; 20%) | agrees (55%; 25%) | partly (15%; 25%) | partly (0%; 17%) | partly (15%; 2%) | partly (0%; 2%) |
+| potatoes | agrees (95%; 30%) | agrees (92%; 30%) | agrees (92%; 30%) | agrees (56%; 30%) | agrees (77%; 25%) | partly (21%; 25%) | agrees (69%; 17%) | agrees (51%; 4%) | partly (8%; 4%) |
+| rapeseed | agrees (95%; 20%) | agrees (92%; 20%) | agrees (100%; 20%) | agrees (88%; 20%) | partly (0%; 12%) | partly (0%; 12%) | agrees (50%; 17%) | partly (0%; 2%) | partly (0%; 2%) |
+| oats | no (30%; 20%) | agrees (60%; 20%) | agrees (78%; 20%) | agrees (62%; 20%) | no (0%; 25%) | no (0%; 25%) | no (12%; 33%) | partly (0%; 4%) | partly (0%; 4%) |
+| maize | partly (70%; 10%) | partly (68%; 10%) | partly (52%; 10%) | agrees (100%; 10%) | agrees (90%; 12%) | agrees (50%; 12%) | agrees (100%; 17%) | agrees (88%; 1%) | partly (10%; 1%) |
+| barley | no (10%; 20%) | no (2%; 20%) | no (8%; 20%) | agrees (68%; 20%) | no (18%; 50%) | no (18%; 50%) | no (2%; 33%) | no (0%; 5%) | no (0%; 5%) |
+| forage legumes | no (0%; 20%) | no (0%; 20%) | no (0%; 20%) | no (8%; 20%) | partly (10%; 25%) | no (8%; 25%) | no (18%; 50%) | no (0%; 4%) | no (0%; 4%) |
+| grassland | no (36%; 50%) | no (28%; 50%) | no (28%; 50%) | partly* (51%; 50%) | no (18%; 25%) | partly (3%; 25%) | partly (0%; 17%) | partly (0%; 6%) | no (0%; 6%) |
+| dry pulses | partly (45%; 20%) | agrees (55%; 20%) | partly (25%; 20%) | partly (12%; 20%) | no (42%; 25%) | no (5%; 25%) | partly (0%; 17%) | partly (0%; 2%) | partly (0%; 2%) |
+| wheat | partly (10%; 20%) | partly (10%; 20%) | partly (5%; 20%) | partly (30%; 20%) | agrees (55%; 25%) | partly (50%; 25%) | agrees (75%; 33%) | partly (18%; 5%) | partly (35%; 5%) |
 
 ### Every method, pooled over species (hit: share of fields whose top block is a main cue; diffuse: top block under 10 % of the field's total effect)
 

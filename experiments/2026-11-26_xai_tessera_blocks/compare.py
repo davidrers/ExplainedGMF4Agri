@@ -164,6 +164,12 @@ def consensus(X: dict, lv: str) -> np.ndarray:
     return np.mean(rk, 0)
 
 
+def chance(r: np.ndarray, x: np.ndarray | None = None) -> float:
+    """The hit rate of a random top block: the share of the (available) blocks that are main cues."""
+    ok = np.isfinite(r) if x is None else np.isfinite(x) & np.isfinite(r)
+    return float((r[ok] >= np.nanmax(r[ok]) - TIE).mean())
+
+
 def agree(x: np.ndarray, r: np.ndarray) -> tuple[float, float, float]:
     """hit, Spearman, AUC gap of one field's block values ``x`` against an AUC vector ``r``."""
     ok = np.isfinite(x)
@@ -221,8 +227,11 @@ def main() -> None:
             r_, _, _ = boot(g.rho.to_numpy(), np.median)
             specific = drl > 0
             verdict = "agrees" if specific and h >= 0.5 else ("partly" if specific or h >= 0.5 else "does not agree")
+            ch = chance(maps[s][lv])
+            if h >= 0.5 and h < ch + 0.05:                 # the hit is no better than chance
+                verdict += " (hit at chance)"
             vrows.append({"species": s, "level": lv, "fields": len(g), "verdict": verdict,
-                          "hit": f"{h:.2f} [{hl:.2f}, {hh:.2f}]", "hit, other maps": g.hit_other.mean(),
+                          "hit": f"{h:.2f} [{hl:.2f}, {hh:.2f}]", "chance": ch, "hit, other maps": g.hit_other.mean(),
                           "Spearman (median)": r_, "Spearman own - other": f"{dr:+.2f} [{drl:+.2f}, {drh:+.2f}]",
                           "_h": h, "_dr": dr, "_drl": drl, "_drh": drh})
     V = pd.DataFrame(vrows)
@@ -241,9 +250,12 @@ def main() -> None:
                 h = g.hit.mean()
                 _, lo, _ = boot(g.d_rho.to_numpy())
                 v = "agrees" if lo > 0 and h >= 0.5 else ("partly" if lo > 0 or h >= 0.5 else "no")
-                row[f"{lv}: {m}"] = f"{v} ({h:.0%})"
+                ch = chance(maps[s][lv], X[lv][m][0])
+                row[f"{lv}: {m}"] = f"{v}{'*' if h >= 0.5 and h < ch + 0.05 else ''} ({h:.0%}; {ch:.0%})"
         mv.append(row)
-    T.append(("The same verdict rule for each method (in brackets: share of fields whose top block is a main cue)",
+    T.append(("The same verdict rule for each method (in brackets: share of fields whose top block is a main cue; "
+              "chance, the share of the blocks that are main cues; * = the hit is within 5 points of chance). SHAP (groups) "
+              "ranks the 6 band groups only, with the main cues re-ranked among them",
               md(pd.DataFrame(mv))))
 
     # ---- per method, pooled and per species
