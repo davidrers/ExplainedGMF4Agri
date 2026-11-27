@@ -52,7 +52,8 @@ arms are in `data/embeddings/<backbone>/EU18_2021_delin/`, and TESSERA's raster 
 **Outcome** (27 November 2026; [REPORT.md](REPORT.md)). On the 1,513 chips, TESSERA v2 with PRUE's U-Net, trained
 on Estonia only, draws borders best on all parcels (border F1 0.733 [0.686, 0.775]; baseline 0.691, best open
 model FTW v2 one-window 0.678); with grassland set aside FTW PRUE B7 leads (0.805 against 0.786). Within Estonia's
-agro-climate group our arms transfer (TESSERA 0.788, best open model 0.624); in the Mediterranean they fail
+agro-climate group our arms transfer (TESSERA 0.788, best open model 0.624), and as well in the oceanic group
+(0.79); in the Mediterranean they fail
 (baseline 0.16, GFM arms 0.40 to 0.48, FTW B7 0.64, trained there), leaving grassland, fallow, orchards, olives and
 vineyards undrawn, the frozen encoders holding far better than the baseline. The best of our arms beats the best
 open model in 14 of 18 countries. THOR collapses (0.365) although its inference path reproduces its Estonian

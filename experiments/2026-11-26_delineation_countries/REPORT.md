@@ -13,9 +13,10 @@ open models with the settings chosen on Estonia. Nothing is trained or tuned on 
   pixel 0.733 [0.686, 0.775], against 0.691 for our baseline, PRUE from ImageNet (paired difference +0.042
   [+0.016, +0.069]), and 0.678 for the best open model, FTW v2 with six monthly predictions averaged. Equal weights
   per country give the same order.
-- **Within Estonia's agro-climate group (eight countries), the reading for RQ1.2, our arms transfer:** TESSERA
-  0.788, the baseline 0.737, the best open model 0.624. In the temperate oceanic group the baseline and TESSERA hold
-  at 0.79, ahead of FTW v2 (0.754).
+- **Across both temperate groups our arms transfer:** in Estonia's agro-climate group (eight countries) TESSERA
+  0.788, the baseline 0.737, the best open model 0.624; in the temperate oceanic group, outside Estonia's zone, the
+  baseline and TESSERA hold just as well, at 0.79, ahead of FTW v2 (0.754). The break comes only in the
+  Mediterranean.
 - **In the Mediterranean (Spain, Italy, Portugal) our arms fail:** baseline 0.16, the GFM arms 0.40 to 0.48, against
   0.64 for FTW PRUE B7, which was trained in Spain and Portugal. Three quarters of the declared land there is grassland,
   fallow, orchards, olive groves and vineyards, which the Estonian decoders leave outside every field. The frozen
@@ -25,8 +26,8 @@ open models with the settings chosen on Estonia. Nothing is trained or tuned on 
 - **Per country, the best of our arms beats the best open model in 14 of 18 countries** (11 of 18 with grassland
   aside); it loses in Spain, Italy, Portugal and, on all parcels, Ireland. In the four countries FTW has never seen
   (Bulgaria, Czechia, Ireland, Italy) FTW keeps its standing, so its advantage elsewhere is not only familiarity.
-- **Our arms lose 0.11 to 0.17 border F1 when they leave Estonia, the open models little or nothing**: the lead of 0.22 over FTW
-  on Estonia shrinks to 0.06 here.
+- **THOR aside, our arms lose 0.11 to 0.17 border F1 when they leave Estonia, the open models little or
+  nothing**: the lead of 0.22 over FTW on Estonia shrinks to 0.06 here.
 - **THOR collapses (0.365)**; its inference path reproduces its Estonian predictions, as every arm's does, so
   the drop is its own.
 - PQ is low for every model (0.05 to 0.20) because the sample holds many parcels too small for 10 m pixels; the
@@ -164,7 +165,8 @@ all parcels, the baseline 0.737, and the best open model 0.624 (Delineate Anythi
 (0.817) and FTW B7 (0.796) are level within their intervals. The GFM arms lose less in the move than the baseline: from
 Estonia to its group, TESSERA loses 0.068, Prithvi 0.086, TerraMind 0.087 and the baseline 0.120.
 
-**In the oceanic group** the baseline and TESSERA hold at 0.79, ahead of FTW v2 one-window (0.754); with grassland
+**In the oceanic group**, outside Estonia's zone, the baseline and TESSERA hold at 0.79, as high as in Estonia's
+group and ahead of FTW v2 one-window (0.754); with grassland
 aside TESSERA leads (0.888), FTW B7 next (0.863).
 
 **In the Mediterranean our arms fail.** The baseline falls to 0.161 (Portugal 0.02, Spain 0.09), and the three GFM
@@ -212,8 +214,8 @@ keep most of them. In the other 15 countries the same arms leave only 11 to
 21 % of the declared pixels outside every field, most of it grassland.
 
 The inputs were checked before this reading was accepted: the band layout and value ranges of the Mediterranean
-chips match Estonia's, and the composites show fields where the declarations put them. The failure is a transfer
-failure of the decoders, not a fault in the data.
+chips match Estonia's, and FTW reads the same composites and scores 0.64 on them. The failure is a transfer failure
+of our decoders, not a fault in the data.
 
 ![Four example chips: France, Spain, Ireland, Finland](figures/examples.png)
 
@@ -243,7 +245,7 @@ parcels of the same crop are found least (0.13 to 0.44), borders against non-far
 | U-TAE + PaPs | 0.522 | 0.591 | +0.069 | 0.535 | 0.661 | +0.126 |
 
 Estonia's score is on its test chips that no FTW chip touches. Our arms, trained there, lose 0.11 to 0.17 when they
-leave; in Estonia's group and the oceanic group the loss is 0.07 to 0.12 (section 3.2). The open models hold or gain: Estonia is
+leave (THOR 0.29); in Estonia's group and the oceanic group the loss is 0.07 to 0.12 (section 3.2). The open models hold or gain: Estonia is
 not their home ground, and FTW has most of these countries in its training set. **The lead our arms had on Estonia
 (0.857 against FTW's 0.637) shrinks to 0.733 against 0.678 on the sample**, and turns into a deficit in the
 Mediterranean.
@@ -281,9 +283,9 @@ difference is at most 0.07, so every arm's numbers on the sample come from its E
 
 The drop is therefore THOR's own. It draws few fields outside Estonia: 34,059 against 252,009 declared, 14 %, where
 on Estonia it drew 52 % (20,722 of 39,978) and the baseline draws 31 % of the sample's. Its border precision holds
-better (0.85 on Estonia, 0.71 here) than its recall (0.53, then 0.25). THOR was already the weakest arm on Estonia,
-the one whose decoder leant most on Estonia's appearance; its averaged band groups (pipeline.md section 10) are one
-candidate, untested here.
+better (0.85 on Estonia, 0.71 here) than its recall (0.53, then 0.25). THOR was already the weakest arm on Estonia.
+Why it transfers so much worse than TerraMind, its closest counterpart, was not tested; its averaged band groups
+(pipeline.md section 10) are one candidate.
 
 ### 3.8 Dates
 
@@ -310,16 +312,21 @@ that gain does not carry over everywhere.
 
 ## 4. Analysis
 
-**The answer to the question.** On a sample spread over 18 countries, none of which any model was tuned on, the
+**The answer to the question.** On a sample spread over 18 countries that no model was tuned on, the
 two-head workflow with TESSERA v2, trained on Estonia alone, delineates fields better than the open models on all
-parcels, overall and in 14 of the 18 countries. The open models win where they were trained (FTW in Spain and
-Portugal) and on FTW's own definition of a field (grassland aside), where FTW PRUE B7 and TESSERA are level.
+parcels, overall and in 14 of the 18 countries. The open models win in Spain and Portugal, where FTW was trained, but
+also in two countries FTW never saw: Italy (FTW PRUE B7) and, on all parcels, Ireland (FTW v2 one-window). On FTW's
+own definition of a field (grassland aside) FTW PRUE B7 and TESSERA are level.
 
-**Transfer within the zone holds; transfer out of it does not.** In Estonia's agro-climate group our four transferable arms keep
-0.70 to 0.79 border F1, 0.07 to 0.12 below Estonia, and lead every open model. In the oceanic group they hold almost
-as well. In the Mediterranean they draw a fraction of the declared land, because most of it is land use the
-Estonian decoders never saw. This is the pattern the rule of transferring only within one GAEZ zone (decided on
-2 October 2026) assumes, and it is now measured for the two-head workflow.
+**Transfer holds across the temperate groups and breaks in the Mediterranean.** In Estonia's agro-climate group
+our four transferable arms keep 0.70 to 0.79 border F1, 0.07 to 0.12 below Estonia, and lead every open model. In
+the oceanic group, a different GAEZ group, they do as well: TESSERA 0.789 against 0.788 in Estonia's group, the
+baseline 0.790 against 0.737. In the Mediterranean they draw a fraction of the declared land, because most of it is
+land use the Estonian decoders never saw. So the line that matters on this sample is not the one between Estonia's
+group and its neighbours, but the one between temperate and Mediterranean agriculture. The rule of transferring
+only within one GAEZ zone (decided on 2 October 2026) is stricter than this sample requires: it would forbid the
+oceanic transfer, which works, and does forbid the Mediterranean one, which fails. Whether the zone boundary is
+the right unit is a question for the transfer design; six blocks per country do not settle it.
 
 **The frozen encoders transfer better than the network trained end to end.** In Estonia the baseline ties
 TESSERA (0.857 against 0.856); out of it, the baseline loses more than every GFM arm except THOR, a little in
@@ -331,8 +338,9 @@ appearance does not. This bears on RQ1.2 directly: against PRUE from ImageNet, t
 transfer, not on the training country.
 
 **FTW's standing depends on what a field is.** Counted on all declared parcels, FTW loses 0.08 to 0.18 to its own
-grassland-aside score, because its labels make grassland background. Where grassland is most of the land (Ireland,
-the Mediterranean, Estonia's group at 34 %), this decides the comparison. Both readings are reported, as on Estonia.
+grassland-aside score, because its labels make grassland background. Where grassland is a large share of the land
+(48 % of the declared area in the oceanic group, 45 % in the Mediterranean, 34 % in Estonia's group, and most of
+Ireland), this decides the comparison. Both readings are reported, as on Estonia.
 
 **PQ says little here beyond border F1.** Small declared pieces hold every model's PQ down, the order of the models
 is the same as by border F1, and the small-pieces-aside truth shows that the order does not come from them.
