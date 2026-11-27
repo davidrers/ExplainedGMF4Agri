@@ -1,0 +1,37 @@
+{
+ "thor_v1_large_s2s1": {
+  "chips": 9,
+  "mean_abs_diff_0_255": 0.0375500460600907,
+  "argmax_agreement": 0.9997785572562359,
+  "boundary_share_new": 0.05854503259637188,
+  "boundary_share_stored": 0.05852510274943311
+ },
+ "terramind_v1_large_s2s1": {
+  "chips": 9,
+  "mean_abs_diff_0_255": 0.033071735638699924,
+  "argmax_agreement": 0.999827274659864,
+  "boundary_share_new": 0.05274766156462585,
+  "boundary_share_stored": 0.05272994614512472
+ },
+ "prithvi_eo_v2_600_tl": {
+  "chips": 9,
+  "mean_abs_diff_0_255": 0.031005674839380198,
+  "argmax_agreement": 0.9997763428287982,
+  "boundary_share_new": 0.0537109375,
+  "boundary_share_stored": 0.053717580782312924
+ },
+ "unet_b7_s2s1": {
+  "chips": 9,
+  "mean_abs_diff_0_255": 0.07088972741874527,
+  "argmax_agreement": 0.9995704010770975,
+  "boundary_share_new": 0.04619074192176871,
+  "boundary_share_stored": 0.046241673752834465
+ },
+ "tessera_v2_medium": {
+  "chips": 9,
+  "mean_abs_diff_0_255": 0.045567749669312166,
+  "argmax_agreement": 0.9997099100056689,
+  "boundary_share_new": 0.043887737386621314,
+  "boundary_share_stored": 0.04390545280612245
+ }
+}
